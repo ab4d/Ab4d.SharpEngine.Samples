@@ -1,0 +1,3 @@
+[submodule "SharpEngine.Tests"]
+	path = SharpEngine.Tests
+	url = https://github.com/ab4d/SharpEngine.Tests.git

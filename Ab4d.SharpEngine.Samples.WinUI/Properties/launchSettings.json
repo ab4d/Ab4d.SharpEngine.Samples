@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Ab4d.SharpEngine.Samples.WinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Ab4d.SharpEngine.Samples.WinUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

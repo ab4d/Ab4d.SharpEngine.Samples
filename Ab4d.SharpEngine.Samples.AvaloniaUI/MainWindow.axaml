@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaUi="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
+        mc:Ignorable="d"
+        x:Class="AvaloniaTest.MainWindow"
+        Width="900" Height="500"
+        Icon="sharp-engine_logo.ico"
+        Title="SharpEngine with AvaloniaUI">
+    <Grid>
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0 0" EndPoint="0% 100%" SpreadMethod="Repeat" >
+                    <GradientStop Offset="0" Color="White" />
+                    <GradientStop Offset="1" Color="LightSkyBlue" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <avaloniaUi:SharpEngineSceneView Name="SharpEngineSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
+
+        <TextBlock Text="Ab4d.SharpEngine in Avalonia App" Foreground="#444" FontSize="20" FontWeight="Bold" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+        <Border BorderBrush="Black" BorderThickness="1" Background="#88FFFFFF" Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="Used PresentationType:" />
+                <TextBlock Name="PresentationTypeTextBlock" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                <TextBlock Text="Used graphics card:" />
+                <TextBlock Name="GraphicsCardTextBlock" FontWeight="Bold" Margin="0 0 0 10"/>
+
+
+              <CheckBox Name="UseTransparentBackgroundCheckBox" Content="Use transparent BG" IsChecked="True" Margin="0 3"
+                          Checked="OnUseTransparentBackgroundCheckBoxCheckedChanged" Unchecked="OnUseTransparentBackgroundCheckBoxCheckedChanged"/>
+
+                <CheckBox Name="ShowAxisCheckBox" Content="ShowAxis" IsChecked="True" Margin="0 3 0 10"
+                          Checked="OnShowAxisCheckBoxCheckedChanged" Unchecked="OnShowAxisCheckBoxCheckedChanged"/>
+                
+                <Button Name="AddSphereButton" Content="Add sphere" Margin="0 3" Padding="8 3" Click="AddSphereButton_OnClick" />
+                <Button Name="StartStopCameraRotateButton" Content="Start camera rotate" Margin="0 3" Padding="8 3" Click="StartStopCameraRotateButton_OnClick" />
+                <Button Name="RenderToBitmapButtonButton" Content="Render to bitmap" Margin="0 3" Padding="8 3" Click="RenderToBitmapButton_OnClick" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Name="ErrorTextBlock" Foreground="Red" Background="White" VerticalAlignment="Bottom" HorizontalAlignment="Left" TextWrapping="Wrap" />
+    </Grid>
+</Window>

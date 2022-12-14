@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Samples>
+
+  <Sample Page="IntroductionPage.xaml" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
+  <Sample IsSeparator="True" />
+
+
+  <Sample Page="QuickStart/QuickStartIntroductionPage.xaml" IsTitle="True" Title="Quick Start" />
+  <Sample Page="QuickStart/SharpEngineSceneViewInCode.xaml" Title="SharpEngineSceneView in code" Description="" />
+  <Sample Page="QuickStart/SharpEngineSceneViewInXaml.xaml" Title="SharpEngineSceneView in XAML" Description="" />
+
+
+  <Sample Page="TestScenes/TestScenesIntroductionPage.xaml" IsTitle="True" Title="Test Scenes"/>
+  <Sample Page="TestScenes/AllObjectsTestScene.xaml" Title="AllObjectsTestScene" Description="" />
+
+  <Sample IsSeparator="True" />
+  <Sample Page="TestScenes/LightsTestScene.xaml" Title="Lights test" Description="" />
+  <Sample Page="TestScenes/HitTestingTestScene.xaml" Title="Hit-testing" Description="" />
+  
+  <Sample IsSeparator="True" />
+  <Sample Page="TestScenes/AssimpImporterTestScene.xaml" Title="Assimp Importer" Description="" />
+
+  <Sample IsSeparator="True" />
+  <Sample Page="TestScenes/ExtrudedMeshTestScene.xaml" Title="Extruded mesh test" Description="" />
+  <Sample Page="TestScenes/LatheTestScene.xaml" Title="Lathe test" Description="" />
+  <Sample Page="TestScenes/TubesTestScene.xaml" Title="Tubes test" Description="" />
+  <Sample Page="TestScenes/TubePathsTestScene.xaml" Title="TubePaths test" Description="" />
+  
+  <Sample IsSeparator="True" />
+  <Sample Page="TestScenes/HeightMapTestScene.xaml" Title="HeightMap test" Description="" />
+
+  <Sample IsSeparator="True" />
+  <Sample Page="TestScenes/LinesTestScene.xaml" Title="Lines test" Description="" />
+  <Sample Page="TestScenes/CurveLineTestScene.xaml" Title="Curve Line" Description="" />
+  <Sample Page="TestScenes/WireGridTestScene.xaml" Title="WireGrid test" Description="" />
+
+</Samples>

@@ -1,0 +1,27 @@
+﻿<Page x:Class="Ab4d.SharpEngine.Samples.Wpf.TestScenes.CurveLineTestScene"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:common="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Common"
+        xmlns:wpf="clr-namespace:Ab4d.SharpEngine.Wpf;assembly=Ab4d.SharpEngine.Wpf"
+        mc:Ignorable="d"
+        Title="CurveLineTestScene"
+        d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Name="RootGrid">
+        <wpf:SharpEngineSceneView x:Name="MainSceneView" BackgroundColor="White" />
+
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#AAFFFFFF" Margin="5">
+            <StackPanel Orientation="Vertical" Margin="10 5 10 8">
+                <TextBlock Name="CurveTypeTextBlock" Text="Curve type:" />
+
+                <Button Name="GenerateNewCurveButton" Content="Generate new curve" Margin="0 10 0 0" Click="GenerateNewCurveButton_OnClick" />
+                <Button Name="ChangeCurveTypeButton" Content="Change curve type" Margin="0 5 0 0" Click="ChangeCurveTypeButton_OnClick" />
+                <Button Name="GenerateNewWeightsButton" Content="Generate new weights" Margin="0 5 0 0" Click="GenerateNewWeightsButton_OnClick" />
+                <Button Name="ResetWeightsButton" Content="Reset weights" Margin="0 5 0 0" Click="ResetWeightsButton_OnClick" />
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Curve lines test" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" />
+    </Grid>
+</Page>
