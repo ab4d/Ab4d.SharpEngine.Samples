@@ -9,7 +9,7 @@
         Title="AssimpImporterTestScene"
         d:DesignHeight="700" d:DesignWidth="1000">
     <Grid Name="RootGrid">
-        <wpf:SharpEngineSceneView x:Name="MainSceneView" BackgroundColor="White" />
+        <wpf:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="White" />
 
         <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Stretch">
             <TextBlock FontWeight="Bold" FontSize="20" Foreground="#333" Margin="10 0" VerticalAlignment="Top" HorizontalAlignment="Left" 

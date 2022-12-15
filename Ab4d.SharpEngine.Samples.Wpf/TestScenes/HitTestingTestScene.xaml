@@ -14,7 +14,7 @@
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
 
-        <wpf:SharpEngineSceneView x:Name="MainSceneView" Grid.Row="0" BackgroundColor="White" />
+        <wpf:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" Grid.Row="0" BackgroundColor="White" />
 
         <TextBlock Grid.Row="0" Text="Hit-testing" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" />
 

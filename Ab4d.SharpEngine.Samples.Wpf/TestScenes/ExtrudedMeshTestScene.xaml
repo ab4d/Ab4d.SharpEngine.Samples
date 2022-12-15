@@ -9,7 +9,7 @@
         Title="ExtrudedMeshTestScene"
         d:DesignHeight="700" d:DesignWidth="1000">
     <Grid Name="RootGrid">
-        <wpf:SharpEngineSceneView x:Name="MainSceneView" BackgroundColor="White" />
+        <wpf:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="White" />
 
         <TextBlock Text="Extruded mesh test" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left" />
     </Grid>
