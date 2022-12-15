@@ -170,9 +170,9 @@ Known issues:
 
 - Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
 
-- When using SharedTexture in WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error.
+- When using SharedTexture in a WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error. Set SharpEngineSceneView.PresentationType to WriteableBitmap as a workaround.
 
-- ReaderObj cannot read obj files from a stream (this makes it impossible to read obj files Android)
+- ReaderObj cannot read obj files from a stream (this makes it impossible to read obj files on Android)
 
 
 To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/
