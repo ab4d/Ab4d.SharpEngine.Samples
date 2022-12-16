@@ -73,8 +73,8 @@ The beta version of Ab4d.SharpEngine will expire 6 months after publishing.
 
 The following Visual Studio solutions are available:
 
-- **Ab4d.SharpEngine.Samples.Wpf**
-  This is the MAJOR SAMPLES SOLUTION because it demonstrates the most of the engine features.
+- **Ab4d.SharpEngine.Samples.Wpf MAIN SAMPLES**
+  This is the MAIN SAMPLES SOLUTION because it demonstrates the most of the engine features.
   This solution provides the samples for WPF and can run only on Windows.
   The samples also use Ab4d.SharpEngine.Wpf library that provides SharpEngineSceneView control for WPF.
   The SharpEngineSceneView provides a WPF control that is very easy to be used and can 
