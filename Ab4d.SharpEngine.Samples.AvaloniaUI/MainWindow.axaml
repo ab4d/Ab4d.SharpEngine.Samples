@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         x:Class="AvaloniaTest.MainWindow"
         Width="900" Height="500"
-        Icon="sharp-engine_logo.ico"
+        Icon="sharp-engine-logo.ico"
         Title="SharpEngine with AvaloniaUI">
     <Grid>
         <Border>
