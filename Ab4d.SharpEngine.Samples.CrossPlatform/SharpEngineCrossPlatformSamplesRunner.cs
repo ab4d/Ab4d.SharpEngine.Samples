@@ -128,12 +128,16 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
 #if WINDOWS
             _bitmapIO = new SystemDrawingBitmapIO();
 #elif LINUX || OSX
-            _bitmapIO = new SkiaSharpBitmapIO();
-            //_bitmapIO = new ImageMagickBitmapIO();
+    #if IMAGE_MAGIC
+            _bitmapIO = new ImageMagickBitmapIO();            
+    #else
+            _bitmapIO = new SkiaSharpBitmapIO();            
+    #endif
+
 #else
             _bitmapIO = new UnsupportedBitmapIO();
 #endif
-            
+
 #if OSX
             // On MacOS Vulkan can be used by MoltenVK library - see: https://github.com/KhronosGroup/MoltenVK
             // This requires that instead of the standard vulkan loader library (libvulkan.1.dylib), the 
@@ -166,7 +170,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                     }
                 }
             }
-#endif            
+#endif
 
             SetupPresentationControl();
         }
@@ -307,7 +311,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-        #region InitializeEngine
+#region InitializeEngine
 
         private bool InitializeEngine()
         {
@@ -495,9 +499,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;    // write log messages to output window
             }
         }
-        #endregion
+#endregion
 
-        #region InitializeSceneView, UpdateLightModels
+#region InitializeSceneView, UpdateLightModels
 
         private void InitializeSceneView()
         {
@@ -641,9 +645,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-        #endregion
+#endregion
 
-        #region Run, RenderCallback, UpdateFrameStatistics
+#region Run, RenderCallback, UpdateFrameStatistics
         public void Run()
         {
             // Start the render loop
@@ -661,9 +665,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 _sceneView.Render();
         }
 
-        #endregion
+#endregion
 
-        #region Mouse event handlers
+#region Mouse event handlers
 
         private void OnMouseMove(object sender, Ab4d.MouseMoveEventArgs e)
         {
@@ -710,9 +714,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-        #endregion
+#endregion
 
-        #region Dispose
+#region Dispose
         public unsafe void Dispose()
         {
             if (_allObjectsTestScene != null)
