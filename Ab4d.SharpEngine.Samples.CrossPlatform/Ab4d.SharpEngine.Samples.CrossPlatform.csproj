@@ -13,14 +13,19 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <DefineConstants>TRACE;DEBUG;WINDOWS;SYSTEM_DRAWING;SKIA;IMAGE_MAGIC</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS;SYSTEM_DRAWING;SKIA</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
     <TargetFramework>net6.0</TargetFramework>
-    <DefineConstants>TRACE;DEBUG;LINUX;SKIA;IMAGE_MAGIC</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LINUX;SKIA</DefineConstants>
   </PropertyGroup>
   
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <TargetFramework>net6.0</TargetFramework>
+    <DefineConstants>TRACE;DEBUG;OSX;SKIA</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Ab4d.SharpEngine" Version="0.9.0-beta1" />
   </ItemGroup>
@@ -62,8 +67,10 @@
 
   <ItemGroup>
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
-    <PackageReference Include="SkiaSharp" Version="2.80.3" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.80.3" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(DefineConstants.Contains('IMAGE_MAGIC'))">
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="11.1.0" />
   </ItemGroup>
 
@@ -73,6 +80,14 @@
     <ProjectReference Include="..\Ab4d.StandardPresentation\WinFormsUI\WinFormsUI.csproj" />
     <ProjectReference Include="..\Ab4d.StandardPresentation\WpfUI\WpfUI.csproj" />
   </ItemGroup>
+
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.3" />
+  </ItemGroup>  
 
   <ItemGroup>
     <Folder Include="Resources\BitmapFonts\" />
