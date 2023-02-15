@@ -13,6 +13,7 @@ using Ab4d.SharpEngine.Transformations;
 using Microsoft.UI;
 using System;
 using Windows.ApplicationModel;
+using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.WinUI;
 using Microsoft.UI.Windowing;
 using Colors = Microsoft.UI.Colors;
