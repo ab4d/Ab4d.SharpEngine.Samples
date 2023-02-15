@@ -291,7 +291,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
             WindowId windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
             var appWindow = AppWindow.GetFromWindowId(windowId);
-            appWindow.SetIcon(System.IO.Path.Combine(Package.Current.InstalledLocation.Path, "sharp-engine_logo.ico"));
+            appWindow.SetIcon(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sharp-engine_logo.ico"));
         }
     }
 }
