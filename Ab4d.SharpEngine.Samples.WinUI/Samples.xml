@@ -59,4 +59,12 @@
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
 
+  <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
+  <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
+  <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
+  <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
+  <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="MaterialAnimation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="CameraAnimation"/>
+
 </Samples>

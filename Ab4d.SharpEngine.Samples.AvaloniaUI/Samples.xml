@@ -68,7 +68,7 @@
   <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
-  <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
-  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="MaterialAnimation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="CameraAnimation"/>
 
 </Samples>
