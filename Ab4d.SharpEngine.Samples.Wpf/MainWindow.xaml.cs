@@ -153,8 +153,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             // Try to create common sample type from page attribute
-            var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{locationAttribute}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+            var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Wpf.{locationAttribute}, Ab4d.SharpEngine.Samples.Wpf", throwOnError: false);
 
+            if (sampleType == null)
+                sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{locationAttribute}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+            
             if (sampleType != null)
             {
                 var commonSamplesContext = WpfSamplesContext.Current;

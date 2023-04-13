@@ -32,7 +32,8 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
     public WpfUIPanel? CurrentPanel { get; private set; }
 
-    private Panel _baseWpfPanel;
+    public Panel BaseWpfPanel { get; }
+
     private bool _isLastPanelVertical;
 
     private double _lastSeparator;
@@ -51,7 +52,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
     public WpfUIProvider(Panel basePanel)
     {
-        _baseWpfPanel = basePanel;
+        BaseWpfPanel = basePanel;
         _rootUIElements = new List<WpfUIElement>();
 
         _settings = new Dictionary<string, string?>();
@@ -91,7 +92,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
         if (CurrentPanel == null)
         {
-            _baseWpfPanel.Children.Add(wpfUiElement.WpfElement);
+            BaseWpfPanel.Children.Add(wpfUiElement.WpfElement);
             _rootUIElements.Add(wpfUiElement);
         }
         else
@@ -103,7 +104,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
     public void ClearAll()
     {
         foreach (var rootUiElement in _rootUIElements)
-            _baseWpfPanel.Children.Remove(rootUiElement.WpfElement);
+            BaseWpfPanel.Children.Remove(rootUiElement.WpfElement);
 
         _rootUIElements.Clear();
 
@@ -125,7 +126,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
         }
         else
         {
-            _baseWpfPanel.Children.Add(stackPanelUiElement.WpfElement);
+            BaseWpfPanel.Children.Add(stackPanelUiElement.WpfElement);
             _rootUIElements.Add(stackPanelUiElement);
         }
 
@@ -285,7 +286,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
         if (_keyDownFunc == null)
             return false; // report that no event is subscribed
 
-        var parentWindow = Window.GetWindow(_baseWpfPanel);
+        var parentWindow = Window.GetWindow(BaseWpfPanel);
 
         if (parentWindow != null)
             parentWindow.PreviewKeyDown += BaseWpfPanelOnPreviewKeyDown;
@@ -308,7 +309,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
     {
         if (_keyDownFunc != null)
         {
-            var parentWindow = Window.GetWindow(_baseWpfPanel);
+            var parentWindow = Window.GetWindow(BaseWpfPanel);
 
             if (parentWindow != null)
                 parentWindow.PreviewKeyDown -= BaseWpfPanelOnPreviewKeyDown;

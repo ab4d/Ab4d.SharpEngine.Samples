@@ -87,6 +87,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
+            UpdateMouseCameraController();
+
             _lastInitializedSample = _currentCommonSample;
         }
 

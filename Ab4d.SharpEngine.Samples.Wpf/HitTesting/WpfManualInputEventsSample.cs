@@ -1,29 +1,28 @@
 ﻿using System.Numerics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Common.HitTesting;
-using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
-using Microsoft.UI;
-using Microsoft.UI.Input;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
+using Ab4d.SharpEngine.Samples.Wpf.UIProvider;
+using Colors = System.Windows.Media.Colors;
 
-namespace Ab4d.SharpEngine.Samples.WinUI.HitTesting;
+namespace Ab4d.SharpEngine.Samples.Wpf.HitTesting;
 
 // This sample derives from a generic ManualInputEventsSample that handles the mouse events in a generic way
 // but here we need to use platform specific code to subscribe to mouse events
 
-public class WinUIManualInputEventsSample : ManualInputEventsSample
+public class WpfManualInputEventsSample : ManualInputEventsSample
 {
     private TextBox? _infoTextBox;
     private Border? _rootBorder;
-    private Panel? _baseWinUIPanel;
+    private Panel? _baseWpfPanel;
 
     private UIElement? _subscribedUIElement;
 
-    public WinUIManualInputEventsSample(ICommonSamplesContext context)
+    public WpfManualInputEventsSample(ICommonSamplesContext context)
         : base(context)
     {
     }
@@ -33,9 +32,9 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
         if (sharpEngineSceneView is not UIElement eventsSourceElement)
             return;
 
-        eventsSourceElement.PointerPressed += OnEventsSourceElementOnPointerPressed;
-        eventsSourceElement.PointerReleased += OnEventsSourceElementOnPointerReleased;
-        eventsSourceElement.PointerMoved += OnEventsSourceElementOnPointerMoved;
+        eventsSourceElement.MouseDown += EventsSourceElementOnMouseDown;
+        eventsSourceElement.MouseUp += EventsSourceElementOnMouseUp;
+        eventsSourceElement.MouseMove += EventsSourceElementOnMouseMove;
 
         _subscribedUIElement = eventsSourceElement;
     }
@@ -45,53 +44,53 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
         if (_subscribedUIElement == null)
             return;
 
-        _subscribedUIElement.PointerPressed -= OnEventsSourceElementOnPointerPressed;
-        _subscribedUIElement.PointerReleased -= OnEventsSourceElementOnPointerReleased;
-        _subscribedUIElement.PointerMoved -= OnEventsSourceElementOnPointerMoved;
+        _subscribedUIElement.MouseDown -= EventsSourceElementOnMouseDown;
+        _subscribedUIElement.MouseUp -= EventsSourceElementOnMouseUp;
+        _subscribedUIElement.MouseMove -= EventsSourceElementOnMouseMove;
 
         _subscribedUIElement = null;
     }
 
-    private void OnEventsSourceElementOnPointerPressed(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnMouseDown(object sender, MouseButtonEventArgs e)
     {
         // PointerPressed is called not only when the mouse button is pressed, but all the time until the button is pressed
         // But we would only like ot know when the left mouse button is pressed
         if (isLeftMouseButtonPressed || _subscribedUIElement == null)
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
-        isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
+        var currentPoint = e.GetPosition(_subscribedUIElement);
+        isLeftMouseButtonPressed = e.LeftButton == MouseButtonState.Pressed;
 
         if (isLeftMouseButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
             ProcessMouseButtonPress(mousePosition);
         }
     }
 
-    private void OnEventsSourceElementOnPointerReleased(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnMouseUp(object sender, MouseButtonEventArgs e)
     {
         if (!isLeftMouseButtonPressed || _subscribedUIElement == null) // is already released
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
-        isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
+        var currentPoint = e.GetPosition(_subscribedUIElement);
+        isLeftMouseButtonPressed = e.LeftButton == MouseButtonState.Pressed;
 
         if (!isLeftMouseButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
             ProcessMouseButtonRelease(mousePosition);
         }
     }
 
-    private void OnEventsSourceElementOnPointerMoved(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnMouseMove(object sender, MouseEventArgs e)
     {
         if (_subscribedUIElement == null)
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
+        var currentPoint = e.GetPosition(_subscribedUIElement);
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
             ProcessMouseMove(mousePosition);
         }
     }
@@ -111,7 +110,7 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
     protected override void CreateCustomUI(ICommonSampleUIProvider ui)
     {
-        if (ui is not WinUIProvider winUIProvider)
+        if (ui is not WpfUIProvider wpfUIProvider)
             return;
 
         _rootBorder = new Border()
@@ -119,13 +118,15 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
             HorizontalAlignment = HorizontalAlignment.Right,
             Width = 260,
             BorderThickness = new Thickness(2),
-            BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.Black),
-            Background = new SolidColorBrush(Microsoft.UI.Colors.White) { Opacity = 0.8 },
+            BorderBrush = new SolidColorBrush(Colors.Black),
+            Background = new SolidColorBrush(Colors.White) { Opacity = 0.8 },
             Margin = new Thickness(5, 5, 0, 5)
         };
 
-        _baseWinUIPanel = winUIProvider.BaseWinUIPanel;
-        _baseWinUIPanel.Children.Add(_rootBorder);
+        _baseWpfPanel = wpfUIProvider.BaseWpfPanel;
+
+        if (_baseWpfPanel != null)
+            _baseWpfPanel.Children.Add(_rootBorder);
 
         var grid = new Grid();
         grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
@@ -187,8 +188,8 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
     {
         UnSubscribeMouseEvents();
 
-        if (_baseWinUIPanel != null && _rootBorder != null)
-            _baseWinUIPanel.Children.Remove(_rootBorder);
+        if (_baseWpfPanel != null && _rootBorder != null)
+            _baseWpfPanel.Children.Remove(_rootBorder);
 
         base.OnDisposed();
     }

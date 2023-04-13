@@ -1,65 +1,74 @@
 ﻿using System.Numerics;
+using System.Windows;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Common.HitTesting;
-using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
-using Microsoft.UI;
-using Microsoft.UI.Input;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Colors = Ab4d.SharpEngine.Common.Colors;
 
-namespace Ab4d.SharpEngine.Samples.WinUI.HitTesting;
+namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
 
 // This sample derives from a generic ManualInputEventsSample that handles the mouse events in a generic way
 // but here we need to use platform specific code to subscribe to mouse events
 
-public class WinUIManualInputEventsSample : ManualInputEventsSample
+public class AvaloniaManualInputEventsSample : ManualInputEventsSample
 {
     private TextBox? _infoTextBox;
     private Border? _rootBorder;
-    private Panel? _baseWinUIPanel;
+    private Panel? _baseAvaloniaPanel;
 
-    private UIElement? _subscribedUIElement;
+    private InputElement? _subscribedElement;
 
-    public WinUIManualInputEventsSample(ICommonSamplesContext context)
+    public AvaloniaManualInputEventsSample(ICommonSamplesContext context)
         : base(context)
     {
     }
 
     protected override void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView)
     {
-        if (sharpEngineSceneView is not UIElement eventsSourceElement)
+        // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
+        // we need to subscribe to parent Border control instead of to sharpEngineSceneView.
+        if (sharpEngineSceneView is not Control avaloniaControl)
             return;
 
-        eventsSourceElement.PointerPressed += OnEventsSourceElementOnPointerPressed;
-        eventsSourceElement.PointerReleased += OnEventsSourceElementOnPointerReleased;
-        eventsSourceElement.PointerMoved += OnEventsSourceElementOnPointerMoved;
+        var parentBorder = avaloniaControl.Parent as Border;
+        if (parentBorder == null)
+            return;
 
-        _subscribedUIElement = eventsSourceElement;
+        parentBorder.PointerPressed += EventsSourceElementOnPointerPressed;
+        parentBorder.PointerReleased += EventsSourceElementOnPointerReleased;
+        parentBorder.PointerMoved += EventsSourceElementOnPointerMoved;
+
+        _subscribedElement = parentBorder;
     }
 
     private void UnSubscribeMouseEvents()
     {
-        if (_subscribedUIElement == null)
+        if (_subscribedElement == null)
             return;
 
-        _subscribedUIElement.PointerPressed -= OnEventsSourceElementOnPointerPressed;
-        _subscribedUIElement.PointerReleased -= OnEventsSourceElementOnPointerReleased;
-        _subscribedUIElement.PointerMoved -= OnEventsSourceElementOnPointerMoved;
+        _subscribedElement.PointerPressed -= EventsSourceElementOnPointerPressed;
+        _subscribedElement.PointerReleased -= EventsSourceElementOnPointerReleased;
+        _subscribedElement.PointerMoved -= EventsSourceElementOnPointerMoved;
 
-        _subscribedUIElement = null;
+        _subscribedElement = null;
     }
 
-    private void OnEventsSourceElementOnPointerPressed(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         // PointerPressed is called not only when the mouse button is pressed, but all the time until the button is pressed
         // But we would only like ot know when the left mouse button is pressed
-        if (isLeftMouseButtonPressed || _subscribedUIElement == null)
+        if (isLeftMouseButtonPressed || _subscribedElement == null)
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
+        var currentPoint = e.GetCurrentPoint(_subscribedElement);
         isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
 
         if (isLeftMouseButtonPressed)
@@ -69,12 +78,12 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
         }
     }
 
-    private void OnEventsSourceElementOnPointerReleased(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (!isLeftMouseButtonPressed || _subscribedUIElement == null) // is already released
+        if (!isLeftMouseButtonPressed || _subscribedElement == null) // is already released
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
+        var currentPoint = e.GetCurrentPoint(_subscribedElement);
         isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
 
         if (!isLeftMouseButtonPressed)
@@ -84,12 +93,12 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
         }
     }
 
-    private void OnEventsSourceElementOnPointerMoved(object sender, PointerRoutedEventArgs args)
+    private void EventsSourceElementOnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_subscribedUIElement == null)
+        if (_subscribedElement == null)
             return;
 
-        var currentPoint = args.GetCurrentPoint(_subscribedUIElement);
+        var currentPoint = e.GetCurrentPoint(_subscribedElement);
         {
             var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
             ProcessMouseMove(mousePosition);
@@ -111,7 +120,7 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
     protected override void CreateCustomUI(ICommonSampleUIProvider ui)
     {
-        if (ui is not WinUIProvider winUIProvider)
+        if (ui is not AvaloniaUIProvider avaloniaUIProvider)
             return;
 
         _rootBorder = new Border()
@@ -119,13 +128,15 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
             HorizontalAlignment = HorizontalAlignment.Right,
             Width = 260,
             BorderThickness = new Thickness(2),
-            BorderBrush = new SolidColorBrush(Microsoft.UI.Colors.Black),
-            Background = new SolidColorBrush(Microsoft.UI.Colors.White) { Opacity = 0.8 },
+            BorderBrush = Brushes.Black,
+            Background = new SolidColorBrush(Avalonia.Media.Colors.White) { Opacity = 0.8 },
             Margin = new Thickness(5, 5, 0, 5)
         };
 
-        _baseWinUIPanel = winUIProvider.BaseWinUIPanel;
-        _baseWinUIPanel.Children.Add(_rootBorder);
+        _baseAvaloniaPanel = avaloniaUIProvider.BaseAvaloniaPanel;
+
+        if (_baseAvaloniaPanel != null)
+            _baseAvaloniaPanel.Children.Add(_rootBorder);
 
         var grid = new Grid();
         grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Auto) });
@@ -187,8 +198,8 @@ public class WinUIManualInputEventsSample : ManualInputEventsSample
     {
         UnSubscribeMouseEvents();
 
-        if (_baseWinUIPanel != null && _rootBorder != null)
-            _baseWinUIPanel.Children.Remove(_rootBorder);
+        if (_baseAvaloniaPanel != null && _rootBorder != null)
+            _baseAvaloniaPanel.Children.Remove(_rootBorder);
 
         base.OnDisposed();
     }

@@ -108,6 +108,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
+            UpdateMouseCameraController();
+
             _lastInitializedSample = _currentCommonSample;
         }
 

@@ -30,7 +30,8 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
     public AvaloniaUIPanel? CurrentPanel { get; private set; }
 
-    private Panel _baseAvaloniaPanel;
+    public Panel BaseAvaloniaPanel { get; }
+
     private bool _isLastPanelVertical;
 
     private double _lastSeparator;
@@ -49,7 +50,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
     public AvaloniaUIProvider(Panel basePanel)
     {
-        _baseAvaloniaPanel = basePanel;
+        BaseAvaloniaPanel = basePanel;
         _rootUIElements = new List<AvaloniaUIElement>();
 
         _settings = new Dictionary<string, string?>();
@@ -89,7 +90,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
         if (CurrentPanel == null)
         {
-            _baseAvaloniaPanel.Children.Add(avaloniaUiElement.AvaloniaControl);
+            BaseAvaloniaPanel.Children.Add(avaloniaUiElement.AvaloniaControl);
             _rootUIElements.Add(avaloniaUiElement);
         }
         else
@@ -101,7 +102,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
     public void ClearAll()
     {
         foreach (var rootUiElement in _rootUIElements)
-            _baseAvaloniaPanel.Children.Remove(rootUiElement.AvaloniaControl);
+            BaseAvaloniaPanel.Children.Remove(rootUiElement.AvaloniaControl);
 
         _rootUIElements.Clear();
 
@@ -123,7 +124,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         }
         else
         {
-            _baseAvaloniaPanel.Children.Add(stackPanelUiElement.AvaloniaControl);
+            BaseAvaloniaPanel.Children.Add(stackPanelUiElement.AvaloniaControl);
             _rootUIElements.Add(stackPanelUiElement);
         }
 

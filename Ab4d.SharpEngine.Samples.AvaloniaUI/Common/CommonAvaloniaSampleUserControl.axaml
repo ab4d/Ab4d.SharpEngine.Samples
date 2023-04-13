@@ -6,9 +6,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Common.CommonAvaloniaSampleUserControl">
     <Grid Name="RootGrid">
-        <Border Name="RootBorder" Background="{StaticResource CommonSamplePageGradient}" />
-
-        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
+        <Border Name="RootBorder" Background="{StaticResource CommonSamplePageGradient}">
+            <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
+        </Border>
 
         <StackPanel Name="TitleStackPanel" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
             <TextBlock Name="TitleTextBlock" FontSize="20" FontWeight="Bold" Foreground="#333" Margin="10 10 5 5" TextWrapping="Wrap" />
