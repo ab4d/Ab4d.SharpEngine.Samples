@@ -30,8 +30,8 @@
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
 
   <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
-  <Sample IsSeparator="True" />
   <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
+  <Sample IsSeparator="True" />
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
