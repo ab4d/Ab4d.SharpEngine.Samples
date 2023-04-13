@@ -4,7 +4,7 @@
   <Sample Location="Titles.IntroductionPage" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
   <Sample IsSeparator="True" />
 
-  <Sample Location="QuickStart.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
+  <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
   <Sample Location="QuickStart.SharpEngineSceneViewInCode" Title="SharpEngineSceneView in code" />
   <Sample Location="QuickStart.SharpEngineSceneViewInXaml" Title="SharpEngineSceneView in XAML" />
   <Sample IsSeparator="True" />
@@ -44,6 +44,10 @@
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
+  <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
+  <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
+  <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
@@ -54,5 +58,13 @@
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+
+  <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
+  <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
+  <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
+  <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
+  <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
 
 </Samples>

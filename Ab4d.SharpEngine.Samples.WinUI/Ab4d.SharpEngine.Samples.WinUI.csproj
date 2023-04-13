@@ -62,6 +62,7 @@
 
   <ItemGroup>
     <None Remove="Samples.xml" />
+    <None Remove="Titles\QuickStartTitle.md" />
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="QuickStart\QuickStartTitle.md" />
+    <EmbeddedResource Include="Titles\QuickStartTitle.md" />
   </ItemGroup>
 
 
@@ -64,6 +64,7 @@
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
     <None Remove="Samples.xml" />
     <None Remove="Titles\IntroductionPage.xaml" />
+    <None Remove="Titles\QuickStartTitle.md" />
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
