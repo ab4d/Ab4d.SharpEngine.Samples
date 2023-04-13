@@ -67,7 +67,7 @@ public class RadioButtonsUIElement : AvaloniaUIElement
             if (toolTip != null)
                 ToolTip.SetTip(radioButton, toolTip);
 
-            radioButton.Checked += RadioButtonOnChecked;
+            radioButton.IsCheckedChanged += RadioButtonOnIsCheckedChanged;
 
             _radioBoxesStackPanel.Children.Add(radioButton);
         }
@@ -103,20 +103,21 @@ public class RadioButtonsUIElement : AvaloniaUIElement
         }
     }
 
-    private void RadioButtonOnChecked(object? sender, RoutedEventArgs e)
+    private void RadioButtonOnIsCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        var radioButton = sender as RadioButton;
+        if (sender is not RadioButton radioButton)
+            return;
 
-        if (radioButton == null)
+        var isChecked = radioButton.IsChecked ?? false;
+        if (!isChecked)
             return;
 
         var selectedIndex = _radioBoxesStackPanel.Children.IndexOf(radioButton);
-        string? selectedText = radioButton.Content as string;
 
-        if (selectedIndex == -1 || selectedText == null)
+        if (selectedIndex == -1 || radioButton.Content is not string selectedText)
             return;
 
-        _checkedItemChangedAction?.Invoke(selectedIndex, selectedText);
+        _checkedItemChangedAction.Invoke(selectedIndex, selectedText);
     }
 
     public override string? GetText()
