@@ -5,8 +5,8 @@
           package="com.ab4d.SharpEngine.Demo">
   <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true">
   </application>
-  <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
+
+  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
   <!-- Require Vulkan 1.0 -->
   <uses-feature android:name="android.hardware.vulkan.version" android:version="0x400003" android:required="true"/>

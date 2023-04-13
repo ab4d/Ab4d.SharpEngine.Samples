@@ -22,6 +22,7 @@ using Android.Content.Res;
 using Android.Gestures;
 using Android.OS;
 using Android.Views;
+using Java.Security;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
@@ -78,6 +79,12 @@ namespace AndroidDemo
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
+            // Check if the BLUETOOTH_CONNECT permission is granted (this is required when using SilkActivity in Android 12+)
+            if (CheckSelfPermission(Android.Manifest.Permission.BluetoothConnect) != Android.Content.PM.Permission.Granted)
+            {
+                RequestPermissions(new string[] { Android.Manifest.Permission.BluetoothConnect }, 0);
+            }
+
             // See: https://developer.android.com/training/gestures/scale#java
             _myScaleListener = new MyScaleListener();
             _scaleGestureDetector = new ScaleGestureDetector(this.ApplicationContext, _myScaleListener);

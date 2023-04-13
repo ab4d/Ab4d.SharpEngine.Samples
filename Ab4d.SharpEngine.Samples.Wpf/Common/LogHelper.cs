@@ -46,9 +46,19 @@ public static class LogHelper
         else
         {
             // Setup minimal logging (write warnings and error to output window)
-            SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;        // Log Warnings and Errors
-            SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true; // write log messages without timestamp, thread id and other details
-            SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;    // write log messages to output window
+            SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn; // Log Warnings and Errors
+
+            // Write log messages to output window (for example Visual Studio Debug window):
+            if (logFileName == null)
+            {
+                SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true; // write log messages without timestamp, thread id and other details
+                Log.IsLoggingToDebugOutput = true;
+            }
+            else
+            {
+                Log.IsLoggingToDebugOutput = false;
+                Log.LogFileName = logFileName;
+            }
         }
     }
 }

@@ -1,0 +1,2 @@
+﻿Planetary gear model converted to .fbx from original .step file from:
+https://grabcad.com/library/plantary-gear-1

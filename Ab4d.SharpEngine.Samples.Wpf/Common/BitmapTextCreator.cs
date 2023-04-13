@@ -61,6 +61,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         private readonly GpuImage?[] _fontPages;
         private SolidColorEffect? _solidColorEffect;
 
+        private List<(StandardMaterial standardFontMaterial, int pageIndex, bool isSolidColorMaterial)>? _delayedResolvedFontTextures;
 
         public BitmapFont BitmapFont => _bitmapFont;
 
@@ -138,7 +139,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                                         Vector3 upDirection,
                                         float fontSize,
                                         Color4 textColor,
-                                        bool isSolidColorMaterial = false)
+                                        bool isSolidColorMaterial = false,
+                                        string? name = null)
         {
             CreateOrMeasureTextNode(text: text,
                                     topLeftPosition: new Vector3(0, 0, 0),
@@ -148,6 +150,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                                     textColor: Color4.Black,
                                     isSolidColorMaterial: false,
                                     createTextNode: false,
+                                    nodeName: null,
                                     sceneNode: out _,
                                     textPosition: out var textPosition,
                                     textSize: out var textSize);
@@ -159,7 +162,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             var topLeftPosition = centerPosition - (0.5f * textSize.X + textPosition.X) * textDirection + (0.5f * textSize.Y - (textPosition.Y + textSize.Y)) * upDirection;
 
-            CreateOrMeasureTextNode(text, topLeftPosition, textDirection, upDirection, fontSize, textColor, isSolidColorMaterial, createTextNode: true, out var sceneNode, out _, out _);
+            CreateOrMeasureTextNode(text, topLeftPosition, textDirection, upDirection, fontSize, textColor, isSolidColorMaterial, createTextNode: true, nodeName: name, out var sceneNode, out _, out _);
             return sceneNode!;
         }
 
@@ -173,6 +176,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                                     textColor: Color4.Black,
                                     isSolidColorMaterial: false,
                                     createTextNode: false,
+                                    nodeName: null,
                                     sceneNode: out _,
                                     textPosition: out _,
                                     textSize: out var textSize);
@@ -188,6 +192,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                                              Color4 textColor,
                                              bool isSolidColorMaterial,
                                              bool createTextNode,
+                                             string? nodeName,
                                              out SceneNode? sceneNode,
                                              out Vector2 textPosition,
                                              out Vector2 textSize)
@@ -208,19 +213,19 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             List<Vector3>? positions;
             List<Vector2>? textureCoordinates;
-            List<MeshModelNode>? allGeometryModels;
+            List<MeshModelNode>? allTextModelNodes;
 
             if (createTextNode)
             {
                 positions = new List<Vector3>();
                 textureCoordinates = new List<Vector2>();
-                allGeometryModels = new List<MeshModelNode>();
+                allTextModelNodes = new List<MeshModelNode>();
             }
             else
             {
                 positions = null;
                 textureCoordinates = null;
-                allGeometryModels = null;
+                allTextModelNodes = null;
             }
 
             float minX = float.MaxValue;
@@ -228,18 +233,18 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             float maxX = float.MinValue;
             float maxY = float.MinValue;
 
-            float fontScale = fontSize / _bitmapFont.BaseHeight;
+            float fontScale = fontSize / (float)_bitmapFont.BaseHeight;
 
             // Multiply by fontScale so we can remove multiplying in the code below
             textDirection *= fontScale;
             upDirection *= fontScale;
 
             if (_bitmapFont.StretchedHeight != 100) // 100 mean no stretch (100%)
-                textDirection *= 100.0f / _bitmapFont.StretchedHeight; // we do not increase the font size (because user specified the required size) but reduce the font width: textDirection *= 1 / ((float)bitmapFont.StretchedHeight / 100.0f); 
+                textDirection *= 100.0f / (float)_bitmapFont.StretchedHeight; // we do not increase the font size (because user specified the required size) but reduce the font width: textDirection *= 1 / ((float)bitmapFont.StretchedHeight / 100.0f); 
 
 
-            float textureWidthFactor = 1.0f / _bitmapFont.TextureSize.Width;
-            float textureHeightFactor = 1.0f / _bitmapFont.TextureSize.Height;
+            float textureWidthFactor = 1.0f / (float)_bitmapFont.TextureSize.Width;
+            float textureHeightFactor = 1.0f / (float)_bitmapFont.TextureSize.Height;
 
             int horizontalPadding = _bitmapFont.Padding.Left + _bitmapFont.Padding.Right;
             int verticalPadding = _bitmapFont.Padding.Top + _bitmapFont.Padding.Bottom;
@@ -270,7 +275,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                         continue;
                     }
 
-                    if (oneChar < 32) // Skip special chars
+                    if ((int)oneChar < (int)32) // Skip special chars
                         continue;
 
                     Character oneCharData;
@@ -314,9 +319,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                             positions.Add(charPosition);
 
 
-                            var texturePos = new Vector2((oneCharData.X + _bitmapFont.Padding.Left) * textureWidthFactor, (oneCharData.Y + _bitmapFont.Padding.Top) * textureHeightFactor);
-                            var tdx = (oneCharData.Width - horizontalPadding) * textureWidthFactor;
-                            var tdy = (oneCharData.Height - verticalPadding) * textureHeightFactor;
+                            var texturePos = new Vector2((float)(oneCharData.X + _bitmapFont.Padding.Left) * textureWidthFactor, (float)(oneCharData.Y + _bitmapFont.Padding.Top) * textureHeightFactor);
+                            var tdx = (float)(oneCharData.Width - horizontalPadding) * textureWidthFactor;
+                            var tdy = (float)(oneCharData.Height - verticalPadding) * textureHeightFactor;
 
                             textureCoordinates!.Add(new Vector2(texturePos.X, texturePos.Y + tdy));
                             textureCoordinates.Add(new Vector2(texturePos.X + tdx, texturePos.Y + tdy));
@@ -384,11 +389,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 }
 
 
-                var textMesh3D = new StandardMesh(vertexBufferArray, triangleIndices);
+                var planeMesh = new StandardMesh(vertexBufferArray, triangleIndices, (nodeName ?? "") + "TextPlaneMesh");
+
+                var textModelNode = new MeshModelNode(planeMesh, nodeName);
 
 
-                EnsureFontPage(pageIndex);
-                var materialName = (_bitmapFont.FamilyName ?? "") + "_FontTexture_" + pageIndex.ToString();
+                // Create material (if GpuDevice exist, else mark this to be created later)
 
                 Material? fontMaterial;
 
@@ -399,57 +405,63 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
                 if (fontMaterial == null)
                 {
-                    var fontTexture = _fontPages[pageIndex];
-                    if (fontTexture != null)
+                    var materialName = (_bitmapFont.FamilyName ?? "") + "_FontTexture_" + pageIndex.ToString();
+
+                    // Create StandardMaterial
+                    var standardFontMaterial = new StandardMaterial(name: materialName);
+                    standardFontMaterial.AlphaClipThreshold = this.AlphaClipThreshold;
+                    standardFontMaterial.DiffuseColor = textColor.ToColor3();
+                    standardFontMaterial.Opacity = textColor.Alpha;
+                    standardFontMaterial.DiffuseTextureSamplerType = CommonSamplerTypes.Clamp;
+
+                    // Set DiffuseTexture if Scene.GpuDevice exist; otherwise we will do that when provided in SceneOnSceneInitialized
+
+                    if (_scene.GpuDevice == null)
                     {
-                        var standardFontMaterial = new StandardMaterial(fontTexture, CommonSamplerTypes.Clamp, name: materialName);
-                        standardFontMaterial.AlphaClipThreshold = AlphaClipThreshold;
-                        standardFontMaterial.DiffuseColor = textColor.ToColor3();
-                        standardFontMaterial.Alpha = textColor.Alpha;
-
-                        if (isSolidColorMaterial)
+                        if (_delayedResolvedFontTextures == null)
                         {
-                            if (_solidColorEffect == null)
-                                _solidColorEffect = _scene.EffectsManager.GetDefault<SolidColorEffect>();
-
-                            standardFontMaterial.Effect = _solidColorEffect;
+                            _delayedResolvedFontTextures = new List<(StandardMaterial standardFontMaterial, int pageIndex, bool isSolidColorMaterial)>(); // Ensure _delayedResolvedModelNodes
+                            _scene.SceneInitialized += SceneOnSceneInitialized;
                         }
 
-                        fontMaterial = standardFontMaterial;
+                        // Save info for later
+                        _delayedResolvedFontTextures.Add((standardFontMaterial, pageIndex, isSolidColorMaterial));
                     }
                     else
                     {
-                        fontMaterial = StandardMaterials.Red;
+                        SetFontMaterialTexture(standardFontMaterial, pageIndex, isSolidColorMaterial);
                     }
+
+                    fontMaterial = standardFontMaterial;
                 }
 
-                //fontMaterial = StandardMaterials.Green;
 
-                var textModel3D = new MeshModelNode(textMesh3D, fontMaterial);
+                textModelNode.Material = fontMaterial;
 
-                if (IsTwoSided)
-                    textModel3D.BackMaterial = fontMaterial;
+                if (this.IsTwoSided)
+                    textModelNode.BackMaterial = fontMaterial;
 
-                allGeometryModels!.Add(textModel3D);
+
+                allTextModelNodes!.Add(textModelNode);
             }
 
             if (createTextNode)
             {
-                if (allGeometryModels!.Count == 0)
+                if (allTextModelNodes!.Count == 0)
                 {
                     sceneNode = new MeshModelNode();
                 }
-                else if (allGeometryModels.Count == 1)
+                else if (allTextModelNodes.Count == 1)
                 {
-                    sceneNode = allGeometryModels[0];
+                    sceneNode = allTextModelNodes[0];
                 }
                 else
                 {
-                    // When we need more font texture pages, we need more GeometryModel3D and in this case we create a new GroupNode
-                    var groupNode = new GroupNode();
+                    // When we need more font texture pages, we need more MeshModelNodes and in this case we create a new GroupNode
+                    var groupNode = new GroupNode(nodeName);
 
-                    for (var i = 0; i < allGeometryModels.Count; i++)
-                        groupNode.Add(allGeometryModels[i]);
+                    for (var i = 0; i < allTextModelNodes.Count; i++)
+                        groupNode.Add(allTextModelNodes[i]);
 
                     sceneNode = groupNode;
                 }
@@ -467,9 +479,54 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             }
         }
 
+        private void SetFontMaterialTexture(StandardMaterial standardFontMaterial, int pageIndex, bool isSolidColorMaterial)
+        {
+            if (_scene == null || _scene.GpuDevice == null || _scene.EffectsManager == null)
+                return;
+
+            EnsureFontPage(pageIndex);
+
+            var fontTexture = _fontPages[pageIndex];
+            if (fontTexture != null)
+            {
+                standardFontMaterial.DiffuseTexture = fontTexture;
+
+                if (isSolidColorMaterial)
+                {
+                    if (_solidColorEffect == null)
+                        _solidColorEffect = _scene.EffectsManager.GetDefault<SolidColorEffect>();
+
+                    standardFontMaterial.Effect = _solidColorEffect;
+                }
+            }
+            else
+            {
+                standardFontMaterial.DiffuseColor = Colors.Red.ToColor3();
+            }
+
+            // Uncomment teh following line to see mesh for each character:
+            //standardFontMaterial.DiffuseColor = Colors.Green.ToColor3();
+        }
+
+        private void SceneOnSceneInitialized(object? sender, EventArgs e)
+        {
+            if (_scene == null)
+                return;
+
+            _scene.SceneInitialized -= SceneOnSceneInitialized;
+
+            if (_delayedResolvedFontTextures == null)
+                return;
+
+            foreach (var materialInfo in _delayedResolvedFontTextures)
+                SetFontMaterialTexture(materialInfo.standardFontMaterial, materialInfo.pageIndex, materialInfo.isSolidColorMaterial);
+
+            _delayedResolvedFontTextures = null;
+        }
+
         private void EnsureFontPage(int pageIndex)
         {
-            if (_scene == null || _fontPages[pageIndex] != null)
+            if (_scene == null || _fontPages[pageIndex] != null || _scene.GpuDevice == null)
                 return;
 
             string fileName = _bitmapFont.Pages[pageIndex].FileName;

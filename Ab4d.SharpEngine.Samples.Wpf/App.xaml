@@ -29,6 +29,11 @@
             <GradientStop Color="#FFFFFFFF" Offset=".5"/>
         </LinearGradientBrush>
 
+        <LinearGradientBrush x:Key="CommonSamplePageGradient" StartPoint="0 0" EndPoint="0 1">
+            <GradientStop Offset="0" Color="White" />
+            <GradientStop Offset="1" Color="LightSkyBlue" />
+        </LinearGradientBrush>
+
         <Style x:Key="MyExpanderNoHeaderStyle" TargetType="Expander">
             <Setter Property="BorderBrush" Value="#FFBC57"/>
             <Setter Property="Margin" Value="0 3 0 0"/>

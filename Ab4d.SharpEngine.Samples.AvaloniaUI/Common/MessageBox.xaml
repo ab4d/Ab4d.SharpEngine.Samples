@@ -1,0 +1,18 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Common.MessageBox"
+        mc:Ignorable="d"
+        MinWidth="200" MinHeight="100"
+        SizeToContent="WidthAndHeight" 
+        CanResize="False"
+        Icon="/Resources/sharp-engine-logo.ico">
+    <Grid RowDefinitions="*, Auto" Margin="10">
+    
+        <TextBlock Name="MessageTextBlock" Grid.Row="0" HorizontalAlignment="Center" TextWrapping="Wrap" />
+
+        <StackPanel Name="ButtonsStackPanel" Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0 10 0 0" />
+
+    </Grid>
+</Window>

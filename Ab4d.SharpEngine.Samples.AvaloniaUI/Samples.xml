@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Samples>
+
+  <Sample Location="Titles.IntroductionPage" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
+  <Sample IsSeparator="True" />
+
+  <Sample Location="QuickStart.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
+  <Sample Location="QuickStart.SharpEngineSceneViewInCode" Title="SharpEngineSceneView in code" />
+  <Sample Location="QuickStart.SharpEngineSceneViewInXaml" Title="SharpEngineSceneView in XAML" />
+  <Sample IsSeparator="True" />
+  <Sample Location="QuickStart.MultiSceneNodesSample" Title="Multi SceneNodes" />
+
+  <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
+  <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
+  <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
+  <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
+  <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+
+  <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
+  <Sample Location="CameraControllers.MouseCameraControllerSample" Title="MouseCameraController"/>
+
+  <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
+  <Sample Location="Lights.LightsSample" Title="Lights"/>
+
+  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
+
+  <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
+  <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
+  <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
+  <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
+  <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
+  <Sample Location="StandardModels.OtherStandardModelsTitle.md" Title="Other models"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="StandardModels.TransformationsSample" Title="Transformations"/>
+
+  <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+
+  <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
+  <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
+
+  <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
+  <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
+  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+
+</Samples>

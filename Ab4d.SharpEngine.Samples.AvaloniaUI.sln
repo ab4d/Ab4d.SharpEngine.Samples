@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.AvaloniaUI", "Ab4d.SharpEngine.Samples.AvaloniaUI\Ab4d.SharpEngine.Samples.AvaloniaUI.csproj", "{E370BC2C-04BB-4080-97AE-5F30671EB8A4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.Common", "Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj", "{096F0E8A-A19E-4412-8D96-C2705BCA5AEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{E370BC2C-04BB-4080-97AE-5F30671EB8A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E370BC2C-04BB-4080-97AE-5F30671EB8A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E370BC2C-04BB-4080-97AE-5F30671EB8A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{096F0E8A-A19E-4412-8D96-C2705BCA5AEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{096F0E8A-A19E-4412-8D96-C2705BCA5AEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{096F0E8A-A19E-4412-8D96-C2705BCA5AEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{096F0E8A-A19E-4412-8D96-C2705BCA5AEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

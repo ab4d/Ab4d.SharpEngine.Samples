@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,9 +18,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
-using Ab4d.SharpEngine.Diagnostics.Wpf;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Samples.Wpf.Common;
+using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
 using Ab4d.SharpEngine.Wpf;
+using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Wpf
 {
@@ -28,14 +33,26 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "TestScenes/AssimpImporterTestScene.xaml";
+        //private string? _startupPage = "AdvancedModels.PlanarShadowsSample";
         private string? _startupPage = null;
+
+        private ISharpEngineSceneView? _currentSharpEngineSceneView;
+        private bool _isPresentationTypeChangedSubscribed;
+        private bool _isSceneViewInitializedSubscribed;
+
+        private CommonWpfSamplePage? _commonWpfSamplePage;
+        private CommonTitlePage? _commonTitlePage;
 
         private BitmapImage? _diagnosticsDisabledImage;
         private BitmapImage? _diagnosticsEnabledImage;
 
+        private Dictionary<Assembly, string[]>? _assemblyEmbeddedResources;
+
         //private SharpEngineSceneView? _currentSharpEngineSceneView;
         private DiagnosticsWindow? _diagnosticsWindow;
+
+        private string? _currentSampleXaml;
+        private CommonSample? _currentCommonSample;
 
         public MainWindow()
         {
@@ -56,73 +73,221 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 }
             };
 
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
             InitializeComponent();
 
             DisableDiagnosticsButton();
 
-            SamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
+            WpfSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
 
 
-            this.Unloaded += delegate (object sender, RoutedEventArgs args)
-            {
-                CloseDiagnosticsWindow(); // If DiagnosticsWindow is not closed, then close it with closing main samples window
-            };
+            this.Unloaded += (sender, args) => CloseDiagnosticsWindow();
 
-            ContentFrame.LoadCompleted += delegate (object o, NavigationEventArgs args)
+            ContentFrame.LoadCompleted += (o, args) =>
             {
                 // When content of ContentFrame is changed, we try to find the SharpEngineSceneView control
                 // that is defined by the newly shown content.
 
                 // Find SharpEngineSceneView
                 var sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
-                SamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+                WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             };
 
 
             // SelectionChanged event handler is used to start the samples with the page set with _startupPage field.
             // SelectionChanged is used because SelectItem cannot be set from this.Loaded event.
-            SampleList.SelectionChanged += delegate (object sender, SelectionChangedEventArgs args)
+            SampleList.SelectionChanged += (sender, args) =>
             {
-                // The following if can be executed only after the SampleList items are populated
+                // The following can be executed only after the SampleList items are populated
                 if (_startupPage != null)
                 {
                     string savedStartupPage = _startupPage;
                     _startupPage = null;
 
                     SelectItem(savedStartupPage);
+                    return;
                 }
+
+                ShowSelectedSample(args);
             };
+        }
+
+        private void ShowSelectedSample(SelectionChangedEventArgs args)
+        {
+            if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not XmlElement xmlElement)
+                return;
+
+            if (_currentCommonSample != null)
+            {
+                _currentCommonSample.Dispose();
+                _currentCommonSample = null;
+            }
+
+            var locationAttribute = xmlElement.GetAttribute("Location");
+
+            if (locationAttribute.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
+            {
+                ContentFrame.Source = new Uri(locationAttribute, UriKind.Relative);
+
+                _currentSampleXaml   = locationAttribute;
+                _currentCommonSample = null;
+                return;
+            }
+            
+            if (locationAttribute.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            {
+                var markdownText = GetMarkdownText(locationAttribute);
+
+                if (markdownText != null)
+                {
+                    _commonTitlePage ??= new CommonTitlePage();
+                    _commonTitlePage.MarkdownText = markdownText;
+
+                    ContentFrame.Navigate(_commonTitlePage);
+
+                    _currentSampleXaml = locationAttribute;
+                    _currentCommonSample = null;
+                    return;
+                }
+            }
+
+            // Try to create common sample type from page attribute
+            var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{locationAttribute}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+
+            if (sampleType != null)
+            {
+                var commonSamplesContext = WpfSamplesContext.Current;
+                var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
+
+                _commonWpfSamplePage ??= new CommonWpfSamplePage();
+                
+                if (_currentSampleXaml != null || ContentFrame.Content == null)
+                {
+                    ContentFrame.Navigate(_commonWpfSamplePage);
+                    _currentSampleXaml = null;
+                }
+
+                _commonWpfSamplePage.CurrentCommonSample = commonSample;
+
+                _currentCommonSample = commonSample;
+            }
+            else
+            {
+                MessageBox.Show("Cannot find: " + locationAttribute, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+        
+        private string? GetMarkdownText(string location)
+        {
+            var markdownText = GetMarkdownText(this.GetType().Assembly, location);
+
+            if (markdownText == null)
+                markdownText = GetMarkdownText(typeof(CommonSample).Assembly, location);
+
+            return markdownText;
+        }
+
+        private string? GetMarkdownText(System.Reflection.Assembly assembly, string location)
+        {
+            _assemblyEmbeddedResources ??= new Dictionary<Assembly, string[]>();
+
+            if (!_assemblyEmbeddedResources.TryGetValue(assembly, out var embeddedResourceNames))
+            {
+                embeddedResourceNames = assembly.GetManifestResourceNames();
+                _assemblyEmbeddedResources.Add(assembly, embeddedResourceNames);
+            }
+
+            foreach (var embeddedResource in embeddedResourceNames)
+            {
+                if (embeddedResource.EndsWith(location))
+                {
+                    var manifestResourceStream = assembly.GetManifestResourceStream(embeddedResource);
+                    if (manifestResourceStream != null)
+                    {
+                        string markdownText;
+
+                        using (var streamReader = new StreamReader(manifestResourceStream))
+                            markdownText = streamReader.ReadToEnd();
+
+                        return markdownText;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void OnCurrentSharpEngineSceneViewChanged(object? sender, EventArgs e)
         {
+            if (_currentSharpEngineSceneView != null)
+            {
+                if (_isSceneViewInitializedSubscribed)
+                {
+                    _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
+                    _isSceneViewInitializedSubscribed = false;
+                }
+                
+                if (_isPresentationTypeChangedSubscribed)
+                {
+                    _currentSharpEngineSceneView.PresentationTypeChanged -= OnPresentationTypeChanged;
+                    _isPresentationTypeChangedSubscribed = false;
+                }
+
+                _currentSharpEngineSceneView = null;
+            }
+
             UpdateGraphicsCardInfo();
         }
 
         private void UpdateGraphicsCardInfo()
         {
-            var sharpEngineSceneView = SamplesContext.Current.CurrentSharpEngineSceneView;
+            var sharpEngineSceneView = WpfSamplesContext.Current.CurrentSharpEngineSceneView;
 
-            if (sharpEngineSceneView == null || sharpEngineSceneView.Scene == null)
+            if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
                 DisableDiagnosticsButton();
                 CloseDiagnosticsWindow();
+
                 SelectedGraphicInfoTextBlock.Text = null;
+                UsedGpuTextBlock.Visibility = Visibility.Hidden;
 
                 if (sharpEngineSceneView != null)
-                    sharpEngineSceneView.SceneViewInitialized += OnSceneViewInitialized;
+                {
+                    if (!_isSceneViewInitializedSubscribed)
+                    {
+                        sharpEngineSceneView.SceneViewInitialized += OnSceneViewInitialized;
+                        _isSceneViewInitializedSubscribed = true;
+                    }
+
+                    _currentSharpEngineSceneView = sharpEngineSceneView; 
+                }
 
                 return;
             }
 
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName + $" ({sharpEngineSceneView.PresentationType.ToString()})";
+                SelectedGraphicInfoTextBlock.ToolTip = null;
 
-            string gpuInfoText = sharpEngineSceneView.Scene.GpuDevice.PhysicalDeviceDetails.DeviceName;
+                UsedGpuTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SelectedGraphicInfoTextBlock.Text = "";
+                SelectedGraphicInfoTextBlock.ToolTip = null;
 
-            if (sharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap)
-                gpuInfoText += " (WriteableBitmap)";
+                UsedGpuTextBlock.Visibility = Visibility.Hidden;
+            }
 
-            SelectedGraphicInfoTextBlock.Text = gpuInfoText;
+            if (!_isPresentationTypeChangedSubscribed)
+            {
+                sharpEngineSceneView.PresentationTypeChanged += OnPresentationTypeChanged;
+                _isPresentationTypeChangedSubscribed = true;
+            }
+
+            _currentSharpEngineSceneView = sharpEngineSceneView;
 
             EnableDiagnosticsButton();
 
@@ -130,8 +295,24 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
         }
 
+        private void OnPresentationTypeChanged(object? sender, string? reason)
+        {
+            UpdateGraphicsCardInfo();
+
+            if (reason != null)
+                SelectedGraphicInfoTextBlock.ToolTip = reason;
+            else
+                SelectedGraphicInfoTextBlock.ToolTip = null;
+        }
+
         private void OnSceneViewInitialized(object? sender, EventArgs e)
         {
+            if (_currentSharpEngineSceneView != null && _isSceneViewInitializedSubscribed)
+            {
+                _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
+                _isSceneViewInitializedSubscribed = true;
+            }
+            
             UpdateGraphicsCardInfo();
         }
         
@@ -143,8 +324,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
         private void EnableDiagnosticsButton()
         {
-            if (_diagnosticsEnabledImage == null)
-                _diagnosticsEnabledImage = new BitmapImage(new Uri("pack://application:,,,/Ab4d.SharpEngine.Samples.Wpf;component/Resources/Diagnostics.png"));
+            _diagnosticsEnabledImage ??= new BitmapImage(new Uri("pack://application:,,,/Ab4d.SharpEngine.Samples.Wpf;component/Resources/Diagnostics.png"));
 
             DiagnosticsImage.Source = _diagnosticsEnabledImage;
             DiagnosticsButton.IsEnabled = true;
@@ -154,8 +334,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
         private void DisableDiagnosticsButton()
         {
-            if (_diagnosticsDisabledImage == null)
-                _diagnosticsDisabledImage = new BitmapImage(new Uri("pack://application:,,,/Ab4d.SharpEngine.Samples.Wpf;component/Resources/Diagnostics-gray.png"));
+            _diagnosticsDisabledImage ??= new BitmapImage(new Uri("pack://application:,,,/Ab4d.SharpEngine.Samples.Wpf;component/Resources/Diagnostics-gray.png"));
 
             DiagnosticsImage.Source = _diagnosticsDisabledImage;
             DiagnosticsButton.IsEnabled = false;
@@ -166,7 +345,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
         private void OpenDiagnosticsWindow()
         {
-            var sharpEngineSceneView = SamplesContext.Current.CurrentSharpEngineSceneView;
+            var sharpEngineSceneView = WpfSamplesContext.Current.CurrentSharpEngineSceneView;
 
             if (sharpEngineSceneView == null)
             {
@@ -175,10 +354,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             _diagnosticsWindow = new DiagnosticsWindow(sharpEngineSceneView);
-            _diagnosticsWindow.Closing += delegate (object? sender, CancelEventArgs args)
-            {
-                _diagnosticsWindow = null;
-            };
+            _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
 
             // Position DiagnosticsWindow to the top-left corner of our window
             double left = this.Left + this.ActualWidth;
@@ -222,89 +398,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             var supportPageElement = SampleList.Items.OfType<System.Xml.XmlElement>()
-                                                     .First(x => x.Attributes["Page"]?.Value == pageName);
+                                                     .First(x => x.Attributes["Location"]?.Value == pageName);
 
             SampleList.SelectedItem = supportPageElement;
 
             SampleList.ScrollIntoView(supportPageElement);
-        }
-
-        private void RightSideBorder_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            string newDescriptionText = "";
-
-            if (e.NewValue is XmlNode xmlNode && xmlNode.Attributes != null)
-            {
-                var descriptionAttribute = xmlNode.Attributes["Description"];
-
-                if (descriptionAttribute != null)
-                    newDescriptionText = descriptionAttribute.Value;
-
-
-                var seeAlsoAttribute = xmlNode.Attributes["SeeAlso"];
-
-                if (seeAlsoAttribute != null)
-                {
-                    var seeAlsoText = seeAlsoAttribute.Value;
-                    var seeAlsoParts = seeAlsoText.Split(';');
-
-                    var seeAlsoContent = new StringBuilder();
-                    for (var i = 0; i < seeAlsoParts.Length; i++)
-                    {
-                        var seeAlsoPart = seeAlsoParts[i].Trim();
-                        if (seeAlsoPart.Length == 0)
-                            continue;
-
-                        if (seeAlsoContent.Length > 0)
-                            seeAlsoContent.Append(", ");
-
-                        // TextBlockEx support links, for example: "click here \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| to learn more"
-                        if (seeAlsoPart.StartsWith("\\@"))
-                        {
-                            seeAlsoContent.Append(seeAlsoPart);
-                        }
-                        else
-                        {
-                            string linkDescription;
-
-                            // remove prefix that specifies the type ("T_"), property ("P_"), event ("E_"), ...
-                            if (seeAlsoPart[1] == '_') // "T_Ab3d_Controls_MouseCameraController", "P_Ab3d_Controls_MouseCameraController_ClosedHandCursor", ...
-                                linkDescription = seeAlsoPart.Substring(2);
-                            else
-                                linkDescription = seeAlsoPart;
-
-                            linkDescription = linkDescription.Replace('_', '.')                // Convert '_' to '.'
-                                                             .Replace("Ab4d.SharpEngine.", "");    // Remove the most common namespaces (preserve less common, for example Ab4d.Utilities)
-
-                            if (seeAlsoPart.EndsWith(".html") || seeAlsoPart.EndsWith(".htm"))
-                                linkDescription = linkDescription.Replace(".html", "").Replace(".htm", ""); // remove .html / .htm from linkDescription
-                            else
-                                seeAlsoPart += ".htm";                                                      // and make sure that the link will end with .htm
-
-                            seeAlsoContent.AppendFormat("\\@{0}:https://www.ab4d.com/help/DXEngine/html/{1}|", linkDescription, seeAlsoPart);
-                        }
-                    }
-
-                    if (seeAlsoContent.Length > 0)
-                    {
-                        if (newDescriptionText.Length > 0 && !newDescriptionText.EndsWith("\\n"))
-                            newDescriptionText += "\\n"; // Add new line for TextBlockEx
-
-                        newDescriptionText += "See also: " + seeAlsoContent.ToString();
-                    }
-                }
-            }
-
-            if (newDescriptionText.Length > 0)
-            {
-                DescriptionTextBlock.ContentText = newDescriptionText;
-                DescriptionExpander.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                DescriptionTextBlock.ContentText = null;
-                DescriptionExpander.Visibility = Visibility.Collapsed;
-            }
         }
 
         // Searches the logical controls tree and returns the first instance of SharpEngineSceneView if found
@@ -366,13 +464,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
-        private void DiagnosticsInfoImage_OnMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            // For CORE3 project we need to set UseShellExecute to true,
-            // otherwise a "The specified executable is not a valid application for this OS platform" exception is thrown.
-            System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com/DirectX/3D/Diagnostics.aspx") { UseShellExecute = true });
-        }
-
         private void ContentFrame_OnNavigated(object sender, NavigationEventArgs e)
         {
             // Prevent navigation (for example clicking back button) because our ListBox is not updated when this navigation occurs
@@ -404,7 +495,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             RightSideBorder.Padding = new Thickness(0);
 
             WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize; // This will also covert the taskbar
+            ResizeMode = ResizeMode.NoResize; // This will also covert the task bar
             WindowState = WindowState.Maximized;
 
             // Allow hitting escape to exit full screen

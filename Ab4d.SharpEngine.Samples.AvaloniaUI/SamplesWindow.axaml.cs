@@ -1,0 +1,628 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using System.Xml;
+using Ab4d.SharpEngine;
+using Ab4d.SharpEngine.AvaloniaUI;
+using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Lights;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.SceneNodes;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+
+namespace Ab4d.SharpEngine.Samples.AvaloniaUI
+{
+    public partial class SamplesWindow : Window
+    {
+        //private string? _startupPage = "CameraControllers.MouseCameraControllerSample";        
+        private string? _startupPage = null;
+
+        private DirectionalLight? _directionalLight;
+        private TargetPositionCamera? _targetPositionCamera;
+        private MouseCameraController? _mouseCameraController;
+        private SkiaSharpBitmapIO? _skiaSharpBitmapIo;
+
+        private Dictionary<string, Bitmap>? _resourceBitmaps;
+
+        private CommonTitleUserControl? _commonTitlePage;
+        private Dictionary<Assembly, string[]>? _assemblyEmbeddedResources;
+
+        private AxisLineNode? _axisLineNode;
+
+        private SolidColorBrush _samplesListTextBrush = new SolidColorBrush(Color.FromRgb(204, 204, 204));        // #CCC
+        private SolidColorBrush _samplesListHeaderTextBrush = new SolidColorBrush(Color.FromRgb(238, 238, 238));  // #EEE
+        private SolidColorBrush _samplesListSelectedTextBrush = new SolidColorBrush(Color.FromRgb(255, 187, 88)); // #FFBC57
+
+        private bool _applySeparator;
+
+        private CommonAvaloniaSampleUserControl? _commonAvaloniaSampleUserControl;
+        private Control? _currentSampleControl;
+        private CommonSample? _currentCommonSample;
+        private IAssetLoader? _assets;
+        private bool _isSceneViewInitializedSubscribed;
+        private bool _isPresentationTypeChangedSubscribed;
+        private ISharpEngineSceneView? _currentSharpEngineSceneView;
+
+        private TextBlock? _errorTextBlock;
+
+        public SamplesWindow()
+        {
+            // Setup logger
+            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
+
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+            InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
+
+            DisableDiagnosticsButton();
+
+            AvaloniaSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
+
+            this.Loaded += delegate(object? sender, RoutedEventArgs args)
+            {
+                LoadSamples();
+            };
+
+#if DEBUG
+            this.AttachDevTools();
+#endif
+        }
+
+        private void LoadSamples()
+        {
+            var xmlDcoument = new XmlDocument();
+            xmlDcoument.Load(@"Samples.xml");
+
+            if (xmlDcoument.DocumentElement == null)
+                throw new Exception("Cannot load Samples.xml");
+
+            var xmlNodeList = xmlDcoument.DocumentElement.SelectNodes("/Samples/Sample");
+
+            if (xmlNodeList == null || xmlNodeList.Count == 0)
+                throw new Exception("No samples in Samples.xml");
+
+
+            var listBoxItems = new List<ListBoxItem>();
+
+            int selectedIndex = 0;
+            foreach (XmlNode xmlNode in xmlNodeList)
+            {
+                try
+                {
+                    var listBoxItem = CreateListBoxItem(xmlNode);
+
+                    if (listBoxItem != null)
+                    {
+                        listBoxItems.Add(listBoxItem);
+
+                        if (listBoxItem.IsSelected)
+                        {
+                            selectedIndex = listBoxItems.Count - 1;
+                            listBoxItem.IsSelected = false;
+                        }
+                    }
+                }
+                catch
+                {
+                    Debug.WriteLine("Error parsing sample xml for " + xmlNode.OuterXml);
+                }
+            }
+
+            SamplesList.ItemsSource = listBoxItems;
+
+            if (selectedIndex != -1)
+                SamplesList.SelectedIndex = selectedIndex;
+        }
+
+        private ListBoxItem? CreateListBoxItem(XmlNode xmlNode)
+        {
+            if (xmlNode.Attributes == null)
+                return null;
+
+            bool isSeparator = false;
+            bool isTitle = false;
+
+            string? location = null;
+            string? title = null;
+            
+            foreach (XmlAttribute attribute in xmlNode.Attributes)
+            {
+                switch (attribute.Name.ToLower())
+                {
+                    case "location":
+                        location = attribute.Value;
+                        break;
+                    
+                    case "title":
+                        title = attribute.Value;
+                        break;
+                    
+                    case "isseparator":
+                        isSeparator = true;
+                        break;
+                    
+                    case "istitle":
+                        isTitle = true;
+                        break;
+                }
+            }
+
+            if (isSeparator)
+            {
+                _applySeparator = true;
+                return null;
+            }
+
+            var stackPanel = new StackPanel() { Orientation = Orientation.Horizontal };
+
+            var textBlock = new TextBlock()
+            {
+                Text = title,
+                FontSize = 14
+            };
+
+            double topMargin;
+            double bottomMargin;
+
+            if (isTitle)
+            {
+                textBlock.FontWeight = FontWeight.Bold;
+                textBlock.Foreground = _samplesListHeaderTextBrush;
+                topMargin = 6;
+                bottomMargin = 1;
+            }
+            else
+            {
+                textBlock.Foreground = _samplesListTextBrush;
+                topMargin = 0;
+                bottomMargin = 0;
+            }
+
+            if (_applySeparator)
+            {
+                topMargin += 4;
+                _applySeparator = false;
+            }
+
+            textBlock.Margin = new Thickness(isTitle ? 4 : 10, topMargin, 0, bottomMargin);
+            
+            stackPanel.Children.Add(textBlock);
+
+            var listBoxItem = new ListBoxItem()
+            {
+                Content = stackPanel,
+                Tag = location,
+            };
+
+            if (_startupPage != null && _startupPage == location)
+                listBoxItem.IsSelected = true;
+
+            return listBoxItem;
+        }
+
+        private void LogoImage_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
+        }
+
+        private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void SamplesList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            ShowSelectedSample(e);
+        }
+
+        private void ShowSelectedSample(SelectionChangedEventArgs args)
+        {
+            if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not ListBoxItem listBoxItem)
+                return;
+
+            var location = listBoxItem.Tag as string;
+
+            if (location == null) 
+                return;
+
+
+            _currentSampleControl = null;
+
+            if (_currentCommonSample != null)
+            {
+                _currentCommonSample.Dispose();
+                _currentCommonSample = null;
+            }
+
+            if (location.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            {
+                var markdownText = GetMarkdownText(location);
+
+                if (markdownText != null)
+                {
+                    _commonTitlePage ??= new CommonTitleUserControl();
+                    _commonTitlePage.MarkdownText = markdownText;
+
+                    _currentSampleControl = _commonTitlePage;
+                    _currentCommonSample = null;
+                }
+            }
+
+            if (_currentSampleControl == null)
+            {
+                // Try to create common sample type from page attribute
+                var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.AvaloniaUI.{location}, Ab4d.SharpEngine.Samples.AvaloniaUI", throwOnError: false);
+
+                if (sampleType == null)
+                    sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{location}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+
+                if (sampleType != null)
+                {
+                    var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+
+                    // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
+                    ConstructorInfo? selectedConstructorInfo = null;
+                    bool isCommonSampleType = false;
+
+                    foreach (var constructorInfo in constructors)
+                    {
+                        var parameterInfos = constructorInfo.GetParameters();
+
+                        // First try to get constructor that takes ICommonSamplesContext
+                        if (parameterInfos.Any(p => p.ParameterType == typeof(ICommonSamplesContext)))
+                        {
+                            selectedConstructorInfo = constructorInfo;
+                            isCommonSampleType = true;
+                            break;
+                        }
+
+                        // ... else use constructor without any parameters
+                        if (selectedConstructorInfo == null && parameterInfos.Length == 0)
+                        {
+                            selectedConstructorInfo = constructorInfo;
+                            isCommonSampleType = false;
+                        }
+                    }
+
+                    if (selectedConstructorInfo == null)
+                    {
+                        ShowError("No constructor without parameters or with ICommonSamplesContext found for the sample:" + Environment.NewLine + location);
+                        return;
+                    }
+
+                    if (isCommonSampleType)
+                    {
+                        // Create a common sample control (calling constructor that takes ICommonSamplesContext as parameter)
+
+                        var commonSamplesContext = AvaloniaSamplesContext.Current;
+
+                        //var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
+                        var commonSample = selectedConstructorInfo.Invoke(new object?[] { commonSamplesContext }) as CommonSample;
+
+                        _commonAvaloniaSampleUserControl ??= new CommonAvaloniaSampleUserControl();
+
+                        _commonAvaloniaSampleUserControl.CurrentCommonSample = commonSample;
+
+                        _currentSampleControl = _commonAvaloniaSampleUserControl;
+
+                        _currentCommonSample = commonSample;
+                    }
+                    else
+                    {
+                        // Create sample control (calling constructor without parameters)
+                        _currentSampleControl = selectedConstructorInfo.Invoke(null) as Control;
+                        _currentCommonSample = null;
+                    }
+                }
+                else
+                {
+                    _currentSampleControl = null;
+                    _currentCommonSample = null;
+                }
+            }
+
+            if (_currentSampleControl == null)
+            {
+                ShowError("Sample not found: " + Environment.NewLine + location);
+                return;
+            }
+
+
+            SelectedSampleContentControl.Content = _currentSampleControl;
+
+            if (_currentSampleControl != null)
+            {
+                // Find SharpEngineSceneView
+                var sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+                AvaloniaSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+            }
+        }
+
+        private string? GetMarkdownText(string location)
+        {
+            var markdownText = GetMarkdownText(this.GetType().Assembly, location);
+
+            if (markdownText == null)
+                markdownText = GetMarkdownText(typeof(CommonSample).Assembly, location);
+
+            return markdownText;
+        }
+
+        private string? GetMarkdownText(System.Reflection.Assembly assembly, string location)
+        {
+            _assemblyEmbeddedResources ??= new Dictionary<Assembly, string[]>();
+
+            if (!_assemblyEmbeddedResources.TryGetValue(assembly, out var embeddedResourceNames))
+            {
+                embeddedResourceNames = assembly.GetManifestResourceNames();
+                _assemblyEmbeddedResources.Add(assembly, embeddedResourceNames);
+            }
+
+            foreach (var embeddedResource in embeddedResourceNames)
+            {
+                if (embeddedResource.EndsWith(location))
+                {
+                    var manifestResourceStream = assembly.GetManifestResourceStream(embeddedResource);
+                    if (manifestResourceStream != null)
+                    {
+                        string markdownText;
+
+                        using (var streamReader = new StreamReader(manifestResourceStream))
+                            markdownText = streamReader.ReadToEnd();
+
+                        return markdownText;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void ShowError(string errorMessage)
+        {
+            _errorTextBlock ??= new TextBlock()
+            {
+                FontSize = 14,
+                FontWeight = FontWeight.Bold,
+                Foreground = Brushes.Red,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            _errorTextBlock.Text = errorMessage;
+
+            SelectedSampleContentControl.Content = _errorTextBlock;
+        }
+
+        private void EnableDiagnosticsButton()
+        {
+            DiagnosticsImage.Source = ReadBitmapFromAvaloniaResource("Resources/Diagnostics.png");
+            DiagnosticsButton.IsEnabled = true;
+
+            ToolTip.SetTip(DiagnosticsButton, null);
+        }
+
+        private void DisableDiagnosticsButton()
+        {
+            DiagnosticsImage.Source = ReadBitmapFromAvaloniaResource("Resources/Diagnostics-gray.png");
+
+            DiagnosticsButton.IsEnabled = false;
+
+            // Avalonia does not support showing tooltip on disabled control: https://github.com/AvaloniaUI/Avalonia/issues/3847
+            //ToolTip.SetTip(DiagnosticsButton, "Diagnostics button is disabled because there is no shown SharpEngineSceneView control.");
+        }
+
+
+        public Bitmap? ReadBitmapFromAvaloniaResource(string resourceName)
+        {
+            _resourceBitmaps ??= new Dictionary<string, Bitmap>();
+
+            if (_resourceBitmaps.TryGetValue(resourceName, out var cachedBitmap))
+                return cachedBitmap;
+
+
+            _assets ??= AvaloniaLocator.Current.GetService<IAssetLoader>();
+
+            if (_assets == null)
+                return null;
+
+            var uri = new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/" + resourceName);
+
+            if (!_assets.Exists(uri))
+                return null;
+
+            Bitmap bitmap;
+            using (var stream = _assets.Open(uri))
+            {
+                bitmap = new Bitmap(stream);
+            }
+
+            _resourceBitmaps.Add(resourceName, bitmap);
+
+            return bitmap;
+        }
+
+        private void OnCurrentSharpEngineSceneViewChanged(object? sender, EventArgs e)
+        {
+            if (_currentSharpEngineSceneView != null)
+            {
+                if (_isSceneViewInitializedSubscribed)
+                {
+                    _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
+                    _isSceneViewInitializedSubscribed = false;
+                }
+
+                if (_isPresentationTypeChangedSubscribed)
+                {
+                    _currentSharpEngineSceneView.PresentationTypeChanged -= OnPresentationTypeChanged;
+                    _isPresentationTypeChangedSubscribed = false;
+                }
+
+                _currentSharpEngineSceneView = null;
+            }
+
+            UpdateGraphicsCardInfo();
+        }
+
+        private void UpdateGraphicsCardInfo()
+        {
+            var sharpEngineSceneView = AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView;
+
+            if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
+            {
+                DisableDiagnosticsButton();
+                CloseDiagnosticsWindow();
+
+                // we cannot use Hidden as Visibility so just remove and set Text
+                SelectedGraphicInfoTextBlock.Text = "";
+                UsedGpuTextBlock.Text = "";
+
+                if (sharpEngineSceneView != null)
+                {
+                    if (!_isSceneViewInitializedSubscribed)
+                    {
+                        sharpEngineSceneView.SceneViewInitialized += OnSceneViewInitialized;
+                        _isSceneViewInitializedSubscribed = true;
+                    }
+
+                    _currentSharpEngineSceneView = sharpEngineSceneView;
+                }
+
+                return;
+            }
+
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName + $" ({sharpEngineSceneView.PresentationType.ToString()})";
+                UsedGpuTextBlock.Text = "Used graphics card:";
+            }
+            else
+            {
+                SelectedGraphicInfoTextBlock.Text = "";
+                UsedGpuTextBlock.Text = "";
+            }
+
+            ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+
+
+            if (!_isPresentationTypeChangedSubscribed)
+            {
+                sharpEngineSceneView.PresentationTypeChanged += OnPresentationTypeChanged;
+                _isPresentationTypeChangedSubscribed = true;
+            }
+
+            _currentSharpEngineSceneView = sharpEngineSceneView;
+
+            EnableDiagnosticsButton();
+
+            //if (_diagnosticsWindow != null)
+            //    _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+        }
+
+        private void OnPresentationTypeChanged(object? sender, string? reason)
+        {
+            UpdateGraphicsCardInfo();
+
+            if (reason != null)
+                ToolTip.SetTip(SelectedGraphicInfoTextBlock, reason);
+            else
+            ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+        }
+
+        private void OnSceneViewInitialized(object? sender, EventArgs e)
+        {
+            if (_currentSharpEngineSceneView != null && _isSceneViewInitializedSubscribed)
+            {
+                _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
+                _isSceneViewInitializedSubscribed = true;
+            }
+
+            UpdateGraphicsCardInfo();
+        }
+
+        // Searches the logical controls tree and returns the first instance of SharpEngineSceneView if found
+        private SharpEngineSceneView? FindSharpEngineSceneView(object? element)
+        {
+            var foundDViewportView = element as SharpEngineSceneView;
+
+            if (foundDViewportView != null)
+                return foundDViewportView;
+
+            if (element is ContentControl contentControl)
+            {
+                // Check the element's Content
+                foundDViewportView = FindSharpEngineSceneView(contentControl.Content);
+            }
+            else if (element is Decorator decorator) // for example Border
+            {
+                // Check the element's Child
+                foundDViewportView = FindSharpEngineSceneView(decorator.Child);
+            }
+            else if (element is ItemsControl itemsControl) // for example TabControl
+            {
+                // Check each child of a Panel
+                if (itemsControl.Items != null)
+                {
+                    foreach (object oneItem in itemsControl.Items)
+                    {
+                        if (oneItem is Control control)
+                        {
+                            foundDViewportView = FindSharpEngineSceneView(control);
+
+                            if (foundDViewportView != null)
+                                break;
+                        }
+                    }
+                }
+            }
+            else if (element is Panel panel)
+            {
+                // Check each child of a Panel
+                foreach (object oneChild in panel.Children)
+                {
+                    if (oneChild is Control control)
+                    {
+                        foundDViewportView = FindSharpEngineSceneView(control);
+
+                        if (foundDViewportView != null)
+                            break;
+                    }
+                }
+            }
+
+            return foundDViewportView;
+        }
+
+        private void CloseDiagnosticsWindow()
+        {
+            //if (_diagnosticsWindow != null)
+            //{
+            //    try
+            //    {
+            //        _diagnosticsWindow.Close();
+            //    }
+            //    catch
+            //    {
+            //        // pass
+            //    }
+            //}
+        }
+    }
+}

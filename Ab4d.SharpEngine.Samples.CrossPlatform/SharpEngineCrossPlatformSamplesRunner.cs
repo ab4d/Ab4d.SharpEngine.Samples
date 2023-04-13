@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -110,66 +109,24 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 UsedPresentationFramework = PresentationFrameworks.WinForms;
             else
-#elif OSX
-            UsedPresentationFramework = PresentationFrameworks.SilkWindowingGlfw; // On MacOS only Glfw is supported (SDL is not)
-#elif LINUX
-            UsedPresentationFramework = PresentationFrameworks.SilkWindowing;
-#else
-            UsedPresentationFramework = PresentationFrameworks.SilkWindowing;
 #endif
+                UsedPresentationFramework = PresentationFrameworks.SilkWindowing;
+
 
             _enableStandardValidation = true;
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             // Setup logger
-            SetupSharpEngineLogger(enableFullLogging: true); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+            SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
 
 
 #if WINDOWS
             _bitmapIO = new SystemDrawingBitmapIO();
-#elif LINUX || OSX
-    #if IMAGE_MAGIC
-            _bitmapIO = new ImageMagickBitmapIO();            
-    #else
-            _bitmapIO = new SkiaSharpBitmapIO();            
-    #endif
-
+#elif LINUX
+            _bitmapIO = new SkiaSharpBitmapIO();
+            //_bitmapIO = new ImageMagickBitmapIO();
 #else
             _bitmapIO = new UnsupportedBitmapIO();
-#endif
-
-#if OSX
-            // On MacOS Vulkan can be used by MoltenVK library - see: https://github.com/KhronosGroup/MoltenVK
-            // This requires that instead of the standard vulkan loader library (libvulkan.1.dylib), the 
-            // Molten VK library is loaded. Then the wrappers for Vulkan functions can be retrieved from that library.
-            // To make sure that GLFW will load the correct library, we need to make sure that MoltenVK library is 
-            // in the application execution folder and that it is named as the Vulkan loader library.
-            // 
-            // In this example we do that by copying the libMoltenVK.dylib into the libvulkan.1.dylib file.
-            // When you application is used only on MacOS, then you can also add the libMoltenVK.dylib
-            // from the lib/macos folder to this project and rename it to libvulkan.1.dylib file
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                string vulkanLibraryName = "libvulkan.1.dylib";
-                
-                string vulkanLibraryTargetPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, vulkanLibraryName);
-
-                if (!System.IO.File.Exists(vulkanLibraryTargetPath))
-                {
-                    string vulkanLibrarySourcePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../lib/macos/libMoltenVK.dylib");
-                    if (System.IO.File.Exists(vulkanLibrarySourcePath))
-                    {
-                        try
-                        {
-                            File.Copy(vulkanLibrarySourcePath, vulkanLibraryTargetPath);
-                        }
-                        catch
-                        {
-                            // pass
-                        }
-                    }
-                }
-            }
 #endif
 
             SetupPresentationControl();
@@ -311,7 +268,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-#region InitializeEngine
+        #region InitializeEngine
 
         private bool InitializeEngine()
         {
@@ -412,9 +369,10 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 return false;
             }
 
+            
             try
             {
-                _vulkanDevice = new VulkanDevice(vulkanInstance, VulkanPhysicalDevice, _vkSurfaceKHR);
+                _vulkanDevice = new VulkanDevice(vulkanInstance, VulkanPhysicalDevice, _vkSurfaceKHR, vulkanInstance.CreateOptions);
             }
             catch (Exception ex)
             {
@@ -499,9 +457,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;    // write log messages to output window
             }
         }
-#endregion
+        #endregion
 
-#region InitializeSceneView, UpdateLightModels
+        #region InitializeSceneView, UpdateLightModels
 
         private void InitializeSceneView()
         {
@@ -645,9 +603,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-#endregion
+        #endregion
 
-#region Run, RenderCallback, UpdateFrameStatistics
+        #region Run, RenderCallback, UpdateFrameStatistics
         public void Run()
         {
             // Start the render loop
@@ -665,9 +623,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 _sceneView.Render();
         }
 
-#endregion
+        #endregion
 
-#region Mouse event handlers
+        #region Mouse event handlers
 
         private void OnMouseMove(object sender, Ab4d.MouseMoveEventArgs e)
         {
@@ -714,9 +672,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-#endregion
+        #endregion
 
-#region Dispose
+        #region Dispose
         public unsafe void Dispose()
         {
             if (_allObjectsTestScene != null)

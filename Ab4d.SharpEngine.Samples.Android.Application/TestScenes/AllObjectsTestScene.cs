@@ -146,7 +146,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var geometryModel3 = new BoxModelNode(centerPosition: new Vector3(0, 0, -200), size: new Vector3(80, 80, 40), "Green transparent box")
             {
-                Material = new StandardMaterial() { DiffuseColor = Colors.Green.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Green.ToColor3(), Opacity = 0.7f, HasTransparency = true },
                 UseSharedBoxMesh = true // this is also a default value (a shared 1x1x1 mesh is by default used to for all boxes; then this mesh is transformed to be positioned and scaled based on centerPosition and Size
             };
 
@@ -159,7 +159,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 Position = new Vector3(0, 0, -100),
                 PositionType = PositionTypes.Center,
                 Size = new Vector3(80, 80, 40),
-                Material = new StandardMaterial() { DiffuseColor = Colors.Blue.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Blue.ToColor3(), Opacity = 0.7f, HasTransparency = true },
             };
 
             _specialMaterialGroup.Add(geometryModel4);
@@ -170,7 +170,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             var redBoxMesh = MeshFactory.CreateBoxMesh(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40));
             var geometryModel5 = new MeshModelNode(redBoxMesh, "Gray transparent box")
             {
-                Material = new StandardMaterial() { DiffuseColor = Colors.Gray.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Gray.ToColor3(), Opacity = 0.7f, HasTransparency = true },
             };
 
             _specialMaterialGroup.Add(geometryModel5);
@@ -953,7 +953,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             if (readObjModelNode != null)
             {
-                SceneNodeUtils.PositionAndScaleSceneNode(readObjModelNode, new Vector3(-300 + _loadedObjectsCount * 150, 0, 500), PositionTypes.Center, new Vector3(100, 100, 100));
+                ModelUtils.PositionAndScaleSceneNode(readObjModelNode, new Vector3(-300 + _loadedObjectsCount * 150, 0, 500), PositionTypes.Center, new Vector3(100, 100, 100));
 
                 if (_scene != null)
                     _scene.RootNode.Add(readObjModelNode);

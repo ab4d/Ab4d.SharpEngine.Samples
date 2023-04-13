@@ -1,0 +1,90 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.7-beta2" />
+    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Textures\sharp-engine-logo.png" />
+    <None Remove="StandardModels\OtherStandardModelsTitle.md" />
+    <None Remove="Titles\AdvancedModelsTitle.md" />
+    <None Remove="Titles\AnimationsTitle.md" />
+    <None Remove="Titles\CamerasTitle.md" />
+    <None Remove="Titles\HitTesting.md" />
+    <None Remove="Titles\ImportersTitle.md" />
+    <None Remove="Titles\LightsTitle.md" />
+    <None Remove="Titles\LinesTitle.md" />
+    <None Remove="Titles\MaterialsTitle.md" />
+    <None Remove="Titles\MouseCameraControllerTitle.md" />
+    <None Remove="Titles\StandardModelsTitle.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\Textures\sharp-engine-logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="StandardModels\OtherStandardModelsTitle.md" />
+    <EmbeddedResource Include="Titles\AnimationsTitle.md" />
+    <EmbeddedResource Include="Titles\LightsTitle.md" />
+    <EmbeddedResource Include="Titles\MaterialsTitle.md" />
+    <EmbeddedResource Include="Titles\MouseCameraControllerTitle.md" />
+    <EmbeddedResource Include="Titles\LinesTitle.md" />
+    <EmbeddedResource Include="Titles\ImportersTitle.md" />
+    <EmbeddedResource Include="Titles\CamerasTitle.md" />
+    <EmbeddedResource Include="Titles\AdvancedModelsTitle.md" />
+    <EmbeddedResource Include="Titles\HitTesting.md" />
+    <EmbeddedResource Include="Titles\StandardModelsTitle.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Importers\" />
+    <Folder Include="Materials\" />
+    <Folder Include="QuickStart\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Models\dragon_vrip_res3.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Models\dragon_vrip_res3.obj.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Models\dragon_vrip_res3_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\HeightMaps\europe.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\HeightMaps\europe_height.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\HeightMaps\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\HeightMaps\simpleHeightMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Models\house with trees.mtl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Models\house with trees.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Models\teapot-hires.obj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

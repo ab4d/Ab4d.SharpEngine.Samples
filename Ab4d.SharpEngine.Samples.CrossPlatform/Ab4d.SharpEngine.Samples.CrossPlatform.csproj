@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>0.9.0</Version>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -20,44 +19,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <DefineConstants>TRACE;DEBUG;LINUX;SKIA</DefineConstants>
   </PropertyGroup>
-  
-  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <TargetFramework>net6.0</TargetFramework>
-    <DefineConstants>TRACE;DEBUG;OSX;SKIA</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.0-beta1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\readme.txt" Link="Resources\BitmapFonts\readme.txt" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto font LICENSE.txt" Link="Resources\BitmapFonts\roboto font LICENSE.txt" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_128_0.png" Link="Resources\BitmapFonts\roboto_128_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_128_0.png" Link="Resources\BitmapFonts\roboto_black_128_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\BitmapFonts\roboto_black_with_outline_128_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\10x10-texture.png" Link="Resources\10x10-texture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\dragon_vrip_res3_readme.txt" Link="Resources\dragon_vrip_res3_readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\TreeTexture.png" Link="Resources\TreeTexture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\uvchecker.png" Link="Resources\uvchecker.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\uvchecker2.jpg" Link="Resources\uvchecker2.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation\Ab4d.StandardPresentation.csproj" />
@@ -66,8 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
-    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+    <PackageReference Include="SkiaSharp" Version="2.80.3" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.80.3" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('IMAGE_MAGIC'))">
@@ -81,44 +44,65 @@
     <ProjectReference Include="..\Ab4d.StandardPresentation\WpfUI\WpfUI.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.3" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.3" />
-  </ItemGroup>  
-
   <ItemGroup>
     <Folder Include="Resources\BitmapFonts\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\dragon_vrip_res3.obj" Link="Resources\dragon_vrip_res3.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\dragon_vrip_res3.obj.mtl" Link="Resources\dragon_vrip_res3.obj.mtl" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\robotarm.mtl" Link="Resources\robotarm.mtl" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\robotarm.obj" Link="Resources\robotarm.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\teapot-hires.obj" Link="Resources\teapot-hires.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Wpf\Resources\Teapot.obj" Link="Resources\Teapot.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" Link="Resources\BitmapFonts\readme.txt" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto font LICENSE.txt" Link="Resources\BitmapFonts\roboto font LICENSE.txt" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128_0.png" Link="Resources\BitmapFonts\roboto_128_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128_0.png" Link="Resources\BitmapFonts\roboto_black_128_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\BitmapFonts\roboto_black_with_outline_128_0.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\10x10-texture.png" Link="Resources\10x10-texture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3_readme.txt" Link="Resources\dragon_vrip_res3_readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\TreeTexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\uvchecker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker2.jpg" Link="Resources\uvchecker2.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_128.bmfc" Link="Resources\BitmapFonts\roboto_128.bmfc">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj" Link="Resources\dragon_vrip_res3.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj.mtl" Link="Resources\dragon_vrip_res3.obj.mtl" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.mtl" Link="Resources\robotarm.mtl" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.obj" Link="Resources\robotarm.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\teapot-hires.obj" Link="Resources\teapot-hires.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\Teapot.obj" Link="Resources\Teapot.obj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128.bmfc" Link="Resources\BitmapFonts\roboto_128.bmfc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_128.fnt" Link="Resources\BitmapFonts\roboto_128.fnt">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128.fnt" Link="Resources\BitmapFonts\roboto_128.fnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_128.bmfc" Link="Resources\BitmapFonts\roboto_black_128.bmfc">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128.bmfc" Link="Resources\BitmapFonts\roboto_black_128.bmfc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_128.fnt" Link="Resources\BitmapFonts\roboto_black_128.fnt">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128.fnt" Link="Resources\BitmapFonts\roboto_black_128.fnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_with_outline_128.bmfc" Link="Resources\BitmapFonts\roboto_black_with_outline_128.bmfc">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128.bmfc" Link="Resources\BitmapFonts\roboto_black_with_outline_128.bmfc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Android.Application\Resources\raw\BitmapFonts\roboto_black_with_outline_128.fnt" Link="Resources\BitmapFonts\roboto_black_with_outline_128.fnt">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128.fnt" Link="Resources\BitmapFonts\roboto_black_with_outline_128.fnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

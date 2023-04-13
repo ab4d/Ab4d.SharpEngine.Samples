@@ -11,20 +11,12 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.0-beta1" />
-    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.232" />
-  </ItemGroup>
-
   <ItemGroup>
     <AndroidResource Remove="Resources\raw\10x10-texture.png" />
     <AndroidResource Remove="Resources\raw\TreeTexture.png" />
     <AndroidResource Remove="Resources\raw\uvchecker.png" />
     <AndroidResource Remove="Resources\raw\uvchecker2.jpg" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="Resources\raw\BitmapFonts\roboto_128.bmfc" />
     <None Remove="Resources\raw\BitmapFonts\roboto_128.fnt" />
@@ -36,8 +28,29 @@
     <None Remove="Resources\raw\BitmapFonts\roboto_black_with_outline_128.fnt" />
     <None Remove="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Resources\raw\10x10-texture.png" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
+    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
+    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.232" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" Link="Resources\raw\BitmapFonts\readme.txt" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto font LICENSE.txt" Link="Resources\raw\BitmapFonts\roboto font LICENSE.txt" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128_0.png" Link="Resources\raw\BitmapFonts\roboto_128_0.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_128_0.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\10x10-texture.png" Link="Resources\raw\10x10-texture.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\raw\TreeTexture.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\raw\uvchecker.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker2.jpg" Link="Resources\raw\uvchecker2.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\raw\10x10-texture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_128.bmfc" />
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_128.fnt" />
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_128_0.png" />
@@ -47,8 +60,6 @@
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_black_with_outline_128.bmfc" />
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_black_with_outline_128.fnt" />
     <EmbeddedResource Include="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\raw\TreeTexture.png" />
     <EmbeddedResource Include="Resources\raw\uvchecker.png" />
     <EmbeddedResource Include="Resources\raw\uvchecker2.jpg" />
@@ -60,5 +71,14 @@
     <Folder Include="Resources\lib\armeabi-v7a\" />
     <Folder Include="Resources\lib\x86-64\" />
     <Folder Include="Resources\lib\x86\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128.bmfc" Link="Resources\raw\BitmapFonts\roboto_128.bmfc" />
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128.fnt" Link="Resources\raw\BitmapFonts\roboto_128.fnt" />
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128.bmfc" Link="Resources\raw\BitmapFonts\roboto_black_128.bmfc" />
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128.fnt" Link="Resources\raw\BitmapFonts\roboto_black_128.fnt" />
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128.bmfc" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128.bmfc" />
+    <None Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128.fnt" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128.fnt" />
   </ItemGroup>
 </Project>

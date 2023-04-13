@@ -1,8 +1,27 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaTest.App">
+             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.App">
     <Application.Styles>
-        <SimpleTheme Mode="Light" />
-        <!--<FluentTheme Mode="Light"/>-->
+        <SimpleTheme />
+        <!--<FluentTheme />-->
     </Application.Styles>
+    <Application.Resources>
+
+        <SolidColorBrush x:Key="BackgroundBrush">#333</SolidColorBrush>
+        <SolidColorBrush x:Key="SelectedBrush">#FFBC57</SolidColorBrush>
+        <SolidColorBrush x:Key="PointerOverBrush">#77FFBC57</SolidColorBrush>
+        <SolidColorBrush x:Key="ForegroundBrush">#CCC</SolidColorBrush>
+        <SolidColorBrush x:Key="HeaderBrush">#EEE</SolidColorBrush>
+
+        <LinearGradientBrush x:Key="GrayTitlePageGradient" StartPoint="0%,100%" EndPoint="0%,0%">
+            <GradientStop Color="#FCCC" Offset="0"/>
+            <GradientStop Color="#FFFFFFFF" Offset=".5"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="CommonSamplePageGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Offset="0" Color="White" />
+            <GradientStop Offset="1" Color="LightBlue" />
+        </LinearGradientBrush>
+
+    </Application.Resources>
 </Application>

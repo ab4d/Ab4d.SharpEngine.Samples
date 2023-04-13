@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.SamplesWindow"
+        xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
+        mc:Ignorable="d"
+        Width="1300" Height="720"
+        Icon="Resources/sharp-engine-logo.ico"
+        Title="SharpEngine with AvaloniaUI">
+
+    <Window.Resources>
+
+        <ControlTheme x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0 0 0 1" />
+            <Setter Property="Padding" Value="2 1 2 0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+              <ControlTemplate>
+                <Grid ColumnDefinitions="Auto, *">
+                  <Path Name="PART_ArrowShape" Grid.Column="0" VerticalAlignment="Bottom" Data="M1,4L4.5,7.5 1,11" StrokeThickness="2" Margin="0 0 0 6"/>
+                  <ContentPresenter Name="PART_ContentPresenter"
+                                    Grid.Column="1"
+                                    Padding="{TemplateBinding Padding}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    CornerRadius="{TemplateBinding CornerRadius}" />
+                </Grid>
+              </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ ContentPresenter">
+                <Setter Property="BorderBrush" Value="{StaticResource PointerOverBrush}" />
+            </Style>
+            <Style Selector="^:selected">
+                <Setter Property="BorderBrush" Value="{StaticResource SelectedBrush}" />
+            </Style>
+            <Style Selector="^:selected /template/ Path">
+                <Setter Property="Stroke" Value="{StaticResource SelectedBrush}" />
+            </Style>
+            <Style Selector="^:selected:pointerover /template/ ContentPresenter">
+                <Setter Property="BorderBrush" Value="{StaticResource SelectedBrush}" />
+            </Style>
+        </ControlTheme>
+
+    </Window.Resources>
+
+    <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}" ColumnDefinitions="270, *">
+
+    <!-- LEFT SIDE: -->
+
+    <Grid Name="LeftSideGrid" Grid.Column="0" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *">
+
+      <TextBlock Grid.Row="0" Margin="10 15 5 0" HorizontalAlignment="Left" Text="Ab4d.SharpEngine by"
+                 FontWeight="Bold" FontSize="16" Foreground="{StaticResource HeaderBrush}"/>
+
+      <Image Name="LogoImage" Grid.Row="1" Margin="10 5 5 0" HorizontalAlignment="Left" Cursor="Hand" PointerPressed="LogoImage_OnPointerPressed"
+             Source="Resources/ab4d-logo.png" Width="128" ToolTip.Tip="Click to visit the AB4D company web site"/>
+
+
+      <TextBlock Name="UsedGpuTextBlock" Grid.Row="2" Margin="10 13 5 0" HorizontalAlignment="Left"
+                 Text="Used graphics card:" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
+
+      <Grid Grid.Row="4" Margin="10 0 5 0" HorizontalAlignment="Left" ColumnDefinitions="Auto, *">
+
+        <Image Name="RejectedGraphicsProfileWarningImage" Grid.Column="0" Margin="0 0 5 0" Height="14"
+               Source="Resources/warningIcon.png" IsVisible="False" ToolTip.ShowDelay="60000"/>
+
+        <TextBlock Name="SelectedGraphicInfoTextBlock" Grid.Column="1" Text="" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" />
+
+      </Grid>
+
+      <StackPanel Grid.Row="5" Margin="10 10 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
+        <!--<Button Name="GraphicsSettingsButton" Width="100" Margin="0 0 20 0" HorizontalContentAlignment="Left" Click="GraphicsSettingsButton_OnClick">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources/Settings.png" Width="18" Height="18" Margin="5 1 0 0" />
+                        <TextBlock Name="SettingsTextBlock" Text="Settings" Margin="5 3" />
+                    </StackPanel>
+                </Button>-->
+
+        <Button Name="DiagnosticsButton" IsEnabled="False" Width="100" Padding="1" Click="DiagnosticsButton_OnClick">
+          <StackPanel Orientation="Horizontal">
+            <Image Name="DiagnosticsImage" Width="18" Height="18" Margin="3 1 0 0" />
+            <TextBlock Name="DiagnosticsTextBlock" Text="Diagnostics" Margin="5 3" />
+          </StackPanel>
+        </Button>
+      </StackPanel>
+
+      <ListBox Name="SamplesList" Grid.Row="6"
+               Margin="5 15 0 5" Padding="0 0 0 0"
+               SelectedIndex="0"
+               Background="{StaticResource BackgroundBrush}"
+               BorderThickness="1"
+               BorderBrush="{StaticResource BackgroundBrush}"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+               SelectionChanged="SamplesList_OnSelectionChanged">
+      </ListBox>
+    </Grid>
+
+
+    <!-- RIGHT SIDE: -->
+
+    <Grid Name="RightSideGrid" Grid.Column="1" RowDefinitions="Auto, *">
+
+      <Border Name="RightSideBorder" Grid.Row="1"
+              BorderBrush="Black" BorderThickness="2" Margin="1 5 5 5" Background="White">
+          <ContentControl x:Name="SelectedSampleContentControl" />
+      </Border>
+    </Grid>
+
+    <GridSplitter Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="1 0 0 0" Width="3" Background="{StaticResource BackgroundBrush}" />
+
+  </Grid>
+</Window>

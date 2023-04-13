@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 17.0.7.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.WinUI", "Ab4d.SharpEngine.Samples.WinUI\Ab4d.SharpEngine.Samples.WinUI.csproj", "{7798A687-CF52-44D4-BC6B-FADB9065BD78}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.Common", "Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj", "{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,22 @@ Global
 		{7798A687-CF52-44D4-BC6B-FADB9065BD78}.Release|x86.ActiveCfg = Release|x86
 		{7798A687-CF52-44D4-BC6B-FADB9065BD78}.Release|x86.Build.0 = Release|x86
 		{7798A687-CF52-44D4-BC6B-FADB9065BD78}.Release|x86.Deploy.0 = Release|x86
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|arm64.Build.0 = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|x64.Build.0 = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Debug|x86.Build.0 = Debug|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|arm64.ActiveCfg = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|arm64.Build.0 = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|x64.ActiveCfg = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|x64.Build.0 = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|x86.ActiveCfg = Release|Any CPU
+		{6441D3D0-AAED-4040-AB22-9C946DBFAE4C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

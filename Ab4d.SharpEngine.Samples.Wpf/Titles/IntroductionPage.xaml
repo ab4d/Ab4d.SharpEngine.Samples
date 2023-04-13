@@ -1,0 +1,24 @@
+﻿<Page x:Class="Ab4d.SharpEngine.Samples.Wpf.Titles.IntroductionPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:common="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Common"
+      xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.Wpf;assembly=Ab4d.SharpEngine.Wpf"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"      
+      Title="IntroductionPage">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" Grid.Row="0" PresentationType="SharedTexture" BackgroundColor="White" />
+
+        <TextBlock Name="InfoTextBlock" Grid.Row="1" FontSize="22" HorizontalAlignment="Center" TextAlignment="Center" Margin="0 0 0 20" Visibility="Hidden"
+                   Text="Ab4d.SharpEngine is a blazing fast and cross platform&#x0a;3D rendering engine for desktop and mobile .Net applications." />
+
+        <Button Name="PlayAgainButton" Grid.Row="1" Content="Play again" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="5" Visibility="Hidden" Click="PlayAgainButton_OnClick" />
+    </Grid>
+</Page>

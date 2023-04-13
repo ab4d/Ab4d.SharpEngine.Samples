@@ -1,0 +1,85 @@
+﻿<Window x:Class="Ab4d.SharpEngine.Samples.Wpf.Diagnostics.DiagnosticsWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Diagnostics"
+             mc:Ignorable="d" 
+             Title="SharpEngine Diagnostics"
+             Icon="../Resources/sharp-engine-logo.ico"
+             Width="310" SizeToContent="Height">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <TextBlock Name="SharpEngineInfoTextBlock" Grid.Row="0" Text="Ab4d.SharpEngine v0.0.0 (debug)" FontWeight="Bold" Margin="10 7 37 2"/>
+
+        <Menu Name="ActionsMenu" Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 2 5 2" SnapsToDevicePixels="True">
+            <MenuItem Name="ActionsRootMenuItem" Padding="6 2" Background="White" >
+                <MenuItem.Header>
+                    <Canvas Width="18" Height="15" Background="Transparent" Margin="2">
+                        <Rectangle Canvas.Top="0" Height="3" Width="18" Fill="#444" />
+                        <Rectangle Canvas.Top="6" Height="3" Width="18" Fill="#444" />
+                        <Rectangle Canvas.Top="12" Height="3" Width="18" Fill="#444" />
+                    </Canvas>
+                </MenuItem.Header>
+
+                <RadioButton Name="ShowRenderingStatisticsRadioButton" Content="Show rendering statistics" IsChecked="True" GroupName="StatisticsType" Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
+                <RadioButton Name="ShowCameraInfoRadioButton" Content="Show camera info" GroupName="StatisticsType"  Width="170" Checked="StatisticsTypeRadioButton_OnChecked" />
+
+                <Separator />
+                <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
+                <MenuItem Name="DumpRenderingLayersMenuItem" Header="Dump RenderingLayers" Click="DumpRenderingLayersMenuItem_OnClick"/>
+                <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
+                <MenuItem Name="DumpUsedMaterialsMenuItem" Header="Dump used materials" Click="DumpUsedMaterialsMenuItem_OnClick"/>
+                <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
+                <MenuItem Name="ShowFullSceneDumpMenuItem" Header="Get full scene dump" Click="ShowFullSceneDumpMenuItem_OnClick"/>
+
+                <Separator />
+                <MenuItem Name="DumpMemoryMenuItem" Header="Dump Memory" Click="DumpMemoryMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesMenuItem" Header="Dump Resources" Click="DumpResourcesMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesGroupByTypeMenuItem" Header="Dump resources (group by type)" Click="DumpResourcesGroupByTypeMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesForDelayedDisposalMenuItem" Header="Dump Resources for delayed disposal" Click="DumpResourcesForDelayedDisposalMenuItem_OnClick"/>
+                <MenuItem Name="GarbageCollectMenuItem" Header="Garbage collect" Click="GarbageCollectMenuItem_OnClick"/>
+                
+                <Separator />
+                <MenuItem Name="StartStopCameraRotationMenuItem" Header="Toggle camera rotation" Click="StartStopCameraRotationMenuItem_OnClick"/>
+                <MenuItem Name="SaveToBitmapMenuItem" Header="Save frame to bitmap" Click="SaveToBitmapMenuItem_OnClick"/>
+                <MenuItem Name="CaptureInRenderDocMenuItem" Header="Capture next frame in RenderDoc" Click="CaptureInRenderDocMenuItem_OnClick"/>
+
+                <Separator />
+                <CheckBox Name="ShowCpuUsageCheckBox" Content="Show CPU usage" IsChecked="False" Checked="OnShowCpuUsageCheckBoxCheckedChanged" Unchecked="OnShowCpuUsageCheckBoxCheckedChanged"/>
+                <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" Checked="AlwaysOnTopCheckBoxChanged" Unchecked="AlwaysOnTopCheckBoxChanged"/>
+                
+                <Separator />
+                <MenuItem Name="OnlineReferenceHelpMenuItem" Header="Online reference help" Click="OnlineReferenceHelpMenuItem_OnClick" />
+
+            </MenuItem>
+        </Menu>
+
+        <local:DeviceInfoUserControl x:Name="DeviceInfoControl" Grid.Row="1" Margin="10 0 10 0" HorizontalAlignment="left"/>
+
+        <StackPanel Name="LogWarningsPanel" Grid.Row="1"  Margin="0 0 10 0" HorizontalAlignment="Right" Orientation="Horizontal" Background="White" Visibility="Collapsed"
+                    Cursor="Hand" MouseLeftButtonDown="LogWarningsPanel_OnMouseLeftButtonDown">
+            <Image Name="WarningIcon" Source="../Resources/warningIcon.png" Width="16" Height="16" Margin="3 0 2 0"/>
+            <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10" Visibility="Collapsed">
+            <!--<Button Name="StopPerformanceAnalyzerButton" Content="STOP Analyzer" Padding="10 4" Visibility="Collapsed" Click="StopPerformanceAnalyzerButton_OnClick" />-->
+            <Button Name="ShowStatisticsButton" Content="Show rendering statistics" Padding="10 4" Visibility="Collapsed" Click="ShowStatisticsButton_OnClick" />
+        </StackPanel>
+
+        <TextBlock Name="ResultsTitleTextBlock" Grid.Row="3" TextDecorations="Underline" Margin="10 10 10 2" Visibility="Collapsed"
+                   Text="Rendering statistics:"/>
+        
+        <TextBlock Name="StatisticsTextBlock" Grid.Row="4" Margin="10 0 10 10" Visibility="Collapsed" />
+
+        <TextBox Name="AnalyerResultsTextBox" Grid.Row="4" Margin="10 0 10 10" Visibility="Collapsed" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="9"/>
+    </Grid>
+</Window>

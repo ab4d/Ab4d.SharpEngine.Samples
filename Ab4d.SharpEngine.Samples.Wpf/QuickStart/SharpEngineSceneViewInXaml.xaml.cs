@@ -5,6 +5,9 @@ using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using Ab4d.SharpEngine.Samples.Wpf;
+using Ab4d.SharpEngine;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
@@ -14,6 +17,7 @@ using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
 using System.Windows.Media.Imaging;
 using System.IO;
+using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 {
@@ -22,9 +26,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
     /// </summary>
     public partial class SharpEngineSceneViewInXaml : Page
     {
-        private Scene? _scene;
-        private SceneView? _sceneView;
-
         private GroupNode? _groupNode;
         
         private MouseCameraController? _mouseCameraController;
@@ -45,51 +46,44 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             // This sample shows how to create SharpEngineSceneView in XAML.
             // To see how do create SharpEngineSceneView in code, see the SharpEngineSceneViewInCode sample.
-            //
-            // When SharpEngineSceneView is defined in XAML, then the Initialize method that creates the Scene and SceneView
-            // is called when the SharpEngineSceneView is loaded (this way it is possible to set CreateOptions and other properties).
-            // To get the Scene and SceneView event when they are created, we can use the SceneViewCreated event.
-            //
 
-            //
+#if DEBUG
             // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             MainSceneView.CreateOptions.EnableStandardValidation = true;
-            
-            MainSceneView.SceneViewCreated += delegate(object sender, SceneViewCreatedEventArgs args)
-            {
-                // NOTE: args.Scene and args.SceneView are never null in SceneViewCreated event handler
-                _scene = args.Scene;
-                _sceneView = args.SceneView;
+#endif
 
-                CreateTestScene(_scene, _sceneView);
-                SetupMouseCameraController();
+            // In case when VulkanDevice cannot be created, show an error message
+            // If this is not handled by the user, then SharpEngineSceneView will show its own error message
+            MainSceneView.GpuDeviceCreationFailed += delegate (object sender, DeviceCreateFailedEventArgs args)
+            {
+                ShowDeviceCreateFailedError(args.Exception); // Show error message
+                args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
 
-
-            // Instead of waiting for SharpEngineSceneView to be loaded and getting Scene and SceneView from SceneViewCreated event,
-            // it is also possible to manually call Initialize and immediately get the Scene and SceneView objects.
-            // This is done in the commented code below:
-            //var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngine WPF samples", enableStandardValidation: true);
+            // We can also manually initialize the SharpEngineSceneView ba calling Initialize method - see commented code below.
+            // This would immediately create the VulkanDevice.
+            // If this is not done, then Initialize is automatically called when the SharpEngineSceneView is loaded.
 
             //// Call Initialize method that creates the Vulkan device, Scene and SceneView
-            //(_scene, _sceneView) = MainSceneView.Initialize(engineCreateOptions);
-            //
-            //CreateTestScene(_scene, _sceneView);
-            //SetupMouseCameraController();
+            //try
+            //{
+            //    var gpuDevice = _sharpEngineSceneView.Initialize();
+            //}
+            //catch (SharpEngineException ex)
+            //{
+            //    ShowDeviceCreateFailedError(ex);
+            //    return;
+            //}
 
 
-            this.Unloaded += delegate (object sender, RoutedEventArgs args)
-            {
-                MainSceneView.Dispose();
-            };
+            CreateTestScene();
+            SetupMouseCameraController();
+
+            this.Unloaded += (sender, args) => MainSceneView.Dispose();
         }
 
         private void SetupMouseCameraController()
         {
-            if (MainSceneView == null || MainSceneView.SceneView == null)
-                return;
-
-
             _targetPositionCamera = new TargetPositionCamera()
             {
                 Heading = -40,
@@ -113,7 +107,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             };
         }
 
-        private void CreateTestScene(Scene scene, SceneView sceneView)
+        private void CreateTestScene()
         {
             var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(0, 0, 0), 
                                                     size: new Vector2(400, 300), 
@@ -125,12 +119,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 BackMaterial = StandardMaterials.Black
             };
 
-            scene.RootNode.Add(planeModelNode);
+            MainSceneView.Scene.RootNode.Add(planeModelNode);
 
             // Create a GroupNode that will group all created objects
             _groupNode = new GroupNode("GroupNode");
             _groupNode.Transform = new StandardTransform(translateX: 50, translateZ: 30);
-            scene.RootNode.Add(_groupNode);
+            MainSceneView.Scene.RootNode.Add(_groupNode);
             
             for (int i = 1; i <= 8; i++)
             {
@@ -156,9 +150,22 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             }
         }
 
+        private void ShowDeviceCreateFailedError(Exception ex)
+        {
+            var errorTextBlock = new TextBlock()
+            {
+                Text = "Error creating VulkanDevice:\r\n" + ex.Message,
+                Foreground = Brushes.Red,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            RootGrid.Children.Add(errorTextBlock);
+        }
+
         private void AddNewButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_scene == null || _groupNode == null)
+            if (_groupNode == null)
                 return;
 
             var boxModel3D = new BoxModelNode($"BoxModel3D_{_newObjectsCounter}")
@@ -175,7 +182,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
         
         private void RemoveButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_scene == null || _groupNode == null || _groupNode.Count == 0)
+            if (_groupNode == null || _groupNode.Count == 0)
                 return;
 
             _groupNode.RemoveAt(_groupNode.Count -1);
@@ -189,33 +196,33 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             if (MainSceneView == null)
                 return;
 
-            MainSceneView.BackgroundColor = SamplesContext.Current.GetRandomWpfColor();
+            MainSceneView.BackgroundColor = WpfSamplesContext.Current.GetRandomWpfColor();
         }
         
         private void ChangeMaterial1Button_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_scene == null || _groupNode == null || _groupNode.Count == 0)
+            if (_groupNode == null || _groupNode.Count == 0)
                 return;
 
-            var index = SamplesContext.Current.GetRandomInt(_groupNode.Count - 1);
+            var index = WpfSamplesContext.Current.GetRandomInt(_groupNode.Count - 1);
 
             if (_groupNode[index] is ModelNode modelNode)
             {
                 if (modelNode.Material is StandardMaterial standardMaterial)
-                    standardMaterial.DiffuseColor = SamplesContext.Current.GetRandomColor3();
+                    standardMaterial.DiffuseColor = WpfSamplesContext.Current.GetRandomColor3();
             }
         }
         
         private void ChangeMaterial2Button_OnClick(object sender, RoutedEventArgs e)
         {
-            if (_scene == null || _groupNode == null || _groupNode.Count == 0)
+            if (_groupNode == null || _groupNode.Count == 0)
                 return;
 
-            var index = SamplesContext.Current.GetRandomInt(_groupNode.Count - 1);
+            var index = WpfSamplesContext.Current.GetRandomInt(_groupNode.Count - 1);
 
             if (_groupNode[index] is ModelNode modelNode)
             {
-                modelNode.Material = SamplesContext.Current.GetRandomStandardMaterial();
+                modelNode.Material = WpfSamplesContext.Current.GetRandomStandardMaterial();
             }
         }
 

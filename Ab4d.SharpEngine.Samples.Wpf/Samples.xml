@@ -1,37 +1,59 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Samples>
 
-  <Sample Page="IntroductionPage.xaml" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
+  <Sample Location="Titles/IntroductionPage.xaml" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
+  <!--<Sample Location="Common/MarkdownTestPage.xaml" IsTitle="True" Title="Markdown Test"/>-->
   <Sample IsSeparator="True" />
 
-
-  <Sample Page="QuickStart/QuickStartIntroductionPage.xaml" IsTitle="True" Title="Quick Start" />
-  <Sample Page="QuickStart/SharpEngineSceneViewInCode.xaml" Title="SharpEngineSceneView in code" Description="" />
-  <Sample Page="QuickStart/SharpEngineSceneViewInXaml.xaml" Title="SharpEngineSceneView in XAML" Description="" />
-
-
-  <Sample Page="TestScenes/TestScenesIntroductionPage.xaml" IsTitle="True" Title="Test Scenes"/>
-  <Sample Page="TestScenes/AllObjectsTestScene.xaml" Title="AllObjectsTestScene" Description="" />
-
+  <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
+  <Sample Location="QuickStart/SharpEngineSceneViewInCode.xaml" Title="SharpEngineSceneView in code" />
+  <Sample Location="QuickStart/SharpEngineSceneViewInXaml.xaml" Title="SharpEngineSceneView in XAML" />
   <Sample IsSeparator="True" />
-  <Sample Page="TestScenes/LightsTestScene.xaml" Title="Lights test" Description="" />
-  <Sample Page="TestScenes/HitTestingTestScene.xaml" Title="Hit-testing" Description="" />
+  <Sample Location="QuickStart.MultiSceneNodesSample" Title="Multi SceneNodes" />
+
+  <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
+  <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
+  <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
+  <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
+  <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+
+  <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
+  <Sample Location="CameraControllers/MouseCameraControllerSample.xaml" Title="MouseCameraController"/>
+
+  <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
+  <Sample Location="Lights.LightsSample" Title="Lights"/>
   
-  <Sample IsSeparator="True" />
-  <Sample Page="TestScenes/AssimpImporterTestScene.xaml" Title="Assimp Importer" Description="" />
+  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
 
+  <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
+  <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
   <Sample IsSeparator="True" />
-  <Sample Page="TestScenes/ExtrudedMeshTestScene.xaml" Title="Extruded mesh test" Description="" />
-  <Sample Page="TestScenes/LatheTestScene.xaml" Title="Lathe test" Description="" />
-  <Sample Page="TestScenes/TubesTestScene.xaml" Title="Tubes test" Description="" />
-  <Sample Page="TestScenes/TubePathsTestScene.xaml" Title="TubePaths test" Description="" />
-  
+  <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
+  <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
+  <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
+  <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
+  <Sample Location="StandardModels.OtherStandardModelsTitle.md" Title="Other models"/>
   <Sample IsSeparator="True" />
-  <Sample Page="TestScenes/HeightMapTestScene.xaml" Title="HeightMap test" Description="" />
+  <Sample Location="StandardModels.TransformationsSample" Title="Transformations"/>
 
-  <Sample IsSeparator="True" />
-  <Sample Page="TestScenes/LinesTestScene.xaml" Title="Lines test" Description="" />
-  <Sample Page="TestScenes/CurveLineTestScene.xaml" Title="Curve Line" Description="" />
-  <Sample Page="TestScenes/WireGridTestScene.xaml" Title="WireGrid test" Description="" />
+  <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+
+  <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
+  <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
+
+  <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
+  <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
+  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
 
 </Samples>

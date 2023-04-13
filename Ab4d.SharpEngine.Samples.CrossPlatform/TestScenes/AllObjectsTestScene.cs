@@ -144,7 +144,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var geometryModel3 = new BoxModelNode(centerPosition: new Vector3(0, 0, -200), size: new Vector3(80, 80, 40), "Green transparent box")
             {
-                Material = new StandardMaterial() { DiffuseColor = Colors.Green.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Green.ToColor3(), Opacity = 0.7f, HasTransparency = true },
                 UseSharedBoxMesh = true // this is also a default value (a shared 1x1x1 mesh is by default used to for all boxes; then this mesh is transformed to be positioned and scaled based on centerPosition and Size
             };
 
@@ -157,7 +157,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 Position = new Vector3(0, 0, -100),
                 PositionType = PositionTypes.Center,
                 Size = new Vector3(80, 80, 40),
-                Material = new StandardMaterial() { DiffuseColor = Colors.Blue.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Blue.ToColor3(), Opacity = 0.7f, HasTransparency = true },
             };
 
             _specialMaterialGroup.Add(geometryModel4);
@@ -168,7 +168,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             var redBoxMesh = MeshFactory.CreateBoxMesh(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40));
             var geometryModel5 = new MeshModelNode(redBoxMesh, "Gray transparent box")
             {
-                Material = new StandardMaterial() { DiffuseColor = Colors.Gray.ToColor3(), Alpha = 0.7f, HasTransparency = true },
+                Material = new StandardMaterial() { DiffuseColor = Colors.Gray.ToColor3(), Opacity = 0.7f, HasTransparency = true },
             };
 
             _specialMaterialGroup.Add(geometryModel5);
@@ -195,17 +195,15 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             // Add textured sample when we support reading texture files
             if (_bitmapIO != null && _bitmapIO.IsFileFormatImportSupported("jpg") && _bitmapIO.IsFileFormatImportSupported("png"))
             {
-                string bitmapFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\10x10-texture.png");
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice, generateMipMaps: false),
+                    Material = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice, generateMipMaps: false),
                 };
 
                 texturedMaterialGroup.Add(geometryModel7);
 
 
-                bitmapFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\uvchecker2.jpg");
-                var textureMaterial = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice, generateMipMaps: true);
+                var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker2.jpg", _bitmapIO, _scene.GpuDevice, generateMipMaps: true);
                 var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
                 {
                     Material = textureMaterial,
@@ -225,17 +223,15 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 texturedMaterialGroup.Add(geometryModel9);
 
 
-                bitmapFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\uvchecker.png");
                 var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice),
+                    Material = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, _scene.GpuDevice),
                 };
 
                 texturedMaterialGroup.Add(geometryModel10);
 
 
-                bitmapFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\TreeTexture.png");
-                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice);
+                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(@"Resources\TreeTexture.png", _bitmapIO, _scene.GpuDevice);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -364,8 +360,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             //
             if (_bitmapIO != null)
             {
-                string bitmapFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\10x10-texture.png");
-                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
                 solidColorMaterial2.Effect = solidColorEffect;
 
                 var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -398,7 +393,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
-                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(bitmapFileName, _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
                 solidColorMaterial3.Effect = customSolidColorEffect;
 
                 var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -956,7 +951,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             if (readObjModelNode != null)
             {
-                SceneNodeUtils.PositionAndScaleSceneNode(readObjModelNode, new Vector3(-300 + _loadedObjectsCount * 150, 0, 500), PositionTypes.Center, new Vector3(100, 100, 100));
+                ModelUtils.PositionAndScaleSceneNode(readObjModelNode, new Vector3(-300 + _loadedObjectsCount * 150, 0, 500), PositionTypes.Center, new Vector3(100, 100, 100));
 
                 if (_scene != null)
                     _scene.RootNode.Add(readObjModelNode);

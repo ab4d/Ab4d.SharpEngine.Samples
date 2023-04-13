@@ -8,185 +8,37 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>sharp-engine-logo.ico</ApplicationIcon>
+    <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.0-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.0-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.0-beta1" />
+    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.7-beta2" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.7-beta2" />    
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab4d.SharpEngine.Diagnostics.Wpf\Ab4d.SharpEngine.Diagnostics.Wpf.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Resources\10x10-texture.png" />
-    <None Remove="Resources\ab4d-logo.png" />
-    <None Remove="Resources\BitmapFonts\arial_128.fnt" />
-    <None Remove="Resources\BitmapFonts\arial_128.png" />
-    <None Remove="Resources\BitmapFonts\arial_black_128.fnt" />
-    <None Remove="Resources\BitmapFonts\arial_black_128.png" />
-    <None Remove="Resources\BitmapFonts\arial_black_with_outline_128.bmfc" />
-    <None Remove="Resources\BitmapFonts\arial_black_with_outline_128.fnt" />
-    <None Remove="Resources\BitmapFonts\arial_black_with_outline_128_0.png" />
-    <None Remove="Resources\BitmapFonts\arial_test_no_padding.fnt" />
-    <None Remove="Resources\BitmapFonts\arial_test_no_padding_0.png" />
-    <None Remove="Resources\Diagnostics-gray.png" />
-    <None Remove="Resources\Diagnostics.png" />
-    <None Remove="Resources\dragon_vrip_res3.obj" />
-    <None Remove="Resources\dragon_vrip_res3.obj.mtl" />
-    <None Remove="Resources\dragon_vrip_res3_readme.txt" />
-    <None Remove="Resources\duck.dae" />
-    <None Remove="Resources\duckCM.png" />
-    <None Remove="Resources\HeightMaps\simpleHeightMap.png" />
-    <None Remove="Resources\new_icon.png" />
-    <None Remove="Resources\robotarm.mtl" />
-    <None Remove="Resources\robotarm.obj" />
-    <None Remove="Resources\Settings.png" />
-    <None Remove="Resources\sharp-engine-logo.png" />
-    <None Remove="Resources\teapot-hires.obj" />
-    <None Remove="Resources\Teapot.obj" />
-    <None Remove="Resources\TreeTexture.png" />
-    <None Remove="Resources\updated_icon.png" />
-    <None Remove="Resources\uvchecker.png" />
-    <None Remove="Resources\uvchecker2.jpg" />
-    <None Remove="Resources\warningIcon.png" />
-    <None Remove="Samples.xml" />
-    <None Remove="sharp-engine-logo.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\10x10-texture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_128.fnt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_128.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_black_128.fnt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_black_128.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_black_with_outline_128.bmfc">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_black_with_outline_128.fnt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_black_with_outline_128_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_test_no_padding.fnt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\BitmapFonts\arial_test_no_padding_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\dragon_vrip_res3.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\dragon_vrip_res3.obj.mtl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\dragon_vrip_res3_readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\duck.dae">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\duckCM.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\HeightMaps\simpleHeightMap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\robotarm.mtl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\robotarm.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\teapot-hires.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Teapot.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\TreeTexture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\uvchecker.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\uvchecker2.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Resources\ab4d-logo.png" />
-    <Resource Include="Resources\Diagnostics-gray.png" />
-    <Resource Include="Resources\Diagnostics.png" />
-    <Resource Include="Resources\new_icon.png" />
-    <Resource Include="Resources\Settings.png" />
-    <Resource Include="Resources\sharp-engine-logo.png" />
-    <Resource Include="Resources\updated_icon.png" />
-    <Resource Include="Resources\warningIcon.png" />
-    <Resource Include="Samples.xml" />
-    <Resource Include="sharp-engine-logo.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Compile Update="CameraControllers\MouseCameraControllerSample.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="QuickStart\SharpEngineSceneViewInXaml.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="QuickStart\SharpEngineSceneViewInCode.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="TestScenes\AllObjectsTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\HitTestingTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\HeightMapTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\WireGridTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\TubePathsTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\TubesTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\LinesTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\LightsTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\LatheTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\ExtrudedMeshTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="TestScenes\CurveLineTestScene.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="CameraControllers\MouseCameraControllerSample.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="QuickStart\SharpEngineSceneViewInXaml.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
@@ -195,71 +47,41 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="QuickStart\QuickStartIntroductionPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="TestScenes\AllObjectsTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\HitTestingTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\HeightMapTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\WireGridTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\TubePathsTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\TubesTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\LinesTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\LightsTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\LatheTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\ExtrudedMeshTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\CurveLineTestScene.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="TestScenes\TestScenesIntroductionPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="assimp-lib\win-x64\" />
-    <Folder Include="assimp-lib\win-x86\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\lib\assimp-lib\win-x64\Assimp64.dll" Link="assimp-lib\win-x64\Assimp64.dll">
+    <EmbeddedResource Include="Titles\QuickStartTitle.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\BitmapFonts\" />
+    <Folder Include="Resources\HeightMaps\" />
+    <Folder Include="Resources\Models\" />
+    <Folder Include="Resources\Textures\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Samples.xml" />
+    <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\lib\assimp-lib\win-x86\Assimp32.dll" Link="assimp-lib\win-x86\Assimp32.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>  
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\"/>
+    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\arial*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
+  </ItemGroup>
 
 </Project>

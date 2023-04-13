@@ -409,7 +409,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                         var standardFontMaterial = new StandardMaterial(fontTexture, CommonSamplerTypes.Clamp, name: materialName);
                         standardFontMaterial.AlphaClipThreshold = this.AlphaClipThreshold;
                         standardFontMaterial.DiffuseColor = textColor.ToColor3();
-                        standardFontMaterial.Alpha = textColor.Alpha;
+                        standardFontMaterial.Opacity = textColor.Alpha;
 
                         if (isSolidColorMaterial)
                         {

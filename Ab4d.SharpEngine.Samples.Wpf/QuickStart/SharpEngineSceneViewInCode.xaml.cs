@@ -6,13 +6,16 @@ using System.Numerics;
 using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Ab4d.SharpEngine;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Vulkan;
 using Ab4d.SharpEngine.Wpf;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
@@ -22,9 +25,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
     /// </summary>
     public partial class SharpEngineSceneViewInCode : Page
     {
-        private SharpEngineSceneView _sharpEngineSceneView;
-        private Scene _scene;
-        private SceneView _sceneView;
+        private readonly SharpEngineSceneView _sharpEngineSceneView;
         private MouseCameraController? _mouseCameraController;
 
         public SharpEngineSceneViewInCode()
@@ -44,6 +45,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             // Scene is used to define the 3D objects (added to Scene.RootNode) and lights (added to Scene.Lights collection).
             // SceneView is a view of the Scene and can render the objects in the Scene. It provides a Camera and size of the view.
             //
+            // Scene and SceneView objects are created in SharpEngineSceneView's constructor.
+            // VulkanDevice object is created when the SharpEngineSceneView is initialized (OnLoaded) or when Initialize method is called.
+            // It is also possible to call Initialize and pass an existing VulkanDevice as parameter. This is used to share resources.
+            //
+            // PresentationType property defines how the rendered 3D scene is presented to the WPF.
             // SharpEngineSceneView for WPF supports the following presentation types:
             // SharedTexture:
             // The SharpEngineSceneView below will try to use SharedTexture as presentation option.
@@ -65,26 +71,46 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             //
             // To see how to create SharpEngineSceneView in XAML, see the SharpEngineSceneViewInXaml sample.
 
-            _sharpEngineSceneView = new SharpEngineSceneView(PresentationTypes.SharedTexture);
+            _sharpEngineSceneView = new SharpEngineSceneView(PresentationTypes.SharedTexture); // SharedTexture is also the default presentation type so we could also create the SharpEngineSceneView without that parameter
 
-            // Before creating the sharp engine, we define the EngineCreateOptions.
-            // This provides many options, but here we only set the application name
-            // and enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-            var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngine WPF samples", enableStandardValidation: true);
+#if DEBUG
+            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
+            _sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
+#endif
 
-            // Call Initialize method that creates the Vulkan device, Scene and SceneView
-            (_scene, _sceneView) = _sharpEngineSceneView.Initialize(engineCreateOptions);
+            // In case when VulkanDevice cannot be created, show an error message
+            // If this is not handled by the user, then SharpEngineSceneView will show its own error message
+            _sharpEngineSceneView.GpuDeviceCreationFailed += delegate(object sender, DeviceCreateFailedEventArgs args)
+            {
+                ShowDeviceCreateFailedError(args.Exception); // Show error message
+                args.IsHandled = true; // Prevent showing error by SharpEngineSceneView
+            };
 
+            // We can also manually initialize the SharpEngineSceneView by calling Initialize method - see commented code below.
+            // This would immediately create the VulkanDevice.
+            // If this is not done, then Initialize is automatically called when the SharpEngineSceneView is loaded.
+
+            //// Call Initialize method that creates the Vulkan device
+            //try
+            //{
+            //    var gpuDevice = _sharpEngineSceneView.Initialize();
+            //}
+            //catch (SharpEngineException ex)
+            //{
+            //    ShowDeviceCreateFailedError(ex);
+            //    return;
+            //}
+            
 
             // Use the following code to create SharpEngine from setting for this sample project and to show Diagnostics window:
             //
             //_sharpEngineSceneView = new SharpEngineSceneView(SamplesContext.Current.PreferredPresentationType)
             //{
-            //    PreferedMultisampleCount = SamplesContext.Current.PreferredSuperSamplingCount,
-            //    WaitForVSync             = SamplesContext.Current.WaitForVSync
+            //    PreferredMultisampleCount = SamplesContext.Current.PreferredSuperSamplingCount,
+            //    WaitForVSync              = SamplesContext.Current.WaitForVSync
             //};
             //
-            //(_scene, _sceneView) = _sharpEngineSceneView.Initialize(SamplesContext.Current.PreferredEngineCreateOptions);
+            //_sharpEngineSceneView.Initialize(SamplesContext.Current.PreferredEngineCreateOptions);
             //
             //// Because the SharpEngineSceneView is manually created in Loaded event, we need to register it to SamplesContext (so we can open the Diagnostics window)
             //SamplesContext.Current.RegisterCurrentSharpEngineSceneView(_sharpEngineSceneView);
@@ -115,7 +141,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 ShowCameraLight = ShowCameraLightType.Auto // If there are no other light in the Scene, then add a camera light that illuminates the scene from the camera's position
             };
 
-            _sceneView.Camera = camera;
+            _sharpEngineSceneView.SceneView.Camera = camera;
 
 
             // MouseCameraController use mouse to control the camera
@@ -134,15 +160,17 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
         private void CreateLights()
         {
-            _scene.Lights.Clear();
+            var scene = _sharpEngineSceneView.Scene;
+
+            scene.Lights.Clear();
 
             // Add lights
-            _scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
+            scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
 
             var directionalLight = new DirectionalLight(new Vector3(-1, -0.3f, 0));
-            _scene.Lights.Add(directionalLight);
+            scene.Lights.Add(directionalLight);
 
-            _scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
+            scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
         }
 
         private void CreateTestScene()
@@ -160,7 +188,21 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 //Material = new StandardMaterial(diffuseColor: new Color3(1f, 0.84313726f, 0f))
             };
 
-            _scene.RootNode.Add(boxModel);
+            _sharpEngineSceneView.Scene.RootNode.Add(boxModel);
         }
+
+        private void ShowDeviceCreateFailedError(Exception ex)
+        {
+            var errorTextBlock = new TextBlock()
+            {
+                Text = "Error creating VulkanDevice:\r\n" + ex.Message,
+                Foreground = Brushes.Red,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            RootGrid.Children.Add(errorTextBlock);
+        }
+
     }
 }
