@@ -87,8 +87,8 @@ public class FirstPersonCameraSample : CommonSample
 
         ui.CreateStackPanel(alignment: PositionTypes.Left, isVertical: false, addBorder: false, parent: rootStackPanel).SetMargin(0, 5, 0, 0);
         ui.CreateButton(leftText, () => _firstPersonCamera.MoveLeft(_buttonMoveDistance), width: 80).SetMargin(0, 0, 0, 0);
-        ui.CreateButton(rightText, () => _firstPersonCamera.MoveBackward(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
-        ui.CreateButton(backText, () => _firstPersonCamera.MoveRight(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
+        ui.CreateButton(backText, () => _firstPersonCamera.MoveBackward(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
+        ui.CreateButton(rightText, () => _firstPersonCamera.MoveRight(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
 
         ui.SetCurrentPanel(rootStackPanel);
 
