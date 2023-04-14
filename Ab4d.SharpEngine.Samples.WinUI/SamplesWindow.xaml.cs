@@ -70,7 +70,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private SolidColorBrush _samplesListTextBrush = new SolidColorBrush(Color.FromArgb(255, 204, 204, 204));        // #CCC
         private SolidColorBrush _samplesListHeaderTextBrush = new SolidColorBrush(Color.FromArgb(255, 238, 238, 238));  // #EEE
         private SolidColorBrush _samplesListSelectedTextBrush = new SolidColorBrush(Color.FromArgb(255, 255, 187, 88)); // #FFBC57
-
+        
 
         public SamplesWindow()
         {
@@ -584,8 +584,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             // TODO:
         }
 
-        private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
+        private async void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
         {
+            await WinUiUtils.ShowMessageBox(this.Content.XamlRoot, "Diagnostics for WinUI is not yet implemented.\r\nCurrently it is implemented only for WPF samples.");
             // TODO:
         }
 

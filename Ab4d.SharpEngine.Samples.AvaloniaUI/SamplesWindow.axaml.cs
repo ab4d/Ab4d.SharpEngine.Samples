@@ -221,9 +221,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
-        private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
+        private async void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
         {
-            
+            await MessageBox.Show(this, "Diagnostics for WinUI is not yet implemented.\r\nCurrently it is implemented only for WPF samples.", "SharpEngine samples", MessageBox.MessageBoxButtons.Ok);
+            // TODO:
         }
 
         private void SamplesList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -612,6 +613,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         private void CloseDiagnosticsWindow()
         {
+            // TODO:
+
             //if (_diagnosticsWindow != null)
             //{
             //    try
