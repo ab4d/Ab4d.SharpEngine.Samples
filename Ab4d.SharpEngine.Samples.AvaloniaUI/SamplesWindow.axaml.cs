@@ -24,6 +24,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Styling;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
@@ -62,6 +63,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         public SamplesWindow()
         {
+            if (Application.Current != null)
+                Application.Current.RequestedThemeVariant = ThemeVariant.Light;
+
             // Setup logger
             // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
             LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
