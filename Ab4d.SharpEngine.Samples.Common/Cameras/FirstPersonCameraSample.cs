@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class FirstPersonCameraSample : CommonSample
 {
     public override string Title => "FirstPersonCamera";
-    public override string? Subtitle => "FirstPersonCamera sample sees the scene from the CameraPosition";
+    public override string? Subtitle => "FirstPersonCamera sample sees the scene from the CameraPosition\nLEFT MOUSE BUTTON: rotate camera; LEFT MOUSE BUTTON + CTRL: move camera";
 
     private ICommonSampleUIProvider? _uiProvider;
 
@@ -87,8 +87,8 @@ public class FirstPersonCameraSample : CommonSample
 
         ui.CreateStackPanel(alignment: PositionTypes.Left, isVertical: false, addBorder: false, parent: rootStackPanel).SetMargin(0, 5, 0, 0);
         ui.CreateButton(leftText, () => _firstPersonCamera.MoveLeft(_buttonMoveDistance), width: 80).SetMargin(0, 0, 0, 0);
-        ui.CreateButton(rightText, () => _firstPersonCamera.MoveBackward(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
-        ui.CreateButton(backText, () => _firstPersonCamera.MoveRight(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
+        ui.CreateButton(backText, () => _firstPersonCamera.MoveBackward(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
+        ui.CreateButton(rightText, () => _firstPersonCamera.MoveRight(_buttonMoveDistance), width: 80).SetMargin(5, 0, 0, 0);
 
         ui.SetCurrentPanel(rootStackPanel);
 

@@ -9,7 +9,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class TargetPositionCameraSample : CommonSample
 {
     public override string Title => "TargetPositionCamera";
-    public override string? Subtitle => "TargetPositionCamera rotates around the TargetPosition";
+    public override string? Subtitle => "TargetPositionCamera rotates around the TargetPosition.\nLEFT MOUSE BUTTON: rotate camera; LEFT MOUSE BUTTON + CTRL: move camera";
 
     private ICommonSampleUIProvider? _uiProvider;
 

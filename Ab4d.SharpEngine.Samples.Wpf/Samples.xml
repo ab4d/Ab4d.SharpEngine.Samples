@@ -26,7 +26,7 @@
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
-  
+
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
 
@@ -49,6 +49,10 @@
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
+  <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
+  <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
+  <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
@@ -59,5 +63,13 @@
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+
+  <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
+  <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
+  <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
+  <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
+  <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="MaterialAnimation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="CameraAnimation"/>
 
 </Samples>
