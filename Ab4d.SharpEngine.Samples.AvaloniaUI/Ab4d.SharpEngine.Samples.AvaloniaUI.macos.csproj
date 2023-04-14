@@ -2,6 +2,8 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine_logo.ico</PackageIcon>
   </PropertyGroup>
@@ -10,33 +12,92 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\TreeTexture.png" />
-    <None Remove="sharp-engine_logo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="sharp-engine_logo.ico" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png">
+      <Link>Resources\TreeTexture.png</Link>
+    </Content>
     <Content Include="..\lib\macos\libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\TreeTexture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.18" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
+    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.7-beta2" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Ab4d.SharpEngine.AvaloniaUI\Ab4d.SharpEngine.AvaloniaUI.csproj" />
-    <ProjectReference Include="..\..\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
+    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Update="SharpEngineIntegrationTest.axaml.cs">
-      <DependentUpon>SharpEngineIntegrationTest.axaml</DependentUpon>
+    <AvaloniaXaml Include="CameraControllers\MouseCameraControllerSample.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="Common\MessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="Common\CommonTitleUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
+    <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
+    <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="SamplesWindow.axaml.cs">
+      <DependentUpon>SamplesWindow.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Titles\QuickStartTitle.md" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Resources\BitmapFonts\" />
+    <Folder Include="Resources\HeightMaps\" />
+    <Folder Include="Resources\Models\" />
+    <Folder Include="Resources\Textures\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
+    <None Remove="Samples.xml" />
+    <None Remove="Titles\IntroductionPage.xaml" />
+    <None Remove="Titles\QuickStartTitle.md" />
+    <Content Include="Samples.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\arial*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
+  </ItemGroup>
+
 </Project>
