@@ -73,23 +73,25 @@ The beta version of Ab4d.SharpEngine will expire 6 months after publishing.
 
 The following Visual Studio solutions are available:
 
-- **Ab4d.SharpEngine.Samples.Wpf MAIN SAMPLES**
-  This is the MAIN SAMPLES SOLUTION because it demonstrates the most of the engine features.
+- **Ab4d.SharpEngine.Samples.Wpf**
   This solution provides the samples for WPF and can run only on Windows.
   The samples also use Ab4d.SharpEngine.Wpf library that provides SharpEngineSceneView control for WPF.
   The SharpEngineSceneView provides a WPF control that is very easy to be used and can 
   compose the 3D scene with the WPF objects (for example showing buttons on top of 3D scene).
-  
-  This solution also shows how to use **AssimpImporter** to import 3D objects from almost any 3D file format.
-  Ab4d.SharpEngine.Assimp can be also used on Linux and other systems (native library for Linux is in the libs folder).
 
 - **Ab4d.SharpEngine.Samples.AvaloniaUI**
   This sample uses Avalonia UI (https://avaloniaui.net/) that provides WPF-like object model to 
-  build UI controls and can run on Windows, Linux and macOS (macOS is not yet supported by SharpEngine).
+  build UI controls and can run on Windows, Linux and macOS.
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
   The SharpEngineSceneView provides an Avalonia control that is very easy to be used and can 
   compose the 3D scene with the Avalonia UI objects (for example showing buttons on top of 3D scene).
-  The sample can be started on Windows and Linux.
+  The sample can be started on Windows, Linux and on macOS (use special macos solution)
+  
+- **Ab4d.SharpEngine.Samples.WinUI**
+  This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
+  This sample uses Ab4d.SharpEngine.WinUI library that provides SharpEngineSceneView control.
+  The SharpEngineSceneView provides an WinUI control that is very easy to be used and can 
+  compose the 3D scene with the WinUI UI objects (for example showing buttons on top of 3D scene).
 
 - **Ab4d.SharpEngine.Samples.CrossPlatform**
   This sample uses third-party Silk.Net library that provides support for SDL and GLFW.
@@ -184,7 +186,7 @@ then each Vulkan call is checked by the validation error and this can give much 
 (all Vulkan validation reports are logged at Warn log level).
 
 
-The alpha and beta version of Ab4d.SharpEngine are compiled with release build options but support full logging.
+The beta versions of Ab4d.SharpEngine are compiled with release build options but support full logging.
 This means that it is possible to get Trace level log messages
 (production version will have only Warning and Error logging compiled into the assembly).
 
@@ -213,40 +215,44 @@ To do this please find the existing code that sets up logging an change it to:
 Beta1 version (2022-12-14): 
 - first beta version
 
+Beta2 version (2023-04-14): 
+- Added many samples to help you understand the SharpEngine and provide code templates for your projects
+- Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
+- Using SwapChainPanel for WinUI instead of SurfaceImageSource - this is faster and better supported by WinUI
+- Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented new much better way to share Vulkan texture with Avalonia
+- Objects and camera animation similar to Anime.js
+- Breaking change: Renamed StandardMaterial.Alpha property to Opacity
+
 
 ## Roadmap
 
 ### Future beta versions
 
 - Improve stability
-- Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
 - Add many samples in a similar way as the samples for Ab3d.PowerToys and Ab3d.DXEngine
 - Port more functionality from Ab3d.PowerToys and Ab3d.DXEngine
 - Support for multiple SceneViews that show a single Scene
 - RenderToBitmap with custom bitmap size
 - SharpEngineSceneView control for WinForms and Android
-- Improve sample for macOS
-- Add sample for iOS
+- Add support for iOS and ahead-of-time compilation for Android (this will require another build of Ab4d.SharpEngine)
 - Add MAUI support
-- Improve Ab4d.SharpEngine.AvaloniaUI library so it will also work on Android, macOS and iOS.
+- Improve Ab4d.SharpEngine.AvaloniaUI library so it will also work on Android and iOS.
 - Add support for 2D sprites
 - Improve xml documentation and online reference help
 
 - Public tests project on GitHub
 
 
-### v1.0 release (Q2-Q3 2023)
+### v1.0 release (Q3 2023)
 
-- Production ready for Windows, major Linux distributions and Android. Other platforms may still be in beta.
-
+- Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
 - Full reference documentation (documenting all public classes, methods, properties and fields)
-- Supersampling
-- Objects and camera animation similar to Anime.js
-- Add support for PhysicallyBasedRendering effect
 
 
 ### Later versions
 
+- Supersampling
+- Add support for PhysicallyBasedRendering effect
 - Multi-threaded rendering
 - Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
 - Gltf 2 file reader included in SharpEngine
