@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class FirstPersonCameraSample : CommonSample
 {
     public override string Title => "FirstPersonCamera";
-    public override string? Subtitle => "FirstPersonCamera sample sees the scene from the CameraPosition";
+    public override string? Subtitle => "FirstPersonCamera sample sees the scene from the CameraPosition\nLEFT MOUSE BUTTON: rotate camera; LEFT MOUSE BUTTON + CTRL: move camera";
 
     private ICommonSampleUIProvider? _uiProvider;
 
