@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,8 +23,6 @@ using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.SharpEngine.Wpf;
 using Ab4d.Vulkan;
-using Color = System.Windows.Media.Color;
-using Exception = System.Exception;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 {
@@ -53,7 +50,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         public const double InitialWindowWidth = 310;
 
-        public bool IsDXEngineDebugBuild { get; private set; }
+        public bool IsSharpEngineDebugBuild { get; private set; }
 
         public bool ShowProcessCpuUsage { get; set; }
 
@@ -65,6 +62,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         private DateTime _lastStatisticsUpdate;
         private DateTime _lastPerfCountersReadTime;
+
+        private bool _isGpuDeviceCreatedSubscribed;
 
         private bool _showRenderingStatistics = true;
 
@@ -121,16 +120,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             DumpFileName = System.IO.Path.Combine(dumpFolder, "SharpEngineDump.txt");
 
 
-            // Set DXEngine assembly version
+            // Set SharpEngine assembly version
             var version = typeof(VulkanDevice).Assembly.GetName().Version ?? new Version(0, 0);
 
             // IsDebugVersion field is defined only in Debug version
             var fieldInfo = typeof(VulkanDevice).GetField("IsDebugVersion");
-            IsDXEngineDebugBuild = fieldInfo != null;
+            IsSharpEngineDebugBuild = fieldInfo != null;
 
             SharpEngineInfoTextBlock.Text = string.Format("Ab4d.SharpEngine v{0}.{1}.{2}{3}",
                 version.Major, version.Minor, version.Build,
-                IsDXEngineDebugBuild ? " (debug build)" : "");
+                IsSharpEngineDebugBuild ? " (debug build)" : "");
 
             Log.AddLogListener(OnLogAction);
 
@@ -247,7 +246,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         private void StartShowingStatistics()
         {
-            if (SharpEngineSceneView != null && SharpEngineSceneView.SceneView != null)
+            if (SharpEngineSceneView != null)
             {
                 ResultsTitleTextBlock.Visibility = Visibility.Visible;
                 ResultsTitleTextBlock.Text = _showRenderingStatistics ? "Rendering statistics:" : "Camera info:";
@@ -268,9 +267,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
                 SetupPerformanceCounters();
 
             // Enable collecting statistics if it was not done yet
-            if (SharpEngineSceneView != null && 
-                SharpEngineSceneView.SceneView != null &&
-                !SharpEngineSceneView.SceneView.IsCollectingStatistics)
+            if (SharpEngineSceneView != null && !SharpEngineSceneView.SceneView.IsCollectingStatistics)
             {
                 SharpEngineSceneView.SceneView.IsCollectingStatistics = true;
                 _isManuallyEnabledCollectingStatistics= true;
@@ -289,7 +286,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             if (_isManuallyEnabledCollectingStatistics)
             {
-                if (SharpEngineSceneView != null && SharpEngineSceneView.SceneView != null)
+                if (SharpEngineSceneView != null)
                     SharpEngineSceneView.SceneView.IsCollectingStatistics = false;
 
                 _isManuallyEnabledCollectingStatistics = true;
@@ -305,14 +302,21 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             if (sharpEngineSceneView == null)
                 return;
 
+            sharpEngineSceneView.ViewSizeChanged += SharpEngineSceneViewOnViewSizeChanged;
+
             sharpEngineSceneView.Disposing += OnSceneViewDisposing;
 
-            DeviceInfoControl.SharpEngineSceneView = sharpEngineSceneView;
+            if (sharpEngineSceneView.GpuDevice == null)
+            {
+                sharpEngineSceneView.GpuDeviceCreated += SharpEngineSceneViewOnGpuDeviceCreated;
+                _isGpuDeviceCreatedSubscribed = true;
+            }
+
+            UpdateDeviceInfo();
 
             StartShowingStatistics();
 
-            if (sharpEngineSceneView.SceneView != null && 
-                sharpEngineSceneView.SceneView.IsCollectingStatistics)
+            if (sharpEngineSceneView.SceneView.IsCollectingStatistics)
             {
                 ResultsTitleTextBlock.Visibility = Visibility.Visible;
 
@@ -321,62 +325,21 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
 
             UpdateEnabledMenuItems();
-
-            // If DXEngine is using non-default adapter, show warning
-            CheckNonDefaultAdapter();
-
-            // If DXEngine is using a adapter that is not the best, show warning
-            CheckBestAdapter();
         }
 
-        private void CheckNonDefaultAdapter()
+        private void SharpEngineSceneViewOnViewSizeChanged(object sender, ViewSizeChangedEventArgs e)
         {
-            //if (DXView != null && 
-            //    DXView.DXScene != null && 
-            //    DXView.DXScene.IsInitialized &&
-            //    DXView.DXScene.DXDevice.Configuration != null &&
-            //    DXView.PresentationType == DXView.PresentationTypes.DirectXImage)
-            //{
-            //    if ((DXView.DXScene.UseSharedWpfTexture ?? true) == false) // warning when not using a shared texture (if value is not yet set, then consider as true for now - we have subscribed to LogActions and will catch the waring in case this will be set to false)
-            //    {
-            //        var defaultAdapter = DXDevice.GetAllSystemAdapters().FirstOrDefault();
-            //        var usedAdapter = DXView.DXScene.DXDevice.Adapter;
-
-            //        string warningText;
-
-            //        if (defaultAdapter != null && usedAdapter != null && usedAdapter.Description.Luid != defaultAdapter.Description.Luid)
-            //            warningText = string.Format("Ab3d.DXEngine is using a non-default adapter (graphics card). This means that it is using a different adapter as WPF is using (Ab3d.DXEngine: '{0}'; WPF: '{1}'). In this case the rendered image cannot be shared with WPF (rendered image cannot stay in graphics card's memory) but needs to be copied from the graphics card that Ab3d.DXEngine is using to the main CPU memory. Then the image needs to be sent by WPF to the graphics card's memory of the WPF's adapter. This can significantly reduce performance (CompleteRenderTime is high). Consider using a default adapter for Ab3d.DXEngine or set the currently used adapter as the default adapter - on laptop computers with Optimus or similar technology you may try to start the application with another graphics card. If DXScene.UseSharedWpfTexture was intentionally set to false, then this warning can be discarded.", usedAdapter.Description.Description, defaultAdapter.Description.Description);
-            //        else // this should not happen
-            //            warningText = "Ab3d.DXEngine is not using a shared texture. This means that the rendered image needs to be copied to the main CPU memory. This usually happens when Ab3d.DXEngine is using a non-default adapter (different adapter then WPF). If DXScene.UseSharedWpfTexture was intentionally set to false, then this warning can be discarded.";
-
-            //        DXEngineLogAction(DXDiagnostics.LogLevels.Warn, warningText);
-            //    }
-            //}
+            UpdateDeviceInfo();
         }
-        
-        private void CheckBestAdapter()
+
+        private void SharpEngineSceneViewOnGpuDeviceCreated(object sender, GpuDeviceCreatedEventArgs e)
         {
-            //if (DXView != null && 
-            //    DXView.DXScene != null && 
-            //    DXView.DXScene.IsInitialized &&
-            //    DXView.DXScene.DXDevice.Configuration != null)
-            //{
-            //    var usedAdapter = DXView.DXScene.DXDevice.Configuration.Adapter;
+            if (_sharpEngineSceneView != null)
+                _sharpEngineSceneView.GpuDeviceCreated -= SharpEngineSceneViewOnGpuDeviceCreated;
 
-            //    if (usedAdapter != null)
-            //    {
-            //        var allAdapters = DXDevice.GetAllSystemAdapters();
+            _isGpuDeviceCreatedSubscribed = false;
 
-            //        // Sort by DedicatedVideoMemory - we assume that more RAM means better card - so pick the one with most RAM (DedicatedVideoMemory is of type PointerSize - to be able to compare by it we need to convert it to long)
-            //        var bestAdapter = allAdapters.OrderByDescending(a => (long)a.Description.DedicatedVideoMemory)  
-            //                                     .FirstOrDefault();
-
-            //        if (bestAdapter != null && usedAdapter.Description.Luid != bestAdapter.Description.Luid)
-            //        {
-            //            DXEngineLogAction(DXDiagnostics.LogLevels.Warn, string.Format("The Ab3d.DXEngine is using an adapter (graphics card) that is not the best adapter on this computer - using: '{0}'; best: '{1}'. On laptop computers with Optimus or similar technology you may try to start the application with using the best graphics card.", usedAdapter.Description.Description, bestAdapter.Description.Description));
-            //        }
-            //    }
-            //}
+            UpdateDeviceInfo();
         }
 
         private void OnSceneViewDisposing(object? sender, bool disposing)
@@ -384,7 +347,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             if (this.Dispatcher.CheckAccess())
                 UnregisterCurrentSceneView();
             else
-                this.Dispatcher.Invoke(new Action(() => UnregisterCurrentSceneView()));
+                this.Dispatcher.Invoke(() => UnregisterCurrentSceneView());
         }
 
         private void UnregisterCurrentSceneView()
@@ -396,6 +359,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             DisposePerformanceCounters();
 
             _sharpEngineSceneView.Disposing -= OnSceneViewDisposing;
+            _sharpEngineSceneView.ViewSizeChanged -= SharpEngineSceneViewOnViewSizeChanged;
+
+            if (_isGpuDeviceCreatedSubscribed)
+            {
+                _sharpEngineSceneView.GpuDeviceCreated -= SharpEngineSceneViewOnGpuDeviceCreated;
+                _isGpuDeviceCreatedSubscribed = false;
+            }
 
             _sharpEngineSceneView = null;
 
@@ -412,7 +382,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             //    _settingsEditorWindow = null;
             //}
-            
+
             //if (_renderingFilterWindow != null)
             //{
             //    try
@@ -427,9 +397,54 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             //    _renderingFilterWindow = null;
             //}
 
-            DeviceInfoControl.SharpEngineSceneView = null;
+            DeviceInfoTextBlock.Text = null;
 
             EndShowingStatistics();
+        }
+        
+        private void UpdateDeviceInfo()
+        {
+            if (_sharpEngineSceneView == null || !_sharpEngineSceneView.SceneView.BackBuffersInitialized)
+            {
+                DeviceInfoTextBlock.Text = "SharpEngineSceneView is not initialized";
+                return;
+            }
+
+
+            string viewInfo;
+            var sceneView = _sharpEngineSceneView.SceneView;
+
+            if (sceneView.BackBuffersInitialized)
+            {
+                int width = sceneView.Width;
+                int height = sceneView.Height;
+
+                viewInfo = string.Format("{0} x {1}", width, height);
+
+                var multisampleCount = sceneView.UsedMultiSampleCount;
+                if (multisampleCount > 1)
+                    viewInfo += string.Format(" x {0}xMSAA", multisampleCount);
+
+                // Supersampling is not yet supported
+                //var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
+                //if (supersamplingCount > 1)
+                //    viewInfo += string.Format(" x {0}xSSAA", supersamplingCount);
+
+                viewInfo += $" ({_sharpEngineSceneView.PresentationType})";
+            }
+            else
+            {
+                viewInfo = "";
+            }
+
+
+            if (_sharpEngineSceneView.GpuDevice != null)
+            {
+                string deviceInfoText = _sharpEngineSceneView.GpuDevice.GpuName;
+                viewInfo = deviceInfoText + Environment.NewLine + viewInfo;
+            }
+
+            DeviceInfoTextBlock.Text = viewInfo;
         }
 
         private void SubscribeOnSceneRendered()
@@ -550,7 +565,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             {
                 if (_showRenderingStatistics)
                 {
-                    if (SharpEngineSceneView?.SceneView?.Statistics != null)
+                    if (SharpEngineSceneView?.SceneView.Statistics != null)
                         UpdateStatistics(SharpEngineSceneView.SceneView.Statistics);
                 }
                 else
@@ -567,7 +582,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             RenderingStatistics? statistics;
 
-            if (SharpEngineSceneView != null && SharpEngineSceneView.SceneView != null && SharpEngineSceneView.SceneView.Statistics != null)
+            if (SharpEngineSceneView != null && SharpEngineSceneView.SceneView.Statistics != null)
                 statistics = SharpEngineSceneView.SceneView.Statistics;
             else
                 statistics = null;
@@ -596,8 +611,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         private void StartStopCameraRotationMenuItem_OnClick(object sender, RoutedEventArgs args)
         {
-            if (SharpEngineSceneView == null || 
-                SharpEngineSceneView.SceneView == null)
+            if (SharpEngineSceneView == null)
                 return;
 
             var camera = SharpEngineSceneView.SceneView.Camera;
@@ -679,32 +693,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         {
             ShowFullSceneDump();
         }
-
-        //private void DumpDXEngineSettingsMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    DumpDXEngineSettings();
-        //}
-
-        //private void EditDXEngineSettingsMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    EditDXEngineSettings();
-        //}
-
-        //private void DumpCurrentSceneMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    ShowFullSceneDump();
-        //}
-
-        //private void RenderObjectIdMenuItemMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    RenderObjectIdBitmap();
-        //}
-
-        //private void RenderingFilterMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    ShowRenderingFilterWindow();
-        //}
-
+        
         private void GetCameraDetailsMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ShowCameraDetails();
@@ -717,100 +706,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             GC.WaitForPendingFinalizers();
             GC.Collect();
         }
-
-        //private void StartPerformanceAnalyzerMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    if (_performanceAnalyzer != null)
-        //        return; // Already started (this should not happen)
-
-        //    EndShowingStatistics();
-        //    AnalyerResultsTextBox.Visibility = Visibility.Collapsed;
-
-        //    ResultsTitleTextBlock.Visibility = Visibility.Collapsed;
-
-        //    // Start new test
-        //    _performanceAnalyzer = new PerformanceAnalyzer(DXView, "DXEngine Snoop performance test", initialCapacity: 10000);
-        //    _performanceAnalyzer.StartCollectingStatistics();
-
-        //    ActionsMenu.Visibility = Visibility.Collapsed;
-
-        //    ShowButtons(showStopPerformanceAnalyzerButton: true, showShowStatisticsButton: false);
-        //}
-
-        //private void StopPerformanceAnalyzerButton_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    StopPerformanceAnalyzer();
-        //}
-
-        //private void StopPerformanceAnalyzer()
-        //{
-        //    if (_performanceAnalyzer == null)
-        //        return;
-
-        //    ActionsMenu.Visibility = Visibility.Visible;
-        //    ActionsMenu.IsEnabled = true;
-
-        //    _performanceAnalyzer.StopCollectingStatistics();
-
-        //    string resultsText = _performanceAnalyzer.GetResultsText();
-        //    resultsText = "DXEngine performance analysis\r\n" + resultsText;
-
-        //    _performanceAnalyzer = null;
-
-        //    // Also write results to Visual Studio output window
-        //    System.Diagnostics.Debug.WriteLine(resultsText);
-
-
-        //    // Show results in AnalyerResultsTextBox (shown instead of StatisticsTextBlock)
-        //    AnalyerResultsTextBox.Text = resultsText;
-
-        //    if (StatisticsTextBlock.ActualHeight > 0)
-        //        AnalyerResultsTextBox.MinHeight = StatisticsTextBlock.ActualHeight; // If StatisticsTextBlock is shown use the same height as it has
-        //    else
-        //        AnalyerResultsTextBox.MinHeight = 400;
-
-        //    StatisticsTextBlock.Visibility = Visibility.Collapsed;
-        //    AnalyerResultsTextBox.Visibility = Visibility.Visible;
-
-        //    ResultsTitleTextBlock.Visibility = Visibility.Visible;
-        //    ResultsTitleTextBlock.Text = "Performance analyzer results:";
-
-        //    SaveAnalyzerResultsMenuItem.IsEnabled = true;
-
-        //    ShowStatisticsButton.Content = _showRenderingStatistics ? "Show rendering statistics" : "Show camera info";
-            
-        //    ShowButtons(showStopPerformanceAnalyzerButton: false, showShowStatisticsButton: true);
-        //}
-
-        //private void SaveAnalyzerResultsMenuItem_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    var saveFileDialog = new Microsoft.Win32.SaveFileDialog();
-        //    saveFileDialog.AddExtension = false;
-        //    saveFileDialog.CheckFileExists = false;
-        //    saveFileDialog.CheckPathExists = true;
-        //    saveFileDialog.OverwritePrompt = false;
-        //    saveFileDialog.ValidateNames = false;
-
-        //    saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        //    saveFileDialog.FileName = string.Format("DXEngine performance {0:HH}_{0:mm}.txt", DateTime.Now);
-        //    saveFileDialog.DefaultExt = "txt";
-        //    saveFileDialog.Filter = "Text file (*.txt)|*.txt";
-        //    saveFileDialog.Title = "Select file name to store DXEngine Performance Analyzer report";
-
-        //    if (saveFileDialog.ShowDialog() ?? false)
-        //    {
-        //        try
-        //        {
-        //            System.IO.File.WriteAllText(saveFileDialog.FileName, AnalyerResultsTextBox.Text);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            MessageBox.Show("Error saving report:\r\n" + ex.Message);
-        //        }
-        //    }
-        //}
-
+        
         private void LogWarningsPanel_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (_logMessagesWindow != null)
@@ -1059,7 +955,7 @@ PipelineChangesCount: {8:#,##0}",
                 _lastRenderingStatisticsWithRecorderCommandBuffers = renderingStatistics.Clone();
             }
 
-            if (SharpEngineSceneView?.SceneView?.RenderingContext != null)
+            if (SharpEngineSceneView?.SceneView.RenderingContext != null)
             {
                 _lastSceneViewDirtyFlags = SharpEngineSceneView.SceneView.RenderingContext.SceneViewDirtyFlags;
                 _lastSceneDirtyFlags     = SharpEngineSceneView.SceneView.RenderingContext.SceneDirtyFlags;
@@ -1082,12 +978,10 @@ PipelineChangesCount: {8:#,##0}",
                 }
             }
 
-            
-            string statisticsText;
 
             if (_showRenderingStatistics)
             {
-                statisticsText = GetRenderingStatisticsText(renderingStatistics, now, fps);
+                var statisticsText = GetRenderingStatisticsText(renderingStatistics, now, fps);
                 StatisticsTextBlock.Text = statisticsText;
             }
             else
@@ -1179,6 +1073,7 @@ PipelineChangesCount: {8:#,##0}",
                             }
                             catch
                             {
+                                // pass
                             }
                         }
 
@@ -1206,7 +1101,7 @@ PipelineChangesCount: {8:#,##0}",
 
         private void DumpSceneNodes()
         {
-            if (SharpEngineSceneView == null || SharpEngineSceneView.Scene == null) 
+            if (SharpEngineSceneView == null) 
                 return;
 
             string dumpText;
@@ -1237,7 +1132,7 @@ PipelineChangesCount: {8:#,##0}",
 
         private void DumpUsedMaterials()
         {
-            if (SharpEngineSceneView == null || SharpEngineSceneView.Scene == null)
+            if (SharpEngineSceneView == null)
                 return;
 
             string dumpText;
@@ -1256,7 +1151,7 @@ PipelineChangesCount: {8:#,##0}",
 
         private void DumpRenderingSteps()
         {
-            if (SharpEngineSceneView == null || SharpEngineSceneView.SceneView == null)
+            if (SharpEngineSceneView == null)
                 return;
 
             string dumpText;
@@ -1275,7 +1170,7 @@ PipelineChangesCount: {8:#,##0}",
 
         private void DumpRenderingLayers()
         {
-            if (SharpEngineSceneView == null || SharpEngineSceneView.Scene == null)
+            if (SharpEngineSceneView == null)
                 return;
 
             string dumpText;
@@ -1299,7 +1194,7 @@ PipelineChangesCount: {8:#,##0}",
 
         public void DumpMemory()
         {
-            if (SharpEngineSceneView == null || SharpEngineSceneView.Scene == null)
+            if (SharpEngineSceneView == null)
                 return;
 
             string fullMemoryUsageDumpString;
@@ -1614,7 +1509,7 @@ PipelineChangesCount: {8:#,##0}",
                 OverwritePrompt = true,
                 ValidateNames = false,
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = initialFileName ?? "DXEngineRender.png",
+                FileName = initialFileName ?? "SharpEngineRender.png",
                 DefaultExt = "txt",
                 Filter = "png Image (*.png)|*.png",
                 Title = dialogTitle ?? "Select file name to store the rendered image"
@@ -1670,8 +1565,8 @@ PipelineChangesCount: {8:#,##0}",
 
             try
             {
-                var dxEngineSettingsDump = GetEngineSettingsDump();
-                AppendDumpText("Engine settings:", dxEngineSettingsDump);
+                var sharpEngineSettingsDump = GetEngineSettingsDump();
+                AppendDumpText("Engine settings:", sharpEngineSettingsDump);
 
 
                 string dumpText;

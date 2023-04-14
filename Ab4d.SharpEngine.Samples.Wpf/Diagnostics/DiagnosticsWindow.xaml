@@ -62,7 +62,7 @@
             </MenuItem>
         </Menu>
 
-        <local:DeviceInfoUserControl x:Name="DeviceInfoControl" Grid.Row="1" Margin="10 0 10 0" HorizontalAlignment="left"/>
+        <TextBlock Name="DeviceInfoTextBlock" Grid.Row="1" Margin="10 0 10 0" HorizontalAlignment="left" />
 
         <StackPanel Name="LogWarningsPanel" Grid.Row="1"  Margin="0 0 10 0" HorizontalAlignment="Right" Orientation="Horizontal" Background="White" Visibility="Collapsed"
                     Cursor="Hand" MouseLeftButtonDown="LogWarningsPanel_OnMouseLeftButtonDown">
