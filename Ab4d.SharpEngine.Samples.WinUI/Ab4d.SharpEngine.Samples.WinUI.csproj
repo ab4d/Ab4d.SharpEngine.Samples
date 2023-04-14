@@ -82,6 +82,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Titles\QuickStartTitle.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Update="CameraControllers\MouseCameraControllerSample.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
