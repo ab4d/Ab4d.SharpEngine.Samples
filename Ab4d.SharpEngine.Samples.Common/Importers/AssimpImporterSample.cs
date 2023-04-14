@@ -132,6 +132,8 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         if (!System.IO.Path.IsPathRooted(fileName))
             fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
+        fileName = FileUtils.FixDirectorySeparator(fileName);
+        
         if (!File.Exists(fileName))
         {
             ShowErrorMessage("File does not exist:\n" + fileName);
