@@ -59,8 +59,8 @@ public class MaterialsSample : CommonSample
         //    DiffuseColor = Colors.Orange
         //};
 
-        //material1 = new StandardMaterial(new Color3(red: 0, Orange: 1, blue: 0));
-        //material1 = new StandardMaterial(Color3.FromByteRgb(red: 0, Orange: 255, blue: 0));
+        //material1 = new StandardMaterial(new Color3(red: 1, green: 0.647058845f, blue: 0));
+        //material1 = new StandardMaterial(Color3.FromByteRgb(red: 255, green: 165, blue: 0));
 
 
         var modelNode1 = new MeshModelNode(sphereMesh, material1, "DiffuseMaterialModel")
