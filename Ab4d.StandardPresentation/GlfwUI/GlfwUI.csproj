@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="glfw-net" Version="3.3.1" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.8-beta2" />
   </ItemGroup>
 
   <ItemGroup>
