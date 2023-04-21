@@ -621,46 +621,44 @@ public class MultiSceneNodesSample : CommonSample
 
         string? fontFileName = fontPath + (useArialFont ? "arial_128.fnt" : "roboto_128.fnt"); // font is rendered with font size 128 pixels
 
-        var arialBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+        var normalBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
 
-        if (arialBitmapFont != null)
+        if (normalBitmapFont != null)
         {
-            var arialBitmapTextCreator = new BitmapTextCreator(scene, arialBitmapFont, BitmapIO);
-            _disposables.Add(arialBitmapTextCreator);
-
-
+            var normalBitmapTextCreator = new BitmapTextCreator(scene, normalBitmapFont, BitmapIO);
+            _disposables.Add(normalBitmapTextCreator);
 
 
             // Create text node
             // Usually this is a GeometryModel3D, but in case when bitmap font uses
             // multiple pages (textures) to define font, then a GroupNode is returned 
             // with multiple GeometryModel3D (each with its own texture)
-            var textNode1 = arialBitmapTextCreator.CreateTextNode(text: "Text node",
-                                                                  position: text1Position,
-                                                                  positionType: PositionTypes.BottomLeft,
-                                                                  textDirection: new Vector3(1, 0, 0),
-                                                                  upDirection: new Vector3(0, 1, 0),
-                                                                  fontSize: 50,
-                                                                  textColor: Colors.Blue,
-                                                                  isSolidColorMaterial: false);
+            var textNode1 = normalBitmapTextCreator.CreateTextNode(text: "Text node",
+                                                                   position: text1Position,
+                                                                   positionType: PositionTypes.BottomLeft,
+                                                                   textDirection: new Vector3(1, 0, 0),
+                                                                   upDirection: new Vector3(0, 1, 0),
+                                                                   fontSize: 50,
+                                                                   textColor: Colors.Blue,
+                                                                   isSolidColorMaterial: false);
 
             scene.RootNode.Add(textNode1);
 
             // Font is render with "Latin", "Latin-1 Supplement" and "Latin Extended-A" characters and defines many special characters.
             string textWithSpecialChars = "with special chars:\r\n@*?${}@{}ß\r\nüůűščžŠČŽ";
-            var textNode2 = arialBitmapTextCreator.CreateTextNode(text: textWithSpecialChars,
-                                                                  position: text1Position,
-                                                                  positionType: PositionTypes.TopLeft,
-                                                                  textDirection: new Vector3(0, 0, -1),
-                                                                  upDirection: new Vector3(0, 1, 0),
-                                                                  fontSize: 30,
-                                                                  textColor: Colors.SkyBlue,
-                                                                  isSolidColorMaterial: false);
+            var textNode2 = normalBitmapTextCreator.CreateTextNode(text: textWithSpecialChars,
+                                                                   position: text1Position,
+                                                                   positionType: PositionTypes.TopLeft,
+                                                                   textDirection: new Vector3(0, 0, -1),
+                                                                   upDirection: new Vector3(0, 1, 0),
+                                                                   fontSize: 30,
+                                                                   textColor: Colors.SkyBlue,
+                                                                   isSolidColorMaterial: false);
 
             scene.RootNode.Add(textNode2);
 
             // Measure text size
-            var textSize = arialBitmapTextCreator.GetTextSize(textWithSpecialChars, fontSize: 30);
+            var textSize = normalBitmapTextCreator.GetTextSize(textWithSpecialChars, fontSize: 30);
 
 
             // Calculate the end position of the text
@@ -675,21 +673,21 @@ public class MultiSceneNodesSample : CommonSample
 
             // Use ArialBlack or Roboto black font
             fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
-            var arialBlackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+            var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
 
-            if (arialBlackBitmapFont != null)
+            if (blackBitmapFont != null)
             {
-                var arialBlackBitmapTextCreator = new BitmapTextCreator(scene, arialBlackBitmapFont, BitmapIO);
-                _disposables.Add(arialBlackBitmapTextCreator);
+                var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, BitmapIO);
+                _disposables.Add(blackBitmapTextCreator);
 
-                var textNode3 = arialBlackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
-                                                                           position: text1Position - new Vector3(0, textSize.Y + 20, 0),
-                                                                           positionType: PositionTypes.TopLeft,
-                                                                           textDirection: new Vector3(1, 0, 0),
-                                                                           upDirection: new Vector3(0, 1, 0),
-                                                                           fontSize: 50,
-                                                                           textColor: Colors.Orange,
-                                                                           isSolidColorMaterial: false);
+                var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
+                                                                      position: text1Position - new Vector3(0, textSize.Y + 20, 0),
+                                                                      positionType: PositionTypes.TopLeft,
+                                                                      textDirection: new Vector3(1, 0, 0),
+                                                                      upDirection: new Vector3(0, 1, 0),
+                                                                      fontSize: 50,
+                                                                      textColor: Colors.Orange,
+                                                                      isSolidColorMaterial: false);
 
                 scene.RootNode.Add(textNode3);
             }
@@ -701,23 +699,23 @@ public class MultiSceneNodesSample : CommonSample
             // To see the difference in color compare this text with the ArialBlack text (defined above)
             fontFileName = fontPath + (useArialFont ? "arial_black_with_outline_128.fnt" : "roboto_black_with_outline_128.fnt");
 
-            var arialBlackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+            var blackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
 
-            if (arialBlackWithOutlineBitmapFont != null)
+            if (blackWithOutlineBitmapFont != null)
             {
-                var arialBlackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, arialBlackWithOutlineBitmapFont, BitmapIO);
-                arialBlackWithOutlineBitmapTextCreator.AdditionalLineSpace = -20; // Decrease default line space
+                var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, blackWithOutlineBitmapFont, BitmapIO);
+                blackWithOutlineBitmapTextCreator.AdditionalLineSpace = -20; // Decrease default line space
 
-                _disposables.Add(arialBlackWithOutlineBitmapTextCreator);
+                _disposables.Add(blackWithOutlineBitmapTextCreator);
 
-                var textNode4 = arialBlackWithOutlineBitmapTextCreator.CreateTextNode(text: "Text with outline and\r\nSolidColorMaterial",
-                                                                                      position: text1Position - new Vector3(0, textSize.Y - 20, 0),
-                                                                                      positionType: PositionTypes.TopRight,
-                                                                                      textDirection: new Vector3(1, 0, 0),
-                                                                                      upDirection: new Vector3(0, 1, 0),
-                                                                                      fontSize: 40,
-                                                                                      textColor: Colors.Orange,
-                                                                                      isSolidColorMaterial: true); // Using solid color material
+                var textNode4 = blackWithOutlineBitmapTextCreator.CreateTextNode(text: "Text with outline and\r\nSolidColorMaterial",
+                                                                                 position: text1Position - new Vector3(0, textSize.Y - 20, 0),
+                                                                                 positionType: PositionTypes.TopRight,
+                                                                                 textDirection: new Vector3(1, 0, 0),
+                                                                                 upDirection: new Vector3(0, 1, 0),
+                                                                                 fontSize: 40,
+                                                                                 textColor: Colors.Orange,
+                                                                                 isSolidColorMaterial: true); // Using solid color material
 
                 scene.RootNode.Add(textNode4);
             }
@@ -732,10 +730,10 @@ public class MultiSceneNodesSample : CommonSample
         instancedMeshNode.Mesh = sphereMesh;
 
         var instancesData = CreateInstancesData(center: new Vector3(150, 0, 100),
-                                                size: new Vector3(100, 40, 100),
-                                                modelScaleFactor: 1,
-                                                xCount: 10, yCount: 4, zCount: 10,
-                                                useTransparency: false);
+                                                                    size: new Vector3(100, 40, 100),
+                                                                    modelScaleFactor: 1,
+                                                                    xCount: 10, yCount: 4, zCount: 10,
+                                                                    useTransparency: false);
 
         instancedMeshNode.SetInstancesData(instancesData);
 
@@ -874,6 +872,8 @@ public class MultiSceneNodesSample : CommonSample
     {
         string? usedFileName = null;
         System.IO.Stream? fileStream = null;
+
+        fontFileName = FileUtils.FixDirectorySeparator(fontFileName); // use slash or backslash as folder separator depanding on the OS
 
         if (System.IO.File.Exists(fontFileName))
         {
