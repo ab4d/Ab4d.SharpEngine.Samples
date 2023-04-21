@@ -15,6 +15,8 @@ public class StackPanelUIElement : AvaloniaUIPanel
 
     public override Panel? AvaloniaPanel => _stackPanel;
 
+    public override bool IsVertical => _stackPanel.Orientation == Orientation.Vertical;
+
     public StackPanelUIElement(AvaloniaUIProvider avaloniaUIProvider, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent)
         : base(avaloniaUIProvider)
     {

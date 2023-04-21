@@ -11,6 +11,7 @@ public abstract class AvaloniaUIPanel : AvaloniaUIElement, ICommonSampleUIPanel
 
     protected List<AvaloniaUIElement> childUIElements;
 
+    public abstract bool IsVertical { get; }
 
     public AvaloniaUIPanel(AvaloniaUIProvider avaloniaUIProvider)
         : base(avaloniaUIProvider)

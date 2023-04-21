@@ -4,6 +4,8 @@ public interface ICommonSampleUIPanel : ICommonSampleUIElement
 {
     int ChildrenCount { get; }
 
+    bool IsVertical { get; }
+
     ICommonSampleUIElement GetChild(int index);
 
     void RemoveChildAt(int index);

@@ -11,6 +11,8 @@ public abstract class WpfUIPanel : WpfUIElement, ICommonSampleUIPanel
 
     protected List<WpfUIElement> childUIElements;
 
+    public abstract bool IsVertical { get; }
+
 
     public WpfUIPanel(WpfUIProvider wpfUIProvider)
         : base(wpfUIProvider)

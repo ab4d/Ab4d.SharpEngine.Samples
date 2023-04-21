@@ -11,6 +11,8 @@ public abstract class WinUIPanel : WinUIElement, ICommonSampleUIPanel
 
     protected List<WinUIElement> childUIElements;
 
+    public abstract bool IsVertical { get; }
+
 
     public WinUIPanel(WinUIProvider winUIProvider)
         : base(winUIProvider)

@@ -32,8 +32,6 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
     public Panel BaseAvaloniaPanel { get; }
 
-    private bool _isLastPanelVertical;
-
     private double _lastSeparator;
 
     private List<AvaloniaUIElement> _rootUIElements;
@@ -80,7 +78,9 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
             margin += _lastSeparator;
 
-            if (_isLastPanelVertical)
+            bool isCurrentPanelVertical = CurrentPanel != null ? CurrentPanel.IsVertical : true;
+
+            if (isCurrentPanelVertical)
                 frameworkElement.Margin = new Thickness(frameworkElement.Margin.Left, margin, frameworkElement.Margin.Right, frameworkElement.Margin.Bottom);
             else
                 frameworkElement.Margin = new Thickness(margin, frameworkElement.Margin.Top, frameworkElement.Margin.Right, frameworkElement.Margin.Bottom);
@@ -129,7 +129,6 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         }
 
         CurrentPanel = stackPanelUiElement;
-        _isLastPanelVertical = isVertical;
 
         return stackPanelUiElement;
     }
