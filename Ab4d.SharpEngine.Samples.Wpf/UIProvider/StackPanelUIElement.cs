@@ -14,6 +14,8 @@ public class StackPanelUIElement : WpfUIPanel
 
     public override Panel? WpfPanel => _stackPanel;
 
+    public override bool IsVertical => _stackPanel.Orientation == Orientation.Vertical;
+
     public StackPanelUIElement(WpfUIProvider wpfUIProvider, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent)
         : base(wpfUIProvider)
     {
