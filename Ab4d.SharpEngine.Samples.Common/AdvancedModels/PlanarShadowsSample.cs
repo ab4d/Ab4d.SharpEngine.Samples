@@ -55,7 +55,8 @@ public class PlanarShadowsSample : CommonSample
             Size = new Vector2(400, 400),
             Normal = new Vector3(0, 1, 0),
             HeightDirection = new Vector3(0, 0, -1),
-            Material = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO)
+            Material = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO),
+            BackMaterial = StandardMaterials.DimGray
         };
 
         scene.RootNode.Add(_planeModelNode);
