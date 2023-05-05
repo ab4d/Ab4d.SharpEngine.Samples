@@ -14,6 +14,7 @@ using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Android.Content.PM;
 using Android.Content.Res;
+using Android.Graphics;
 using Android.OS;
 using Android.Views;
 using Java.Lang;
@@ -26,8 +27,8 @@ using Java.Lang;
 
 namespace AndroidApp1
 {
-    [Activity(Label = "@string/app_name", 
-              MainLauncher = true, 
+    [Activity(Label = "@string/app_name",
+              MainLauncher = true,
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize | ConfigChanges.KeyboardHidden)] // handle those changes without recreating the activity
     public class MainActivity : Activity
     {
@@ -65,7 +66,7 @@ namespace AndroidApp1
                     ChangeBoxColor();
                 };
             }
-            
+
             var changeSceneButton = FindViewById<Button>(Resource.Id.button_change_scene);
             if (changeSceneButton != null)
             {
@@ -74,7 +75,7 @@ namespace AndroidApp1
                     ChangeTestScene();
                 };
             }
-            
+
 
             // Create VulkanView and add it to layout
             var layout = FindViewById<LinearLayout>(Resource.Id.Layout);
@@ -104,7 +105,7 @@ namespace AndroidApp1
             //
             // Then also set the following to true:
             bool enableStandardValidation = false;
-            
+
             var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngineAndroidDemo", enableStandardValidation: enableStandardValidation);
 
             // Create VulkanSurface provider that will create the surface pointer when the VulkanInstance will be available
@@ -114,8 +115,15 @@ namespace AndroidApp1
             // In case when we have _vulkanSurface it is recommended to provide it when creating the VulkanDevice.
             // This way the correct settings for the device can be used (for example SwapChainImagesCount).
             // It is also possible not to specify surface when creating VulkanDevice and do that only when creating SceneView.
-            _vulkanDevice = VulkanDevice.Create(engineCreateOptions);
-
+            try
+            {
+                _vulkanDevice = VulkanDevice.Create(engineCreateOptions);
+            }
+            catch (SharpEngineException ex)
+            {
+                ShowErrorMessage("Error creating Vulkan device:\n" + ex.Message);
+                return;
+            }
 
             // After we have VulkanDevice, we can create Scene.
             // The Scene will contain the 3D objects (as SceneNodes) and Lights
@@ -223,7 +231,7 @@ namespace AndroidApp1
 
             base.OnConfigurationChanged(newConfig);
         }
-        
+
         private void OnSceneViewResized(object? sender, EventArgs e)
         {
             _isConfigurationChanged = false;
@@ -284,7 +292,7 @@ namespace AndroidApp1
         {
             if (_scene == null)
                 return;
-            
+
             if (_allObjectsTestScene == null)
             {
                 _scene.RootNode.Clear();
@@ -337,6 +345,16 @@ namespace AndroidApp1
             };
         }
 
+        private void ShowErrorMessage(string message)
+        {
+            var sutTitleTextView = FindViewById<TextView>(Resource.Id.text_view_subtitle);
+
+            if (sutTitleTextView == null)
+                return;
+
+            sutTitleTextView.Text = message;
+            sutTitleTextView.SetTextColor(Color.Red);
+        }
 
         public override bool DispatchTouchEvent(MotionEvent? e)
         {

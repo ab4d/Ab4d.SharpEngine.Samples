@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:id="@+id/Layout">
     <TextView 
+        android:id="@+id/text_view_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
