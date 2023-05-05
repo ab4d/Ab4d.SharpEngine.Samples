@@ -474,7 +474,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
         private void EnsureFontPage(int pageIndex)
         {
-            if (_scene == null || _fontPages[pageIndex] != null)
+            if (_scene == null || _fontPages[pageIndex] != null || _scene.GpuDevice == null)
                 return;
 
             string fileName = _bitmapFont.Pages[pageIndex].FileName;

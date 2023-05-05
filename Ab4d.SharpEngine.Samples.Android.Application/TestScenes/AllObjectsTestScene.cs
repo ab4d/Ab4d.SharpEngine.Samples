@@ -16,6 +16,7 @@ using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
+using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using Android.Graphics;
 using Android.Transitions;
@@ -80,6 +81,11 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         public void CreateTestScene()
         {
+            var gpuDevice = _scene.GpuDevice;
+
+            if (gpuDevice == null)
+                return;
+
             _planeModel = new PlaneModelNode(centerPosition: new Vector3(0, -50, 0),
                                              size: new Vector2(800, 1000),
                                              normal: new Vector3(0, 1, 0),
@@ -199,13 +205,13 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice, generateMipMaps: false),
+                    Material = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice, generateMipMaps: false),
                 };
 
                 texturedMaterialGroup.Add(geometryModel7);
 
 
-                var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker2.jpg", _bitmapIO, _scene.GpuDevice, generateMipMaps: true);
+                var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker2.jpg", _bitmapIO, gpuDevice, generateMipMaps: true);
                 var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
                 {
                     Material = textureMaterial,
@@ -227,13 +233,13 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, _scene.GpuDevice),
+                    Material = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, gpuDevice),
                 };
 
                 texturedMaterialGroup.Add(geometryModel10);
 
 
-                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(@"Resources\TreeTexture.png", _bitmapIO, _scene.GpuDevice);
+                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(@"Resources\TreeTexture.png", _bitmapIO, gpuDevice);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -266,7 +272,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
 
             // TEST crating custom texture
-            var customTexture = CreateCustomTexture(_scene, 256, 128, alphaValue: 1);
+            var customTexture = CreateCustomTexture(gpuDevice, 256, 128, alphaValue: 1);
 
             var customTextureMaterial = new StandardMaterial(customTexture, CommonSamplerTypes.Clamp, "CustomTextureMaterial");
 
@@ -362,7 +368,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             //
             if (_bitmapIO != null)
             {
-                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice);
                 solidColorMaterial2.Effect = solidColorEffect;
 
                 var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -395,7 +401,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
-                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice);
                 solidColorMaterial3.Effect = customSolidColorEffect;
 
                 var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -795,7 +801,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 _specialMaterialGroupTransform.Y = MathF.Sin(totalTime * 2) * 20 + 15;
         }
 
-        private GpuImage CreateCustomTexture(Scene scene, int width, int height, float alphaValue)
+        private GpuImage CreateCustomTexture(VulkanDevice gpuDevice, int width, int height, float alphaValue)
         {
             int imageStride = width * 4;
             var imageBytes = new byte[imageStride * height];
@@ -850,7 +856,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var rawImageData = new RawImageData(width, height, imageStride, Ab4d.Vulkan.Format.B8G8R8A8Unorm, imageBytes, checkTransparency: false);
 
-            var gpuImage = new GpuImage(scene.GpuDevice, rawImageData, generateMipMaps: true, isDeviceLocal: true, imageSource: "CustomTexture")
+            var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, isDeviceLocal: true, imageSource: "CustomTexture")
             {
                 IsPreMultipliedAlpha = true,
                 HasTransparentPixels = alphaValue < 1,
@@ -918,7 +924,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\" + fileName);
 
 
-            
+
             string? usedFileName;
             Stream? usedFileStream = null;
 
@@ -1027,7 +1033,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
         }
 
         public void Dispose()
-        { 
+        {
             _disposables.Dispose();
             _scene.RootNode.Clear();
         }
