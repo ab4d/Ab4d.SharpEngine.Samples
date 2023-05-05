@@ -290,7 +290,7 @@ namespace AndroidApp1
 
         private void ChangeTestScene()
         {
-            if (_scene == null)
+            if (_scene == null || _sceneView == null)
                 return;
 
             if (_allObjectsTestScene == null)
@@ -299,7 +299,7 @@ namespace AndroidApp1
 
                 EnsureSkiaSharpBitmapIO();
 
-                _allObjectsTestScene = new AllObjectsTestScene(_scene, _skiaSharpBitmapIO);
+                _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _skiaSharpBitmapIO);
 
                 // Add demo objects to _scene
                 _allObjectsTestScene.CreateTestScene();

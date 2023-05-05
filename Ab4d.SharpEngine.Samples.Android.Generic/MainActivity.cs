@@ -296,7 +296,7 @@ namespace AndroidDemo
 
             EnsureSkiaSharpBitmapIO();
 
-            var allObjectsTestScene = new AllObjectsTestScene(_scene, _skiaSharpBitmapIO);
+            var allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _skiaSharpBitmapIO);
 
             // Add demo objects to _scene
             allObjectsTestScene.CreateTestScene();

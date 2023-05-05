@@ -27,9 +27,12 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
     public class AllObjectsTestScene : IDisposable
     {
         private Scene _scene;
+        private SceneView _sceneView;
         private IBitmapIO? _bitmapIO;
 
         private bool _isAnimatingScene = true;
+
+        private bool _isOtherModelsCreated;
 
         //private MouseCameraController? _mouseCameraController;
 
@@ -67,7 +70,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
         private int _loadedObjectsCount;
 
 
-        public AllObjectsTestScene(Scene scene, IBitmapIO bitmapIO)
+        public AllObjectsTestScene(Scene scene, SceneView sceneView, IBitmapIO bitmapIO)
         {
             // Setup log listener
             //Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => Debug.Write($"SharpEngine {logLevel}: {message}"));
@@ -75,17 +78,13 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             _bitmapIO = bitmapIO;
             _scene = scene;
+            _sceneView = sceneView;
 
             _disposables = new DisposeList();
         }
 
         public void CreateTestScene()
         {
-            var gpuDevice = _scene.GpuDevice;
-
-            if (gpuDevice == null)
-                return;
-
             _planeModel = new PlaneModelNode(centerPosition: new Vector3(0, -50, 0),
                                              size: new Vector2(800, 1000),
                                              normal: new Vector3(0, 1, 0),
@@ -101,6 +100,27 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var axisLineNode = new AxisLineNode(length: 50, "AxisGroup");
             _scene.RootNode.Add(axisLineNode);
+
+
+            // Because this is a complex scene, it takes some time to load all textures and show the scene.
+            // Therefore we first show only the plane node with axis and after that is shows load all other nodes.
+            // This will be further optimized in the future (with background loading).
+            _sceneView.SceneRendered += delegate(object? sender, EventArgs args)
+            {
+                CreateTestScene2();
+            };
+        }
+
+
+        private void CreateTestScene2()
+        {
+            if (_isOtherModelsCreated)
+                return;
+
+            var gpuDevice = _scene.GpuDevice;
+
+            if (gpuDevice == null)
+                return;
 
 
 
@@ -763,6 +783,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
             _scene.RootNode.Add(_additionalObjectsGroup);
 
+            _isOtherModelsCreated = true;
 
             AnimateModels();
         }
