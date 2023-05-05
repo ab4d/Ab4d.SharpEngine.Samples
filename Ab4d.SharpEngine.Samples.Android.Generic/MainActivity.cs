@@ -79,6 +79,10 @@ namespace AndroidDemo
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
+            // Setup logger
+            SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+
+
             // Check if the BLUETOOTH_CONNECT permission is granted (this is required when using SilkActivity in Android 12+)
             if (CheckSelfPermission(Android.Manifest.Permission.BluetoothConnect) != Android.Content.PM.Permission.Granted)
             {
@@ -100,19 +104,8 @@ namespace AndroidDemo
         {
             Log.Info?.Write("STARTING: OnRun");
 
-
-            // We need to use GLFW instead of SDL
-            // because currently there is a bug in Silk.NET.Sdl that crashes the app when the screen is rotated:
-            // https://github.com/dotnet/Silk.NET/issues/922
-            // If you want to use SDK, then call this in OnCreate method above:
-            RequestedOrientation = ScreenOrientation.Locked; // Prevent rotating the screen
-            
-            Silk.NET.Windowing.Window.PrioritizeSdl();
-            //Silk.NET.Windowing.Window.PrioritizeGlfw();
-
-
             var options = ViewOptions.DefaultVulkan;
-            options.API = new GraphicsAPI(ContextAPI.Vulkan, ContextProfile.Compatability, ContextFlags.Default, new APIVersion(30, 0));
+            options.API = new GraphicsAPI(ContextAPI.Vulkan, ContextProfile.Compatability, ContextFlags.Default, new APIVersion(28, 0));
             _view = Silk.NET.Windowing.Window.GetView(options);
 
 
@@ -155,8 +148,8 @@ namespace AndroidDemo
         {
             Log.Info?.Write("Resize to " + newSize);
 
-            if (_sceneView != null)
-                _sceneView.Resize();
+            // This is also called after the orientation is changed - we need to render the scene again to apply new view transformation
+            _sceneView?.Render(forceRender: true);
         }
 
         private void OnClose()
