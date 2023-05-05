@@ -36,18 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" Link="Resources\raw\BitmapFonts\readme.txt" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto font LICENSE.txt" Link="Resources\raw\BitmapFonts\roboto font LICENSE.txt" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_128_0.png" Link="Resources\raw\BitmapFonts\roboto_128_0.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_128_0.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\10x10-texture.png" Link="Resources\raw\10x10-texture.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\raw\TreeTexture.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\raw\uvchecker.png" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker2.jpg" Link="Resources\raw\uvchecker2.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Resources\raw\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
