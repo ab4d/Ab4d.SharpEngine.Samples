@@ -12,14 +12,14 @@ using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
-using Android.Graphics;
-using Android.Transitions;
+using Android.Content.Res;
 using Cyotek.Drawing.BitmapFont;
 
 namespace Ab4d.SharpEngine.Samples.TestScenes
@@ -28,11 +28,12 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
     {
         private Scene _scene;
         private SceneView _sceneView;
-        private IBitmapIO? _bitmapIO;
+        private AndroidBitmapIO? _bitmapIO;
+        private Resources _androidResources;
 
         private bool _isAnimatingScene = true;
 
-        private bool _isOtherModelsCreated;
+        private bool _isOtherModelsLoadCalled;
 
         //private MouseCameraController? _mouseCameraController;
 
@@ -69,8 +70,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private int _loadedObjectsCount;
 
-
-        public AllObjectsTestScene(Scene scene, SceneView sceneView, IBitmapIO bitmapIO)
+        public AllObjectsTestScene(Scene scene, SceneView sceneView, AndroidBitmapIO bitmapIO, Resources androidResources)
         {
             // Setup log listener
             //Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => Debug.Write($"SharpEngine {logLevel}: {message}"));
@@ -79,6 +79,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _bitmapIO = bitmapIO;
             _scene = scene;
             _sceneView = sceneView;
+            _androidResources = androidResources;
 
             _disposables = new DisposeList();
         }
@@ -105,7 +106,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             // Because this is a complex scene, it takes some time to load all textures and show the scene.
             // Therefore we first show only the plane node with axis and after that is shows load all other nodes.
             // This will be further optimized in the future (with background loading).
-            _sceneView.SceneRendered += delegate(object? sender, EventArgs args)
+            _sceneView.SceneRendered += delegate (object? sender, EventArgs args)
             {
                 CreateTestScene2();
             };
@@ -114,15 +115,18 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private void CreateTestScene2()
         {
-            if (_isOtherModelsCreated)
+            if (_isOtherModelsLoadCalled)
                 return;
+
+
+            _isOtherModelsLoadCalled = true;
 
             var gpuDevice = _scene.GpuDevice;
 
             if (gpuDevice == null)
                 return;
 
-
+            
 
             //_silverPyramidMaterial = new StandardMaterial("SpecularGrayMaterial1") { DiffuseColor = Colors.White, SpecularColor = Color3.White, SpecularPower = 16 };
             _silverPyramidMaterial = StandardMaterials.LightGray.SetSpecular(Color3.White, specularPower: 16);
@@ -225,13 +229,20 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice, generateMipMaps: false),
+                    //Material = TextureLoader.CreateTextureMaterial(@"drawable\10x10-texture.png", _bitmapIO, gpuDevice, generateMipMaps: false),
+                    Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice, generateMipMaps: false),
                 };
 
                 texturedMaterialGroup.Add(geometryModel7);
 
 
-                var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker2.jpg", _bitmapIO, gpuDevice, generateMipMaps: true);
+                // Use AndroidTextureLoader to load texture from Andorid's resources (image files added to Resources/Drawable folder and with build action set to AndroidResource)
+                var textureMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
+
+                // We could also read textures that are compiled with EmbeddedResources
+                // This require that FileStreamResolver is setup on the AndroidBitmapIO (see MainActivity.ChangeTestScene method)
+                //var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, gpuDevice);
+
                 var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
                 {
                     Material = textureMaterial,
@@ -251,15 +262,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 texturedMaterialGroup.Add(geometryModel9);
 
 
-                var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
-                {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, gpuDevice),
-                };
-
-                texturedMaterialGroup.Add(geometryModel10);
-
-
-                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(@"Resources\TreeTexture.png", _bitmapIO, gpuDevice);
+                var treePlaneMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.TreeTexture, _bitmapIO, gpuDevice);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -388,7 +391,8 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             //
             if (_bitmapIO != null)
             {
-                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice);
+                // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
+                var solidColorMaterial2 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
                 solidColorMaterial2.Effect = solidColorEffect;
 
                 var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -421,7 +425,8 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
-                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, gpuDevice);
+                // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
+                var solidColorMaterial3 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
                 solidColorMaterial3.Effect = customSolidColorEffect;
 
                 var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -672,10 +677,10 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                                                                           fontSize: 50,
                                                                           textColor: Colors.Blue,
                                                                           isSolidColorMaterial: false,
-                    name: "TextNode1");
+                                                                          name: "TextNode1");
 
                     _scene.RootNode.Add(textNode1);
-
+                    
                     // Font is render with "Latin", "Latin-1 Supplement" and "Latin Extended-A" characters and defines many special characters.
                     string textWithSpecialChars = "with special chars:\r\n@*?${}@{}ß\r\nščžŠČŽüůű";
                     var textNode2 = arialBitmapTextCreator.CreateTextNode(text: textWithSpecialChars,
@@ -782,9 +787,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
             _scene.RootNode.Add(_additionalObjectsGroup);
-
-            _isOtherModelsCreated = true;
-
+            
             AnimateModels();
         }
 
@@ -887,50 +890,68 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
         }
 
 
-        private static BitmapFont? CreateBitmapFont(string fontFileName, IBitmapIO bitmapIO)
+        private static bool ResolveFileName(string fileName, IBitmapIO bitmapIO, out string? usedFileName, out System.IO.Stream? fileStream)
         {
-            string? usedFileName = null;
-            System.IO.Stream? fileStream = null;
+            usedFileName = null;
+            fileStream = null;
 
-            if (System.IO.File.Exists(fontFileName))
+            if (System.IO.File.Exists(fileName))
             {
-                usedFileName = fontFileName;
+                usedFileName = fileName;
+                return true;
             }
-            else
+            
+            if (bitmapIO.FileStreamResolver != null) // if stream resolved exists, then try to get the stream from the file name (note that this is the only way to resolve files on Android)
+                fileStream = bitmapIO.FileStreamResolver(fileName);
+
+            if (fileStream != null)
+                return true;
+
+            if (fileStream == null && bitmapIO.FileNotFoundResolver != null)
             {
-                if (bitmapIO.FileStreamResolver != null) // if stream resolved exists, then try to get the stream from the file name (note that this is the only way to resolve files on Android)
-                    fileStream = bitmapIO.FileStreamResolver(fontFileName);
+                usedFileName = bitmapIO.FileNotFoundResolver(fileName); // try to resolve the path to the file
 
-                if (fileStream == null && bitmapIO.FileNotFoundResolver != null)
+                if (usedFileName != null)
                 {
-                    usedFileName = bitmapIO.FileNotFoundResolver(fontFileName); // try to resolve the path to the file
-
-                    if (usedFileName != null && !System.IO.File.Exists(fontFileName))
-                        usedFileName = null;
+                    if (System.IO.File.Exists(fileName))
+                        return true;
                 }
             }
 
-            BitmapFont? arialBitmapFont;
+            return false;
+        }
+
+        private static BitmapFont? CreateBitmapFont(string fontFileName, IBitmapIO bitmapIO)
+        {
+            bool fileExists = ResolveFileName(fontFileName, bitmapIO, out string? usedFileName, out System.IO.Stream? fileStream);
+
+            if (!fileExists)
+                return null;
+
+
+            BitmapFont? bitmapFont;
             if (usedFileName != null || fileStream != null)
             {
-                arialBitmapFont = new BitmapFont();
+
+
+                bitmapFont = new BitmapFont();
 
                 if (fileStream != null)
                 {
-                    arialBitmapFont.Load(fileStream); // load from stream
+                    bitmapFont.Load(fileStream); // load from stream
                     fileStream.Close();
                 }
                 else
                 {
-                    arialBitmapFont.Load(usedFileName);
+                    bitmapFont.Load(usedFileName);
                 }
             }
             else
             {
-                arialBitmapFont = null;
+                bitmapFont = null;
             }
 
-            return arialBitmapFont;
+            return bitmapFont;
         }
 
         public void LoadObject(string fileName)

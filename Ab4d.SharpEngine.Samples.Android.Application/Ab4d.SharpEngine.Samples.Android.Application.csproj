@@ -12,10 +12,8 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <AndroidResource Remove="Resources\raw\10x10-texture.png" />
-    <AndroidResource Remove="Resources\raw\TreeTexture.png" />
-    <AndroidResource Remove="Resources\raw\uvchecker.png" />
-    <AndroidResource Remove="Resources\raw\uvchecker2.jpg" />
+    <AndroidResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\drawable\TreeTexture.png" />
+    <AndroidResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\drawable\uvchecker.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" Link="Resources\raw\BitmapFonts\readme.txt" />
@@ -28,16 +26,6 @@
   <ItemGroup>
     <PackageReference Include="Ab4d.SharpEngine" Version="0.9.8-beta2" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.232" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\raw\10x10-texture.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\raw\TreeTexture.png" />
-    <EmbeddedResource Include="Resources\raw\uvchecker.png" />
-    <EmbeddedResource Include="Resources\raw\uvchecker2.jpg" />
   </ItemGroup>
 
   <ItemGroup>

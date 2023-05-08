@@ -15,9 +15,8 @@ using Ab4d.SharpEngine.SceneNodes;
 using Android.Content.PM;
 using Android.Content.Res;
 using Android.Graphics;
-using Android.OS;
 using Android.Views;
-using Java.Lang;
+using Activity = Android.App.Activity;
 
 // This Android sample is using a .Net 6 Android Application template.
 // It uses only standard Android objects like Activity and SurfaceView to show the 3D scene by SharpEngine.
@@ -27,8 +26,8 @@ using Java.Lang;
 
 namespace AndroidApp1
 {
-    [Activity(Label = "@string/app_name",
-              MainLauncher = true,
+    [Activity(Label = "@string/app_name", 
+              MainLauncher = true, 
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize | ConfigChanges.KeyboardHidden)] // handle those changes without recreating the activity
     public class MainActivity : Activity
     {
@@ -48,7 +47,7 @@ namespace AndroidApp1
 
         private AllObjectsTestScene? _allObjectsTestScene;
         private string[]? _allManifestResourceNames;
-        private SkiaSharpBitmapIO? _skiaSharpBitmapIO;
+        private AndroidBitmapIO? _androidBitmapIO;
 
 
         protected override void OnCreate(Bundle? savedInstanceState)
@@ -66,7 +65,7 @@ namespace AndroidApp1
                     ChangeBoxColor();
                 };
             }
-
+            
             var changeSceneButton = FindViewById<Button>(Resource.Id.button_change_scene);
             if (changeSceneButton != null)
             {
@@ -75,8 +74,8 @@ namespace AndroidApp1
                     ChangeTestScene();
                 };
             }
-
-
+            
+         
             // Create VulkanView and add it to layout
             var layout = FindViewById<LinearLayout>(Resource.Id.Layout);
 
@@ -105,7 +104,7 @@ namespace AndroidApp1
             //
             // Then also set the following to true:
             bool enableStandardValidation = false;
-
+            
             var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngineAndroidDemo", enableStandardValidation: enableStandardValidation);
 
             // Create VulkanSurface provider that will create the surface pointer when the VulkanInstance will be available
@@ -231,7 +230,7 @@ namespace AndroidApp1
 
             base.OnConfigurationChanged(newConfig);
         }
-
+        
         private void OnSceneViewResized(object? sender, EventArgs e)
         {
             _isConfigurationChanged = false;
@@ -290,16 +289,17 @@ namespace AndroidApp1
 
         private void ChangeTestScene()
         {
-            if (_scene == null || _sceneView == null)
+            if (_scene == null || _sceneView == null || this.Resources == null)
                 return;
-
+            
             if (_allObjectsTestScene == null)
             {
                 _scene.RootNode.Clear();
 
-                EnsureSkiaSharpBitmapIO();
+                EnsureAndroidBitmapIO();
 
-                _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _skiaSharpBitmapIO);
+                _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
+
 
                 // Add demo objects to _scene
                 _allObjectsTestScene.CreateTestScene();
@@ -316,19 +316,19 @@ namespace AndroidApp1
             }
         }
 
-        [MemberNotNull(nameof(_skiaSharpBitmapIO))]
-        private void EnsureSkiaSharpBitmapIO()
+        [MemberNotNull(nameof(_androidBitmapIO))]
+        private void EnsureAndroidBitmapIO()
         {
-            if (_skiaSharpBitmapIO != null)
+            if (_androidBitmapIO != null)
                 return;
 
-            _skiaSharpBitmapIO = new SkiaSharpBitmapIO();
+            _androidBitmapIO = new AndroidBitmapIO();
 
+            // Setup simple resolver that returns file stream based on the fileName for files that
+            // have build action set to Embedded resources.
+            // This is not used in this sample, because images here are compiled with AndroidResource and added to drawable folder.
             _allManifestResourceNames = this.GetType().Assembly.GetManifestResourceNames();
-
-            // Setup simple resolver that returns file stream from Android Resources based on the fileName
-            // For this to work the build action for image files need to be set to Embedded resources
-            _skiaSharpBitmapIO.FileStreamResolver = delegate (string fileName)
+            _androidBitmapIO.FileStreamResolver = delegate (string fileName)
             {
                 if (_allManifestResourceNames != null)
                 {
