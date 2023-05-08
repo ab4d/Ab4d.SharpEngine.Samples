@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview7" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="Ab4d.SharpEngine" Version="0.9.8-beta2" />
