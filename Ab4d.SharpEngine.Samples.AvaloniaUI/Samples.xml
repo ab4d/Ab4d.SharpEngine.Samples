@@ -15,6 +15,7 @@
   <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
   <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
   <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+  <Sample Location="Cameras.AvaloniaPoint3DTo2DSample" Title="Point3DTo2D"/>
 
   <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
   <Sample Location="CameraControllers.MouseCameraControllerSample" Title="MouseCameraController"/>
@@ -30,8 +31,8 @@
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
 
   <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
-  <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
   <Sample IsSeparator="True" />
+  <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
@@ -68,7 +69,7 @@
   <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
-  <Sample Location="Animations.MaterialAnimationSample" Title="MaterialAnimation"/>
-  <Sample Location="Animations.CameraAnimationSample" Title="CameraAnimation"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
 
 </Samples>

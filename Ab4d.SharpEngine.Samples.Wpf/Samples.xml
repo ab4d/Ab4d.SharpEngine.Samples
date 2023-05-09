@@ -16,6 +16,7 @@
   <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
   <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
   <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+  <Sample Location="Cameras.WpfPoint3DTo2DSample" Title="Point3DTo2D"/>
 
   <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
   <Sample Location="CameraControllers/MouseCameraControllerSample.xaml" Title="MouseCameraController"/>
@@ -26,7 +27,7 @@
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
-
+  
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
 
@@ -69,7 +70,7 @@
   <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
-  <Sample Location="Animations.MaterialAnimationSample" Title="MaterialAnimation"/>
-  <Sample Location="Animations.CameraAnimationSample" Title="CameraAnimation"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
 
 </Samples>
