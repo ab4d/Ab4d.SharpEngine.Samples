@@ -12,7 +12,6 @@ using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
@@ -20,6 +19,8 @@ using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using Android.Content.Res;
+using Android.Graphics;
+using Android.Transitions;
 using Cyotek.Drawing.BitmapFont;
 
 namespace Ab4d.SharpEngine.Samples.TestScenes
@@ -69,6 +70,10 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
         private DisposeList _disposables;
 
         private int _loadedObjectsCount;
+
+
+        public int Drawable1Id { get; set; }
+        public int Drawable2Id { get; set; }
 
         public AllObjectsTestScene(Scene scene, SceneView sceneView, AndroidBitmapIO bitmapIO, Resources androidResources)
         {
@@ -229,15 +234,16 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
-                    //Material = TextureLoader.CreateTextureMaterial(@"drawable\10x10-texture.png", _bitmapIO, gpuDevice, generateMipMaps: false),
-                    Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice, generateMipMaps: false),
+                    //Material = TextureLoader.CreateTextureMaterial(@"drawable\uvchecker.png", _bitmapIO, gpuDevice, generateMipMaps: false),
+                    //Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice, generateMipMaps: false),
+                    Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice, generateMipMaps: false),
                 };
 
                 texturedMaterialGroup.Add(geometryModel7);
 
 
                 // Use AndroidTextureLoader to load texture from Andorid's resources (image files added to Resources/Drawable folder and with build action set to AndroidResource)
-                var textureMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
+                var textureMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
 
                 // We could also read textures that are compiled with EmbeddedResources
                 // This require that FileStreamResolver is setup on the AndroidBitmapIO (see MainActivity.ChangeTestScene method)
@@ -262,7 +268,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 texturedMaterialGroup.Add(geometryModel9);
 
 
-                var treePlaneMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.TreeTexture, _bitmapIO, gpuDevice);
+                var treePlaneMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable2Id, _bitmapIO, gpuDevice);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -392,7 +398,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             if (_bitmapIO != null)
             {
                 // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
-                var solidColorMaterial2 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
+                var solidColorMaterial2 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
                 solidColorMaterial2.Effect = solidColorEffect;
 
                 var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -426,7 +432,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
                 // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
-                var solidColorMaterial3 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice);
+                var solidColorMaterial3 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
                 solidColorMaterial3.Effect = customSolidColorEffect;
 
                 var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")

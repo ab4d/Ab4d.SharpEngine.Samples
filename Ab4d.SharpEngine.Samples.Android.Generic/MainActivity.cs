@@ -10,6 +10,7 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.Samples.Android.Generic;
 using Ab4d.SharpEngine.Samples.TestScenes;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
@@ -74,15 +75,11 @@ namespace AndroidDemo
         private ScaleGestureDetector? _scaleGestureDetector;
         private ManualMouseCameraController? _mouseCameraController;
         private MyScaleListener? _myScaleListener;
-        private SkiaSharpBitmapIO? _skiaSharpBitmapIO;
+        private AndroidBitmapIO? _androidBitmapIO;
 
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
-            // Setup logger
-            SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-
-
             // Check if the BLUETOOTH_CONNECT permission is granted (this is required when using SilkActivity in Android 12+)
             if (CheckSelfPermission(Android.Manifest.Permission.BluetoothConnect) != Android.Content.PM.Permission.Granted)
             {
@@ -104,8 +101,19 @@ namespace AndroidDemo
         {
             Log.Info?.Write("STARTING: OnRun");
 
+
+            // We need to use GLFW instead of SDL
+            // because currently there is a bug in Silk.NET.Sdl that crashes the app when the screen is rotated:
+            // https://github.com/dotnet/Silk.NET/issues/922
+            // If you want to use SDK, then call this in OnCreate method above:
+            RequestedOrientation = ScreenOrientation.Locked; // Prevent rotating the screen
+            
+            Silk.NET.Windowing.Window.PrioritizeSdl();
+            //Silk.NET.Windowing.Window.PrioritizeGlfw();
+
+
             var options = ViewOptions.DefaultVulkan;
-            options.API = new GraphicsAPI(ContextAPI.Vulkan, ContextProfile.Compatability, ContextFlags.Default, new APIVersion(28, 0));
+            options.API = new GraphicsAPI(ContextAPI.Vulkan, ContextProfile.Compatability, ContextFlags.Default, new APIVersion(30, 0));
             _view = Silk.NET.Windowing.Window.GetView(options);
 
 
@@ -148,8 +156,8 @@ namespace AndroidDemo
         {
             Log.Info?.Write("Resize to " + newSize);
 
-            // This is also called after the orientation is changed - we need to render the scene again to apply new view transformation
-            _sceneView?.Render(forceRender: true);
+            if (_sceneView != null)
+                _sceneView.Resize();
         }
 
         private void OnClose()
@@ -291,30 +299,32 @@ namespace AndroidDemo
 
         private void CreateAllObjectsTestScene()
         {
-            if (_scene == null || _sceneView == null)
+            if (_scene == null || _sceneView == null || this.Resources == null)
                 return;
 
-            EnsureSkiaSharpBitmapIO();
+            EnsureAndroidBitmapIO();
 
-            var allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _skiaSharpBitmapIO);
+            var allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
+            allObjectsTestScene.Drawable1Id = Resource.Drawable.uvchecker;
+            allObjectsTestScene.Drawable2Id = Resource.Drawable.TreeTexture;
 
             // Add demo objects to _scene
             allObjectsTestScene.CreateTestScene();
         }
 
-        [MemberNotNull(nameof(_skiaSharpBitmapIO))]
-        private void EnsureSkiaSharpBitmapIO()
+        [MemberNotNull(nameof(_androidBitmapIO))]
+        private void EnsureAndroidBitmapIO()
         {
-            if (_skiaSharpBitmapIO != null)
+            if (_androidBitmapIO != null)
                 return;
 
-            _skiaSharpBitmapIO = new SkiaSharpBitmapIO();
+            _androidBitmapIO = new AndroidBitmapIO();
 
+            // Setup simple resolver that returns file stream based on the fileName for files that
+            // have build action set to Embedded resources.
+            // This is not used in this sample, because images here are compiled with AndroidResource and added to drawable folder.
             _allManifestResourceNames = this.GetType().Assembly.GetManifestResourceNames();
-
-            // Setup simple resolver that returns file stream from Android Resources based on the fileName
-            // For this to work the build action for image files need to be set to Embedded resources
-            _skiaSharpBitmapIO.FileStreamResolver = delegate (string fileName)
+            _androidBitmapIO.FileStreamResolver = delegate (string fileName)
             {
                 if (_allManifestResourceNames != null)
                 {

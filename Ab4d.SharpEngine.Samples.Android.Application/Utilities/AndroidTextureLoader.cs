@@ -42,7 +42,7 @@ public class AndroidTextureLoader
         var rawImageData = bitmapIO.LoadBitmap(resources, drawableId);
 
         if (rawImageData == null)
-            throw new FileNotFoundException($"Cannot find texture with drawable id {drawableId}");
+            throw new System.IO.FileNotFoundException($"Cannot find texture with drawable id {drawableId}");
 
         GpuImage? gpuImage;
         string? imageName = $"android_drawable_{drawableId}";
@@ -56,11 +56,8 @@ public class AndroidTextureLoader
         {
             var imageData = bitmapIO.LoadBitmap(resources, drawableId);
 
-            gpuImage = new GpuImage(gpuDevice, imageData, generateMipMaps, isDeviceLocal, imageSource: imageName)
-            {
-                HasTransparentPixels = imageData.HasTransparentPixels ?? false,
-                IsPreMultipliedAlpha = imageData.IsPreMultipliedAlpha ?? false,
-            };
+
+            gpuImage = new GpuImage(gpuDevice, imageData, generateMipMaps, isDeviceLocal, imageSource: imageName);
 
             if (cacheGpuTexture)
                 gpuDevice.CacheValue(imageName, gpuImage);

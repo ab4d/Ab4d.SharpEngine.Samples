@@ -109,7 +109,6 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         public Func<string, int, int, RawImageData>? CustomMipMapBitmapProvider { get; set; }
 
 
-
         public BitmapTextCreator(Scene? scene, BitmapFont bitmapFont, IBitmapIO bitmapIO)
         {
             _scene = scene;
@@ -480,7 +479,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             string fileName = _bitmapFont.Pages[pageIndex].FileName;
 
 
-            RawImageData imageData;
+        RawImageData imageData;
 
             if (_bitmapLoader != null)
             {

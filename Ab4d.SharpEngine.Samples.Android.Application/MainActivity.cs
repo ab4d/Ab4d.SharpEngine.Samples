@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine;
@@ -7,6 +8,7 @@ using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using System.Numerics;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.TestScenes;
@@ -75,7 +77,7 @@ namespace AndroidApp1
                 };
             }
             
-         
+
             // Create VulkanView and add it to layout
             var layout = FindViewById<LinearLayout>(Resource.Id.Layout);
 
@@ -124,9 +126,9 @@ namespace AndroidApp1
                 return;
             }
 
-            // After we have VulkanDevice, we can create Scene.
-            // The Scene will contain the 3D objects (as SceneNodes) and Lights
-            _scene = new Scene(_vulkanDevice, "MainScene");
+            // Create the Scene that will contain the 3D objects (as SceneNodes) and Lights
+            // We do not initialize Scene with the created VulkanDevice - we postpone that until we initialize SceneView
+            _scene = new Scene("MainScene");
 
             // Add lights
             _scene.Lights.Add(new AmbientLight(intensity: 0.3f));
@@ -154,7 +156,8 @@ namespace AndroidApp1
 
             _sceneView.ViewResized += OnSceneViewResized; // This is needed to handle orientation change - see comments for OnConfigurationChanged method below
 
-            _sceneView.Initialize(vulkanSurface);
+            // Initialize GPU resources after we have a valid surface
+            _sceneView.Initialize(_vulkanDevice, vulkanSurface);
 
 
             if (this.ApplicationContext != null)
@@ -299,6 +302,8 @@ namespace AndroidApp1
                 EnsureAndroidBitmapIO();
 
                 _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
+                _allObjectsTestScene.Drawable1Id = Resource.Drawable.uvchecker;
+                _allObjectsTestScene.Drawable2Id = Resource.Drawable.TreeTexture;
 
 
                 // Add demo objects to _scene
