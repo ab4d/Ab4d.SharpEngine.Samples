@@ -71,5 +71,6 @@
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
   <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
+  <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
 
 </Samples>
