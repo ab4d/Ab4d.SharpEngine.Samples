@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
@@ -23,7 +24,7 @@ public class AdvancedHeightMapSample : CommonSample
     private HeightMapContoursNode? _heightMapContoursNode;
     private HeightMapWireframeNode? _heightMapWireframeNode;
 
-    private GradientType _gradientType = GradientType.GeographicalHard;
+    private GradientType _gradientType = GradientType.GeographicalSmooth;
     private LinesType _linesType = LinesType.CombinedContourLines;
 
     private bool _useTransparentColor;
@@ -35,6 +36,7 @@ public class AdvancedHeightMapSample : CommonSample
 
     public enum GradientType
     {
+        None,
         Technical,
         GeographicalSmooth,
         GeographicalHard,
@@ -58,14 +60,15 @@ public class AdvancedHeightMapSample : CommonSample
     {
         // Load height data from image
         // _heightData array should contain values from 0 to 1
-        var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/simpleHeightMap.png");
+        //var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/simpleHeightMap.png");
+        var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/vulkan-heightmap-cropped.png");
         _heightData = HeightMapSurfaceNode.CreateHeightDataFromImageData(heightImageData);
 
         var graySpecularMaterial = StandardMaterials.Gray.SetSpecular(Color3.White, 16);
 
         // Create height map surface
         _heightMapSurfaceNode1 = new HeightMapSurfaceNode(centerPosition: new Vector3(0, 0, 0),
-                                                          size: new Vector3(100, 20, 100),
+                                                          size: new Vector3(100, 10, 100),
                                                           heightData: _heightData,
                                                           useHeightValuesAsTextureCoordinates: false,
                                                           name: "HeightMapSurface")
@@ -74,8 +77,8 @@ public class AdvancedHeightMapSample : CommonSample
             BackMaterial = graySpecularMaterial,
         };
 
-        _heightMapSurfaceNode2 = new HeightMapSurfaceNode(centerPosition: new Vector3(0, 0, 0),
-                                                          size: new Vector3(100, 20, 100),
+        _heightMapSurfaceNode2 = new HeightMapSurfaceNode(centerPosition: _heightMapSurfaceNode1.CenterPosition,
+                                                          size: _heightMapSurfaceNode1.Size,
                                                           heightData: _heightData,
                                                           useHeightValuesAsTextureCoordinates: true,
                                                           name: "HeightMapSurface")
@@ -120,6 +123,10 @@ public class AdvancedHeightMapSample : CommonSample
             targetPositionCamera.Heading   = -30;
             targetPositionCamera.Attitude  = -20;
             targetPositionCamera.Distance  = 200;
+
+            // Show height map on the left side so it is not behind the options:
+            targetPositionCamera.TargetPosition = new Vector3(20, 0, 0);
+            targetPositionCamera.RotationCenterPosition = new Vector3(0, 0, 0);
         }
 
 
@@ -259,83 +266,83 @@ public class AdvancedHeightMapSample : CommonSample
 
         switch (type)
         {
+            case GradientType.None:
+                stops = new GradientStop[1];
+                stops[0] = new GradientStop(Colors.LightGray, 0);
+                break;
+
             case GradientType.Technical:
+                stops = new GradientStop[addTransparentColor ? 7 : 5];
+
+                stops[index++] = new GradientStop(Colors.Red, 1.0f);
+                stops[index++] = new GradientStop(Colors.Yellow, 0.75f);
+                stops[index++] = new GradientStop(Colors.LightGreen, 0.5f);
+                stops[index++] = new GradientStop(Colors.Aqua, 0.25f);
+
+                if (addTransparentColor)
                 {
-                    stops = new GradientStop[addTransparentColor ? 7 : 5];
-
-                    stops[index++] = new GradientStop(Colors.Red, 1.0f);
-                    stops[index++] = new GradientStop(Colors.Yellow, 0.75f);
-                    stops[index++] = new GradientStop(Colors.LightGreen, 0.5f);
-                    stops[index++] = new GradientStop(Colors.Aqua, 0.25f);
-
-                    if (addTransparentColor)
-                    {
-                        // All values below 0.01 will be transparent
-                        stops[index++] = new GradientStop(Colors.Blue, 0.01f);
-                        stops[index++] = new GradientStop(Colors.Blue, 0.009f);
-                        stops[index] = new GradientStop(Color4.Transparent, 0.0f);
-                    }
-                    else
-                    {
-                        stops[index] = new GradientStop(Colors.Blue, 0.0f);
-                    }
-                    break;
+                    // All values below 0.01 will be transparent
+                    stops[index++] = new GradientStop(Colors.Blue, 0.01f);
+                    stops[index++] = new GradientStop(Colors.Blue, 0.009f);
+                    stops[index] = new GradientStop(Color4.Transparent, 0.0f);
                 }
+                else
+                {
+                    stops[index] = new GradientStop(Colors.Blue, 0.0f);
+                }
+                break;
+                
             case GradientType.GeographicalSmooth:
+                stops = new GradientStop[addTransparentColor ? 8 : 6];
+
+                stops[index++] = new GradientStop(Colors.White, 1.0f);
+                stops[index++] = new GradientStop(Colors.Gray, 0.8f);
+                stops[index++] = new GradientStop(Colors.SandyBrown, 0.6f);
+                stops[index++] = new GradientStop(Colors.LightGreen, 0.4f);
+                stops[index++] = new GradientStop(Colors.Aqua, 0.2f);
+
+                if (addTransparentColor)
                 {
-                    stops = new GradientStop[addTransparentColor ? 8 : 6];
-
-                    stops[index++] = new GradientStop(Colors.White, 1.0f);
-                    stops[index++] = new GradientStop(Colors.Gray, 0.8f);
-                    stops[index++] = new GradientStop(Colors.SandyBrown, 0.6f);
-                    stops[index++] = new GradientStop(Colors.LightGreen, 0.4f);
-                    stops[index++] = new GradientStop(Colors.Aqua, 0.2f);
-
-                    if (addTransparentColor)
-                    {
-                        // All values below 0.01 will be transparent
-                        stops[index++] = new GradientStop(Colors.Blue, 0.01f);
-                        stops[index++] = new GradientStop(Color4.Transparent, 0.009f);
-                        stops[index] = new GradientStop(Color4.Transparent, 0.0f);
-                    }
-                    else
-                    {
-                        stops[index] = new GradientStop(Colors.Blue, 0.0f);
-                    }
-                    break;
+                    // All values below 0.01 will be transparent
+                    stops[index++] = new GradientStop(Colors.Blue, 0.01f);
+                    stops[index++] = new GradientStop(Color4.Transparent, 0.009f);
+                    stops[index] = new GradientStop(Color4.Transparent, 0.0f);
                 }
+                else
+                {
+                    stops[index] = new GradientStop(Colors.Blue, 0.0f);
+                }
+                break;
+                
             case GradientType.GeographicalHard:
+                stops = new GradientStop[addTransparentColor ? 12 : 10];
+
+                // The gradient with hard transition is defined by making the transition from one color to another very small (for example from 0.799 to 0.8)
+                stops[index++] = new GradientStop(Colors.White, 1.0f);
+                stops[index++] = new GradientStop(Colors.White, 0.8f);
+                stops[index++] = new GradientStop(Colors.SandyBrown, 0.799f);
+                stops[index++] = new GradientStop(Colors.SandyBrown, 0.6f);
+                stops[index++] = new GradientStop(Colors.LightGreen, 0.599f);
+                stops[index++] = new GradientStop(Colors.LightGreen, 0.400f);
+                stops[index++] = new GradientStop(Colors.Aqua, 0.399f);
+                stops[index++] = new GradientStop(Colors.Aqua, 0.2f);
+                stops[index++] = new GradientStop(Colors.Blue, 0.199f);
+
+                if (addTransparentColor)
                 {
-                    stops = new GradientStop[addTransparentColor ? 12 : 10];
-
-                    // The gradient with hard transition is defined by making the transition from one color to another very small (for example from 0.799 to 0.8)
-                    stops[index++] = new GradientStop(Colors.White, 1.0f);
-                    stops[index++] = new GradientStop(Colors.White, 0.8f);
-                    stops[index++] = new GradientStop(Colors.SandyBrown, 0.799f);
-                    stops[index++] = new GradientStop(Colors.SandyBrown, 0.6f);
-                    stops[index++] = new GradientStop(Colors.LightGreen, 0.599f);
-                    stops[index++] = new GradientStop(Colors.LightGreen, 0.400f);
-                    stops[index++] = new GradientStop(Colors.Aqua, 0.399f);
-                    stops[index++] = new GradientStop(Colors.Aqua, 0.2f);
-                    stops[index++] = new GradientStop(Colors.Blue, 0.199f);
-
-                    if (addTransparentColor)
-                    {
-                        // All values below 0.01 will be transparent
-                        stops[index++] = new GradientStop(Colors.Blue, 0.01f);
-                        stops[index++] = new GradientStop(Color4.Transparent, 0.009f);
-                        stops[index] = new GradientStop(Color4.Transparent, 0.0f);
-                    }
-                    else
-                    {
-                        stops[index] = new GradientStop(Colors.Blue, 0.0f);
-                    }
-                    break;
+                    // All values below 0.01 will be transparent
+                    stops[index++] = new GradientStop(Colors.Blue, 0.01f);
+                    stops[index++] = new GradientStop(Color4.Transparent, 0.009f);
+                    stops[index] = new GradientStop(Color4.Transparent, 0.0f);
                 }
+                else
+                {
+                    stops[index] = new GradientStop(Colors.Blue, 0.0f);
+                }
+                break;
+                
             default:
-                {
-                    throw new ArgumentException($"Invalid gradient type: {type}!", nameof(type));
-                }
+                throw new ArgumentException($"Invalid gradient type: {type}!", nameof(type));
         }
 
         return stops;
@@ -347,7 +354,7 @@ public class AdvancedHeightMapSample : CommonSample
 
         
         ui.CreateLabel("Gradient:", isHeader: true);
-        ui.CreateRadioButtons(new string[] { "Technical", "GeographicalSmooth", "GeographicalHard" }, (itemIndex, itemText) =>
+        ui.CreateRadioButtons(new string[] { "None", "Technical", "GeographicalSmooth", "GeographicalHard" }, (itemIndex, itemText) =>
         {
             _gradientType = (GradientType)itemIndex;
             UpdateTexture();
