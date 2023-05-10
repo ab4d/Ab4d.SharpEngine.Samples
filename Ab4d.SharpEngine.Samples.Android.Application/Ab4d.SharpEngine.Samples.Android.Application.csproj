@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-android</TargetFramework>
     <Version>0.9.0</Version>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.8-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.10-beta3" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
   </ItemGroup>
 
