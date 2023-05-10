@@ -15,7 +15,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
 public class TransformationAnimationSample2 : CommonSample
 {
-    public override string Title => "TransformationAnimation sample 2";
+    public override string Title => "TransformationAnimation sample";
     public override string? Subtitle => null;
 
     private ICommonSampleUIProvider? _uiProvider;
