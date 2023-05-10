@@ -24,18 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview8" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview8" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.0-preview8" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <!--<PackageReference Include="Ab4d.SharpEngine" Version="0.9.7-beta2" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.7-beta2" />-->
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.10-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.10-beta3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ab4d.SharpEngine.AvaloniaUI\Ab4d.SharpEngine.AvaloniaUI.csproj" />
-    <ProjectReference Include="..\..\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
   </ItemGroup>
 
