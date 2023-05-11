@@ -20,9 +20,9 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.10-beta3" />
-    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="0.9.10-beta3" />    
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.10-beta3" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.11-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="0.9.11-beta3" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.11-beta3" />    
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
   </ItemGroup>

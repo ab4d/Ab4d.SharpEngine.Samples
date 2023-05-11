@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.10-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.11-beta3" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
   </ItemGroup>
 
