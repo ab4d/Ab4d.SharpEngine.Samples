@@ -14,6 +14,7 @@ using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.TestScenes;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
+using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
 using Android.Graphics;
@@ -28,8 +29,8 @@ using Activity = Android.App.Activity;
 
 namespace AndroidApp1
 {
-    [Activity(Label = "@string/app_name", 
-              MainLauncher = true, 
+    [Activity(Label = "@string/app_name",
+              MainLauncher = true,
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize | ConfigChanges.KeyboardHidden)] // handle those changes without recreating the activity
     public class MainActivity : Activity
     {
@@ -51,6 +52,10 @@ namespace AndroidApp1
         private string[]? _allManifestResourceNames;
         private AndroidBitmapIO? _androidBitmapIO;
 
+        // Saved app state:
+        private bool _isComplexScene = false;
+        private Color3 _lastUsedColor = Color3.Black;
+
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
@@ -67,7 +72,7 @@ namespace AndroidApp1
                     ChangeBoxColor();
                 };
             }
-            
+
             var changeSceneButton = FindViewById<Button>(Resource.Id.button_change_scene);
             if (changeSceneButton != null)
             {
@@ -76,7 +81,7 @@ namespace AndroidApp1
                     ChangeTestScene();
                 };
             }
-            
+
 
             // Create VulkanView and add it to layout
             var layout = FindViewById<LinearLayout>(Resource.Id.Layout);
@@ -91,73 +96,91 @@ namespace AndroidApp1
             }
         }
 
+        // OnSurfaceCreated method is called when the app get new Android surface
+        // This happens on app startup or when the app was resumed from background
         private void OnSurfaceCreated(IntPtr windowPtr)
         {
-            // Setup logger
-            SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+            // If app was resumed from background, then the Vulkan device and Scene were preserved
+            if (_vulkanDevice == null)
+            {
+                // Setup logger
+                SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
 
-            // EngineCreateOptions can be used to set many engine options.
+                // EngineCreateOptions can be used to set many engine options.
 
-            // To enable Vulkan validation layers first download the *.so libraries from:
-            // https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases
-            // 
-            // Then copy the *.so files to the subfolders in the Resources/lib folder.
-            // Check that the the Build Action is set to "AndroidNativeLibrary"
-            //
-            // Then also set the following to true:
-            bool enableStandardValidation = false;
-            
-            var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngineAndroidDemo", enableStandardValidation: enableStandardValidation);
+                // To enable Vulkan validation layers first download the *.so libraries from:
+                // https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases
+                // 
+                // Then copy the *.so files to the subfolders in the Resources/lib folder.
+                // Check that the the Build Action is set to "AndroidNativeLibrary"
+                //
+                // Then also set the following to true:
+                bool enableStandardValidation = false;
+
+                var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngineAndroidDemo", enableStandardValidation: enableStandardValidation);
+
+                // Create a VulkanDevice (and VulkanInstance if it was not created yet)
+                // In case when we have _vulkanSurface it is recommended to provide it when creating the VulkanDevice.
+                // This way the correct settings for the device can be used (for example SwapChainImagesCount).
+                // It is also possible not to specify surface when creating VulkanDevice and do that only when creating SceneView.
+                try
+                {
+                    _vulkanDevice = VulkanDevice.Create(engineCreateOptions);
+                }
+                catch (SharpEngineException ex)
+                {
+                    ShowErrorMessage("Error creating Vulkan device:\n" + ex.Message);
+                    return;
+                }
+            }
+
+            if (_scene == null)
+            {
+                // Create the Scene that will contain the 3D objects (as SceneNodes) and Lights
+                // We do not initialize Scene with the created VulkanDevice - we postpone that until we initialize SceneView
+                _scene = new Scene("MainScene");
+
+                // Add lights
+                _scene.Lights.Add(new AmbientLight(intensity: 0.3f));
+                _scene.Lights.Add(new PointLight(new Vector3(500, 200, 0), range: 10000));
+                //_scene.Lights.Add(new DirectionalLight(new Vector3(-1, -0.3f, 0)));
+                //_scene.Lights.Add(new SpotLight(new Vector3(300, 0, 300), new Vector3(-1, -0.3f, 0)) { Color = new Color3(0.4f, 0.4f, 0.4f) });
+            }
+
+            // If app was resumed from background, then we need to recreate the SceneView because it was disposed in OnTrimMemory
+            if (_sceneView == null)
+            {
+                // Create SceneView that will show the scene
+                _sceneView = new SceneView(_scene, "MainSceneView");
+
+                _sceneView.WaitForVSync = true;                // This is recommended for mobile. This will use FIFO present mode. Read more about the recommendations here: https://developer.samsung.com/sdp/blog/en-us/2019/07/26/vulkan-mobile-best-practice-how-to-configure-your-vulkan-swapchain
+                _sceneView.BackgroundColor = Colors.LightGray;
+
+                _sceneView.ViewResized += OnSceneViewResized; // This is needed to handle orientation change - see comments for OnConfigurationChanged method below
+            }
+
 
             // Create VulkanSurface provider that will create the surface pointer when the VulkanInstance will be available
             var vulkanSurface = new AndroidVulkanSurfaceProvider(windowPtr);
 
-            // Create a VulkanDevice (and VulkanInstance if it was not created yet)
-            // In case when we have _vulkanSurface it is recommended to provide it when creating the VulkanDevice.
-            // This way the correct settings for the device can be used (for example SwapChainImagesCount).
-            // It is also possible not to specify surface when creating VulkanDevice and do that only when creating SceneView.
-            try
-            {
-                _vulkanDevice = VulkanDevice.Create(engineCreateOptions);
-            }
-            catch (SharpEngineException ex)
-            {
-                ShowErrorMessage("Error creating Vulkan device:\n" + ex.Message);
-                return;
-            }
-
-            // Create the Scene that will contain the 3D objects (as SceneNodes) and Lights
-            // We do not initialize Scene with the created VulkanDevice - we postpone that until we initialize SceneView
-            _scene = new Scene("MainScene");
-
-            // Add lights
-            _scene.Lights.Add(new AmbientLight(intensity: 0.3f));
-            _scene.Lights.Add(new PointLight(new Vector3(500, 200, 0), range: 10000));
-            //_scene.Lights.Add(new DirectionalLight(new Vector3(-1, -0.3f, 0)));
-            //_scene.Lights.Add(new SpotLight(new Vector3(300, 0, 300), new Vector3(-1, -0.3f, 0)) { Color = new Color3(0.4f, 0.4f, 0.4f) });
-
-
-            // Create SceneView that will show the scene
-            _sceneView = new SceneView(_scene, "MainSceneView");
-
-            _sceneView.WaitForVSync = true;                // This is recommended for mobile. This will use FIFO present mode. Read more about the recommendations here: https://developer.samsung.com/sdp/blog/en-us/2019/07/26/vulkan-mobile-best-practice-how-to-configure-your-vulkan-swapchain
-            _sceneView.BackgroundColor = Colors.LightGray;
-
-            _targetPositionCamera = new TargetPositionCamera()
-            {
-                Heading = -40,
-                Attitude = -25,
-                Distance = 500,
-                ViewWidth = 500,
-                TargetPosition = new Vector3(0, 0, 0)
-            };
-
-            _sceneView.Camera = _targetPositionCamera;
-
-            _sceneView.ViewResized += OnSceneViewResized; // This is needed to handle orientation change - see comments for OnConfigurationChanged method below
-
             // Initialize GPU resources after we have a valid surface
             _sceneView.Initialize(_vulkanDevice, vulkanSurface);
+
+
+            // Setup camera
+            if (_targetPositionCamera == null)
+            {
+                _targetPositionCamera = new TargetPositionCamera()
+                {
+                    Heading = -40,
+                    Attitude = -25,
+                    Distance = 500,
+                    ViewWidth = 500,
+                    TargetPosition = new Vector3(0, 0, 0)
+                };
+            }
+
+            _sceneView.Camera = _targetPositionCamera;
 
 
             if (this.ApplicationContext != null)
@@ -170,11 +193,54 @@ namespace AndroidApp1
                 };
             }
 
+            // Recreate the scene if it was not preserved
+            if (_scene.RootNode.Count == 0)
+            {
+                if (_isComplexScene) // _isComplexScene is set in SaveAppState method
+                    CreateComplexScene();
+                else
+                    CreateSimpleScene();
 
-            CreateSimpleScene();
+                if (_lastUsedColor != Color3.Black)
+                    SetCustomColor(_lastUsedColor);
+            }
 
             // Render the scene
             RenderScene();
+        }
+
+        public override void OnTrimMemory(TrimMemory level)
+        {
+            if (level == TrimMemory.UiHidden)
+            {
+                // When app is put to background, we can dispose the SceneView resources (Swapchain, images and render passes)
+                // We will recreated them when the app is resumed
+                if (_sceneView != null)
+                {
+                    _sceneView.Dispose();
+                    _sceneView = null;
+                }
+            }
+            else
+            {
+                // In all other cases when the OnTrimMemory is called, we dispose all SharpEngine resources (in real app you many preserve more resources based on level).
+                // Here we should save the state of the 3D scene so it could be recreated.
+                SaveAppState();
+
+                // We can simulate that by first putting the app in background and then execute:
+                // adb shell am send-trim-memory com.ab4d.SharpEngineApp1 MODERATE
+                DisposeSharpEngine();
+            }
+
+            base.OnTrimMemory(level);
+        }
+
+        protected override void OnDestroy()
+        {
+            // Dispose all SharpEngine resources
+            DisposeSharpEngine();
+
+            base.OnDestroy();
         }
 
         private void CreateSimpleScene()
@@ -190,6 +256,37 @@ namespace AndroidApp1
             };
 
             _scene.RootNode.Add(_boxModel);
+        }
+
+        private void CreateComplexScene()
+        {
+            if (_scene == null || _sceneView == null || this.Resources == null)
+                return;
+
+            _scene.RootNode.Clear();
+
+            EnsureAndroidBitmapIO();
+
+            _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
+            _allObjectsTestScene.Drawable1Id = Resource.Drawable.uvchecker;
+            _allObjectsTestScene.Drawable2Id = Resource.Drawable.TreeTexture;
+
+
+            // Add demo objects to _scene
+            _allObjectsTestScene.CreateTestScene();
+
+            if (_targetPositionCamera != null && _targetPositionCamera.Distance < 1500)
+                _targetPositionCamera.Distance = 1500;
+        }
+
+        private void SaveAppState()
+        {
+            // This method is called when all the SharpEngine resources are disposed.
+            // Here we should save the state of the app so it can be recreated when the app is resumed.
+            // In this sample we preserve the _targetPositionCamera so the view to the scene is preserved.
+            // We also also save the type of the scene: simple or complex.
+            // If we changed the color, then it will be also resumed (saved into _lastUsedColor)
+            _isComplexScene = _allObjectsTestScene != null;
         }
 
         private void RenderScene()
@@ -233,7 +330,7 @@ namespace AndroidApp1
 
             base.OnConfigurationChanged(newConfig);
         }
-        
+
         private void OnSceneViewResized(object? sender, EventArgs e)
         {
             _isConfigurationChanged = false;
@@ -284,33 +381,27 @@ namespace AndroidApp1
 
             var randomColor = new Color3((float)_rnd.NextDouble(), (float)_rnd.NextDouble(), (float)_rnd.NextDouble());
 
+            SetCustomColor(randomColor);
+        }
+
+        private void SetCustomColor(Color3 color)
+        {
             if (_allObjectsTestScene != null)
-                _allObjectsTestScene.ChangeBasePlaneColor(randomColor);
+                _allObjectsTestScene.ChangeBasePlaneColor(color);
             else if (_boxModel != null)
-                _boxModel.Material = new StandardMaterial(randomColor);
+                _boxModel.Material = new StandardMaterial(color);
+
+            _lastUsedColor = color;
         }
 
         private void ChangeTestScene()
         {
             if (_scene == null || _sceneView == null || this.Resources == null)
                 return;
-            
+
             if (_allObjectsTestScene == null)
             {
-                _scene.RootNode.Clear();
-
-                EnsureAndroidBitmapIO();
-
-                _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
-                _allObjectsTestScene.Drawable1Id = Resource.Drawable.uvchecker;
-                _allObjectsTestScene.Drawable2Id = Resource.Drawable.TreeTexture;
-
-
-                // Add demo objects to _scene
-                _allObjectsTestScene.CreateTestScene();
-
-                if (_targetPositionCamera != null && _targetPositionCamera.Distance < 1500)
-                    _targetPositionCamera.Distance = 1500;
+                CreateComplexScene();
             }
             else
             {
@@ -371,6 +462,33 @@ namespace AndroidApp1
                 isHandled = false;
 
             return base.DispatchTouchEvent(e) || isHandled;
+        }
+
+        private void DisposeSharpEngine()
+        {
+            if (_allObjectsTestScene != null)
+            {
+                _allObjectsTestScene.Dispose();
+                _allObjectsTestScene = null;
+            }
+
+            if (_sceneView != null)
+            {
+                _sceneView.Dispose();
+                _sceneView = null;
+            }
+
+            if (_scene != null)
+            {
+                _scene.Dispose();
+                _scene = null;
+            }
+
+            if (_vulkanDevice != null)
+            {
+                _vulkanDevice.Dispose();
+                _vulkanDevice = null;
+            }
         }
     }
 }
