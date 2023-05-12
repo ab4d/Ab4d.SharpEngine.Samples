@@ -74,8 +74,6 @@ namespace AndroidApp1
         {
             // mFrameTime = frameTimeNanos;
 
-            Log.Info?.Write(LogArea, "DoFrame");
-
             Invalidate(); // Call Draw method below
 
 			if (Choreographer.Instance != null)
