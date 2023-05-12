@@ -19,15 +19,20 @@ namespace AndroidApp1
 		public Action? RenderSceneAction;
 		public Action<IntPtr>? SurfaceCreatedAction;
 		public Action? SurfaceDestroyedAction;
+		public Action? SurfaceSizeChangedAction;
+
+		public SceneView? SceneView { get; set; }
 
 		public SharpEngineSceneView (Context context) 
             : base (context)
 		{
 			Log.Info?.Write(LogArea, $"SharpEngineSceneView created on Android device {Build.Manufacturer} {Build.Model}, cpu: {Build.Hardware}");
 
-			Holder?.AddCallback(this);
-			SetWillNotDraw(false);
-		}
+            // ReSharper disable VirtualMemberCallInConstructor
+            Holder?.AddCallback(this);
+            SetWillNotDraw(false);
+            // ReSharper restore VirtualMemberCallInConstructor
+        }
 
         void AcquireNativeWindow (ISurfaceHolder holder)
 		{
@@ -68,12 +73,11 @@ namespace AndroidApp1
 
 		public void SurfaceChanged (ISurfaceHolder holder, global::Android.Graphics.Format format, int w, int h)
 		{
-		}
+            Log.Info?.Write(LogArea, $"SurfaceChanged {w} x {h} {format}");
+        }
 
         public void DoFrame(long frameTimeNanos)
         {
-            // mFrameTime = frameTimeNanos;
-
             Invalidate(); // Call Draw method below
 
 			if (Choreographer.Instance != null)
@@ -82,7 +86,13 @@ namespace AndroidApp1
 
         public override void Draw(Canvas? canvas)
         {
-			RenderSceneAction?.Invoke();
+			if (SceneView != null && canvas != null && (SceneView.Width != canvas.Width || SceneView.Height != canvas.Height))
+            {
+                Log.Info?.Write(LogArea, $"SurfaceSizeChanged: SceneView: {SceneView.Width} x {SceneView.Height}; Surface: {canvas.Width} x {canvas.Height}");
+                SurfaceSizeChangedAction?.Invoke();
+            }
+
+            RenderSceneAction?.Invoke();
 			base.Draw(canvas);
         }
     }

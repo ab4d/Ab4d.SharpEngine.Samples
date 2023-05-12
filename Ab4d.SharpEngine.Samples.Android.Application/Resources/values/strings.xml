@@ -3,4 +3,5 @@
     <string name="app_text">Hello, Android with SharpEngine!</string>
     <string name="button_change_color_text">Change color</string>
     <string name="button_change_scene_text">Change scene</string>
+    <string name="button_start_logging_text">Start logging</string>
 </resources>

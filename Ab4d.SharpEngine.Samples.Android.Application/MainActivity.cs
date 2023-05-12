@@ -29,11 +29,15 @@ using Activity = Android.App.Activity;
 
 namespace AndroidApp1
 {
-    [Activity(Label = "@string/app_name",
-              MainLauncher = true,
+    [Activity(Label = "@string/app_name", 
+              MainLauncher = true, 
               ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenLayout | ConfigChanges.ScreenSize | ConfigChanges.KeyboardHidden)] // handle those changes without recreating the activity
     public class MainActivity : Activity
     {
+        private static readonly bool StartWithFullLogging = false;
+        private static readonly bool ShowStartLoggingButton = true;
+
+
         private VulkanDevice? _vulkanDevice;
         private Scene? _scene;
         private SceneView? _sceneView;
@@ -41,9 +45,7 @@ namespace AndroidApp1
 
         private AndroidCameraController? _cameraController;
 
-        private bool _isConfigurationChanged;
-        private DateTime _configurationChangedTime;
-        private readonly TimeSpan _resizeAfterConfigurationChangedTimeout = TimeSpan.FromSeconds(2);
+        private bool _isForceResizeWithRenderCalled;
 
         private Random? _rnd;
         private BoxModelNode? _boxModel;
@@ -51,6 +53,8 @@ namespace AndroidApp1
         private AllObjectsTestScene? _allObjectsTestScene;
         private string[]? _allManifestResourceNames;
         private AndroidBitmapIO? _androidBitmapIO;
+
+        private SharpEngineSceneView? _vulkanView;
 
         // Saved app state:
         private bool _isComplexScene = false;
@@ -72,7 +76,7 @@ namespace AndroidApp1
                     ChangeBoxColor();
                 };
             }
-
+            
             var changeSceneButton = FindViewById<Button>(Resource.Id.button_change_scene);
             if (changeSceneButton != null)
             {
@@ -82,17 +86,36 @@ namespace AndroidApp1
                 };
             }
 
+            var startLoggingButton = FindViewById<Button>(Resource.Id.button_start_logging);
+            if (startLoggingButton != null)
+            {
+                if (ShowStartLoggingButton && !StartWithFullLogging)
+                {
+                    startLoggingButton.Click += delegate (object? sender, EventArgs args)
+                    {
+                        Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;
+                        Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+                    };
+                }
+                else
+                {
+                    startLoggingButton.Visibility = ViewStates.Gone;
+                }
+            }
+
 
             // Create VulkanView and add it to layout
             var layout = FindViewById<LinearLayout>(Resource.Id.Layout);
 
             if (layout != null && ApplicationContext != null)
             {
-                var vulkanView = new SharpEngineSceneView(ApplicationContext);
-                vulkanView.SurfaceCreatedAction = OnSurfaceCreated;
-                vulkanView.RenderSceneAction = RenderScene;
+                _vulkanView = new SharpEngineSceneView(ApplicationContext);
+                _vulkanView.SurfaceCreatedAction = OnSurfaceCreated;
+                _vulkanView.RenderSceneAction = RenderScene;
+                _vulkanView.SurfaceSizeChangedAction = OnSurfaceSizeChanged;
+                _vulkanView.SurfaceDestroyedAction = DisposeSceneView;
 
-                layout.AddView(vulkanView);
+                layout.AddView(_vulkanView);
             }
         }
 
@@ -104,7 +127,7 @@ namespace AndroidApp1
             if (_vulkanDevice == null)
             {
                 // Setup logger
-                SetupSharpEngineLogger(enableFullLogging: false); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+                SetupSharpEngineLogger(enableFullLogging: StartWithFullLogging); // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
 
                 // EngineCreateOptions can be used to set many engine options.
 
@@ -156,7 +179,8 @@ namespace AndroidApp1
                 _sceneView.WaitForVSync = true;                // This is recommended for mobile. This will use FIFO present mode. Read more about the recommendations here: https://developer.samsung.com/sdp/blog/en-us/2019/07/26/vulkan-mobile-best-practice-how-to-configure-your-vulkan-swapchain
                 _sceneView.BackgroundColor = Colors.LightGray;
 
-                _sceneView.ViewResized += OnSceneViewResized; // This is needed to handle orientation change - see comments for OnConfigurationChanged method below
+                if (_vulkanView != null)
+                    _vulkanView.SceneView = _sceneView;
             }
 
 
@@ -215,11 +239,7 @@ namespace AndroidApp1
             {
                 // When app is put to background, we can dispose the SceneView resources (Swapchain, images and render passes)
                 // We will recreated them when the app is resumed
-                if (_sceneView != null)
-                {
-                    _sceneView.Dispose();
-                    _sceneView = null;
-                }
+                DisposeSceneView();
             }
             else
             {
@@ -289,6 +309,23 @@ namespace AndroidApp1
             _isComplexScene = _allObjectsTestScene != null;
         }
 
+        // Rotation change (in Android v10+) is handled by forcing rendering until VK_SUBOPTIMAL_KHR is returned from Present call
+        // See: https://developer.android.com/games/optimize/vulkan-prerotation
+        //
+        // Also changes in size (for example when two apps are opened size by side and user resizes the area) may require to 
+        // call Present method. Until then the Surface may still report the previous size and orientation.
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            ForceResizeWithRender();
+            base.OnConfigurationChanged(newConfig);
+        }
+
+        // The following method is called from SharpEngineSceneView.Draw when used Canvas size is different than the size of SceneView
+        private void OnSurfaceSizeChanged()
+        {
+            ForceResizeWithRender();
+        }
+
         private void RenderScene()
         {
             if (_sceneView != null)
@@ -296,82 +333,23 @@ namespace AndroidApp1
                 if (_allObjectsTestScene != null)
                     _allObjectsTestScene.AnimateModels(); // update animation
 
-
-                // Usually the scene is rendered only when there are any changes in the scene.
-                // But after the configuration was changed (screen rotated or size changed),
-                // then we need to force rendering the scene until the surface is resized.
-                // See comments for OnConfigurationChanged method below.
-
-                // Just in case have a timeout in which the resize need to be done
-                if (_isConfigurationChanged)
-                {
-                    if ((DateTime.Now - _configurationChangedTime) > _resizeAfterConfigurationChangedTimeout)
-                        _isConfigurationChanged = false; // prevent forcing to render each frame
-                }
-
-                _sceneView.Render(forceRender: _isConfigurationChanged);
+                _sceneView.Render();
+                _isForceResizeWithRenderCalled = false;
             }
         }
 
-        // Rotation change (in Android v10+) is handled by forcing rendering until VK_SUBOPTIMAL_KHR is returned from Present call
-        // See: https://developer.android.com/games/optimize/vulkan-prerotation
-        //
-        // So when the screen is rotated, we the OnConfigurationChanged is called (because we setup ConfigurationChanges enum in the Activity attribute).
-        // There we set _isConfigurationChanged to true.
-        // When _isConfigurationChanged is true, each call to Render method will force rendering the scene.
-        // When the Present method will return VK_SUBOPTIMAL_KHR, then the SharpEngine will automatically
-        // call Resize and in then the ViewResized event will be triggered and in the handler (OnSceneViewResized)
-        // the _isConfigurationChanged will be set to false to prevent forcing rendering.
-
-        public override void OnConfigurationChanged(Configuration newConfig)
+        private void ForceResizeWithRender()
         {
-            _configurationChangedTime = DateTime.Now; // Save time so we can use timeout in which the change should be handled
-            _isConfigurationChanged = true;
+            // Prevent calling Resize and Render from both events: OnConfigurationChanged and OnSurfaceSizeChanged
+            if (_isForceResizeWithRenderCalled)
+                return;
 
-            base.OnConfigurationChanged(newConfig);
-        }
-
-        private void OnSceneViewResized(object? sender, EventArgs e)
-        {
-            _isConfigurationChanged = false;
-        }
-
-        // Setup SharpEngine logging
-        // In case of problems and then please send the log text with the description of the problem
-        private void SetupSharpEngineLogger(bool enableFullLogging)
-        {
-            // The alpha and beta version are compiled with release build options but support full logging.
-            // This means that it is possible to get Trace level log messages
-            // (production version will have only Warning and Error logging compiled into the assembly).
-
-            // When you have some problems, then please enable Trace level logging and writing log messages to a file or debug output.
-            // To do this please find the existing code that sets up logging an change it to:
-
-            if (enableFullLogging)
+            if (_sceneView != null)
             {
-                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;
-                Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false; // write full log messages timestamp, thread id and other details
+                _sceneView.Resize(renderNextFrameAfterResize: false);
+                _sceneView.Render(forceRender: true);
 
-                // Use one of the following:
-
-                // Write log messages to output window (for example Visual Studio Debug window):
-                Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
-
-                //// Write log to file:
-                //Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
-
-                //// Write to local StringBuilder:
-                //// First create a new StringBuilder field:
-                //private System.Text.StringBuilder _logStringBuilder;
-                //// Then call AddLogListener:
-                //Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
-            }
-            else
-            {
-                // Setup minimal logging (write warnings and error to output window)
-                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;        // Log Warnings and Errors
-                Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true; // write log messages without timestamp, thread id and other details
-                Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;    // write log messages to output window
+                _isForceResizeWithRenderCalled = true;
             }
         }
 
@@ -398,7 +376,7 @@ namespace AndroidApp1
         {
             if (_scene == null || _sceneView == null || this.Resources == null)
                 return;
-
+            
             if (_allObjectsTestScene == null)
             {
                 CreateComplexScene();
@@ -464,6 +442,54 @@ namespace AndroidApp1
             return base.DispatchTouchEvent(e) || isHandled;
         }
 
+        // Setup SharpEngine logging
+        // In case of problems and then please send the log text with the description of the problem
+        private void SetupSharpEngineLogger(bool enableFullLogging)
+        {
+            // The alpha and beta version are compiled with release build options but support full logging.
+            // This means that it is possible to get Trace level log messages
+            // (production version will have only Warning and Error logging compiled into the assembly).
+
+            // When you have some problems, then please enable Trace level logging and writing log messages to a file or debug output.
+            // To do this please find the existing code that sets up logging an change it to:
+
+            if (enableFullLogging)
+            {
+                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;
+                Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false; // write full log messages timestamp, thread id and other details
+
+                // Use one of the following:
+
+                // Write log messages to output window (for example Visual Studio Debug window):
+                Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+
+                //// Write log to file:
+                //Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
+
+                //// Write to local StringBuilder:
+                //// First create a new StringBuilder field:
+                //private System.Text.StringBuilder _logStringBuilder;
+                //// Then call AddLogListener:
+                //Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+            }
+            else
+            {
+                // Setup minimal logging (write warnings and error to output window)
+                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;        // Log Warnings and Errors
+                Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true; // write log messages without timestamp, thread id and other details
+                Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;    // write log messages to output window
+            }
+        }
+
+        private void DisposeSceneView()
+        {
+            if (_sceneView != null)
+            {
+                _sceneView.Dispose();
+                _sceneView = null;
+            }
+        }
+
         private void DisposeSharpEngine()
         {
             if (_allObjectsTestScene != null)
@@ -472,11 +498,7 @@ namespace AndroidApp1
                 _allObjectsTestScene = null;
             }
 
-            if (_sceneView != null)
-            {
-                _sceneView.Dispose();
-                _sceneView = null;
-            }
+            DisposeSceneView();
 
             if (_scene != null)
             {
