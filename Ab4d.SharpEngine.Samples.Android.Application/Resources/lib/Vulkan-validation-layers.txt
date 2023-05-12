@@ -1,2 +1,8 @@
 ﻿To enable Vulkan validation layers copy the *.so files to the subfolders (for newer devices it is usually enough to copy only to arm64-v8a folder).
 The *.so files can be downloaded from https://github.com/KhronosGroup/Vulkan-ValidationLayers/releases
+Check that the the Build Action is set to "AndroidNativeLibrary"
+
+Add the following to AndroidManifest.xml:
+<meta-data android:name="com.android.graphics.injectLayers.enable"  android:value="true"/>
+
+Then enabled validation layers in MainActivity.cs: set enableStandardValidation to true
