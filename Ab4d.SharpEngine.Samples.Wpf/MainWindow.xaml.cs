@@ -48,8 +48,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
         private Dictionary<Assembly, string[]>? _assemblyEmbeddedResources;
 
-        //private SharpEngineSceneView? _currentSharpEngineSceneView;
         private DiagnosticsWindow? _diagnosticsWindow;
+        private bool _automaticallyOpenDiagnosticsWindow;
 
         private string? _currentSampleXaml;
         private CommonSample? _currentCommonSample;
@@ -153,11 +153,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             // Try to create common sample type from page attribute
+
             var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Wpf.{locationAttribute}, Ab4d.SharpEngine.Samples.Wpf", throwOnError: false);
 
             if (sampleType == null)
                 sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{locationAttribute}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
-            
+
             if (sampleType != null)
             {
                 var commonSamplesContext = WpfSamplesContext.Current;
@@ -250,6 +251,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
                 DisableDiagnosticsButton();
+
+                if (_diagnosticsWindow != null)
+                    _automaticallyOpenDiagnosticsWindow = true; // This will reopen the diagnostics window
+
                 CloseDiagnosticsWindow();
 
                 SelectedGraphicInfoTextBlock.Text = null;
@@ -295,7 +300,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             EnableDiagnosticsButton();
 
             if (_diagnosticsWindow != null)
+            {
                 _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+            }
+            else if (_automaticallyOpenDiagnosticsWindow)
+            {
+                OpenDiagnosticsWindow();
+                _automaticallyOpenDiagnosticsWindow = false;
+            }
         }
 
         private void OnPresentationTypeChanged(object? sender, string? reason)
@@ -356,7 +368,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 return;
             }
 
-            _diagnosticsWindow = new DiagnosticsWindow(sharpEngineSceneView);
+            _diagnosticsWindow =  new DiagnosticsWindow();
+            _diagnosticsWindow.SharpEngineSceneView =  sharpEngineSceneView;
             _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
 
             // Position DiagnosticsWindow to the top-left corner of our window
