@@ -10,6 +10,7 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <DefineConstants>FULL_LOGGING</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <AndroidResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\drawable\TreeTexture.png" />

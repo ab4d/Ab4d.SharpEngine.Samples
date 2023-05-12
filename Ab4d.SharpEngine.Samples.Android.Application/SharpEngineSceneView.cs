@@ -4,12 +4,17 @@ using Android.Views;
 using Java.Interop;
 using System.Runtime.InteropServices;
 using Android.Graphics;
+using Android.OS;
+using Ab4d.SharpEngine;
+using Ab4d.SharpEngine.Utilities;
 
 namespace AndroidApp1
 {
 	public class SharpEngineSceneView : SurfaceView, ISurfaceHolderCallback, Choreographer.IFrameCallback
 	{
-		protected IntPtr nativeAndroidWindow = IntPtr.Zero;
+        private static readonly string LogArea = typeof(SceneView).FullName!;
+
+        protected IntPtr nativeAndroidWindow = IntPtr.Zero;
 
 		public Action? RenderSceneAction;
 		public Action<IntPtr>? SurfaceCreatedAction;
@@ -18,6 +23,8 @@ namespace AndroidApp1
 		public SharpEngineSceneView (Context context) 
             : base (context)
 		{
+			Log.Info?.Write(LogArea, $"SharpEngineSceneView created on Android device {Build.Manufacturer} {Build.Model}, cpu: {Build.Hardware}");
+
 			Holder?.AddCallback(this);
 			SetWillNotDraw(false);
 		}
@@ -40,14 +47,18 @@ namespace AndroidApp1
 
 		public void SurfaceCreated (ISurfaceHolder holder)
 		{
-			AcquireNativeWindow (holder);
+            Log.Info?.Write(LogArea, "SurfaceCreated");
+
+            AcquireNativeWindow (holder);
 
             SurfaceCreatedAction?.Invoke(nativeAndroidWindow);
         }
 
 		public void SurfaceDestroyed (ISurfaceHolder holder)
 		{
-			if (nativeAndroidWindow != IntPtr.Zero)
+            Log.Info?.Write(LogArea, "SurfaceDestroyed");
+
+            if (nativeAndroidWindow != IntPtr.Zero)
 				NativeMethods.ANativeWindow_release (nativeAndroidWindow);
 
 			nativeAndroidWindow = IntPtr.Zero;
@@ -61,7 +72,9 @@ namespace AndroidApp1
 
         public void DoFrame(long frameTimeNanos)
         {
-			// mFrameTime = frameTimeNanos;
+            // mFrameTime = frameTimeNanos;
+
+            Log.Info?.Write(LogArea, "DoFrame");
 
             Invalidate(); // Call Draw method below
 
