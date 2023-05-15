@@ -413,7 +413,6 @@ public class GlobalAnimationPropertiesSample : CommonSample
     }
 
 
-
     public enum StaggeringStartingPositions
     {
         First,
@@ -500,5 +499,13 @@ public class GlobalAnimationPropertiesSample : CommonSample
 
             return startValue + distance * valueIncrease;
         });
+    }
+
+    protected override void OnDisposed()
+    {
+        if (_animation != null)
+            _animation.Stop();
+
+        base.OnDisposed();
     }
 }

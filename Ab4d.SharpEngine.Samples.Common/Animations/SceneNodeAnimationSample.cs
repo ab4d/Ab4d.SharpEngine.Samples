@@ -178,15 +178,15 @@ public class SceneNodeAnimationSample : CommonSample
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        // TEMP CODE:
-        // In the future animation will be able to automatically register in SharpEngine so it will automatically call UpdateAnimation
-        sceneView.SceneUpdating += delegate (object? sender, EventArgs args)
-        {
-            foreach (var animation in _animations)
-                animation.Update();
+        sceneView.SceneUpdating += SceneViewOnSceneUpdating;
+    }
 
-            UpdatePlanarShadow();
-        };
+    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
+    {
+        foreach (var animation in _animations)
+            animation.Update();
+
+        UpdatePlanarShadow();
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -327,6 +327,9 @@ public class SceneNodeAnimationSample : CommonSample
     
     protected override void OnDisposed()
     {
+        if (SceneView != null)
+            SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+
         if (_textBlockFactory != null)
         {
             _textBlockFactory.Dispose();
