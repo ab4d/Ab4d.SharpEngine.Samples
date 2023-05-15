@@ -3,18 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab4d.SharpEngine.Common;
 using Ab4d.Vulkan;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 
-namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
+namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 {
     /// <summary>
     /// Interaction logic for LogMessagesWindow.xaml

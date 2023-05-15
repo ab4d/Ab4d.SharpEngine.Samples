@@ -1,0 +1,71 @@
+﻿<Window x:Class="Ab4d.SharpEngine.Samples.WinUI.Diagnostics.DiagnosticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d" >
+    <Grid Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Name="SharpEngineInfoTextBlock" Grid.Row="0" Text="Ab4d.SharpEngine v0.0.0 (debug)" FontWeight="Bold" VerticalAlignment="Center" Margin="10 2 37 2"/>
+
+        <Canvas Name="MenuCanvas" Width="18" Height="15" Background="Transparent"  Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 10 2"
+                Tapped="UIElement_OnTapped">
+            <Rectangle Canvas.Top="0" Height="3" Width="18" Fill="#444" />
+            <Rectangle Canvas.Top="6" Height="3" Width="18" Fill="#444" />
+            <Rectangle Canvas.Top="12" Height="3" Width="18" Fill="#444" />
+            <Canvas.ContextFlyout>
+                <MenuFlyout x:Name="ActionsRootMenuItem" Placement="LeftEdgeAlignedTop">
+                    <RadioMenuFlyoutItem Name="ShowRenderingStatisticsRadioButton" Text="Show rendering statistics" Margin="0 -2" IsChecked="True" GroupName="StatisticsType" Click="ShowRenderingStatisticsRadioButton_OnClick" />
+                    <RadioMenuFlyoutItem Name="ShowCameraInfoRadioButton" Text="Show camera info" Margin="0 -2" GroupName="StatisticsType" Click="ShowCameraInfoRadioButton_OnClick" />
+
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Name="DumpSceneNodesMenuItem" Text="Dump SceneNodes" Margin="0 -2" Tapped="DumpSceneNodesMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpCameraDetailsMenuItem" Text="Dump Camera details" Margin="0 -2" Tapped="DumpCameraDetailsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpRenderingLayersMenuItem" Text="Dump RenderingLayers" Margin="0 -2" Tapped="DumpRenderingLayersMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpRenderingStepsMenuItem" Text="Dump RenderingSteps" Margin="0 -2" Tapped="DumpRenderingStepsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpUsedMaterialsMenuItem" Text="Dump used materials" Margin="0 -2" Tapped="DumpUsedMaterialsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpSystemInfoMenuItem" Text="Dump System info" Margin="0 -2" Tapped="DumpSystemInfoMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="ShowFullSceneDumpMenuItem" Text="Get full scene dump" Margin="0 -2" Tapped="ShowFullSceneDumpMenuItem_OnTapped"/>
+
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Name="DumpMemoryMenuItem" Text="Dump Memory" Margin="0 -2" Tapped="DumpMemoryMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesMenuItem" Text="Dump Resources" Margin="0 -2" Tapped="DumpResourcesMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesGroupByTypeMenuItem" Text="Dump resources (group by type)" Margin="0 -2" Tapped="DumpResourcesGroupByTypeMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesForDelayedDisposalMenuItem" Text="Dump Resources for delayed disposal" Margin="0 -2" Tapped="DumpResourcesForDelayedDisposalMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="GarbageCollectMenuItem" Text="Garbage collect" Margin="0 -2" Tapped="GarbageCollectMenuItem_OnTapped"/>
+
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="CaptureInRenderDocMenuItem" Text="Capture next frame in RenderDoc" Margin="0 -2" Tapped="CaptureInRenderDocMenuItem_OnTapped"/>
+
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Name="OnlineReferenceHelpMenuItem" Text="Online reference help" Margin="0 -2" Tapped="OnlineReferenceHelpMenuItem_OnTapped" />
+                </MenuFlyout>
+            </Canvas.ContextFlyout>
+        </Canvas>
+
+        <TextBlock Name="DeviceInfoTextBlock" Grid.Row="1" Margin="10 0 10 0" HorizontalAlignment="left" />
+
+        <StackPanel Name="LogWarningsPanel" Grid.Row="1"  Margin="0 0 10 0" HorizontalAlignment="Right" Orientation="Horizontal" Background="White" Visibility="Collapsed"
+                    PointerPressed="LogWarningsPanel_OnPointerPressed">
+            <Image Name="WarningIcon" Source="../Assets/warningIcon.png" Width="16" Height="16" Margin="3 0 2 0"/>
+            <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10" Visibility="Collapsed">
+            <Button Name="ShowStatisticsButton" Content="Show rendering statistics" Padding="10 4" Visibility="Collapsed" Click="ShowStatisticsButton_OnClick" />
+        </StackPanel>
+
+        <TextBlock Name="ResultsTitleTextBlock" Grid.Row="3" TextDecorations="Underline" Margin="10 10 10 2" Visibility="Collapsed"
+                   Text="Rendering statistics:"/>
+        
+        <TextBlock Name="StatisticsTextBlock" Grid.Row="4" Margin="10 0 10 10" Visibility="Collapsed" />
+    </Grid>
+</Window>

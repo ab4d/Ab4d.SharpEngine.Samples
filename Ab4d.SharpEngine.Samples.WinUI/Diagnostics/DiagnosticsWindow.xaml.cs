@@ -7,21 +7,29 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common.Diagnostics;
-using Ab4d.SharpEngine.Wpf;
+using Ab4d.SharpEngine.Samples.WinUI.Common;
+using Ab4d.SharpEngine.WinUI;
+using Microsoft.UI.Input;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 
-namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
+namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
 {
     /// <summary>
     /// Interaction logic for DiagnosticsWindow.xaml
     /// </summary>
     public partial class DiagnosticsWindow : Window
     {
-        public const double InitialWindowWidth = 310;
+        public const int InitialWindowWidth = 340;
+        private bool _isInitialSizeSet;
+
+        public bool SetWindowHeightToContent = true;
+        public double MinWindowHeight = 600; // This is needed to correctly show the menu
 
         private DispatcherTimer? _updateStatisticsTimer;
 
@@ -33,7 +41,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         private bool _showRenderingStatistics = true;
 
         private LogMessagesWindow? _logMessagesWindow;
-        private WpfBitmapIO _bitmapIO;
+
 
         public ISharpEngineSceneView? SharpEngineSceneView
         {
@@ -52,14 +60,18 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         {
             InitializeComponent();
 
-            _bitmapIO = new WpfBitmapIO();
+            this.Title = "Diagnostics";
+            WinUiUtils.SetWindowIcon(this, @"Assets\sharp-engine-logo.ico");
+            WinUiUtils.ChangeCursor(LogWarningsPanel, InputSystemCursor.Create(InputSystemCursorShape.Hand));
 
-            _commonDiagnostics = new CommonDiagnostics(_bitmapIO);
+
+            var bitmapIO = new WinUIBitmapIO();
+            _commonDiagnostics = new CommonDiagnostics(bitmapIO);
 
             _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
             {
                 WarningsCountTextBlock.Text = warningsCount.ToString();
-                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Hidden;
+                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
             };
 
             _commonDiagnostics.NewLogMessageAddedAction = () => _logMessagesWindow?.UpdateLogMessages();
@@ -67,15 +79,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             _commonDiagnostics.DeviceInfoChangedAction = () => DeviceInfoTextBlock.Text = _commonDiagnostics.GetDeviceInfo();
 
             _commonDiagnostics.OnSceneRenderedAction = () => UpdateStatistics();
-
-            _commonDiagnostics.ShowMessageBoxAction = (message) => MessageBox.Show(message);
-
-
-            this.Width = InitialWindowWidth;
-
-            // Start as always on top Window
-            this.Topmost = true;
-            AlwaysOnTopCheckBox.IsChecked = true;
 
 
             string dumpFolder;
@@ -89,41 +92,32 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             SharpEngineInfoTextBlock.Text = _commonDiagnostics.GetSharpEngineInfoText();
 
-            // When the window is shown start showing statistics
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(StartShowingStatistics));
+            StartShowingStatistics();
 
-            this.Loaded += OnLoaded;
-            this.Closing += OnClosing;
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
-        {
-            UpdateEnabledMenuItems();
-        }
-
-        private void OnClosing(object? sender, CancelEventArgs cancelEventArgs)
-        {
-            if (_logMessagesWindow != null)
+            this.Closed += delegate(object sender, WindowEventArgs args)
             {
-                try
+                if (_logMessagesWindow != null)
                 {
-                    _logMessagesWindow.Close();
-                }
-                catch
-                {
-                    // Maybe the window was already closed
+                    try
+                    {
+                        _logMessagesWindow.Close();
+                    }
+                    catch
+                    {
+                        // Maybe the window was already closed
+                    }
+
+                    _logMessagesWindow = null;
                 }
 
-                _logMessagesWindow = null;
-            }
-
-            _commonDiagnostics.UnregisterCurrentSceneView();
+                _commonDiagnostics.UnregisterCurrentSceneView();
+            };
         }
-
+        
         private void UpdateEnabledMenuItems()
         {
             // On each new scene reset the StartStopCameraRotationMenuItem text
-            StartStopCameraRotationMenuItem.Header = "Toggle camera rotation";
+            StartStopCameraRotationMenuItem.Text = "Toggle camera rotation";
         }
         
         private void StartShowingStatistics()
@@ -138,7 +132,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
                 ResultsTitleTextBlock.Visibility = Visibility.Collapsed;
             }
 
-            AnalyerResultsTextBox.Visibility = Visibility.Collapsed;
             StatisticsTextBlock.Visibility = Visibility.Visible;
 
             _commonDiagnostics.StartShowingStatistics();
@@ -200,7 +193,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
         }
 
-        private void CheckToUpdateStatisticsOrCameraInfo(object? sender, EventArgs eventArgs)
+        private void CheckToUpdateStatisticsOrCameraInfo(object? sender, object? eventArgs)
         {
             var elapsed = (DateTime.Now - _lastStatisticsUpdate).TotalMilliseconds;
 
@@ -218,62 +211,62 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
         }
 
-        private void StartStopCameraRotationMenuItem_OnClick(object sender, RoutedEventArgs args)
+        private void StartStopCameraRotationMenuItem_OnTapped(object sender, TappedRoutedEventArgs args)
         {
             bool isCameraRotating = _commonDiagnostics.ToggleCameraRotation();
 
             if (isCameraRotating)
-                StartStopCameraRotationMenuItem.Header = "Stop camera rotation";
+                StartStopCameraRotationMenuItem.Text = "Stop camera rotation";
             else
-                StartStopCameraRotationMenuItem.Header = "Start camera rotation";
+                StartStopCameraRotationMenuItem.Text = "Start camera rotation";
         }
         
-        private void DumpSceneNodesMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpSceneNodesMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSceneNodesDumpString());
         }
 
-        private void DumpRenderingLayersMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpRenderingLayersMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetRenderingLayersDumpString());
         }
 
-        private void DumpRenderingStepsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpRenderingStepsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetRenderingStepsDumpString());
         }
 
-        private void DumpUsedMaterialsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpUsedMaterialsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetUsedMaterialsDumpString());
         }
 
-        private void DumpMemoryMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpMemoryMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetMemoryDumpString());
         }
         
-        private void DumpResourcesMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpResourcesMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesDumpString(groupByType: false));
         }
         
-        private void DumpResourcesGroupByTypeMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpResourcesGroupByTypeMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesDumpString(groupByType: true));
         }
         
-        private void DumpResourcesForDelayedDisposalMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpResourcesForDelayedDisposalMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesForDelayedDisposalDumpString());
         }
 
-        private void DumpSystemInfoMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpSystemInfoMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());
         }
         
-        private void ShowFullSceneDumpMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void ShowFullSceneDumpMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             if (SharpEngineSceneView == null)
                 return;
@@ -285,53 +278,25 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             StartProcess(DumpFileName);
         }
         
-        private void DumpCameraDetailsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void DumpCameraDetailsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetCameraDetailsDumpString());
         }
 
-        private void GarbageCollectMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void GarbageCollectMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
         {
             _commonDiagnostics.GarbageCollect();
         }
         
-        private void LogWarningsPanel_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (_logMessagesWindow != null)
-                return;
-
-            _logMessagesWindow = new LogMessagesWindow();
-
-            _logMessagesWindow.LogMessages = _commonDiagnostics.LogMessages;
-
-            _logMessagesWindow.OnLogMessagesClearedAction = () => _commonDiagnostics.ClearLogMessages();
-
-            _logMessagesWindow.Closing += delegate(object? o, CancelEventArgs args)
-            {
-                _logMessagesWindow = null;
-            };
-
-            _logMessagesWindow.Show();
-        }
-
         private void ShowStatisticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             StartShowingStatistics();
             ShowButtons(showStopPerformanceAnalyzerButton: false, showShowStatisticsButton: false);
         }
 
-        private void AlwaysOnTopCheckBoxChanged(object sender, RoutedEventArgs e)
-        {
-            this.Topmost = (AlwaysOnTopCheckBox.IsChecked ?? false);
-
-            // Close the menu
-            ActionsRootMenuItem.IsSubmenuOpen = false;
-        }
-
         private void ShowButtons(bool showStopPerformanceAnalyzerButton, bool showShowStatisticsButton)
         {
-            //StopPerformanceAnalyzerButton.Visibility = showStopPerformanceAnalyzerButton ? Visibility.Visible : Visibility.Collapsed;
-            ShowStatisticsButton.Visibility          = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+            ShowStatisticsButton.Visibility = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
 
             ButtonsPanel.Visibility = showStopPerformanceAnalyzerButton || showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -378,6 +343,45 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             ResultsTitleTextBlock.Visibility = Visibility.Visible;
             StatisticsTextBlock.Visibility = Visibility.Visible;
+
+            UpdateWindowSize();
+        }
+
+        private void UpdateWindowSize()
+        {
+            if (!SetWindowHeightToContent && _isInitialSizeSet)
+                return;
+
+            StatisticsTextBlock.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+            ResultsTitleTextBlock.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+
+            RootGrid.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var rootGridHeight = RootGrid.DesiredSize.Height;
+
+            var newWindowHeight = rootGridHeight;
+            if (SharpEngineSceneView != null)
+                newWindowHeight *= SharpEngineSceneView.SceneView.DpiScaleY;
+
+            if (newWindowHeight < MinWindowHeight)
+                newWindowHeight = MinWindowHeight;
+
+
+            if (!_isInitialSizeSet)
+            {
+                int width = InitialWindowWidth;
+
+                if (SharpEngineSceneView != null)
+                    width = (int)(width * SharpEngineSceneView.SceneView.DpiScaleX);
+
+                WinUiUtils.SetWindowClientSize(this, width, (int)newWindowHeight);
+                _isInitialSizeSet = true;
+            }
+            else
+            {
+                var windowSize = WinUiUtils.GetWindowSize(this);
+                if (Math.Abs(windowSize.Height - (int)newWindowHeight) > 10)
+                    WinUiUtils.SetWindowClientHeight(this, (int)newWindowHeight);
+            }
         }
 
         private void UpdateCameraInfo()
@@ -396,6 +400,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
 
             StatisticsTextBlock.Text = cameraInfo;
+
+            UpdateWindowSize();
         }
         
         private void ShowInfoText(string infoText)
@@ -418,7 +424,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
         }
         
-        private void CaptureInRenderDocMenuItem_OnClick(object sender, RoutedEventArgs args)
+        private void CaptureInRenderDocMenuItem_OnTapped(object sender, RoutedEventArgs args)
         {
             if (SharpEngineSceneView == null || !SharpEngineSceneView.SceneView.BackBuffersInitialized)
                 return;
@@ -427,65 +433,22 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             if (!isRenderDocAvailable)
             {
-                MessageBox.Show("Start the application from RenderDoc to be able to capture frames.");
+                //MessageBox.Show("Start the application from RenderDoc to be able to capture frames.");
                 return;
             }
 
             SharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
         }
-
-        private void SaveRenderedBitmap(BitmapSource? renderedBitmap, bool openSavedImage = true, string? initialFileName = null, string? dialogTitle = null)
-        {
-            if (renderedBitmap == null)
-            {
-                MessageBox.Show("No rendered image");
-                return;
-            }
-
-            var saveFileDialog = new Microsoft.Win32.SaveFileDialog()
-            {
-                AddExtension = true,
-                CheckFileExists = false,
-                CheckPathExists = true,
-                OverwritePrompt = true,
-                ValidateNames = false,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = initialFileName ?? "SharpEngineRender.png",
-                DefaultExt = "txt",
-                Filter = "png Image (*.png)|*.png",
-                Title = dialogTitle ?? "Select file name to store the rendered image"
-            };
-
-            if (saveFileDialog.ShowDialog() ?? false)
-            {
-                // write the bitmap to a file
-                using (var imageStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-                {
-                    //JpegBitmapEncoder enc = new JpegBitmapEncoder();
-                    var enc = new PngBitmapEncoder();
-                    var bitmapImage = BitmapFrame.Create(renderedBitmap);
-                    enc.Frames.Add(bitmapImage);
-                    enc.Save(imageStream);
-                }
-
-                if (openSavedImage)
-                    StartProcess(saveFileDialog.FileName);
-            }
-        }
         
-        private void StatisticsTypeRadioButton_OnChecked(object sender, RoutedEventArgs e)
+        private void ShowStatisticsOrCameraInfo(bool showStatistics)
         {
-            if (!this.IsLoaded)
-                return;
+            _showRenderingStatistics = showStatistics;
 
-            // Store value in local field so we do not need to check the value ShowRenderingStatisticsRadioButton.IsChecked on each update (this is quite slow)
-            _showRenderingStatistics = ShowRenderingStatisticsRadioButton.IsChecked ?? false;
-
-            if (_showRenderingStatistics)
+            if (showStatistics)
             {
                 ResultsTitleTextBlock.Text = "Rendering statistics:";
-                StatisticsTextBlock.ClearValue(FontFamilyProperty);
-                StatisticsTextBlock.ClearValue(FontSizeProperty);
+                StatisticsTextBlock.ClearValue(TextBlock.FontFamilyProperty);
+                StatisticsTextBlock.ClearValue(TextBlock.FontSizeProperty);
 
                 UpdateStatistics();
             }
@@ -497,14 +460,47 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
                 UpdateCameraInfo();
             }
-
-            // Close the menu
-            ActionsRootMenuItem.IsSubmenuOpen = false;
         }
 
-        private void OnlineReferenceHelpMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void OnlineReferenceHelpMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             StartProcess("https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm");
+        }
+
+        private void LogWarningsPanel_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            if (_logMessagesWindow != null)
+                return;
+
+            _logMessagesWindow = new LogMessagesWindow();
+
+            _logMessagesWindow.LogMessages = _commonDiagnostics.LogMessages;
+
+            _logMessagesWindow.OnLogMessagesClearedAction = () => _commonDiagnostics.ClearLogMessages();
+
+            _logMessagesWindow.Closed += delegate(object o, WindowEventArgs args)
+            {
+                _logMessagesWindow = null;
+            };
+
+            _logMessagesWindow.Activate();
+        }
+
+        private void UIElement_OnTapped(object sender, TappedRoutedEventArgs e)
+        {
+            MenuCanvas.ContextFlyout.ShowAt(MenuCanvas, new FlyoutShowOptions() { Placement = FlyoutPlacementMode.Auto});
+        }
+
+        private void ShowRenderingStatisticsRadioButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowCameraInfoRadioButton.IsChecked = false;
+            ShowStatisticsOrCameraInfo(showStatistics: true);
+        }
+
+        private void ShowCameraInfoRadioButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowRenderingStatisticsRadioButton.IsChecked = false;
+            ShowStatisticsOrCameraInfo(showStatistics: false);
         }
     }
 }

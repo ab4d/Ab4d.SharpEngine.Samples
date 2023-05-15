@@ -34,6 +34,8 @@ using System.Reflection;
 using Ab4d.SharpEngine.Samples.Common;
 using Microsoft.UI.Input;
 using System.IO;
+using Ab4d.SharpEngine.Samples.WinUI.Diagnostics;
+using Microsoft.Graphics.Display;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -67,10 +69,14 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private BitmapImage? _disabledDiagnosticsImage;
         private BitmapImage? _diagnosticsImage;
 
+        private DiagnosticsWindow? _diagnosticsWindow;
+        private bool _automaticallyOpenDiagnosticsWindow;
+        private Windows.Graphics.PointInt32 _diagnosticsWindowPosition;
+
         private SolidColorBrush _samplesListTextBrush = new SolidColorBrush(Color.FromArgb(255, 204, 204, 204));        // #CCC
         private SolidColorBrush _samplesListHeaderTextBrush = new SolidColorBrush(Color.FromArgb(255, 238, 238, 238));  // #EEE
         private SolidColorBrush _samplesListSelectedTextBrush = new SolidColorBrush(Color.FromArgb(255, 255, 187, 88)); // #FFBC57
-        
+
 
         public SamplesWindow()
         {
@@ -86,6 +92,11 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             this.Title = "SharpEngine in WinUI";
 
             LoadSamples();
+
+            this.Closed += delegate (object sender, WindowEventArgs args)
+            {
+                CloseDiagnosticsWindow();
+            };
         }
 
         private void LoadSamples()
@@ -435,7 +446,16 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.IsInitialized)
             {
                 DisableDiagnosticsButton();
+
+                if (_diagnosticsWindow != null)
+                {
+                    _automaticallyOpenDiagnosticsWindow = true; // This will reopen the diagnostics window
+                    var appWindow = WinUiUtils.GetAppWindow(_diagnosticsWindow);
+                    _diagnosticsWindowPosition = appWindow.Position;
+                }
+
                 CloseDiagnosticsWindow();
+
 
                 // we cannot use Hidden as Visibility so just remove and set Text
                 // We need to set a space otherwise the height will be calculated differently
@@ -482,8 +502,22 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
             EnableDiagnosticsButton();
 
-            //if (_diagnosticsWindow != null)
-            //    _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+            if (_diagnosticsWindow != null)
+            {
+                _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+            }
+            else if (_automaticallyOpenDiagnosticsWindow)
+            {
+                OpenDiagnosticsWindow();
+
+                if (_diagnosticsWindow != null)
+                {
+                    var appWindow = WinUiUtils.GetAppWindow(_diagnosticsWindow);
+                    appWindow.Move(_diagnosticsWindowPosition);
+                }
+
+                _automaticallyOpenDiagnosticsWindow = false;
+            }
         }
 
         private void OnPresentationTypeChanged(object? sender, string? reason)
@@ -581,13 +615,52 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
         private void CloseDiagnosticsWindow()
         {
-            // TODO:
+            if (_diagnosticsWindow != null)
+            {
+                _diagnosticsWindow.Close();
+                _diagnosticsWindow = null;
+            }
         }
 
-        private async void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
+        private void OpenDiagnosticsWindow()
         {
-            await WinUiUtils.ShowMessageBox(this.Content.XamlRoot, "Diagnostics for WinUI is not yet implemented.\r\nCurrently it is implemented only for WPF samples.");
-            // TODO:
+            if (_currentSharpEngineSceneView == null)
+                return;
+
+            _diagnosticsWindow = new DiagnosticsWindow();
+            _diagnosticsWindow.SharpEngineSceneView = _currentSharpEngineSceneView;
+
+            // Position the Diagnostics window to the edge of the main window
+            // HM: How to get the size of the screen (DisplayInformation.GetForCurrentView does not work in WinUI 3)
+
+            //var mainWindow = WinUiUtils.GetAppWindow(this);
+            //var diagnosticsWindow = WinUiUtils.GetAppWindow(_diagnosticsWindow);
+
+            //// Position DiagnosticsWindow to the top-left corner of our window
+            //double left = mainWindow.Position.X + mainWindow.Size.Width;
+
+            // The following does not work in WinUI 3
+            //var currentView = DisplayInformation.GetForCurrentView();
+
+            //double diagnosticsWindowWidth = DiagnosticsWindow.InitialWindowWidth * currentView.RawDpiX;
+            //double maxLeft = left + diagnosticsWindowWidth;
+
+            //if (maxLeft > currentView.ScreenWidthInRawPixels)
+            //{
+            //    if (mainWindow.Position.X > diagnosticsWindowWidth)
+            //        left = mainWindow.Position.X - diagnosticsWindowWidth;
+            //    else
+            //        left = currentView.ScreenWidthInRawPixels - diagnosticsWindowWidth;
+            //}
+
+            //diagnosticsWindow.Move(new Windows.Graphics.PointInt32((int)left, mainWindow.Position.Y));
+
+            _diagnosticsWindow.Activate();
+        }
+
+        private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenDiagnosticsWindow();
         }
 
         private void SamplesListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

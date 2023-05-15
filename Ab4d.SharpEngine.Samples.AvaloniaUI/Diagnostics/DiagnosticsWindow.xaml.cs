@@ -7,14 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.Samples.Common.Animations;
 using Ab4d.SharpEngine.Samples.Common.Diagnostics;
-using Ab4d.SharpEngine.Wpf;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Threading;
 
-namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
+namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 {
     /// <summary>
     /// Interaction logic for DiagnosticsWindow.xaml
@@ -32,8 +36,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         private DateTime _lastStatisticsUpdate;
         private bool _showRenderingStatistics = true;
 
+        private bool _isChangingRadioButtons;
+
         private LogMessagesWindow? _logMessagesWindow;
-        private WpfBitmapIO _bitmapIO;
 
         public ISharpEngineSceneView? SharpEngineSceneView
         {
@@ -52,14 +57,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         {
             InitializeComponent();
 
-            _bitmapIO = new WpfBitmapIO();
-
-            _commonDiagnostics = new CommonDiagnostics(_bitmapIO);
+            var bitmapIO = new SkiaSharpBitmapIO();
+            _commonDiagnostics = new CommonDiagnostics(bitmapIO);
 
             _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
             {
                 WarningsCountTextBlock.Text = warningsCount.ToString();
-                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Hidden;
+                LogWarningsPanel.IsVisible = warningsCount > 0;
             };
 
             _commonDiagnostics.NewLogMessageAddedAction = () => _logMessagesWindow?.UpdateLogMessages();
@@ -68,7 +72,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             _commonDiagnostics.OnSceneRenderedAction = () => UpdateStatistics();
 
-            _commonDiagnostics.ShowMessageBoxAction = (message) => MessageBox.Show(message);
+            _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
+            {
+                WarningsCountTextBlock.Text = warningsCount.ToString();
+                LogWarningsPanel.IsVisible = warningsCount > 0;
+            };
+
+            //_commonDiagnostics.ShowMessageBoxAction = (message) => MessageBox.Show(message);
 
 
             this.Width = InitialWindowWidth;
@@ -90,7 +100,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             SharpEngineInfoTextBlock.Text = _commonDiagnostics.GetSharpEngineInfoText();
 
             // When the window is shown start showing statistics
-            Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(StartShowingStatistics));
+            Dispatcher.UIThread.Post(() => StartShowingStatistics(), DispatcherPriority.Background);
 
             this.Loaded += OnLoaded;
             this.Closing += OnClosing;
@@ -130,24 +140,24 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         {
             if (SharpEngineSceneView != null)
             {
-                ResultsTitleTextBlock.Visibility = Visibility.Visible;
+                ResultsTitleTextBlock.IsVisible = true;
                 ResultsTitleTextBlock.Text = _showRenderingStatistics ? "Rendering statistics:" : "Camera info:";
             }
             else
             {
-                ResultsTitleTextBlock.Visibility = Visibility.Collapsed;
+                ResultsTitleTextBlock.IsVisible = false;
             }
 
-            AnalyerResultsTextBox.Visibility = Visibility.Collapsed;
-            StatisticsTextBlock.Visibility = Visibility.Visible;
+            AnalyerResultsTextBox.IsVisible = false;
+            StatisticsTextBlock.IsVisible = true;
 
             _commonDiagnostics.StartShowingStatistics();
         }
 
         private void EndShowingStatistics()
         {
-            StatisticsTextBlock.Visibility = Visibility.Collapsed;
-            ResultsTitleTextBlock.Visibility = Visibility.Collapsed;
+            StatisticsTextBlock.IsVisible = false;
+            ResultsTitleTextBlock.IsVisible = false;
 
             DisposeUpdateStatisticsTimer();
 
@@ -166,7 +176,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             if (sharpEngineSceneView != null && 
                 sharpEngineSceneView.SceneView.IsCollectingStatistics)
             {
-                ResultsTitleTextBlock.Visibility = Visibility.Visible;
+                ResultsTitleTextBlock.IsVisible = true;
                 UpdateStatistics();
             }
 
@@ -294,26 +304,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
         {
             _commonDiagnostics.GarbageCollect();
         }
-        
-        private void LogWarningsPanel_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (_logMessagesWindow != null)
-                return;
-
-            _logMessagesWindow = new LogMessagesWindow();
-
-            _logMessagesWindow.LogMessages = _commonDiagnostics.LogMessages;
-
-            _logMessagesWindow.OnLogMessagesClearedAction = () => _commonDiagnostics.ClearLogMessages();
-
-            _logMessagesWindow.Closing += delegate(object? o, CancelEventArgs args)
-            {
-                _logMessagesWindow = null;
-            };
-
-            _logMessagesWindow.Show();
-        }
-
+ 
         private void ShowStatisticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             StartShowingStatistics();
@@ -325,22 +316,22 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             this.Topmost = (AlwaysOnTopCheckBox.IsChecked ?? false);
 
             // Close the menu
-            ActionsRootMenuItem.IsSubmenuOpen = false;
+            ActionsRootMenuItem.Close();
         }
 
         private void ShowButtons(bool showStopPerformanceAnalyzerButton, bool showShowStatisticsButton)
         {
             //StopPerformanceAnalyzerButton.Visibility = showStopPerformanceAnalyzerButton ? Visibility.Visible : Visibility.Collapsed;
-            ShowStatisticsButton.Visibility          = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+            ShowStatisticsButton.IsVisible = showShowStatisticsButton;
 
-            ButtonsPanel.Visibility = showStopPerformanceAnalyzerButton || showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+            ButtonsPanel.IsVisible = showStopPerformanceAnalyzerButton || showShowStatisticsButton;
         }
 
         private void UpdateStatistics()
         {
             if (SharpEngineSceneView == null || SharpEngineSceneView.SceneView.Statistics == null)
             {
-                StatisticsTextBlock.Visibility = Visibility.Collapsed;
+                StatisticsTextBlock.IsVisible = false;
                 return;
             }
 
@@ -376,8 +367,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             _lastStatisticsUpdate = now;
 
-            ResultsTitleTextBlock.Visibility = Visibility.Visible;
-            StatisticsTextBlock.Visibility = Visibility.Visible;
+            ResultsTitleTextBlock.IsVisible = true;
+            StatisticsTextBlock.IsVisible = true;
         }
 
         private void UpdateCameraInfo()
@@ -427,61 +418,21 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             if (!isRenderDocAvailable)
             {
-                MessageBox.Show("Start the application from RenderDoc to be able to capture frames.");
+                //MessageBox.Show("Start the application from RenderDoc to be able to capture frames.");
                 return;
             }
 
             SharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
         }
 
-        private void SaveRenderedBitmap(BitmapSource? renderedBitmap, bool openSavedImage = true, string? initialFileName = null, string? dialogTitle = null)
-        {
-            if (renderedBitmap == null)
-            {
-                MessageBox.Show("No rendered image");
-                return;
-            }
-
-            var saveFileDialog = new Microsoft.Win32.SaveFileDialog()
-            {
-                AddExtension = true,
-                CheckFileExists = false,
-                CheckPathExists = true,
-                OverwritePrompt = true,
-                ValidateNames = false,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = initialFileName ?? "SharpEngineRender.png",
-                DefaultExt = "txt",
-                Filter = "png Image (*.png)|*.png",
-                Title = dialogTitle ?? "Select file name to store the rendered image"
-            };
-
-            if (saveFileDialog.ShowDialog() ?? false)
-            {
-                // write the bitmap to a file
-                using (var imageStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-                {
-                    //JpegBitmapEncoder enc = new JpegBitmapEncoder();
-                    var enc = new PngBitmapEncoder();
-                    var bitmapImage = BitmapFrame.Create(renderedBitmap);
-                    enc.Frames.Add(bitmapImage);
-                    enc.Save(imageStream);
-                }
-
-                if (openSavedImage)
-                    StartProcess(saveFileDialog.FileName);
-            }
-        }
-        
-        private void StatisticsTypeRadioButton_OnChecked(object sender, RoutedEventArgs e)
+        private void ShowStatisticsOrCameraInfo(bool showStatistics)
         {
             if (!this.IsLoaded)
                 return;
 
-            // Store value in local field so we do not need to check the value ShowRenderingStatisticsRadioButton.IsChecked on each update (this is quite slow)
-            _showRenderingStatistics = ShowRenderingStatisticsRadioButton.IsChecked ?? false;
+            _showRenderingStatistics = showStatistics;
 
-            if (_showRenderingStatistics)
+            if (showStatistics)
             {
                 ResultsTitleTextBlock.Text = "Rendering statistics:";
                 StatisticsTextBlock.ClearValue(FontFamilyProperty);
@@ -499,12 +450,59 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
 
             // Close the menu
-            ActionsRootMenuItem.IsSubmenuOpen = false;
+            ActionsRootMenuItem.Close();
         }
 
         private void OnlineReferenceHelpMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             StartProcess("https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm");
+        }
+
+        private void LogWarningsPanel_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (_logMessagesWindow != null)
+                return;
+
+            _logMessagesWindow = new LogMessagesWindow();
+
+            _logMessagesWindow.LogMessages = _commonDiagnostics.LogMessages;
+
+            _logMessagesWindow.OnLogMessagesClearedAction = () => _commonDiagnostics.ClearLogMessages();
+
+            _logMessagesWindow.Closing += delegate(object? o, WindowClosingEventArgs args)
+            {
+                _logMessagesWindow = null;
+            };
+
+            _logMessagesWindow.Show();
+        }
+        
+        private void ShowRenderingStatisticsRadioButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            if (_isChangingRadioButtons)
+                return;
+
+            _isChangingRadioButtons = true; // This is needed to prevent infinite recursion because we need to manually set the IsChecked for both RadioButtons
+
+            ShowCameraInfoRadioButton.IsChecked = false;
+            ShowRenderingStatisticsRadioButton.IsChecked = true;
+            ShowStatisticsOrCameraInfo(showStatistics: true);
+
+            _isChangingRadioButtons = false;
+        }
+
+        private void ShowCameraInfoRadioButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            if (_isChangingRadioButtons)
+                return;
+
+            _isChangingRadioButtons = true; // This is needed to prevent infinite recursion because we need to manually set the IsChecked for both RadioButtons
+
+            ShowRenderingStatisticsRadioButton.IsChecked = false;
+            ShowCameraInfoRadioButton.IsChecked = true;
+            ShowStatisticsOrCameraInfo(showStatistics: false);
+
+            _isChangingRadioButtons = false;
         }
     }
 }

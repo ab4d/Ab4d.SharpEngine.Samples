@@ -12,6 +12,16 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common;
 
 public class WinUiUtils
 {
+    public static AppWindow GetAppWindow(Window window)
+    {
+        // From: https://github.com/microsoft/microsoft-ui-xaml/issues/4056
+        IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
+        WindowId windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+
+        return appWindow;
+    }
+
     public static void SetWindowIcon(Window window, string fileName)
     {
         string fullFileNamer = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
@@ -24,15 +34,42 @@ public class WinUiUtils
         var appWindow = AppWindow.GetFromWindowId(windowId);
         appWindow.SetIcon(fullFileNamer);
     }
-    
+
+    public static Windows.Graphics.SizeInt32 GetWindowSize(Window window)
+    {
+        var appWindow = GetAppWindow(window);
+        return appWindow.Size;
+    }
+
     public static void SetWindowSize(Window window, int width, int height)
     {
-        // From: https://github.com/microsoft/microsoft-ui-xaml/issues/4056
-        IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
-        WindowId windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
-
+        var appWindow = GetAppWindow(window);
         appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = width, Height = height });
+    }
+    
+    public static void SetWindowClientSize(Window window, int width, int height)
+    {
+        var appWindow = GetAppWindow(window);
+
+        int widthMargin = appWindow.Size.Width - appWindow.ClientSize.Width;
+        int heightMargin = appWindow.Size.Height - appWindow.ClientSize.Height;
+
+        appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = width + widthMargin, Height = height + heightMargin });
+    }
+    
+    public static void SetWindowClientHeight(Window window, int height)
+    {
+        var appWindow = GetAppWindow(window);
+
+        int heightMargin = appWindow.Size.Height - appWindow.ClientSize.Height;
+
+        appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = appWindow.Size.Width, Height = height + heightMargin });
+    }
+    
+    public static void SetWindowAlwaysOnTop(Window window)
+    {
+        var appWindow = GetAppWindow(window);
+        appWindow.MoveInZOrderAtTop();
     }
 
     // Based on https://github.com/microsoft/WindowsAppSDK/discussions/1816

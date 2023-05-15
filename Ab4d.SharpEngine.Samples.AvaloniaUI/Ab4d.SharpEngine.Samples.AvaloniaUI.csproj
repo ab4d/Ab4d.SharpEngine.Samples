@@ -35,6 +35,8 @@
     <AvaloniaXaml Include="Common\CommonTitleUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
+    <AvaloniaXaml Include="Diagnostics\DiagnosticsWindow.xaml" />
+    <AvaloniaXaml Include="Diagnostics\LogMessagesWindow.xaml" />    
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
     <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
@@ -62,6 +64,8 @@
 
   <ItemGroup>
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
+    <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
+    <None Remove="Diagnostics\LogMessagesWindow.xaml" />    
     <None Remove="Samples.xml" />
     <None Remove="Titles\IntroductionPage.xaml" />
     <None Remove="Titles\QuickStartTitle.md" />

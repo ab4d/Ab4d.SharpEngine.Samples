@@ -1,0 +1,86 @@
+﻿<Window x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics.DiagnosticsWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" 
+        Title="Diagnostics"
+        Icon="../Resources/sharp-engine-logo.ico"
+        Width="310" SizeToContent="Height">
+    <Grid>
+
+        <TextBlock Name="SharpEngineInfoTextBlock" Grid.Column="0" Text="Ab4d.SharpEngine v0.0.0 (debug)" FontWeight="Bold" Margin="10 7 0 2" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
+        <Menu Name="ActionsMenu" Margin="0 2 5 2" VerticalAlignment="Top"  HorizontalAlignment="Right">
+            <MenuItem Name="ActionsRootMenuItem" Padding="6 2" Background="White" >
+                <MenuItem.Header>
+                    <Canvas Width="18" Height="15" Background="Transparent" Margin="2">
+                        <Rectangle Canvas.Top="0" Height="3" Width="18" Fill="#444" />
+                        <Rectangle Canvas.Top="6" Height="3" Width="18" Fill="#444" />
+                        <Rectangle Canvas.Top="12" Height="3" Width="18" Fill="#444" />
+                    </Canvas>
+                </MenuItem.Header>
+
+                <RadioButton Name="ShowRenderingStatisticsRadioButton" Content="Show rendering statistics" IsChecked="True" GroupName="StatisticsType" IsCheckedChanged="ShowRenderingStatisticsRadioButton_OnIsCheckedChanged" />
+                <RadioButton Name="ShowCameraInfoRadioButton" Content="Show camera info" GroupName="StatisticsType" IsCheckedChanged="ShowCameraInfoRadioButton_OnIsCheckedChanged" />
+
+                <Separator />
+                <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
+                <MenuItem Name="DumpCameraDetailsMenuItem" Header="Dump Camera details" Click="DumpCameraDetailsMenuItem_OnClick"/>
+                <MenuItem Name="DumpRenderingLayersMenuItem" Header="Dump RenderingLayers" Click="DumpRenderingLayersMenuItem_OnClick"/>
+                <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
+                <MenuItem Name="DumpUsedMaterialsMenuItem" Header="Dump used materials" Click="DumpUsedMaterialsMenuItem_OnClick"/>
+                <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
+                <MenuItem Name="ShowFullSceneDumpMenuItem" Header="Get full scene dump" Click="ShowFullSceneDumpMenuItem_OnClick"/>
+
+                <Separator />
+                <MenuItem Name="DumpMemoryMenuItem" Header="Dump Memory" Click="DumpMemoryMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesMenuItem" Header="Dump Resources" Click="DumpResourcesMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesGroupByTypeMenuItem" Header="Dump resources (group by type)" Click="DumpResourcesGroupByTypeMenuItem_OnClick"/>
+                <MenuItem Name="DumpResourcesForDelayedDisposalMenuItem" Header="Dump Resources for delayed disposal" Click="DumpResourcesForDelayedDisposalMenuItem_OnClick"/>
+                <MenuItem Name="GarbageCollectMenuItem" Header="Garbage collect" Click="GarbageCollectMenuItem_OnClick"/>
+
+                <Separator />
+                <MenuItem Name="StartStopCameraRotationMenuItem" Header="Toggle camera rotation" Click="StartStopCameraRotationMenuItem_OnClick"/>
+                <MenuItem Name="CaptureInRenderDocMenuItem" Header="Capture next frame in RenderDoc" Click="CaptureInRenderDocMenuItem_OnClick"/>
+
+                <Separator />
+                <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" IsCheckedChanged="AlwaysOnTopCheckBoxChanged" />
+
+                <Separator />
+                <MenuItem Name="OnlineReferenceHelpMenuItem" Header="Online reference help" Click="OnlineReferenceHelpMenuItem_OnClick" />
+
+            </MenuItem>
+        </Menu>
+
+        <Grid Margin="0 30 0 0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Name="DeviceInfoTextBlock" Grid.Row="1" Margin="10 0 10 0" HorizontalAlignment="Left" />
+
+            <StackPanel Name="LogWarningsPanel" Grid.Row="1"  Margin="0 0 10 0" HorizontalAlignment="Right" Orientation="Horizontal" Background="White" IsVisible="False"
+                        Cursor="Hand" PointerPressed="LogWarningsPanel_OnPointerPressed">
+                <Image Name="WarningIcon" Source="../Resources/warningIcon.png" Width="16" Height="16" Margin="3 0 2 0"/>
+                <TextBlock Name="WarningsCountTextBlock" Text="0" Margin="0 0 3 0" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Name="ButtonsPanel" Grid.Row="2" Orientation="Horizontal" Margin="10 5 10 10" IsVisible="False">
+                <Button Name="ShowStatisticsButton" Content="Show rendering statistics" Padding="10 4" IsVisible="False" Click="ShowStatisticsButton_OnClick" />
+            </StackPanel>
+
+            <TextBlock Name="ResultsTitleTextBlock" Grid.Row="3" TextDecorations="Underline" Margin="10 10 10 2" IsVisible="False"
+                       Text="Rendering statistics:"/>
+
+            <TextBlock Name="StatisticsTextBlock" Grid.Row="4" Margin="10 0 10 10" IsVisible="False" TextWrapping="NoWrap" TextTrimming="None" />
+
+            <TextBox Name="AnalyerResultsTextBox" Grid.Row="4" Margin="10 0 10 10" IsVisible="False" FontFamily="Consolas" FontSize="9"/>
+        </Grid>
+    </Grid>
+</Window>

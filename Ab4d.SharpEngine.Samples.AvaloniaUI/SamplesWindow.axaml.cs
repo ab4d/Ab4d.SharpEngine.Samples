@@ -14,6 +14,7 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Avalonia;
@@ -51,6 +52,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         private bool _applySeparator;
 
+        private DiagnosticsWindow? _diagnosticsWindow;
+        private bool _automaticallyOpenDiagnosticsWindow;
+
         private CommonAvaloniaSampleUserControl? _commonAvaloniaSampleUserControl;
         private Control? _currentSampleControl;
         private CommonSample? _currentCommonSample;
@@ -81,6 +85,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             this.Loaded += delegate(object? sender, RoutedEventArgs args)
             {
                 LoadSamples();
+            };
+
+            this.Closing += delegate (object? sender, WindowClosingEventArgs args)
+            {
+                CloseDiagnosticsWindow();
             };
 
 #if DEBUG
@@ -225,10 +234,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
-        private async void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
+        private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
         {
-            await MessageBox.Show(this, "Diagnostics for WinUI is not yet implemented.\r\nCurrently it is implemented only for WPF samples.", "SharpEngine samples", MessageBox.MessageBoxButtons.Ok);
-            // TODO:
+            OpenDiagnosticsWindow();
         }
 
         private void SamplesList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -493,6 +501,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
                 DisableDiagnosticsButton();
+
+                if (_diagnosticsWindow != null)
+                    _automaticallyOpenDiagnosticsWindow = true; // This will reopen the diagnostics window
+
                 CloseDiagnosticsWindow();
 
                 // we cannot use Hidden as Visibility so just remove and set Text
@@ -537,8 +549,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             EnableDiagnosticsButton();
 
-            //if (_diagnosticsWindow != null)
-            //    _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+            if (_diagnosticsWindow != null)
+            {
+                _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
+            }
+            else if (_automaticallyOpenDiagnosticsWindow)
+            {
+                OpenDiagnosticsWindow();
+                _automaticallyOpenDiagnosticsWindow = false;
+            }
         }
 
         private void OnPresentationTypeChanged(object? sender, string? reason)
@@ -615,21 +634,53 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             return foundDViewportView;
         }
 
+        private void OpenDiagnosticsWindow()
+        {
+            if (_currentSharpEngineSceneView == null)
+            {
+                CloseDiagnosticsWindow();
+                return;
+            }
+
+            _diagnosticsWindow = new DiagnosticsWindow();
+            _diagnosticsWindow.SharpEngineSceneView = _currentSharpEngineSceneView;
+            _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
+
+            // Position DiagnosticsWindow to the top-left corner of our window
+
+            double dpiScale = _currentSharpEngineSceneView.SceneView.DpiScaleX;
+            double diagnosticsWindowWidth = DiagnosticsWindow.InitialWindowWidth * dpiScale;
+
+            double left = this.Position.X + this.Width * dpiScale;
+            double maxLeft = left + diagnosticsWindowWidth;
+
+            if (Screens.Primary != null && maxLeft > Screens.Primary.WorkingArea.Width)
+            {
+                if (this.Position.X > diagnosticsWindowWidth)
+                    left = this.Position.X - diagnosticsWindowWidth;
+                else
+                    left = Screens.Primary.WorkingArea.Width - diagnosticsWindowWidth;
+            }
+
+            _diagnosticsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            _diagnosticsWindow.Position = new PixelPoint((int)(left), this.Position.Y);
+
+            _diagnosticsWindow.Show();
+        }
+
         private void CloseDiagnosticsWindow()
         {
-            // TODO:
-
-            //if (_diagnosticsWindow != null)
-            //{
-            //    try
-            //    {
-            //        _diagnosticsWindow.Close();
-            //    }
-            //    catch
-            //    {
-            //        // pass
-            //    }
-            //}
+            if (_diagnosticsWindow != null)
+            {
+                try
+                {
+                    _diagnosticsWindow.Close();
+                }
+                catch
+                {
+                    // pass
+                }
+            }
         }
     }
 }

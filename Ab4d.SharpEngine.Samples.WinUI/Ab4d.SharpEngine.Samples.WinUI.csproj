@@ -41,6 +41,8 @@
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
     <None Remove="Common\CommonTitleUserControl.xaml" />
     <None Remove="Common\CommonWinUISampleUserControl.xaml" />
+    <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
+    <None Remove="Diagnostics\LogMessagesWindow.xaml" />
     <None Remove="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <None Remove="QuickStart\SharpEngineSceneViewInXaml.xaml" />
     <None Remove="Samples.xml" />
@@ -84,6 +86,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Titles\QuickStartTitle.md" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Page Update="Diagnostics\DiagnosticsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Diagnostics\LogMessagesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup> 
 
   <ItemGroup>
     <Page Update="CameraControllers\MouseCameraControllerSample.xaml">

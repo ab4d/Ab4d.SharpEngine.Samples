@@ -34,6 +34,7 @@
 
                 <Separator />
                 <MenuItem Name="DumpSceneNodesMenuItem" Header="Dump SceneNodes" Click="DumpSceneNodesMenuItem_OnClick"/>
+                <MenuItem Name="DumpCameraDetailsMenuItem" Header="Dump Camera details" Click="DumpCameraDetailsMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingLayersMenuItem" Header="Dump RenderingLayers" Click="DumpRenderingLayersMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
                 <MenuItem Name="DumpUsedMaterialsMenuItem" Header="Dump used materials" Click="DumpUsedMaterialsMenuItem_OnClick"/>
@@ -49,11 +50,9 @@
                 
                 <Separator />
                 <MenuItem Name="StartStopCameraRotationMenuItem" Header="Toggle camera rotation" Click="StartStopCameraRotationMenuItem_OnClick"/>
-                <MenuItem Name="SaveToBitmapMenuItem" Header="Save frame to bitmap" Click="SaveToBitmapMenuItem_OnClick"/>
                 <MenuItem Name="CaptureInRenderDocMenuItem" Header="Capture next frame in RenderDoc" Click="CaptureInRenderDocMenuItem_OnClick"/>
 
                 <Separator />
-                <CheckBox Name="ShowCpuUsageCheckBox" Content="Show CPU usage" IsChecked="False" Checked="OnShowCpuUsageCheckBoxCheckedChanged" Unchecked="OnShowCpuUsageCheckBoxCheckedChanged"/>
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" Checked="AlwaysOnTopCheckBoxChanged" Unchecked="AlwaysOnTopCheckBoxChanged"/>
                 
                 <Separator />
