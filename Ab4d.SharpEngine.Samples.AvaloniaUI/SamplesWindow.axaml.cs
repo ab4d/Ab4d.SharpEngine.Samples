@@ -451,18 +451,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return cachedBitmap;
 
 
-            _assets ??= AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-            if (_assets == null)
-                return null;
-
             var uri = new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/" + resourceName);
 
-            if (!_assets.Exists(uri))
+            if (!AssetLoader.Exists(uri))
                 return null;
 
             Bitmap bitmap;
-            using (var stream = _assets.Open(uri))
+            using (var stream = AssetLoader.Open(uri))
             {
                 bitmap = new Bitmap(stream);
             }
