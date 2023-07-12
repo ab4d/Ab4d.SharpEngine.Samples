@@ -19,6 +19,7 @@
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="Ab4d.SharpEngine" Version="0.9.13-beta3" />
     <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.13-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.13-beta3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
