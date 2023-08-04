@@ -417,7 +417,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
                 // pass
             }
         }
-        
+
         private void CaptureInRenderDocMenuItem_OnClick(object sender, RoutedEventArgs args)
         {
             if (SharpEngineSceneView == null || !SharpEngineSceneView.SceneView.BackBuffersInitialized)
@@ -432,45 +432,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
 
             SharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
-        }
-
-        private void SaveRenderedBitmap(BitmapSource? renderedBitmap, bool openSavedImage = true, string? initialFileName = null, string? dialogTitle = null)
-        {
-            if (renderedBitmap == null)
-            {
-                MessageBox.Show("No rendered image");
-                return;
-            }
-
-            var saveFileDialog = new Microsoft.Win32.SaveFileDialog()
-            {
-                AddExtension = true,
-                CheckFileExists = false,
-                CheckPathExists = true,
-                OverwritePrompt = true,
-                ValidateNames = false,
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                FileName = initialFileName ?? "SharpEngineRender.png",
-                DefaultExt = "txt",
-                Filter = "png Image (*.png)|*.png",
-                Title = dialogTitle ?? "Select file name to store the rendered image"
-            };
-
-            if (saveFileDialog.ShowDialog() ?? false)
-            {
-                // write the bitmap to a file
-                using (var imageStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-                {
-                    //JpegBitmapEncoder enc = new JpegBitmapEncoder();
-                    var enc = new PngBitmapEncoder();
-                    var bitmapImage = BitmapFrame.Create(renderedBitmap);
-                    enc.Frames.Add(bitmapImage);
-                    enc.Save(imageStream);
-                }
-
-                if (openSavedImage)
-                    StartProcess(saveFileDialog.FileName);
-            }
         }
         
         private void StatisticsTypeRadioButton_OnChecked(object sender, RoutedEventArgs e)

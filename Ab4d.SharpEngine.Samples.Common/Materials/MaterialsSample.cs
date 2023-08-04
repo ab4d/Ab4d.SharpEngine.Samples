@@ -266,8 +266,7 @@ public class MaterialsSample : CommonSample
         var pointLight = new PointLight(new Vector3(-500, 100, 200));
         scene.Lights.Add(pointLight);
 
-        var ambientLight = new AmbientLight(0.3f);
-        scene.Lights.Add(ambientLight);
+        scene.SetAmbientLight(intensity: 0.3f);
 
         base.OnCreateLights(scene);
     }

@@ -60,7 +60,7 @@ public class SimpleHeightMapSample : CommonSample
 
     protected override void OnCreateLights(Scene scene)
     {
-        scene.Lights.Add(new AmbientLight(0.5f));
+        scene.SetAmbientLight(intensity: 0.5f);
 
         scene.Lights.Add(new DirectionalLight(new Vector3(1, -0.8f, 0)));
 

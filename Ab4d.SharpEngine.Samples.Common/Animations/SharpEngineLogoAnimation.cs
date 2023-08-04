@@ -168,7 +168,7 @@ public class SharpEngineLogoAnimation
     {
         scene.Lights.Clear();
 
-        scene.Lights.Add(new AmbientLight(intensity: 0.25f));              // 25% ambient light
+        scene.SetAmbientLight(intensity: 0.25f);                           // 25% ambient light
         scene.Lights.Add(new DirectionalLight(new Vector3(0, -0.2f, -1))); // light into the screen
     }
 

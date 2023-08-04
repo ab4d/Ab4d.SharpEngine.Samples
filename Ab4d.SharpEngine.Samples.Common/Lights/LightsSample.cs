@@ -4,6 +4,7 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lights;
 
@@ -11,7 +12,6 @@ public class LightsSample : CommonSample
 {
     public override string Title => "Lights sample";
 
-    private AmbientLight? _ambientLight;
     private DirectionalLight? _directionalLight1;
     private PointLight? _pointLight1;
     private SpotLight? _spotLight1;
@@ -186,23 +186,28 @@ public class LightsSample : CommonSample
 
         float intensity = intensityInPercent / 100.0f;
 
-        if (_ambientLight == null)
-            _ambientLight = new AmbientLight(intensity);
-        else
-            _ambientLight.SetIntensity(intensity);
+        Scene.SetAmbientLight(intensity);
 
-        if (!Scene.Lights.Contains(_ambientLight))
-            Scene.Lights.Add(_ambientLight);
+        // We could also manually add AmbientLight:
+        //if (_ambientLight == null)
+        //    _ambientLight = new AmbientLight(intensity);
+        //else
+        //    _ambientLight.SetIntensity(intensity);
+
+        //if (!Scene.Lights.Contains(_ambientLight))
+        //    Scene.Lights.Add(_ambientLight);
 
         //UpdateAmbientLightTextBlock();
     }
 
     private float GetAmbientLightIntensity()
     {
-        if (_ambientLight == null)
-            return 0;
+        //if (_ambientLight == null)
+        //    return 0;
 
-        return (_ambientLight.Color.Red + _ambientLight.Color.Green + _ambientLight.Color.Blue) / 3.0f;
+        //return (_ambientLight.Color.Red + _ambientLight.Color.Green + _ambientLight.Color.Blue) / 3.0f;
+
+        return Scene?.GetAmbientLightIntensity() ?? 0;
     }
 
 

@@ -30,7 +30,6 @@ public class AdvancedHeightMapSample : CommonSample
     private bool _useTransparentColor;
     private bool _useHeightTexture = false;
     
-    private AmbientLight? _ambientLight;
     private GradientStop[]? _gradientData;
 
 
@@ -130,8 +129,7 @@ public class AdvancedHeightMapSample : CommonSample
         }
 
 
-        _ambientLight = new AmbientLight(0.2f);
-        scene.Lights.Add(_ambientLight);
+        scene.SetAmbientLight(0.2f);
     }
 
     private void UpdateTexture()
@@ -393,7 +391,7 @@ public class AdvancedHeightMapSample : CommonSample
 
         ui.CreateLabel("View:", isHeader: true);
 
-        ui.CreateSlider(0, 1, () => 0.2f, ambientValue => _ambientLight?.SetIntensity(ambientValue), width: 150, 
+        ui.CreateSlider(0, 1, () => 0.2f, ambientValue => Scene?.SetAmbientLight(ambientValue), width: 150, 
             keyText: "Ambient light:", 
             formatShownValueFunc: ambientValue => $"{ambientValue * 100:F0}%");
 

@@ -305,7 +305,7 @@ public abstract class ManualInputEventsSample : CommonSample
         // we can use local BoundingBox. Otherwise WorldBoundingBox should be used.
         var boundingBox = modelNode.GetLocalBoundingBox(updateIfDirty: true);
 
-        if (boundingBox.IsEmpty || groupNode == null || groupNode.Count == 0)
+        if (boundingBox.IsUndefined || groupNode == null || groupNode.Count == 0)
             return null;
 
         // The collision detection will be done in 2D (top down),
@@ -325,7 +325,7 @@ public abstract class ManualInputEventsSample : CommonSample
 
             boundingBox = childNode.GetLocalBoundingBox(updateIfDirty: true);
 
-            if (boundingBox.IsEmpty)
+            if (boundingBox.IsUndefined)
                 continue;
 
             var rect2Min = new Vector2(boundingBox.Minimum.X, boundingBox.Minimum.Z);

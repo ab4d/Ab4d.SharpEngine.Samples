@@ -158,12 +158,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             scene.Lights.Clear();
 
             // Add lights
-            scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
-
             var directionalLight = new DirectionalLight(new Vector3(-1, -0.3f, 0));
             scene.Lights.Add(directionalLight);
 
             scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
+
+
+            // Set ambient light (illuminates the objects from all directions)
+            scene.SetAmbientLight(intensity: 0.3f);
+            
+            // We could also add AmbientLight manually:
+            //scene.Lights.Add(new AmbientLight(0.3f));
+            //scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
         }
 
         private void CreateTestScene()

@@ -46,7 +46,7 @@ public class AvaloniaHitTestingSample : HitTestingSample
     protected override void OnDisposed()
     {
         if (_subscribedElement != null)
-            _subscribedElement.PointerMoved += OnParentBorderOnPointerMoved;
+            _subscribedElement.PointerMoved -= OnParentBorderOnPointerMoved;
 
         base.OnDisposed();
     }

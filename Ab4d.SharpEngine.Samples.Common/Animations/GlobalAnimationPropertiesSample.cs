@@ -108,7 +108,7 @@ public class GlobalAnimationPropertiesSample : CommonSample
     protected override void OnCreateLights(Scene scene)
     {
         // Add ambient light and one directions lights that will be also used for planar shadow
-        scene.Lights.Add(new AmbientLight(0.3f));
+        scene.SetAmbientLight(intensity: 0.3f);
 
         _shadowDirectionalLight = new DirectionalLight(new Vector3(-0.4f, -1, -0.2f));
         scene.Lights.Add(_shadowDirectionalLight);

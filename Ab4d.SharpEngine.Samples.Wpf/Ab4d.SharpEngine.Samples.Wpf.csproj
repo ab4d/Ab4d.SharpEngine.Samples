@@ -17,9 +17,9 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.13-beta3" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.13-beta3" />    
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.13-beta3" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.14-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.14-beta3" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.14-beta3" />    
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
   </ItemGroup>
 
@@ -54,6 +54,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Cameras\" />
+    <Folder Include="Importers\" />
     <Folder Include="Resources\BitmapFonts\" />
     <Folder Include="Resources\HeightMaps\" />
     <Folder Include="Resources\Models\" />

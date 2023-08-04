@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Assimp;
+﻿using System.Numerics;
+using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
@@ -14,7 +15,18 @@ public class ReaderObjSample : CommonSample
     private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
 
     private ICommonSampleUIElement? _textBoxElement;
-    private MultiLineNode? _wireframeLineNode;
+    private MultiLineNode? _objectLinesNode;
+    private SceneNode? _importedModelNodes;
+
+    private enum ViewTypes
+    {
+        SolidObjectsOnly = 0,
+        SolidObjectWithEdgeLines = 1,
+        SolidObjectWithWireframe = 2
+    }
+
+    private ViewTypes _currentViewType = ViewTypes.SolidObjectWithEdgeLines;
+
 
     public ReaderObjSample(ICommonSamplesContext context)
         : base(context)
@@ -27,7 +39,7 @@ public class ReaderObjSample : CommonSample
         ImportFile(fileName);
     }
 
-    private void ImportFile(string? fileName)
+    protected void ImportFile(string? fileName)
     {
         if (Scene == null || fileName == null)
             return;
@@ -58,11 +70,9 @@ public class ReaderObjSample : CommonSample
 
         var readerObj = new ReaderObj();
 
-        GroupNode importedModelNodes;
-
         try
         {
-            importedModelNodes = readerObj.ReadSceneNodes(fileName);
+            _importedModelNodes = readerObj.ReadSceneNodes(fileName);
         }
         catch (Exception ex)
         {
@@ -87,47 +97,96 @@ public class ReaderObjSample : CommonSample
         //var objFileData = readerObj.ReadObjFileData(fileName);
 
 
-        Scene.RootNode.Add(importedModelNodes);
+        Scene.RootNode.Add(_importedModelNodes);
 
 
-        var wireframePositions = LineUtils.GetWireframeLinePositions(importedModelNodes, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
-
-        var wireframeLineMaterial = new LineMaterial(Color3.Black, 1)
+        if (_objectLinesNode == null)
         {
-            DepthBias = 0.005f
-        };
+            var lineMaterial = new LineMaterial(Color3.Black, 1)
+            {
+                DepthBias = 0.005f
+            };
 
-        _wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, wireframeLineMaterial, "Wireframe");
+            _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
 
-        Scene.RootNode.Add(_wireframeLineNode);
-
-
-        if (importedModelNodes.WorldBoundingBox.IsEmpty)
-            importedModelNodes.Update();
-
-        if (targetPositionCamera != null && !importedModelNodes.WorldBoundingBox.IsEmpty)
-        {
-            targetPositionCamera.TargetPosition = importedModelNodes.WorldBoundingBox.GetCenterPosition();
-            targetPositionCamera.Distance = importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2;
+            Scene.RootNode.Add(_objectLinesNode);
         }
+
+        UpdateShownLines();
+
+
+        if (_importedModelNodes.WorldBoundingBox.IsUndefined)
+            _importedModelNodes.Update();
+
+        if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
+        {
+            targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
+            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2;
+        }
+    }
+
+    private void UpdateShownLines()
+    {
+        if (_importedModelNodes == null || _objectLinesNode == null)
+            return; // no model imported
+
+        if (_currentViewType == ViewTypes.SolidObjectsOnly)
+        {
+            _objectLinesNode.Visibility = SceneNodeVisibility.Hidden;
+            return;
+        }
+
+
+        if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
+        {
+            var edgeLinePositions = new List<Vector3>();
+            EdgeLinesFactory.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+
+            _objectLinesNode.Positions = edgeLinePositions.ToArray();
+            _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
+        }
+        else if (_currentViewType == ViewTypes.SolidObjectWithWireframe)
+        {
+            var wireframePositions = LineUtils.GetWireframeLinePositions(_importedModelNodes, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
+
+            _objectLinesNode.Positions = wireframePositions;
+            _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
+        }
+    }
+
+    // Drag and drop is platform specific function and needs to be implemented on per-platform sample
+    protected virtual bool SetupDragAndDrop(ICommonSampleUIProvider ui)
+    {
+        return false; // no drag and drop not supported
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
-        var rootStackPanel = ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left, isVertical: false);
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
-        ui.CreateLabel("FileName:");
-        _textBoxElement = ui.CreateTextBox(width: 400, initialText: FileUtils.FixDirectorySeparator(_initialFileName));
-
-        ui.CreateButton("Load", () =>
+        ui.CreateLabel("View", isHeader: true);
+        ui.CreateRadioButtons(new string[] { "Solid objects only", "Solid + EdgeLines", "Solid + Wireframe" }, (selectedIndex, selectedText) =>
         {
-            ImportFile(_textBoxElement.GetText());
-        });
+            _currentViewType = (ViewTypes)selectedIndex;
+            UpdateShownLines();
+        }, selectedItemIndex: (int)_currentViewType);
 
-        if (_wireframeLineNode != null)
+
+        bool isDragAndDropSupported = SetupDragAndDrop(ui);
+
+        if (!isDragAndDropSupported)
         {
-            ui.AddSeparator();
-            ui.CreateCheckBox("Show wireframe", true, isChecked => _wireframeLineNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden);
+            // If drag and drop is not supported, then show TextBox so user can enter file name to import
+
+            ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left, isVertical: false);
+
+            ui.CreateLabel("FileName:");
+            _textBoxElement = ui.CreateTextBox(width: 400, initialText: FileUtils.FixDirectorySeparator(_initialFileName));
+
+            ui.CreateButton("Load", () =>
+            {
+                ImportFile(_textBoxElement.GetText());
+            });
         }
     }
 }

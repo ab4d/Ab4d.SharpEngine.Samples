@@ -230,7 +230,7 @@ public class TubePathsSample : CommonSample
         scene.Lights.Clear();
 
         // Add lights
-        scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
+        scene.SetAmbientLight(intensity: 0.3f);
 
         var directionalLight = new DirectionalLight(new Vector3(-1, -0.3f, 0));
         scene.Lights.Add(directionalLight);

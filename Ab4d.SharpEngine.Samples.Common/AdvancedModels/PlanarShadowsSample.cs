@@ -20,7 +20,6 @@ public class PlanarShadowsSample : CommonSample
 
     private PointLight? _shadowPointLight;
     private DirectionalLight? _shadowDirectionalLight;
-    private AmbientLight? _ambientLight;
 
     private Light? _currentShadowLight;
 
@@ -79,9 +78,7 @@ public class PlanarShadowsSample : CommonSample
         _lightHorizontalAngle = -60;
         _lightVerticalAngle = 60;
         _lightDistance = 500;
-
-        _ambientLight = new AmbientLight(0.2f);
-
+        
         _shadowPointLight = new PointLight();
         _shadowDirectionalLight = new DirectionalLight();
 
@@ -306,8 +303,7 @@ public class PlanarShadowsSample : CommonSample
         }
 
 
-        if (_ambientLight != null && !Scene.Lights.Contains(_ambientLight))
-            Scene.Lights.Add(_ambientLight);
+        Scene.SetAmbientLight(0.2f);
 
         if (_currentShadowLight != null && !Scene.Lights.Contains(_currentShadowLight))
             Scene.Lights.Add(_currentShadowLight);

@@ -58,12 +58,13 @@
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
-  <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
-  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
+  <Sample Location="Importers.ReaderObjWpfSample" Title="ReaderObj"/>
+  <Sample Location="Importers.AssimpImporterWpfSample" Title="AssimpImporter"/>
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
+  <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>

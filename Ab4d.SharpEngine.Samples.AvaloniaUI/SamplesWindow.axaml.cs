@@ -58,7 +58,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private CommonAvaloniaSampleUserControl? _commonAvaloniaSampleUserControl;
         private Control? _currentSampleControl;
         private CommonSample? _currentCommonSample;
-        private IAssetLoader? _assets;
         private bool _isSceneViewInitializedSubscribed;
         private bool _isPresentationTypeChangedSubscribed;
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
@@ -87,7 +86,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 LoadSamples();
             };
 
-            this.Closing += delegate (object? sender, WindowClosingEventArgs args)
+            this.Closing += delegate(object? sender, WindowClosingEventArgs args)
             {
                 CloseDiagnosticsWindow();
             };

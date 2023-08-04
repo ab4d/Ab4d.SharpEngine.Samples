@@ -27,6 +27,8 @@ public class FitIntoViewSample : CommonSample
     private GroupNode? _boxesGroup;
     private WireGridNode? _wireGridNode;
 
+    private Vector3[] _corners;
+
     public FitIntoViewSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -85,8 +87,12 @@ public class FitIntoViewSample : CommonSample
                 //var boundingBox = new BoundingBox(new Vector3(-50, 0, -50), new Vector3(50, 0, 50));
                 var boundingBox = _wireGridNode.GetLocalBoundingBox();
 
-                var cornerPositions = boundingBox.GetCorners();
-                fitIntoViewCamera.FitIntoView(cornerPositions,
+                _corners ??= new Vector3[8]; // reuse the corners array
+                boundingBox.GetCorners(_corners);
+                //var cornerPositions = boundingBox.GetCorners(); // The following always creates a new array
+
+
+                fitIntoViewCamera.FitIntoView(_corners,
                                               adjustTargetPosition: _adjustTargetPosition,
                                               adjustmentFactor: _marginAdjustmentFactor,
                                               waitUntilSceneViewSizeIsValid: true);

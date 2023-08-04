@@ -460,7 +460,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 // we cannot use Hidden as Visibility so just remove and set Text
                 // We need to set a space otherwise the height will be calculated differently
                 SelectedGraphicInfoTextBlock.Text = " ";
-                UsedGpuTextBlock.Text = " "; 
+                UsedGpuTextBlock.Text = " ";
 
                 if (sharpEngineSceneView != null)
                 {
@@ -586,17 +586,17 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 {
                     //if (oneChild is Control control)
                     //{
-                        foundDViewportView = FindSharpEngineSceneView(oneChild);
+                    foundDViewportView = FindSharpEngineSceneView(oneChild);
 
-                        if (foundDViewportView != null)
-                            break;
+                    if (foundDViewportView != null)
+                        break;
                     //}
                 }
             }
 
             return foundDViewportView;
         }
-        
+
         private void EnableDiagnosticsButton()
         {
             _diagnosticsImage ??= new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\Diagnostics.png")));

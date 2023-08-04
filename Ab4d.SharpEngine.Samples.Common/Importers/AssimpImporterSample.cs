@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Ab4d.Assimp;
 using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Cameras;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Importers;
 
@@ -21,7 +22,18 @@ public class AssimpImporterSample : CommonSample
     private ICommonSampleUIElement? _textBoxElement;
     private ICommonSampleUIPanel? _infoPanel;
     private ICommonSampleUIElement? _infoLabel;
-    private MultiLineNode? _wireframeLineNode;
+    private MultiLineNode? _objectLinesNode;
+    private SceneNode? _importedModelNodes;
+
+    private enum ViewTypes
+    {
+        SolidObjectsOnly = 0,
+        SolidObjectWithEdgeLines = 1,
+        SolidObjectWithWireframe = 2
+    }
+
+    private ViewTypes _currentViewType = ViewTypes.SolidObjectWithEdgeLines;
+
 
     public AssimpImporterSample(ICommonSamplesContext context)
         : base(context)
@@ -32,6 +44,12 @@ public class AssimpImporterSample : CommonSample
     {
         if (scene.GpuDevice != null)
             InitAssimpLibrary(scene.GpuDevice, "assimp-lib");
+
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 50;
+            targetPositionCamera.Attitude = 12;
+        }
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
         ImportFile(fileName);
@@ -114,7 +132,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         _assimpImporter = new AssimpImporter(gpuDevice, BitmapIO);
     }
 
-    private void ImportFile(string? fileName)
+    protected void ImportFile(string? fileName)
     {
         if (_assimpImporter == null || Scene == null || fileName == null)
             return;
@@ -141,14 +159,28 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         }
 
 
+        ClearErrorMessage();
+
+        if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
+        {
+            var fileInfo = new FileInfo(fileName);
+            if (fileInfo.Length > 5000000) // > 5 MB
+            {
+                // Switch to SolidObjectsOnly because analysis of large models can take very long time
+                _currentViewType = ViewTypes.SolidObjectsOnly;
+                ShowErrorMessage("Switching view to SolidObjectsOnly because analysis of large models can take very long time");
+            }
+        }
+
+
         // FixDirectorySeparator method returns file path with correctly sets backslash or slash as directory separator based on the current OS.
         fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
 
-        SceneNode? importedModelNodes;
+        _assimpImporter.PreserveNativeResourcesAfterImporting = true;
 
         try
         {
-            importedModelNodes = _assimpImporter.ImportSceneNodes(fileName);
+            _importedModelNodes = _assimpImporter.ImportSceneNodes(fileName);
         }
         catch (Exception ex)
         {
@@ -156,68 +188,163 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             return;
         }
 
-        if (importedModelNodes != null)
+        if (_importedModelNodes != null)
         {
-            Scene.RootNode.Add(importedModelNodes);
-
-
-            var wireframePositions = LineUtils.GetWireframeLinePositions(importedModelNodes, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
-
-            var wireframeLineMaterial = new LineMaterial(Color3.Black, 1)
+            // Check animations:
+            if (_assimpImporter.NativeAssimpScene != null) // This should not be null because we set PreserveNativeResourcesAfterImporting to true
             {
-                DepthBias = 0.005f
-            };
+                int animationsCount = (int)_assimpImporter.NativeAssimpScene.Scene.NumAnimations;
+                if (animationsCount > 0)
+                {
+                    for (int animationIndex = 0; animationIndex < animationsCount; animationIndex++)
+                    {
+                        var assimpAnimation = _assimpImporter.NativeAssimpScene.Scene.GetAnimation(animationIndex);
 
-            _wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, wireframeLineMaterial, "Wireframe");
+                        int channelsCount = (int)assimpAnimation.NumChannels;
+                        for (int channelIndex = 0; channelIndex < channelsCount; channelIndex++)
+                        {
+                            var assimpChannel = assimpAnimation.GetChannel(channelIndex);
 
-            Scene.RootNode.Add(_wireframeLineNode);
+                            var nodeName = assimpChannel.NodeName; // nodeName defines which object is animated by this channel
+
+                            if (assimpChannel.NumPositionKeys > 0)
+                            {
+                                var positionKeys = assimpChannel.PositionKeys;
+                                // TODO:
+                            }
+
+                            if (assimpChannel.NumScalingKeys > 0)
+                            {
+                                var scalingKeys = assimpChannel.ScalingKeys;
+                                // TODO:
+                            }
+
+                            if (assimpChannel.NumRotationKeys > 0)
+                            {
+                                var rotationKeys = assimpChannel.RotationKeys;
+                                // TODO:
+                            }
+                        }
+                    }
+                }
+
+                // When reading the file and PreserveNativeResourcesAfterImporting is true, then we need to manually dispose the native assimp scene.
+                _assimpImporter.DisposeNativeAssimpScene();
+            }
 
 
-            if (importedModelNodes.WorldBoundingBox.IsEmpty)
-                importedModelNodes.Update();
+            Scene.RootNode.Add(_importedModelNodes);
 
-            if (targetPositionCamera != null && !importedModelNodes.WorldBoundingBox.IsEmpty)
+
+            if (_objectLinesNode == null)
             {
-                targetPositionCamera.TargetPosition = importedModelNodes.WorldBoundingBox.GetCenterPosition();
-                targetPositionCamera.Distance = importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
+                var lineMaterial = new LineMaterial(Color3.Black, 1)
+                {
+                    DepthBias = 0.005f
+                };
+
+                _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
+
+                Scene.RootNode.Add(_objectLinesNode);
+            }
+
+            UpdateShownLines();
+
+
+            if (_importedModelNodes.WorldBoundingBox.IsUndefined)
+                _importedModelNodes.Update();
+
+            if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
+            {
+                targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
+                targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
             }
         }
     }
 
+    private void UpdateShownLines()
+    {
+        if (_importedModelNodes == null || _objectLinesNode == null)
+            return; // no model imported
+
+        if (_currentViewType == ViewTypes.SolidObjectsOnly)
+        {
+            _objectLinesNode.Visibility = SceneNodeVisibility.Hidden;
+            return;
+        }
+
+
+        if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
+        {
+            var edgeLinePositions = new List<Vector3>();
+            EdgeLinesFactory.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+
+            _objectLinesNode.Positions = edgeLinePositions.ToArray();
+            _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
+        }
+        else if (_currentViewType == ViewTypes.SolidObjectWithWireframe)
+        {
+            var wireframePositions = LineUtils.GetWireframeLinePositions(_importedModelNodes, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
+
+            _objectLinesNode.Positions = wireframePositions;
+            _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
+        }
+    }
+
+    // Drag and drop is platform specific function and needs to be implemented on per-platform sample
+    protected virtual bool SetupDragAndDrop(ICommonSampleUIProvider ui)
+    {
+        return false; // no drag and drop not supported
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
-        var rootStackPanel = ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left, isVertical: false);
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
-        ui.CreateLabel("FileName:");
-        _textBoxElement = ui.CreateTextBox(width: 400, initialText: FileUtils.FixDirectorySeparator(_initialFileName));
-
-        ui.CreateButton("Load", () =>
+        ui.CreateLabel("View", isHeader: true);
+        ui.CreateRadioButtons(new string[] { "Solid objects only", "Solid + EdgeLines", "Solid + Wireframe" }, (selectedIndex, selectedText) =>
         {
-            _infoPanel?.SetIsVisible(false);
-            ImportFile(_textBoxElement.GetText());
-        });
-        
+            _currentViewType = (ViewTypes)selectedIndex;
+            UpdateShownLines();
+        }, selectedItemIndex: (int)_currentViewType);
+
         ui.AddSeparator();
-        ui.CreateButton("Show supported import formats", () =>
+        ui.CreateButton("Show supported formats", () =>
         {
-            if (_assimpImporter == null)
-                return;
-
-            var supportedExtensions = string.Join(", ", _assimpImporter.SupportedImportFileExtensions);
-
-            _infoLabel?.SetText("Supported import file formats: " + supportedExtensions);
-            _infoPanel?.SetIsVisible(true);
+            if (_infoPanel != null)
+            {
+                var currentlyVisible = _infoPanel.GetIsVisible();
+                _infoPanel.SetIsVisible(!currentlyVisible);
+            }
         });
 
-        if (_wireframeLineNode != null)
-        {
-            ui.AddSeparator();
-            ui.CreateCheckBox("Show wireframe", true, isChecked => _wireframeLineNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden);
-        }
-        
+
         _infoPanel = ui.CreateStackPanel(PositionTypes.Center, addBorder: true, isSemiTransparent: true);
         _infoPanel.SetIsVisible(false);
 
-        _infoLabel = ui.CreateLabel("");
+        if (_assimpImporter != null)
+        {
+            var supportedExtensions = string.Join(", ", _assimpImporter.SupportedImportFileExtensions);
+            _infoLabel = ui.CreateLabel("Supported import file formats: " + supportedExtensions);
+        }
+
+
+        bool isDragAndDropSupported = SetupDragAndDrop(ui);
+
+        if (!isDragAndDropSupported)
+        {
+            // If drag and drop is not supported, then show TextBox so user can enter file name to import
+
+            ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left, isVertical: false);
+
+            ui.CreateLabel("FileName:");
+            _textBoxElement = ui.CreateTextBox(width: 400, initialText: FileUtils.FixDirectorySeparator(_initialFileName));
+
+            ui.CreateButton("Load", () =>
+            {
+                _infoPanel?.SetIsVisible(false);
+                ImportFile(_textBoxElement.GetText());
+            });
+        }
     }
 }

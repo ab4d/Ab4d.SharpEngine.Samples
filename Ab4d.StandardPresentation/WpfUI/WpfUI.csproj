@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.11-beta3" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.14-beta3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 

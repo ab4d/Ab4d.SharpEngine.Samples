@@ -23,9 +23,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         }
     }
 
-    public class DragAndDropHelper
+    public class DragAndDropHelper : IDisposable
     {
         private readonly string[]? _allowedFileExtensions;
+
+        private bool _usePreviewEvents;
+        private FrameworkElement? _subscribedFrameworkElement;
 
         public event EventHandler<FileDroppedEventArgs>? FileDropped;
 
@@ -56,8 +59,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             {
                 controlToAddDragAndDrop.Drop += pageToAddDragAndDrop_Drop;
                 controlToAddDragAndDrop.DragOver += pageToAddDragAndDrop_DragOver;
-
             }
+
+            _subscribedFrameworkElement = controlToAddDragAndDrop;
+            _usePreviewEvents = usePreviewEvents;
         }
 
         public void pageToAddDragAndDrop_DragOver(object sender, DragEventArgs args)
@@ -86,8 +91,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 }
             }
 
-            if (args.Effects != DragDropEffects.None)
-                args.Handled = true;
+            args.Handled = true;
         }
 
         public void pageToAddDragAndDrop_Drop(object sender, DragEventArgs args)
@@ -109,6 +113,25 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         {
             if (FileDropped != null)
                 FileDropped(this, new FileDroppedEventArgs(fileName));
+        }
+
+        public void Dispose()
+        {
+            if (_subscribedFrameworkElement == null)
+                return;
+
+            if (_usePreviewEvents)
+            {
+                _subscribedFrameworkElement.PreviewDrop -= pageToAddDragAndDrop_Drop;
+                _subscribedFrameworkElement.PreviewDragOver -= pageToAddDragAndDrop_DragOver;
+            }
+            else
+            {
+                _subscribedFrameworkElement.Drop -= pageToAddDragAndDrop_Drop;
+                _subscribedFrameworkElement.DragOver -= pageToAddDragAndDrop_DragOver;
+            }
+
+            _subscribedFrameworkElement = null;
         }
     }
 }

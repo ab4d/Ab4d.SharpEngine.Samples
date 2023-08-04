@@ -469,7 +469,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             _scene = new Scene(_vulkanDevice, "MainScene");
 
             // Add lights
-            _scene.Lights.Add(new AmbientLight(intensity: 0.3f));
+            _scene.SetAmbientLight(intensity: 0.3f);
             _scene.Lights.Add(new PointLight(new Vector3(500, 200, 0), range: 10000));
             _scene.Lights.Add(new DirectionalLight(new Vector3(-1, -0.3f, 0)));
             _scene.Lights.Add(new SpotLight(new Vector3(300, 0, 300), new Vector3(-1, -0.3f, 0)) { Color = new Color3(0.4f, 0.4f, 0.4f) });

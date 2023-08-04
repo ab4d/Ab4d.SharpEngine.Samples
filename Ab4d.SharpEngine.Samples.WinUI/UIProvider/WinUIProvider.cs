@@ -43,7 +43,7 @@ public class WinUIProvider : ICommonSampleUIProvider
     public double HeaderBottomMarin { get; private set; }
     public double FontSize { get; private set; }
 
-    private double GetDefaultHeaderTopMargin() => StandardMargin * 2 + 8;
+    private double GetDefaultHeaderTopMargin() => StandardMargin * 2;
     private double GetDefaultHeaderBottomMarin() => StandardMargin * 1.3;
 
     public WinUIProvider(Panel basePanel)

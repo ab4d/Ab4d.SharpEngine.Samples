@@ -983,9 +983,6 @@ PipelineChangesCount: {8:#,##0}",
 
     private void OnLogAction(LogLevels logLevel, string message)
     {
-        if (message.StartsWith("SceneNode.DirtyFlags is not None")) // Skip one warning that just an internal message and is not problematic (this prevent disturbing user)
-            return;
-
         LogMessages.Add(new Tuple<LogLevels, string>(logLevel, message));
 
         // We count number of warnings separately because _logMessages can be deleted
