@@ -5,6 +5,7 @@ using Windows.UI;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.SharpEngine.WinUI;
 
@@ -18,6 +19,8 @@ public class WinUISamplesContext : ICommonSamplesContext
 
     private WinUIBitmapIO _bitmapIO = new WinUIBitmapIO();
     public IBitmapIO BitmapIO => _bitmapIO;
+
+    private TextBlockFactory? _textBlockFactory;
 
     public ISharpEngineSceneView? CurrentSharpEngineSceneView { get; private set; }
 
@@ -63,6 +66,22 @@ public class WinUISamplesContext : ICommonSamplesContext
     protected void OnCurrentSharpEngineSceneViewChanged()
     {
         CurrentSharpEngineSceneViewChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public TextBlockFactory GetTextBlockFactory()
+    {
+        if (CurrentSharpEngineSceneView == null)
+            throw new InvalidOperationException("Cannot call GetTextBlockFactory when CurrentSharpEngineSceneView is not yet set.");
+
+        if (_textBlockFactory == null)
+        {
+            _textBlockFactory = new TextBlockFactory(CurrentSharpEngineSceneView.Scene, this.BitmapIO);
+            //_textBlockFactory.BackgroundColor = Colors.LightYellow;
+            //_textBlockFactory.BorderThickness = 1;
+            //_textBlockFactory.BorderColor = Colors.DimGray;
+        }
+
+        return _textBlockFactory;
     }
 
     #region GetRandom... methods

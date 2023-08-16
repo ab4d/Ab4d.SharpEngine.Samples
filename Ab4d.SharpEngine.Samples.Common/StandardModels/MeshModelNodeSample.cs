@@ -112,8 +112,10 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         base.OnCreateScene(scene);
 
         // Show position index as 3D text
-        var textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
+        var textBlockFactory = context.GetTextBlockFactory();
         textBlockFactory.FontSize = 6;
+        textBlockFactory.BackgroundColor = Colors.Transparent; // no background
+        textBlockFactory.BorderThickness = 0;
 
         if (_mesh != null)
         {

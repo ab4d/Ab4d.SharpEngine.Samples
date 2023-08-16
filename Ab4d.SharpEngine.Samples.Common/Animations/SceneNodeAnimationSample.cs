@@ -22,8 +22,6 @@ public class SceneNodeAnimationSample : CommonSample
 
     private TargetPositionCamera? _targetPositionCamera;
 
-    private TextBlockFactory? _textBlockFactory;
-
     private List<IAnimation> _animations;
 
     private GroupNode? _animatedObjectsGroup;
@@ -247,33 +245,19 @@ public class SceneNodeAnimationSample : CommonSample
 
     private void AddTextWithBorder(Scene scene, Vector3 topCenterPosition, string text, Color4 textColor)
     {
-        EnsureTextBlockFactory(scene);
+        var textBlockFactory = context.GetTextBlockFactory();
 
-        if (_textBlockFactory == null)
-            return;
+        textBlockFactory.FontSize = 14;
+        textBlockFactory.TextColor = textColor;
+        textBlockFactory.IsSolidColorMaterial = true;
 
-        var textNode = _textBlockFactory.CreateTextBlock(position: topCenterPosition,
-                                                         positionType: PositionTypes.Top | PositionTypes.Center,
-                                                         text,
-                                                         textDirection: new Vector3(1, 0, 0),
-                                                         upDirection: new Vector3(0, 0, -1));
-        
-        _textBlockFactory.FontSize = 14;
-        _textBlockFactory.TextColor = textColor;
-        _textBlockFactory.IsSolidColorMaterial = true;
+        var textNode = textBlockFactory.CreateTextBlock(position: topCenterPosition,
+                                                        positionType: PositionTypes.Top | PositionTypes.Center,
+                                                        text,
+                                                        textDirection: new Vector3(1, 0, 0),
+                                                        upDirection: new Vector3(0, 0, -1));
 
         scene.RootNode.Add(textNode);
-    }
-
-    private void EnsureTextBlockFactory(Scene scene)
-    {
-        if (_textBlockFactory != null)
-            return;
-
-        _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
-        //_textBlockFactory.BackgroundColor = Colors.LightYellow;
-        //_textBlockFactory.BorderThickness = 1;
-        //_textBlockFactory.BorderColor = Colors.DimGray;
     }
 
     private void SetupPlanarShadow(Scene scene)
@@ -329,12 +313,6 @@ public class SceneNodeAnimationSample : CommonSample
     {
         if (SceneView != null)
             SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
-
-        if (_textBlockFactory != null)
-        {
-            _textBlockFactory.Dispose();
-            _textBlockFactory = null;
-        }
 
         base.OnDisposed();
     }

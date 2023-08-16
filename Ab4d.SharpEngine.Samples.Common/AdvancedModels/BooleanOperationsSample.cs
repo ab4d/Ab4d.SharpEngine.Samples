@@ -15,8 +15,6 @@ public class BooleanOperationsSample : CommonSample
 {
     public override string Title => "Boolean Operations";
 
-    private TextBlockFactory? _textBlockFactory;
-
     private GroupNode? _wireframeGroup;
 
     public BooleanOperationsSample(ICommonSamplesContext context) 
@@ -46,18 +44,19 @@ public class BooleanOperationsSample : CommonSample
         ShowMesh(scene, unionMesh, 150);
 
 
-        _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
-        _textBlockFactory.BackgroundColor = Colors.LightYellow;
-        _textBlockFactory.BorderThickness = 1;
-        _textBlockFactory.BorderColor = Colors.DimGray;
+        var textBlockFactory = context.GetTextBlockFactory();
 
-        var textNode = _textBlockFactory.CreateTextBlock(new Vector3(-150, -45, 100), "Subtract", textAttitude: 30);
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+
+        var textNode = textBlockFactory.CreateTextBlock(new Vector3(-150, -45, 100), "Subtract", textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = _textBlockFactory.CreateTextBlock(new Vector3(0, -45, 100), "Intersect", textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock(new Vector3(0, -45, 100), "Intersect", textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = _textBlockFactory.CreateTextBlock(new Vector3(150, -45, 100), "Union", textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock(new Vector3(150, -45, 100), "Union", textAttitude: 30);
         scene.RootNode.Add(textNode);
 
 

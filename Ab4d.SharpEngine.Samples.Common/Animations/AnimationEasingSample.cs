@@ -17,8 +17,6 @@ public class AnimationEasingSample : CommonSample
     public override string Title => "Animation easing sample";
     public override string? Subtitle => null;
 
-    private TextBlockFactory? _textBlockFactory;
-
     private List<IAnimation> _allAnimations = new();
 
     public AnimationEasingSample(ICommonSamplesContext context)
@@ -166,29 +164,18 @@ public class AnimationEasingSample : CommonSample
 
     private void AddTextWithBorder(Scene scene, Vector3 position, string text, Color4 textColor, float fontSize)
     {
-        EnsureTextBlockFactory(scene);
+        var textBlockFactory = context.GetTextBlockFactory();
 
-        if (_textBlockFactory == null)
-            return;
+        textBlockFactory.FontSize = fontSize;
+        textBlockFactory.TextColor = textColor;
+        textBlockFactory.IsSolidColorMaterial = true;
 
-        _textBlockFactory.FontSize = fontSize;
-        _textBlockFactory.TextColor = textColor;
-        _textBlockFactory.IsSolidColorMaterial = true;
-
-        var textNode = _textBlockFactory.CreateTextBlock(position: position,
-            positionType: PositionTypes.Center | PositionTypes.Left,
-            text,
-            textDirection: new Vector3(1, 0, 0),
-            upDirection: new Vector3(0, 0, -1));
+        var textNode = textBlockFactory.CreateTextBlock(position: position,
+                                                        positionType: PositionTypes.Center | PositionTypes.Left,
+                                                        text,
+                                                        textDirection: new Vector3(1, 0, 0),
+                                                        upDirection: new Vector3(0, 0, -1));
 
         scene.RootNode.Add(textNode);
-    }
-
-    private void EnsureTextBlockFactory(Scene scene)
-    {
-        if (_textBlockFactory != null)
-            return;
-
-        _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
     }
 }

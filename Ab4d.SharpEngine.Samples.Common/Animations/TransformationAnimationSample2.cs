@@ -22,8 +22,6 @@ public class TransformationAnimationSample2 : CommonSample
 
     private TargetPositionCamera? _targetPositionCamera;
 
-    private TextBlockFactory? _textBlockFactory;
-
     private IAnimation? _animation;
 
     private GroupNode? _animatedObjectsGroup;
@@ -98,33 +96,19 @@ TranslateZ, RotateY";
 
     private void AddTextWithBorder(Scene scene, Vector3 topCenterPosition, string text, Color4 textColor, float fontSize)
     {
-        EnsureTextBlockFactory(scene);
+        var textBlockFactory = context.GetTextBlockFactory();
 
-        if (_textBlockFactory == null)
-            return;
+        textBlockFactory.FontSize = fontSize;
+        textBlockFactory.TextColor = textColor;
+        textBlockFactory.IsSolidColorMaterial = true;
 
-        _textBlockFactory.FontSize = fontSize;
-        _textBlockFactory.TextColor = textColor;
-        _textBlockFactory.IsSolidColorMaterial = true;
-
-        var textNode = _textBlockFactory.CreateTextBlock(position: topCenterPosition,
-                                                         positionType: PositionTypes.Top | PositionTypes.Center,
-                                                         text,
-                                                         textDirection: new Vector3(1, 0, 0),
-                                                         upDirection: new Vector3(0, 0, -1));
+        var textNode = textBlockFactory.CreateTextBlock(position: topCenterPosition,
+                                                        positionType: PositionTypes.Top | PositionTypes.Center,
+                                                        text,
+                                                        textDirection: new Vector3(1, 0, 0),
+                                                        upDirection: new Vector3(0, 0, -1));
 
         scene.RootNode.Add(textNode);
-    }
-
-    private void EnsureTextBlockFactory(Scene scene)
-    {
-        if (_textBlockFactory != null)
-            return;
-
-        _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
-        //_textBlockFactory.BackgroundColor = Colors.LightYellow;
-        //_textBlockFactory.BorderThickness = 1;
-        //_textBlockFactory.BorderColor = Colors.DimGray;
     }
 
     private void SetupPlanarShadow(Scene scene)
@@ -252,12 +236,6 @@ TranslateZ, RotateY";
         // Stop all animations (this will prevent automatically updating animations when the objects are removed from scene)
         if (_animation != null)
             _animation.Stop();
-
-        if (_textBlockFactory != null)
-        {
-            _textBlockFactory.Dispose();
-            _textBlockFactory = null;
-        }
 
         base.OnDisposed();
     }

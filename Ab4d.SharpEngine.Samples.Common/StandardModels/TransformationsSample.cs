@@ -16,8 +16,6 @@ public class TransformationsSample : CommonSample
     public override string Title => "Transformations";
     public override string Subtitle => "This sample shows different SceneNode transformations.\nThe last two teapots show that different order of transformations in TransformGroup gives different results.";
 
-    private TextBlockFactory? _textBlockFactory;
-
     private Vector3 _currentPosition = new Vector3(-280, 0, 0);
     private Vector3 _modelSize = new Vector3(60, 60, 60);
     
@@ -127,18 +125,14 @@ public class TransformationsSample : CommonSample
 
         scene.RootNode.Add(teapotModel);
 
-
-        if (_textBlockFactory == null)
-        {
-            _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
-            _textBlockFactory.BackgroundColor = Colors.LightYellow;
-            _textBlockFactory.BorderThickness = 1;
-            _textBlockFactory.BorderColor = Colors.DimGray;
-            _textBlockFactory.FontSize = 8;
-        }
+        var textBlockFactory = context.GetTextBlockFactory();
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+        textBlockFactory.FontSize = 8;
 
         var textZPos = (_modelIndex % 2 == 0) ? 150 : 100;
-        var textNode1 = _textBlockFactory.CreateTextBlock(_currentPosition + new Vector3(0, 20, textZPos), text, textAttitude: 30);
+        var textNode1 = textBlockFactory.CreateTextBlock(_currentPosition + new Vector3(0, 20, textZPos), text, textAttitude: 30);
         scene.RootNode.Add(textNode1);
 
 

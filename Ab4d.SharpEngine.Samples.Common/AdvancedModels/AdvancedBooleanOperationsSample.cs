@@ -14,8 +14,6 @@ public class AdvancedBooleanOperationsSample : CommonSample
 {
     public override string Title => "Advanced Boolean operations processing options";
 
-    private TextBlockFactory? _textBlockFactory;
-
     private GroupNode? _wireframeGroup;
 
     private bool _generateInnerTriangles = true;
@@ -69,22 +67,22 @@ public class AdvancedBooleanOperationsSample : CommonSample
         ShowMesh(scene, subtractedMesh2, 120);
 
 
-        _textBlockFactory = new TextBlockFactory(scene, context.BitmapIO);
-        _textBlockFactory.FontSize = 10;
-        _textBlockFactory.BackgroundColor = Colors.LightYellow;
-        _textBlockFactory.BorderThickness = 1;
-        _textBlockFactory.BorderColor = Colors.DimGray;
+        var textBlockFactory = context.GetTextBlockFactory();
 
-        var textNode = _textBlockFactory.CreateTextBlock(new Vector3(-120, 0, 150), 
-                                                         $"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {subtractedMesh1!.TriangleIndices!.Length / 3}",
-                                                         textAttitude: 30);
+        textBlockFactory.FontSize = 10;
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+
+        var textNode = textBlockFactory.CreateTextBlock(new Vector3(-120, 0, 150),
+                                                        $"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {subtractedMesh1!.TriangleIndices!.Length / 3}",
+                                                        textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = _textBlockFactory.CreateTextBlock(new Vector3(120, 0, 150),
-                                                     $"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {subtractedMesh2!.TriangleIndices!.Length / 3}",
-                                                     textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock(new Vector3(120, 0, 150),
+                                                    $"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {subtractedMesh2!.TriangleIndices!.Length / 3}",
+                                                    textAttitude: 30);
         scene.RootNode.Add(textNode);
-
 
 
         // Deep dive:
