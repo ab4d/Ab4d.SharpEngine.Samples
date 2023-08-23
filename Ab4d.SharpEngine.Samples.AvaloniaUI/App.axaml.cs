@@ -33,6 +33,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new SamplesWindow();
+
+                // You can start the app with TestVulkanInteropWindow to show a
+                // window can be used to show what are the supported Vulkan features and extensions 
+                // and what AvaloniaUI requires and supports for Vulkan interop.
+                //desktop.MainWindow = new TestVulkanInteropWindow();
             }
 
 

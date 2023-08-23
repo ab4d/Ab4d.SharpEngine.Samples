@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define ADVANCED_TIME_MEASUREMENT
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -108,6 +110,10 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         /// </summary>
         public Func<string, int, int, RawImageData>? CustomMipMapBitmapProvider { get; set; }
 
+#if ADVANCED_TIME_MEASUREMENT
+        public static double FontImageLoadTimeMs;
+        public static double FontGpuImageCreateTimeMs;
+#endif
 
         public BitmapTextCreator(Scene? scene, BitmapFont bitmapFont, IBitmapIO bitmapIO)
         {
@@ -478,6 +484,9 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
             string fileName = _bitmapFont.Pages[pageIndex].FileName;
 
+#if ADVANCED_TIME_MEASUREMENT
+            var startTime = DateTime.Now;
+#endif
 
         RawImageData imageData;
 
@@ -501,6 +510,11 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                 throw new InvalidOperationException("No texture loader provided");
             }
 
+#if ADVANCED_TIME_MEASUREMENT
+            var fontLoadedTime = DateTime.Now;
+            FontImageLoadTimeMs += (fontLoadedTime - startTime).TotalMilliseconds;
+#endif
+
 
             var name = System.IO.Path.GetFileName(fileName);
 
@@ -519,7 +533,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             if (minPadding < 2)
             {
                 // No mips
-                gpuImage = new GpuImage(_scene.GpuDevice, imageData, generateMipMaps: false, isDeviceLocal: true, imageSource: fileName);
+                gpuImage = new GpuImage(_scene.GpuDevice, imageData, generateMipMaps: false, imageSource: fileName);
             }
             else
             {
@@ -567,6 +581,10 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                     gpuImage.CopyDataToImage(imageData.Data, transitionImageToShaderReadOnlyOptimalLayout: true);
                 }
             }
+
+#if ADVANCED_TIME_MEASUREMENT
+            FontGpuImageCreateTimeMs += (DateTime.Now - fontLoadedTime).TotalMilliseconds;
+#endif
 
             _fontPages[pageIndex] = gpuImage;
         }

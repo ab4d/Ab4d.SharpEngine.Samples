@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define ADVANCED_TIME_MEASUREMENT
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -71,6 +73,10 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private int _loadedObjectsCount;
 
+#if ADVANCED_TIME_MEASUREMENT
+        private DateTime _startTime;
+        private static double _loadBitmapFontsTime;
+#endif
 
         public int Drawable1Id { get; set; }
         public int Drawable2Id { get; set; }
@@ -125,6 +131,11 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
 
             _isOtherModelsLoadCalled = true;
+
+#if ADVANCED_TIME_MEASUREMENT
+            _startTime = DateTime.Now;
+            _sceneView.SceneRendered += SceneViewOnSceneRendered;
+#endif
 
             var gpuDevice = _scene.GpuDevice;
 
@@ -795,6 +806,10 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _scene.RootNode.Add(_additionalObjectsGroup);
             
             AnimateModels();
+
+#if ADVANCED_TIME_MEASUREMENT
+            System.Diagnostics.Debug.WriteLine($"OnCreateScene METHOD TIME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
+#endif
         }
 
         public void AnimateModels()
@@ -886,7 +901,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var rawImageData = new RawImageData(width, height, imageStride, Ab4d.Vulkan.Format.B8G8R8A8Unorm, imageBytes, checkTransparency: false);
 
-            var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, isDeviceLocal: true, imageSource: "CustomTexture")
+            var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, imageSource: "CustomTexture")
             {
                 IsPreMultipliedAlpha = true,
                 HasTransparentPixels = alphaValue < 1,
@@ -929,6 +944,11 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private static BitmapFont? CreateBitmapFont(string fontFileName, IBitmapIO bitmapIO)
         {
+#if ADVANCED_TIME_MEASUREMENT
+            var startTime = DateTime.Now;
+#endif
+
+
             bool fileExists = ResolveFileName(fontFileName, bitmapIO, out string? usedFileName, out System.IO.Stream? fileStream);
 
             if (!fileExists)
@@ -956,6 +976,10 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 bitmapFont = null;
             }
+
+#if ADVANCED_TIME_MEASUREMENT
+            _loadBitmapFontsTime += (DateTime.Now - startTime).TotalMilliseconds;
+#endif
 
             return bitmapFont;
         }
@@ -1073,6 +1097,22 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             return instancedData;
         }
+
+#if ADVANCED_TIME_MEASUREMENT
+        private void SceneViewOnSceneRendered(object? sender, EventArgs e)
+        {
+            _sceneView.SceneRendered -= SceneViewOnSceneRendered;
+            System.Diagnostics.Debug.WriteLine($"TIME TO FIRST FRAME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
+
+            System.Diagnostics.Debug.WriteLine($"BufferStagingTicks: {_sceneView.GpuDevice!.BufferStagingTimeMs} ms");
+            System.Diagnostics.Debug.WriteLine($"ImageStagingTime: {_sceneView.GpuDevice!.ImageStagingTimeMs} ms");
+            System.Diagnostics.Debug.WriteLine($"TextureLoader.LoadBitmapTimeMs: {TextureLoader.LoadBitmapTimeMs} ms");
+            System.Diagnostics.Debug.WriteLine($"TextureLoader.CreateGpuImageTimeMs: {TextureLoader.CreateGpuImageTimeMs} ms");
+            System.Diagnostics.Debug.WriteLine($"loadBitmapFontsTime: {_loadBitmapFontsTime} ms");
+            System.Diagnostics.Debug.WriteLine($"BitmapTextCreator.FontImageLoadTimeMs: {BitmapTextCreator.FontImageLoadTimeMs} ms");
+            System.Diagnostics.Debug.WriteLine($"BitmapTextCreator.FontGpuImageCreateTimeMs: {BitmapTextCreator.FontGpuImageCreateTimeMs} ms");
+        }
+#endif
 
         public void ChangeBasePlaneColor(Color3 color)
         {

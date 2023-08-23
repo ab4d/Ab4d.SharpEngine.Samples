@@ -140,7 +140,7 @@ public class ReaderObjSample : CommonSample
         if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
         {
             var edgeLinePositions = new List<Vector3>();
-            EdgeLinesFactory.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+            LineUtils.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;

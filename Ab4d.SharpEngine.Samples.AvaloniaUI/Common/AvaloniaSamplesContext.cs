@@ -51,7 +51,7 @@ public class AvaloniaSamplesContext : ICommonSamplesContext
             CustomDeviceId = 0,     // no preferred device
         };
 
-        PreferredEngineCreateOptions.RequiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNames);
+        PreferredEngineCreateOptions.DesiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNamesForSharedTexture);
     }
 
     public void RegisterCurrentSharpEngineSceneView(SharpEngineSceneView? sharpEngineSceneView)

@@ -212,16 +212,28 @@ To do this please find the existing code that sets up logging an change it to:
 
 ## Change log
 
-Beta1 version (2022-12-14): 
+v0.9.0 beta1 version (2022-12-14): 
 - first beta version
 
-Beta2 version (2023-04-14): 
+v0.9.7 beta2 version (2023-04-14): 
 - Added many samples to help you understand the SharpEngine and provide code templates for your projects
 - Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
 - Using SwapChainPanel for WinUI instead of SurfaceImageSource - this is faster and better supported by WinUI
 - Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented new much better way to share Vulkan texture with Avalonia
 - Objects and camera animation similar to Anime.js
 - Breaking change: Renamed StandardMaterial.Alpha property to Opacity
+
+v0.9.10 beta3 version (2023-05-10):
+- Many improvements and fixes
+
+v0.9.15 beta4 version (2023-08-23):
+- Engine can load the vulkan loader from the path that is set to the VK_DRIVER_FILES environment variable (see the following on how to use SharpEngine in a virtual machine or a web server: https://www.ab4d.com/SharpEngine/using-vulkan-in-virtual-machine-mesa-llvmpipe.aspx)
+- Removed isDeviceLocal parameter from GpuImage constructor and TextureLoader.CreateTexture method.
+- By default MSAA (multi-sampling anti-aliasing) is disabled for software renderer (Mesa's llvmpipe).
+- Renamed SharpEngineSceneView.RequiredDeviceExtensionNames to RequiredDeviceExtensionNamesForSharedTexture
+- Added DesiredInstanceExtensionNames and DesiredDeviceExtensionNames to EngineCreateOptions class (before there were only RequiredInstanceExtensionNames and RequiredDeviceExtensionNames).
+- Moved methods to create edge lines from Ab4d.SharpEngine.Utilities.EdgeLinesFactory class to Ab4d.SharpEngine.Utilities.LineUtils class.
+- Many other improvements and fixes
 
 
 ## Roadmap

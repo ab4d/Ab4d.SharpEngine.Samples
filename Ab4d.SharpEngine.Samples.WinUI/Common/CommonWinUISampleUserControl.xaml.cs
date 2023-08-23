@@ -60,7 +60,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         public CommonWinUISampleUserControl()
         {
             InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
-            
+
+            // Setup logger
+            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
+            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
+
+
             _wpfUiProvider = new WinUIProvider(RootGrid);
 
             this.Loaded += OnLoaded;

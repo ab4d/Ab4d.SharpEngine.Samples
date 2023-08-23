@@ -848,7 +848,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var rawImageData = new RawImageData(width, height, imageStride, Ab4d.Vulkan.Format.B8G8R8A8Unorm, imageBytes, checkTransparency: false);
 
-            var gpuImage = new GpuImage(scene.GpuDevice, rawImageData, generateMipMaps: true, isDeviceLocal: true, imageSource: "CustomTexture")
+            var gpuImage = new GpuImage(scene.GpuDevice, rawImageData, generateMipMaps: true, imageSource: "CustomTexture")
             {
                 IsPreMultipliedAlpha = true,
                 HasTransparentPixels = alphaValue < 1,

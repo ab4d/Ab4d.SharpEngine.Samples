@@ -95,7 +95,7 @@ public class EdgeLinesSample : CommonSample
         // So after changing the transformation of any object in the _rootSceneNode, the AddEdgeLinePositions
         // needs to be called again. This is quite fast operation because it only reads the positions,
         // transforms them and adds them to list.
-        EdgeLinesFactory.AddEdgeLinePositions(_rootSceneNode, _edgeStartAngle, _edgeLinePositions);
+        LineUtils.AddEdgeLinePositions(_rootSceneNode, _edgeStartAngle, _edgeLinePositions);
 
         // Create a new MultiLineNode that will show the edge lines
         var multiLineNode = new MultiLineNode(_edgeLinePositions.ToArray(), isLineStrip: false, _lineMaterial);
@@ -118,7 +118,7 @@ public class EdgeLinesSample : CommonSample
             if (_rootSceneNode != null)
             {
                 // After changing the angle, we will need to calculate the edge lines again.
-                EdgeLinesFactory.ClearEdgeLineIndices(_rootSceneNode);
+                LineUtils.ClearEdgeLineIndices(_rootSceneNode);
                 UpdateEdgeLines();
             }
         }, 100, false, "EdgeStartAngle", 100, sliderValue => sliderValue.ToString("F0"));

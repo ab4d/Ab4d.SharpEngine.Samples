@@ -520,7 +520,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             if (minPadding < 2)
             {
                 // No mips
-                gpuImage = new GpuImage(_scene.GpuDevice, imageData, generateMipMaps: false, isDeviceLocal: true, imageSource: fileName);
+                gpuImage = new GpuImage(_scene.GpuDevice, imageData, generateMipMaps: false, imageSource: fileName);
             }
             else
             {

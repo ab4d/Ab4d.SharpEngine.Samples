@@ -95,11 +95,11 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             UpdateRotateCameraConditions();
             UpdateMoveCameraConditions();
             UpdateQuickZoomCameraConditions();
-            
+
             this.Unloaded += delegate (object sender, RoutedEventArgs args)
             {
                 MainSceneView.Dispose();
-            };            
+            };
         }
 
         private void CreateTestScene()

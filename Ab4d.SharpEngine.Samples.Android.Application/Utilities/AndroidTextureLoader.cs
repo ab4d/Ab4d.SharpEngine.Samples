@@ -54,10 +54,22 @@ public class AndroidTextureLoader
 
         if (gpuImage == null)
         {
+#if ADVANCED_TIME_MEASUREMENT
+            var startTime = DateTime.Now;
+#endif
+
             var imageData = bitmapIO.LoadBitmap(resources, drawableId);
 
+#if ADVANCED_TIME_MEASUREMENT
+            var loadedTime = DateTime.Now;
+            LoadBitmapTimeMs += (loadedTime - startTime).TotalMilliseconds;
+#endif
 
             gpuImage = new GpuImage(gpuDevice, imageData, generateMipMaps, isDeviceLocal, imageSource: imageName);
+
+#if ADVANCED_TIME_MEASUREMENT
+            CreateGpuImageTimeMs += (DateTime.Now - loadedTime).TotalMilliseconds;
+#endif
 
             if (cacheGpuTexture)
                 gpuDevice.CacheValue(imageName, gpuImage);

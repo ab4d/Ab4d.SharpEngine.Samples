@@ -66,8 +66,6 @@ public class MultiSceneNodesSample : CommonSample
 
     protected override void OnDisposed()
     {
-        _disposables.Dispose();
-        
         if (SceneView != null)
         {
             SceneView.SceneUpdating -= UpdateModelWorldMatrices;
@@ -76,6 +74,8 @@ public class MultiSceneNodesSample : CommonSample
             SceneView.SceneRendered -= SceneViewOnSceneRendered;
 #endif
         }
+
+        _disposables.Dispose();
 
         base.OnDisposed();
     }
@@ -238,7 +238,7 @@ public class MultiSceneNodesSample : CommonSample
             if (gpuDevice != null)
             {
                 // Manually load texture with TextureLoader (this way we can set generateMipMaps to false)
-                var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", BitmapIO, gpuDevice, generateMipMaps: false, isDeviceLocal: true);
+                var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", BitmapIO, gpuDevice, generateMipMaps: false, cacheGpuTexture: true);
 
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
@@ -902,7 +902,7 @@ public class MultiSceneNodesSample : CommonSample
 
         var rawImageData = new RawImageData(width, height, imageStride, Format.B8G8R8A8Unorm, imageBytes, checkTransparency: false);
 
-        var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, isDeviceLocal: true, imageSource: "CustomTexture")
+        var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, imageSource: "CustomTexture")
         {
             IsPreMultipliedAlpha = true,
             HasTransparentPixels = alphaValue < 1,
