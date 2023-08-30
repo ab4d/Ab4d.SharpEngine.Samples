@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Ab4d.SharpEngine.Samples.Maui.MainPage">
+    <Grid x:Name="RootGrid">
+        <Label x:Name="InfoLabel" HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="WordWrap" InputTransparent="True" IsVisible="False" />
+
+        <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="End" Margin="10">
+            <Button x:Name="ChangeCameraButton" Text="Rotate camera" Clicked="OnChangeCameraButtonClicked" Margin="3"/>
+            <Button x:Name="ChangeColorButton" Text="Change box color" Clicked="OnChangeColorButtonClicked" Margin="3"/>
+        </StackLayout>
+
+    </Grid>
+
+</ContentPage>
