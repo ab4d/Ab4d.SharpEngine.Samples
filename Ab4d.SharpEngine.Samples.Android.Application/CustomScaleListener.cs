@@ -31,7 +31,7 @@ public class CustomScaleListener : ScaleGestureDetector.SimpleOnScaleGestureList
         if (detector == null)
             return false;
 
-        System.Diagnostics.Debug.WriteLine($"OnScale: CurrentSpanX: {detector.CurrentSpanX}; CurrentSpanY: {detector.CurrentSpanY};  ScaleFactor: {detector.ScaleFactor}");
+        //System.Diagnostics.Debug.WriteLine($"OnScale: CurrentSpanX: {detector.CurrentSpanX}; CurrentSpanY: {detector.CurrentSpanY};  ScaleFactor: {detector.ScaleFactor}");
 
         if (_mouseCameraController != null)
         {
@@ -41,8 +41,7 @@ public class CustomScaleListener : ScaleGestureDetector.SimpleOnScaleGestureList
             //_mouseCameraController.ProcessMouseWheel(new Vector2(detector.FocusX, detector.FocusY), detector.ScaleFactor);
             _mouseCameraController.ChangeCameraDistance(1f / oneStepScaleFactor);
 
-            System.Diagnostics.Debug.WriteLine($"ChangeCameraDistance({oneStepScaleFactor})");
-
+            //System.Diagnostics.Debug.WriteLine($"ChangeCameraDistance({oneStepScaleFactor})");
         }
 
         return base.OnScale(detector);
