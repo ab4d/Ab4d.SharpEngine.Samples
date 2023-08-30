@@ -47,13 +47,9 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="Ab4d.SharpEngine" Version="0.9.15-beta4" />-->
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.15-beta4" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\My\Ab4d\SharpEngine\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup>
