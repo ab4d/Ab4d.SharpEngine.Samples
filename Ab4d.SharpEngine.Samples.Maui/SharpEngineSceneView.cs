@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using System.Runtime.InteropServices;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
@@ -59,7 +60,7 @@ public class SharpEngineSceneView : SKCanvasView
         this.Loaded += delegate (object? sender, EventArgs args)
         {
             if (GpuDevice == null)
-                InitializeInt(throwException: false, initializePresentationType: true);
+                InitializeInt(throwException: false); // Do not thorw exception from Loaded event handler in case the VulkanDevice cannot be created
 
             Refresh();
         };
@@ -67,7 +68,7 @@ public class SharpEngineSceneView : SKCanvasView
 
     public void Refresh()
     {
-        if (_isRenderedSceneBitmapDirty)
+        if (_isRenderedSceneBitmapDirty || !SceneView.IsInitialized)
             return; // already waiting to be updated
 
         _isRenderedSceneBitmapDirty = true;
@@ -78,7 +79,7 @@ public class SharpEngineSceneView : SKCanvasView
     {
         CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
 
-        InitializeInt(throwException: true, initializePresentationType: true);
+        InitializeInt(throwException: true);
 
         return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
     }
@@ -89,7 +90,7 @@ public class SharpEngineSceneView : SKCanvasView
 
         CreateOptions = createOptions;
 
-        InitializeInt(throwException: true, initializePresentationType: true);
+        InitializeInt(throwException: true);
 
         return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
     }
@@ -99,7 +100,7 @@ public class SharpEngineSceneView : SKCanvasView
         CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
 
         configureAction?.Invoke(CreateOptions);
-        InitializeInt(throwException: true, initializePresentationType: true);
+        InitializeInt(throwException: true);
 
         return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
     }
@@ -114,11 +115,11 @@ public class SharpEngineSceneView : SKCanvasView
         GpuDevice     = gpuDevice;
         CreateOptions = GpuDevice.CreateOptions;
 
-        InitializeInt(throwException: false, initializePresentationType: true);
+        InitializeInt(throwException: false);
     }
 
 
-    private void InitializeInt(bool throwException, bool initializePresentationType)
+    private void InitializeInt(bool throwException)
     {
         bool isGpuDeviceCreated = false;
 
@@ -126,12 +127,14 @@ public class SharpEngineSceneView : SKCanvasView
         {
             if (Scene.GpuDevice != null)
             {
-                Log.Info?.Write(LogArea, Id, "Scene.GpuDevice was already set by the used");
+                Log.Info?.Write(LogArea, "Scene.GpuDevice was already set by the used");
                 GpuDevice = Scene.GpuDevice;
             }
             else
             {
                 isGpuDeviceCreated = CreateGpuDevice(vulkanSurfaceProvider: null, throwException);
+                if (!isGpuDeviceCreated)
+                    return;
             }
         }
 
@@ -145,7 +148,7 @@ public class SharpEngineSceneView : SKCanvasView
             catch (Exception ex)
             {
                 string errorMessage = "Failed to initialize Scene: " + ex.Message;
-                Log.Error?.Write(LogArea, Id, errorMessage, ex);
+                Log.Error?.Write(LogArea, errorMessage, ex);
 
                 if (throwException)
                     throw new SharpEngineException(errorMessage, ex);
@@ -180,7 +183,7 @@ public class SharpEngineSceneView : SKCanvasView
         if (_isFailedToCreateGpuDevice) // It is useless to try to create GpuDevice multiple times
             return false;
 
-        Log.Info?.Write(LogArea, Id, "SharpEngineSceneView.CreateGpuDevice()");
+        Log.Info?.Write(LogArea, "SharpEngineSceneView.CreateGpuDevice()");
 
         _isGpuDeviceCreatedHere = false;
 
@@ -204,11 +207,10 @@ public class SharpEngineSceneView : SKCanvasView
             if (Log.LastVulkanValidationMessage != null && !ex.Message.Contains(Log.LastVulkanValidationMessage))
                 errorMessage += Environment.NewLine + Log.LastVulkanValidationMessage; // Add additional info
 
-
-            Log.Error?.Write(LogArea, Id, errorMessage, ex);
+            Log.Error?.Write(LogArea, errorMessage);
 
             // Call DeviceCreateFailed event. If user sets IsHandled to true, then we will not call ShowVulkanDeviceCreationError
-            bool isHandled = OnGpuDeviceCreationFailed(ex);
+            OnGpuDeviceCreationFailed(ex);
 
             if (throwException)
             {
@@ -297,7 +299,7 @@ public class SharpEngineSceneView : SKCanvasView
         }
         catch (Exception ex)
         {
-            Log.Error?.Write(LogArea, Id, "Unhandled exception in SceneViewInitialized event handler: " + ex.Message, ex);
+            Log.Error?.Write(LogArea, "Unhandled exception in SceneViewInitialized event handler: " + ex.Message, ex);
         }
     }
 
@@ -318,7 +320,7 @@ public class SharpEngineSceneView : SKCanvasView
         }
         catch (Exception ex)
         {
-            Log.Error?.Write(LogArea, Id, "Unhandled exception in GpuDeviceCreated event handler: " + ex.Message, ex);
+            Log.Error?.Write(LogArea, "Unhandled exception in GpuDeviceCreated event handler: " + ex.Message, ex);
         }
     }
 
@@ -339,7 +341,7 @@ public class SharpEngineSceneView : SKCanvasView
         }
         catch (Exception ex)
         {
-            Log.Error?.Write(LogArea, Id, "Unhandled exception in GpuDeviceCreationFailed event handler: " + ex.Message, ex);
+            Log.Error?.Write(LogArea, "Unhandled exception in GpuDeviceCreationFailed event handler: " + ex.Message, ex);
         }
 
         return deviceCreateFailedEventArgs.IsHandled;

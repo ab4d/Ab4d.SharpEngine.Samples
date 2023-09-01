@@ -33,20 +33,17 @@ public partial class MainPage : ContentPage
 
         _sharpEngineSceneView = new SharpEngineSceneView();
 
+        bool isSupported = SetupPlatform(_sharpEngineSceneView.CreateOptions);
+
+        if (!isSupported)
+            return;
+
         _sharpEngineSceneView.GpuDeviceCreationFailed += delegate(object sender, DeviceCreateFailedEventArgs args)
         {
-            InfoLabel.Text = "Error creating VulkanDevice:\n" + args.Exception.Message;
+            InfoLabel.Text = args.Exception.Message;
             InfoLabel.IsVisible = true;
         };
-
-
-        if (OperatingSystem.IsIOS() && RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
-        {
-            // The libMoltenVK.dylib library that is required on macOS and iOS is provided only for Arm64 platform
-            InfoLabel.Text = $"Unsupported ProcessArchitecture for iOS: {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}. Required Arm64! If this is running in a simulator, then start the app on a real device or on simulator with Arm64 architecture.";
-            return;
-        }
-
+       
 
         CreateTestScene();
 
@@ -67,6 +64,55 @@ public partial class MainPage : ContentPage
             _mauiCameraController.MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
         else
             _mauiCameraController.MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
+    }
+
+    private bool SetupPlatform(EngineCreateOptions engineCreateOptions)
+    {
+        if (RuntimeInformation.RuntimeIdentifier.Contains("ios") && RuntimeInformation.ProcessArchitecture != Architecture.Arm64)
+        {
+            // The libMoltenVK.dylib library that is required on iOS is provided only for Arm64 platform (version for mac catalyst supports both x64 and arm64)
+            InfoLabel.Text = $"Unsupported ProcessArchitecture for iOS: {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}. Required Arm64! If this is running in a simulator, then start the app on a real device or on simulator with Arm64 architecture.";
+            InfoLabel.IsVisible = true;
+            return false;
+        }
+
+        if (RuntimeInformation.RuntimeIdentifier.Contains("catalyst"))
+        {
+            string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "libMoltenVK.dylib");
+            bool fileExist = System.IO.File.Exists(fileName);
+
+            // If the libMoltenVK.dylib does not exist, then we try to read the file from the Vulkan SKD folder (if installed)
+            if (!fileExist)
+            {
+                var usersFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); // get "/Users/[user_name]/
+                var vulkanSdkFolder = System.IO.Path.Combine(usersFolder, "VulkanSDK");
+                
+                if (System.IO.Directory.Exists(vulkanSdkFolder))
+                {
+                    var allSubfolders = System.IO.Directory.GetDirectories(vulkanSdkFolder).OrderBy(f => f).ToList();
+
+                    if (allSubfolders.Count > 0)
+                    {
+                        var lastVulkanSdkFolder = allSubfolders.Last();
+
+                        var moltenVkFile = System.IO.Path.Combine(lastVulkanSdkFolder, "MoltenVK/dylib/macOS/libMoltenVK.dylib");
+
+                        if (System.IO.File.Exists(moltenVkFile))
+                        {
+                            // Use the libMoltenVK from Vulkan SKD folder
+                            engineCreateOptions.CustomVulkanLoaderLibrary = moltenVkFile;
+                            return true;
+                        }
+                    }
+                }
+
+                InfoLabel.Text = $"Cannot find libMoltenVK.dylib library that is required to run Vulkan on Mac Catalyst. ";
+                InfoLabel.IsVisible = true;
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void CreateTestScene()

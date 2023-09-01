@@ -17,7 +17,7 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png">
       <Link>Resources\TreeTexture.png</Link>
     </Content>
-    <Content Include="..\lib\macos\libMoltenVK.dylib">
+    <Content Include="..\lib\macOS\libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

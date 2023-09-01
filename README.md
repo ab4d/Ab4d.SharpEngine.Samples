@@ -23,24 +23,28 @@ The following features are supported by the current version:
 
 **Windows:**
   - WPF full composition support with SharpEngineSceneView control (Ab4d.SharpEngine.Wpf library)
-  - Avalonia UI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
+  - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - WinUI 3 support with SharpEngineSceneView control (Ab4d.SharpEngine.WinUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Linux)
-  - WinForms support (coming in the next beta version)
-  - MAUI (coming soon)
+  - MAUI
+  - WinForms support (coming soon)
   
 **Linux** (including Raspberry PI 4):
+  - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
   - See "Vulkan on Resberry Pi 4" guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
   
 **Android:**
   - Using SurfaceView in C# Android Application
   - Using SDL (using third-party Silk.Net library)
+  - MAUI
   
 **macOS:**
-   - Using MoltenVK. See AvaloniaUI project for macOS. 
+  - Using AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library). Requires MoltenVK library - see special project for macos.
+  - Using MAUI - requires MoltenVK library - see Building for macOS and iOS below.
    
-**iOS:** (planned for the next beta version)
+**iOS:**
+  - Using MAUI - requires .Net 8 and MoltenVK library - see "Building for macOS and iOS" below.
 
 
 Online help:
@@ -57,15 +61,18 @@ Online help:
 
 ### System requirements to run the samples:
 - NET 6.0+
+- NET 7.0 is required to use MAUI (.NET 8.0 is required to run MAUI on macOS and iOS)
+
 
 ### System requirements to open the sample projects:
 - Visual Studio 2022 on Windows (VS 2019 does not support .Net 6)
 - Rider from JetBrains on Windows, Linux and macOS
+- Visual Studio for mac on macOS
 - Visual Studio Code on Windows, Linux and macOS
 
 
 ### Expiration date:
-The beta version of Ab4d.SharpEngine will expire 6 months after publishing.
+The beta version of Ab4d.SharpEngine will expire around 6 months after publishing. See warning log message for the exact date of expiration.
 
 
 
@@ -85,7 +92,8 @@ The following Visual Studio solutions are available:
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
   The SharpEngineSceneView provides an Avalonia control that is very easy to be used and can 
   compose the 3D scene with the Avalonia UI objects (for example showing buttons on top of 3D scene).
-  The sample can be started on Windows, Linux and on macOS (use special macos solution)
+  The sample can be started on Windows, Linux and on macOS (use special macos solution).
+  See also "Building for macOS and iOS" section for more information on how to compile for macOS.
   
 - **Ab4d.SharpEngine.Samples.WinUI**
   This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
@@ -108,7 +116,14 @@ The following Visual Studio solutions are available:
 - **Ab4d.SharpEngine.Samples.Android.Application**
   This solution uses a Xamarin based Android.Application project template for .Net 6.
   The 3D scene is shown on the part of the view that is defined by SurfaceView.
-  
+
+- **Ab4d.SharpEngine.Samples.Maui**
+  This solution uses a NET Maui and can work on Windows, Android, macOS and iOS.
+  Compiling for Windows, Android and macOS requires .Net 7 or newer.
+  Compiling for iOS requires .Net 8 (at the time of writing this preview7 is required).
+  Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
+  See "Building for macOS and iOS" section for more information on how to compile for macOS and iOS.
+
 
 
 ## Quick Start
@@ -126,7 +141,22 @@ Common materials are defined by using StandardMaterial object.
 For each color there are predefined StandardMaterials, for example StandardMaterials.Blue.
 
 Use ReaderObj to read 3D models from obj files.
-To read 3D models from other file formats, use AssimpImporter (see Ab4d.SharpEngine.Samples.Wpf samples)
+To read 3D models from other file formats, use AssimpImporter.
+
+
+
+## Building for macOS and iOS
+  
+The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
+- .Net 8 is requried to use Ab4d.SharpEngine on iOS (because function pointers do not work with .Net 7 on iOS). Mac Catalyst can run on .Net 7, but it is recommended to use .Net 8. It is possible to use preview version of .Net 8 - at the time of writing this preview 7 was used.
+
+- To use preview version of .Net 8 in Visual Studio for Mac, you need to enable .Net 8. This is done in Preferences / Preview Featrues / check "Use the .NEt 8 SDK if installed".
+
+- The 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add reference to SkiaSharp.Views.Maui.Controls NuGet package. The add ".UseSkiaSharp()" to the bulder setup in the MauiProgram.cs file.
+
+- Add libMoltenVK.dylib from the Vulkan SDK to the projects so that the library can be loaded at runtime. Note that there are different builds for iOS and for Catalyst (the lates use the version of macOS). When running the verson of Mac Catalyst the sample app can also use the library from the installed Vulkan SDK. The preview 7 version of .Net 8 and the Visual Studio for Mac v17.6 can sometimes produce "clang++ exited with code 1" error when compiling. I do not know why this happens and how to solve that. Sometimes it helps to delete obj and bin folder and restart the Visual Studio. If this do not help, remove the inclusion of libMoltenVK.dylib for catalyst - in this case install the Vulkan SKD to the computer and the Catalyst app will use the library from Vulkan SKD folder.
+
+- To run the app in iOS, the application need to have provisionining profile set. One option is to follow the instructions on the following page: https://learn.microsoft.com/en-us/dotnet/maui/ios/capabilities?tabs=vs Another option is to open the project in the Rider IDE, then right click on the project and select "Open in Xcode". Rider will create the Xcode project file and open it in Xcode. There you can click on the project file and in the "Certificates, Identifiers & Profiles" tab create an ad-hoc provisioning profile (allow having up to 3 development apps installed at the same time). See more: https://developer.apple.com/help/account/manage-profiles/create-a-development-provisioning-profile/ Note that to create the provisioning profile, the ApplicationId (in csproj file) needs to be in a form of "com.companyName.appName" - this is then used as a Bundle Id.
 
 
 
@@ -212,8 +242,17 @@ To do this please find the existing code that sets up logging an change it to:
 
 ## Change log
 
-v0.9.0 beta1 version (2022-12-14): 
-- first beta version
+v0.9.15 beta4 version (2023-08-23):
+- Engine can load the vulkan loader from the path that is set to the VK_DRIVER_FILES environment variable (see the following on how to use SharpEngine in a virtual machine or a web server: https://www.ab4d.com/SharpEngine/using-vulkan-in-virtual-machine-mesa-llvmpipe.aspx)
+- Removed isDeviceLocal parameter from GpuImage constructor and TextureLoader.CreateTexture method.
+- By default MSAA (multi-sampling anti-aliasing) is disabled for software renderer (Mesa's llvmpipe).
+- Renamed SharpEngineSceneView.RequiredDeviceExtensionNames to RequiredDeviceExtensionNamesForSharedTexture
+- Added DesiredInstanceExtensionNames and DesiredDeviceExtensionNames to EngineCreateOptions class (before there were only RequiredInstanceExtensionNames and RequiredDeviceExtensionNames).
+- Moved methods to create edge lines from Ab4d.SharpEngine.Utilities.EdgeLinesFactory class to Ab4d.SharpEngine.Utilities.LineUtils class.
+- Many other improvements and fixes
+
+v0.9.10 beta3 version (2023-05-10):
+- Many improvements and fixes
 
 v0.9.7 beta2 version (2023-04-14): 
 - Added many samples to help you understand the SharpEngine and provide code templates for your projects
@@ -223,17 +262,8 @@ v0.9.7 beta2 version (2023-04-14):
 - Objects and camera animation similar to Anime.js
 - Breaking change: Renamed StandardMaterial.Alpha property to Opacity
 
-v0.9.10 beta3 version (2023-05-10):
-- Many improvements and fixes
-
-v0.9.15 beta4 version (2023-08-23):
-- Engine can load the vulkan loader from the path that is set to the VK_DRIVER_FILES environment variable (see the following on how to use SharpEngine in a virtual machine or a web server: https://www.ab4d.com/SharpEngine/using-vulkan-in-virtual-machine-mesa-llvmpipe.aspx)
-- Removed isDeviceLocal parameter from GpuImage constructor and TextureLoader.CreateTexture method.
-- By default MSAA (multi-sampling anti-aliasing) is disabled for software renderer (Mesa's llvmpipe).
-- Renamed SharpEngineSceneView.RequiredDeviceExtensionNames to RequiredDeviceExtensionNamesForSharedTexture
-- Added DesiredInstanceExtensionNames and DesiredDeviceExtensionNames to EngineCreateOptions class (before there were only RequiredInstanceExtensionNames and RequiredDeviceExtensionNames).
-- Moved methods to create edge lines from Ab4d.SharpEngine.Utilities.EdgeLinesFactory class to Ab4d.SharpEngine.Utilities.LineUtils class.
-- Many other improvements and fixes
+v0.9.0 beta1 version (2022-12-14): 
+- first beta version
 
 
 ## Roadmap
