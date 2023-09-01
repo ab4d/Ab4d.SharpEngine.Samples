@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.Maui", "Ab4d.SharpEngine.Samples.Maui\Ab4d.SharpEngine.Samples.Maui.csproj", "{6A982980-06F9-4CAE-BBE7-2A6D62F572BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.Maui", "Ab4d.SharpEngine.Samples.Maui\Ab4d.SharpEngine.Samples.Maui.macos.ios.csproj", "{6A982980-06F9-4CAE-BBE7-2A6D62F572BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
