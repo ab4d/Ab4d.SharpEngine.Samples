@@ -108,9 +108,11 @@ public class ReaderObjSample : CommonSample
             };
 
             _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
-
-            Scene.RootNode.Add(_objectLinesNode);
         }
+
+        // Add _objectLinesNode to the scene because before all the children of RootNode were cleared
+        Scene.RootNode.Add(_objectLinesNode);
+
 
         UpdateShownLines();
 
