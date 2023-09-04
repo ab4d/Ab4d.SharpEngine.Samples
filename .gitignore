@@ -254,3 +254,5 @@ paket-files/
 *.nuspec
 
 !*.obj
+
+.DS_STORE

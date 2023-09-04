@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Ab4d.SharpEngine.Samples.Maui.MainPage">
     <Grid x:Name="RootGrid">
-        <Label x:Name="InfoLabel" HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="WordWrap" InputTransparent="True" IsVisible="False" />
+        <Label x:Name="InfoLabel" HorizontalOptions="Center" VerticalOptions="Center" LineBreakMode="WordWrap" InputTransparent="True" Margin="10"  IsVisible="False" />
 
         <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="End" Margin="10">
             <Button x:Name="ChangeCameraButton" Text="Rotate camera" Clicked="OnChangeCameraButtonClicked" Margin="3"/>
