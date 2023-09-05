@@ -40,6 +40,7 @@ public class AvaloniaMarkdownTextCreator : MarkdownTextCreator<TextBlock>
         {
             _textBlock = new TextBlock();
             _textBlock.Inlines = new InlineCollection();
+            _textBlock.TextWrapping = TextWrapping.Wrap;
         }
         else if (_textBlock == null)
         {
