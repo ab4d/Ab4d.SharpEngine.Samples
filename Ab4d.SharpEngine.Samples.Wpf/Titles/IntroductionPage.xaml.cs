@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using Ab4d.SharpEngine.Cameras;
@@ -32,9 +34,15 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
 
             InitializeComponent();
 
-            if (SkipInitializingSharpEngine)
+            // When Control key is pressed or when SkipInitializingSharpEngine is true,
+            // then no Ab3d.SharpEngine objects are created - only WPF objects are created.
+            if (SkipInitializingSharpEngine || Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 MainSceneView.PresentationType = PresentationTypes.None;
+
+                InfoTextBlock.Visibility = Visibility.Visible;
+                ShowStaticSharpEngineLogo();
+
                 return;
             }
 
@@ -87,6 +95,24 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
                 PlayAgainButton.Visibility = Visibility.Visible;
             }
+        }
+
+        private void ShowStaticSharpEngineLogo()
+        {
+            string fileName = AppDomain.CurrentDomain.BaseDirectory + @"Resources\Textures\sharp-engine-logo.png";
+            var bitmapImage = new BitmapImage(new Uri(fileName));
+
+            var image = new Image()
+            {
+                Source = bitmapImage,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(30)
+            };
+
+            Grid.SetRow(image, 0);
+
+            RootGrid.Children.Add(image);
         }
 
         private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)

@@ -14,19 +14,22 @@ using System.IO;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common.Animations;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia;
+using Avalonia.Media.Imaging;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
 {
     public partial class IntroductionPage : UserControl
     {
         private bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
+        private bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only Avalonia objects will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
@@ -42,6 +45,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
             if (SkipInitializingSharpEngine)
             {
                 MainSceneView.PresentationType = PresentationTypes.None;
+
+                ShowStaticSharpEngineLogo();
+                ShowInfoTextBlock();
+
                 return;
             }
 
@@ -72,7 +79,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
 
             _sharpEngineLogoAnimation.AnimationCompleted += delegate (object? sender2, EventArgs args2)
             {
-                ShowInfoTextBlockAndPlayButton();
+                ShowInfoTextBlock();
+                PlayAgainButton.IsVisible = true;
             };
 
 
@@ -89,22 +97,20 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
                 _sharpEngineLogoAnimation.GotoLastFrame();
 
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
-                ShowInfoTextBlockAndPlayButton();
+                PlayAgainButton.IsVisible = true;
             }
         }
 
-        private void ShowInfoTextBlockAndPlayButton()
+        private void ShowInfoTextBlock()
         {
             // Avalonia does not have Visibility with Hidden, so we need to first show two empty lines of text and then set the actual text
             InfoTextBlock.Text = "Ab4d.SharpEngine is a blazing fast and cross platform\n3D rendering engine for desktop and mobile .Net applications.";
-            PlayAgainButton.IsVisible = true;
         }
 
-        private void HideInfoTextBlockAndPlayButton()
+        private void HideInfoTextBlock()
         {
             // Avalonia does not have Visibility with Hidden, so to hide the text we only set it to two empty lines
             InfoTextBlock.Text = "\n";
-            PlayAgainButton.IsVisible = false;
         }
 
         private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)
@@ -112,9 +118,29 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
             _sharpEngineLogoAnimation?.UpdateAnimation();
         }
 
+        private void ShowStaticSharpEngineLogo()
+        {
+            string fileName = AppDomain.CurrentDomain.BaseDirectory + @"Resources\Textures\sharp-engine-logo.png";
+            fileName = FileUtils.FixDirectorySeparator(fileName);
+            var bitmapImage = new Bitmap(fileName);
+
+            var image = new Image()
+            {
+                Source = bitmapImage,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(30)
+            };
+
+            Grid.SetRow(image, 0);
+
+            RootGrid.Children.Add(image);
+        }
+
         private void PlayAgainButton_OnClick(object sender, RoutedEventArgs e)
         {
-            HideInfoTextBlockAndPlayButton();
+            HideInfoTextBlock();
+            PlayAgainButton.IsVisible = false;
 
             _sharpEngineLogoAnimation?.StartAnimation();
         }
