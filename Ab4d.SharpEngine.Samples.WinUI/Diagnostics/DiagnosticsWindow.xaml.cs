@@ -8,9 +8,11 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.Common.Animations;
 using Ab4d.SharpEngine.Samples.Common.Diagnostics;
 using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.WinUI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -68,17 +70,13 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             var bitmapIO = new WinUIBitmapIO();
             _commonDiagnostics = new CommonDiagnostics(bitmapIO);
 
-            _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
-            {
-                WarningsCountTextBlock.Text = warningsCount.ToString();
-                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-            };
-
             _commonDiagnostics.NewLogMessageAddedAction = () => _logMessagesWindow?.UpdateLogMessages();
 
             _commonDiagnostics.DeviceInfoChangedAction = () => DeviceInfoTextBlock.Text = _commonDiagnostics.GetDeviceInfo();
 
-            _commonDiagnostics.OnSceneRenderedAction = () => UpdateStatistics();
+            _commonDiagnostics.WarningsCountChangedAction = UpdateWarningsCount;
+
+            _commonDiagnostics.OnSceneRenderedAction = UpdateStatistics;
 
 
             string dumpFolder;
@@ -299,6 +297,23 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             ShowStatisticsButton.Visibility = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
 
             ButtonsPanel.Visibility = showStopPerformanceAnalyzerButton || showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void UpdateWarningsCount(int warningsCount)
+        {
+            if (this.DispatcherQueue.HasThreadAccess)
+            {
+                WarningsCountTextBlock.Text = warningsCount.ToString();
+                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                this.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () => 
+                {
+                    WarningsCountTextBlock.Text = warningsCount.ToString();
+                    LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+                });
+            }
         }
 
         private void UpdateStatistics()

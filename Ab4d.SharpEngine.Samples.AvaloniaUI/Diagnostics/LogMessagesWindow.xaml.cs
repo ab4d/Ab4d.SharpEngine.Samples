@@ -8,6 +8,7 @@ using Ab4d.Vulkan;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 {
@@ -19,6 +20,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
         private const int MaxLogMessages = 200;
 
         private int _deletedLogMessagesCount;
+
+        private volatile bool _isUpdateLogMessagesCalled;
 
         private List<Tuple<LogLevels, string>>? _logMessages;
 
@@ -45,6 +48,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 
         public void UpdateLogMessages()
         {
+            // If we are not on UI thread and we did not yet called UpdateLogMessages ...
+            if (!Dispatcher.UIThread.CheckAccess() && !_isUpdateLogMessagesCalled)
+            {
+                // ... then use Dispatcher.InvokeAsync to call UpdateLogMessages on the UI thread 
+                _isUpdateLogMessagesCalled = true;
+                Dispatcher.UIThread.InvokeAsync(UpdateLogMessages);
+                return;
+            }
+
+            _isUpdateLogMessagesCalled = false;
+
+
             if (_logMessages == null || _logMessages.Count == 0)
             {
                 InfoTextBox.Text = "";

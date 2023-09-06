@@ -56,17 +56,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
             _commonDiagnostics = new CommonDiagnostics(_bitmapIO);
 
-            _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
-            {
-                WarningsCountTextBlock.Text = warningsCount.ToString();
-                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Hidden;
-            };
-
             _commonDiagnostics.NewLogMessageAddedAction = () => _logMessagesWindow?.UpdateLogMessages();
 
             _commonDiagnostics.DeviceInfoChangedAction = () => DeviceInfoTextBlock.Text = _commonDiagnostics.GetDeviceInfo();
 
-            _commonDiagnostics.OnSceneRenderedAction = () => UpdateStatistics();
+            _commonDiagnostics.OnSceneRenderedAction = UpdateStatistics;
+
+            _commonDiagnostics.WarningsCountChangedAction = UpdateWarningsCount;
 
             _commonDiagnostics.ShowMessageBoxAction = (message) => MessageBox.Show(message);
 
@@ -334,6 +330,23 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             ShowStatisticsButton.Visibility          = showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
 
             ButtonsPanel.Visibility = showStopPerformanceAnalyzerButton || showShowStatisticsButton ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void UpdateWarningsCount(int warningsCount)
+        {
+            if (this.Dispatcher.CheckAccess())
+            {
+                WarningsCountTextBlock.Text = warningsCount.ToString();
+                LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Hidden;
+            }
+            else
+            {
+                this.Dispatcher.InvokeAsync(() =>
+                {
+                    WarningsCountTextBlock.Text = warningsCount.ToString();
+                    LogWarningsPanel.Visibility = warningsCount > 0 ? Visibility.Visible : Visibility.Hidden;
+                });
+            }
         }
 
         private void UpdateStatistics()

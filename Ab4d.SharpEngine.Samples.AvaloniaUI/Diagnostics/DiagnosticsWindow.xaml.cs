@@ -70,13 +70,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 
             _commonDiagnostics.DeviceInfoChangedAction = () => DeviceInfoTextBlock.Text = _commonDiagnostics.GetDeviceInfo();
 
-            _commonDiagnostics.OnSceneRenderedAction = () => UpdateStatistics();
+            _commonDiagnostics.OnSceneRenderedAction = UpdateStatistics;
 
-            _commonDiagnostics.WarningsCountChangedAction = (warningsCount) =>
-            {
-                WarningsCountTextBlock.Text = warningsCount.ToString();
-                LogWarningsPanel.IsVisible = warningsCount > 0;
-            };
+            _commonDiagnostics.WarningsCountChangedAction = UpdateWarningsCount;
 
             //_commonDiagnostics.ShowMessageBoxAction = (message) => MessageBox.Show(message);
 
@@ -325,6 +321,23 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             ShowStatisticsButton.IsVisible = showShowStatisticsButton;
 
             ButtonsPanel.IsVisible = showStopPerformanceAnalyzerButton || showShowStatisticsButton;
+        }
+
+        private void UpdateWarningsCount(int warningsCount)
+        {
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                WarningsCountTextBlock.Text = warningsCount.ToString();
+                LogWarningsPanel.IsVisible = warningsCount > 0;
+            }
+            else
+            {
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    WarningsCountTextBlock.Text = warningsCount.ToString();
+                    LogWarningsPanel.IsVisible = warningsCount > 0;
+                });
+            }
         }
 
         private void UpdateStatistics()

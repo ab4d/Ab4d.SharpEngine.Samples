@@ -25,6 +25,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         private int _deletedLogMessagesCount;
 
+        private volatile bool _isUpdateLogMessagesCalled;
+
         private List<Tuple<LogLevels, string>>? _logMessages;
 
         public List<Tuple<LogLevels, string>>? LogMessages
@@ -50,6 +52,18 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
 
         public void UpdateLogMessages()
         {
+            // If we are not on UI thread and we did not yet called UpdateLogMessages ...
+            if (!this.Dispatcher.CheckAccess() && !_isUpdateLogMessagesCalled)
+            {
+                // ... then use Dispatcher.InvokeAsync to call UpdateLogMessages on the UI thread 
+                _isUpdateLogMessagesCalled = true;
+                this.Dispatcher.InvokeAsync(UpdateLogMessages);
+                return;
+            }
+
+            _isUpdateLogMessagesCalled = false;
+
+
             if (_logMessages == null || _logMessages.Count == 0)
             {
                 InfoTextBox.Text = "";

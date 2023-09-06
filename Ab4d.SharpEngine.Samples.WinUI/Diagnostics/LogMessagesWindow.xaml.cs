@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.Vulkan;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
@@ -19,6 +20,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
         private const int MaxLogMessages = 200;
 
         private int _deletedLogMessagesCount;
+
+        private volatile bool _isUpdateLogMessagesCalled;
 
         private List<Tuple<LogLevels, string>>? _logMessages;
 
@@ -47,6 +50,18 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
 
         public void UpdateLogMessages()
         {
+            // If we are not on UI thread and we did not yet called UpdateLogMessages ...
+            if (!this.DispatcherQueue.HasThreadAccess && !_isUpdateLogMessagesCalled)
+            {
+                // ... then use Dispatcher.InvokeAsync to call UpdateLogMessages on the UI thread 
+                _isUpdateLogMessagesCalled = true;
+                this.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, UpdateLogMessages);
+                return;
+            }
+
+            _isUpdateLogMessagesCalled = false;
+
+
             if (_logMessages == null || _logMessages.Count == 0)
             {
                 InfoTextBox.Text = "";
