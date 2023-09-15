@@ -233,6 +233,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
         private void RenderToBitmapButton_OnClick(object sender, RoutedEventArgs e)
         {
+            // Call SharpEngineSceneView.RenderToBitmap to the get Avalonia's WritableBitmap.
+            // This will create a new WritableBitmap on each call. To reuse the WritableBitmap,
+            // call the RenderToBitmap and pass the WritableBitmap by ref as the first parameter.
+            // It is also possible to call SceneView.RenderToXXXX methods - this give more low level bitmap objects.
             var renderedSceneBitmap = MainSceneView.RenderToBitmap(renderNewFrame: true);
 
             if (renderedSceneBitmap != null)

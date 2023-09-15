@@ -89,7 +89,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
             WinUISamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
 
-            this.Title = "SharpEngine in WinUI";
+            this.Title = "Ab4d.SharpEngine samples for WinUI 3";
 
             LoadSamples();
 

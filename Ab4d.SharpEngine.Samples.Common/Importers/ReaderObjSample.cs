@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.IO;
+using System.Numerics;
 using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
@@ -17,6 +18,8 @@ public class ReaderObjSample : CommonSample
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
     private SceneNode? _importedModelNodes;
+
+    private string? _importedFileName;
 
     private enum ViewTypes
     {
@@ -45,6 +48,7 @@ public class ReaderObjSample : CommonSample
             return;
 
         Scene.RootNode.Clear();
+        _importedFileName = null;
 
         string fileExtension = System.IO.Path.GetExtension(fileName);
         if (!fileExtension.Equals(".obj", StringComparison.OrdinalIgnoreCase))
@@ -68,11 +72,15 @@ public class ReaderObjSample : CommonSample
         // FixDirectorySeparator method returns file path with correctly sets backslash or slash as directory separator based on the current OS.
         fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
 
-        var readerObj = new ReaderObj();
+        // Create ReaderObj object
+        // To read texture images we also need to provide BitmapIO and 
+        // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
+        var readerObj = new ReaderObj(this.BitmapIO, this.GpuDevice);
 
         try
         {
             _importedModelNodes = readerObj.ReadSceneNodes(fileName);
+            _importedFileName   = fileName;
         }
         catch (Exception ex)
         {
@@ -81,7 +89,7 @@ public class ReaderObjSample : CommonSample
         }
 
         // By default textures are read from the same directory as the obj file.
-        // If they are stored in some other folder, then this can be specified in the texturesDirectory parameter.
+        // If they are not stored in some other folder, then the folder can be specified in the texturesDirectory parameter.
         // 
         // It is also possible to change the default material. When it is not specified then StandardMaterials.Silver is used.
         //
@@ -89,9 +97,25 @@ public class ReaderObjSample : CommonSample
         //var defaultMaterial = StandardMaterials.Orange;
         //var readSceneNodes = readerObj.ReadSceneNodes(fileName, texturesDirectory, defaultMaterial);
 
+
         // To read obj file from stream use the following
         // (GetResourceStream should return the Stream of the specified resourceFileName)
-        //readerObj.ReadSceneNodes(FileStream, resourceFileName => GetResourceStream(resourceFileName));
+        //using (var fileStream = System.IO.File.OpenRead(fileName))
+        //{
+        //    _importedModelNodes = readerObj.ReadSceneNodes(fileStream, resourceFileName => GetResourceStream(resourceFileName));
+        //}
+
+        //Stream? GetResourceStream(string resourceName)
+        //{
+        //    var directoryName = System.IO.Path.GetDirectoryName(_importedFileName);
+        //    var fileName = System.IO.Path.Combine(directoryName, resourceName);
+
+        //    if (System.IO.File.Exists(fileName))
+        //        return System.IO.File.OpenRead(fileName);
+
+        //    return null;
+        //}
+
 
         // It is also possible to read only obj file data without converting that into SharpEngine's objects:
         //var objFileData = readerObj.ReadObjFileData(fileName);
@@ -113,7 +137,6 @@ public class ReaderObjSample : CommonSample
         // Add _objectLinesNode to the scene because before all the children of RootNode were cleared
         Scene.RootNode.Add(_objectLinesNode);
 
-
         UpdateShownLines();
 
 
@@ -126,6 +149,7 @@ public class ReaderObjSample : CommonSample
             targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2;
         }
     }
+
 
     private void UpdateShownLines()
     {

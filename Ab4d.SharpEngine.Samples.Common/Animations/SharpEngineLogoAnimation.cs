@@ -1,14 +1,12 @@
-﻿using Ab4d.SharpEngine.Cameras;
+﻿using System;
+using System.Numerics;
+using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
-using Ab4d.SharpEngine.Utilities;
-using static Ab4d.SharpEngine.Meshes.MeshFactory;
-using System.Numerics;
-using System;
 using Ab4d.SharpEngine.Animation;
 
 namespace Ab4d.SharpEngine.Samples.Common.Animations;
@@ -63,13 +61,13 @@ public class SharpEngineLogoAnimation
 
 
         // Create hash symbol
-        var hashSymbolMesh = CreateHashSymbolMesh(centerPosition: new Vector3(0, HashModelBarThickness * -0.5f, 0),
-                                                  shapeYVector: new Vector3(0, 0, 1),
-                                                  extrudeVector: new Vector3(0, HashModelBarThickness, 0),
-                                                  size: HashModelSize,
-                                                  barThickness: HashModelBarThickness,
-                                                  barOffset: HashModelBarOffset,
-                                                  name: "HashSymbolMesh");
+        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(centerPosition: new Vector3(0, HashModelBarThickness * -0.5f, 0),
+                                                              shapeYVector: new Vector3(0, 0, 1),
+                                                              extrudeVector: new Vector3(0, HashModelBarThickness, 0),
+                                                              size: HashModelSize,
+                                                              barThickness: HashModelBarThickness,
+                                                              barOffset: HashModelBarOffset,
+                                                              name: "HashSymbolMesh");
 
         _hashModelMaterial = new StandardMaterial(Color3.FromByteRgb(255, 197, 0));
 
@@ -185,116 +183,5 @@ public class SharpEngineLogoAnimation
         
         // When increasing transparency of the logo model, we also increase the EmissiveColor amount to prevent color bleeding
         _hashModelMaterial.EmissiveColor = new Color3(showLogoImageAmount, showLogoImageAmount, showLogoImageAmount);
-    }
-
-    // Centered around (0,0)
-    private static Vector2[][] CreateHashSymbolPolygons(float size,
-                                                        float barThickness,
-                                                        float barOffset)
-    {
-        var outerPoints = new Vector2[28];
-
-        float barInnerDistance = size - 2 * (barOffset + barThickness);
-
-        // Start to the right and down:
-        Vector2 xDirection = new Vector2(1, 0);
-        Vector2 yDirection = new Vector2(0, 1);
-
-        // start positions
-        Vector2 position = new Vector2(barOffset - size * 0.5f, size * -0.5f);
-
-        int i = 0; // index in outerPoints
-
-        outerPoints[i++] = position;
-
-        // create positions for outer polygon in 4 steps
-        for (int segment = 0; segment < 4; segment++)
-        {
-            position += xDirection * barThickness;
-            outerPoints[i++] = position;
-
-            position += yDirection * barOffset;
-            outerPoints[i++] = position;
-
-            position += xDirection * barInnerDistance;
-            outerPoints[i++] = position;
-
-            position -= yDirection * barOffset;
-            outerPoints[i++] = position;
-
-            position += xDirection * barThickness;
-            outerPoints[i++] = position;
-
-            position += yDirection * barOffset;
-            outerPoints[i++] = position;
-
-            if (i < 28) // skip last position - it is connected to the first position
-            {
-                position += xDirection * barOffset;
-                outerPoints[i++] = position;
-            }
-
-            // Rotate by 90 degrees:
-            xDirection = yDirection;
-            yDirection = new Vector2(-yDirection.Y, yDirection.X);
-        }
-
-        // add points for inner hole - those points need to be oriented in the opposite (counter-clockwise) direction
-        var innerPoints = new Vector2[4];
-
-        float innerPolygonStart = barOffset + barThickness - size * 0.5f;
-        innerPoints[0] = new Vector2(innerPolygonStart, innerPolygonStart);
-        innerPoints[1] = new Vector2(innerPolygonStart, innerPolygonStart + barInnerDistance);
-        innerPoints[2] = new Vector2(innerPolygonStart + barInnerDistance, innerPolygonStart + barInnerDistance);
-        innerPoints[3] = new Vector2(innerPolygonStart + barInnerDistance, innerPolygonStart);
-
-        return new Vector2[][] { outerPoints, innerPoints };
-    }
-
-    /// <summary>
-    /// CreateHashSymbolMesh creates a mesh for hash symbol from the specified parameters.
-    /// </summary>
-    /// <param name="centerPosition">center position as Vector3</param>
-    /// <param name="shapeYVector">Y axis vector of the shape as Vector3</param>
-    /// <param name="extrudeVector">extrude vector as Vector3</param>
-    /// <param name="size">size of the hash symbol</param>
-    /// <param name="barThickness">thickness of the horizontal and vertical bar</param>
-    /// <param name="barOffset">offset of the horizontal and vertical bar</param>
-    /// <param name="name">optional name for the mesh</param>
-    /// <returns>StandardMesh with filled vertices array and index array</returns>        
-    public static StandardMesh CreateHashSymbolMesh(Vector3 centerPosition,
-                                                    Vector3 shapeYVector,
-                                                    Vector3 extrudeVector,
-                                                    float size,
-                                                    float barThickness,
-                                                    float barOffset,
-                                                    string? name = null)
-    {
-        var hashSymbolPolygons = CreateHashSymbolPolygons(size, barThickness, barOffset);
-
-        var triangulator = new Triangulator(hashSymbolPolygons, isYAxisUp: false);
-        triangulator.Triangulate(out var positions, out var triangulatedIndices);
-
-        var triangleIndices = triangulatedIndices.ToArray();
-
-        MeshUtils.InverseTriangleIndicesOrientation(triangleIndices);
-
-#if DEBUG
-        if (name == null)
-            name = "HashSymbolMesh";
-#endif
-
-        var extrudedMesh = MeshFactory.CreateExtrudedMesh(positions.ToArray(),
-                                                          triangleIndices,
-                                                          isSmooth: false,
-                                                          flipNormals: false,
-                                                          modelOffset: centerPosition,
-                                                          extrudeVector: extrudeVector,
-                                                          shapeYVector: shapeYVector,
-                                                          textureCoordinatesGenerationType: ExtrudeTextureCoordinatesGenerationType.Cylindrical,
-                                                          closeBottom: true,
-                                                          closeTop: true,
-                                                          name: name);
-        return extrudedMesh;
     }
 }

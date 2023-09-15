@@ -18,6 +18,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Colors = Microsoft.UI.Colors;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.QuickStart
 {
@@ -224,6 +228,42 @@ namespace Ab4d.SharpEngine.Samples.WinUI.QuickStart
             {
                 modelNode.Material = WinUISamplesContext.Current.GetRandomStandardMaterial();
             }
+        }
+
+        private async void RenderToBitmapButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            // Call SharpEngineSceneView.RenderToBitmap to the get WinUI's WritableBitmap.
+            // This will create a new WritableBitmap on each call. To reuse the WritableBitmap,
+            // call the RenderToBitmap and pass the WritableBitmap as the first parameter.
+            // In this case the size of the WritableBitmap MUST be the same as the size of the SceneView (SceneView.Width x SceneView.Height).
+            // It is also possible to call SceneView.RenderToXXXX methods - this give more low level bitmap objects.
+            var renderedBitmap = MainSceneView.RenderToBitmap(renderNewFrame: true);
+
+            if (renderedBitmap == null)
+                return;
+
+            string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SharpEngine.png");
+
+            using (IRandomAccessStream stream = File.OpenWrite(fileName).AsRandomAccessStream())
+            {
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
+                Stream pixelStream = renderedBitmap.PixelBuffer.AsStream();
+                byte[] pixels = new byte[pixelStream.Length];
+
+                await pixelStream.ReadAsync(pixels, 0, pixels.Length);
+
+                var pixelFormat = MainSceneView.SceneView.Format == StandardBitmapFormats.Bgra ? BitmapPixelFormat.Bgra8 : BitmapPixelFormat.Rgba8;
+
+                encoder.SetPixelData(pixelFormat, BitmapAlphaMode.Premultiplied,
+                                     (uint)renderedBitmap.PixelWidth,
+                                     (uint)renderedBitmap.PixelHeight,
+                                     96.0,
+                                     96.0,
+                                     pixels);
+                await encoder.FlushAsync();
+            }
+
+            System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
         }
     }
 }

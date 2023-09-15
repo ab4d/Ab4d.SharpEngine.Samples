@@ -17,9 +17,9 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.15-beta4" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.15-beta4" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.15-beta4" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.16-beta5" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.16-beta5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />

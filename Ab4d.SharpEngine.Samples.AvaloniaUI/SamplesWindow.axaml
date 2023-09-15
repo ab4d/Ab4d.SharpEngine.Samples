@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Width="1300" Height="720"
         Icon="Resources/sharp-engine-logo.ico"
-        Title="SharpEngine with AvaloniaUI">
+        Title="Ab4d.SharpEngine samples with AvaloniaUI">
 
     <Window.Resources>
 

@@ -228,6 +228,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
         private void RenderToBitmapButton_OnClick(object sender, RoutedEventArgs e)
         {
+            // Call SharpEngineSceneView.RenderToBitmap to the get WPF's WritableBitmap.
+            // This will create a new WritableBitmap on each call. To reuse the WritableBitmap,
+            // call the RenderToBitmap and pass the WritableBitmap by ref as the first parameter.
+            // It is also possible to call SceneView.RenderToXXXX methods - this give more low level bitmap objects.
             var renderedBitmap = MainSceneView.RenderToBitmap(renderNewFrame: true);
 
             if (renderedBitmap == null)

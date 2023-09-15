@@ -24,6 +24,7 @@
                 <Button Name="ChangeMaterial1Button" Content="Change material 1" Margin="0 2 0 2" Click="ChangeMaterial1Button_OnClick" />
                 <Button Name="ChangeMaterial2Button" Content="Change material 2" Margin="0 2 0 2" Click="ChangeMaterial2Button_OnClick" />
                 <Button Name="ChangeBackgroundButton" Content="Change background" Margin="0 2 0 2" Click="ChangeBackgroundButton_OnClick" />
+                <Button Name="RenderToBitmapButton" Content="Render to bitmap" Margin="0 2 0 2" Click="RenderToBitmapButton_OnClick" />
             </StackPanel>
         </Border>
 

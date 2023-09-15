@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net7.0-android</TargetFrameworks>
@@ -68,7 +68,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.15-beta4" />
+		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.5" />
 	</ItemGroup>
 

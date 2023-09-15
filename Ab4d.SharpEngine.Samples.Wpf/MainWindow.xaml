@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:common="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Common"
         mc:Ignorable="d"
-        Title="SharpEngine Samples"
+        Title="Ab4d.SharpEngine Samples for WPF"
         Icon="Resources/sharp-engine-logo.ico"
         Width="1300" Height="720">
     <Window.Resources>

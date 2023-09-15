@@ -25,6 +25,8 @@ public class AssimpImporterSample : CommonSample
     private MultiLineNode? _objectLinesNode;
     private SceneNode? _importedModelNodes;
 
+    private string? _importedFileName;
+
     private enum ViewTypes
     {
         SolidObjectsOnly = 0,
@@ -129,7 +131,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         if (!AssimpLibrary.Instance.IsInitialized)
             throw new Exception("Cannot initialize native Assimp library");
 
-        _assimpImporter = new AssimpImporter(gpuDevice, BitmapIO);
+        _assimpImporter = new AssimpImporter(BitmapIO, GpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
     }
 
     protected void ImportFile(string? fileName)
@@ -138,6 +140,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             return;
 
         Scene.RootNode.Clear();
+        _importedFileName = null;
 
 
         string fileExtension = System.IO.Path.GetExtension(fileName);
@@ -166,9 +169,9 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             var fileInfo = new FileInfo(fileName);
             if (fileInfo.Length > 5000000) // > 5 MB
             {
-                // Switch to SolidObjectsOnly because analysis of large models can take very long time
+                // Switch to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time
                 _currentViewType = ViewTypes.SolidObjectsOnly;
-                ShowErrorMessage("Switching view to SolidObjectsOnly because analysis of large models can take very long time");
+                ShowErrorMessage("Switching view to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time");
             }
         }
 
@@ -181,6 +184,10 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         try
         {
             _importedModelNodes = _assimpImporter.ImportSceneNodes(fileName);
+            _importedFileName = fileName;
+
+            // To see the hierarchy of the imported models, execute the following in the Visual Studio's Immediate Window (first check that _importedModelNodes is GroupNode and not ModelMeshNode):
+            //((GroupNode)_importedModelNodes).DumpHierarchy();
         }
         catch (Exception ex)
         {
@@ -249,7 +256,6 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             // Add _objectLinesNode to the scene because before all the children of RootNode were cleared
             Scene.RootNode.Add(_objectLinesNode);
 
-
             UpdateShownLines();
 
 
@@ -280,6 +286,44 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         {
             var edgeLinePositions = new List<Vector3>();
             LineUtils.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+
+            // Because for complex files it may take a long time to calculate edge lines, 
+            // we can use the following code to save the edge lines so next time we can load the data:
+            //if (_importedFileName != null)
+            //{
+            //    string edgeLinesFileName = System.IO.Path.ChangeExtension(_importedFileName, ".edgelines");
+
+            //    // Save edge lines:
+            //    using (var stream = File.Open(edgeLinesFileName, FileMode.Create))
+            //    {
+            //        using (var writer = new BinaryWriter(stream))
+            //        {
+            //            writer.Write(edgeLinePositions.Count);
+
+            //            foreach (var edgeLinePosition in edgeLinePositions)
+            //            {
+            //                writer.Write(edgeLinePosition.X);
+            //                writer.Write(edgeLinePosition.Y);
+            //                writer.Write(edgeLinePosition.Z);
+            //            }
+            //        }
+            //    }
+                
+            //    // Read edge lines:
+            //    using (var stream = File.Open(edgeLinesFileName, FileMode.Open))
+            //    {
+            //        using (var reader = new BinaryReader(stream))
+            //        {
+            //            int count = reader.ReadInt32();
+
+            //            var edgeLines = new Vector3[count];
+
+            //            for (int i = 0; i < count; i++)
+            //                edgeLines[i] = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            //        }
+            //    }
+            //}
+
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
