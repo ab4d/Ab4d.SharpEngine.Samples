@@ -33,7 +33,7 @@ The following features are supported by the current version:
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
   - Off-screen rendering combined with Linux framebuffer display (FbDev or DRM/KMS).
-  - See "Vulkan on Resberry Pi 4" guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
+  - See ["Vulkan on Resberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
   
 **Android:**
   - Using SurfaceView in C# Android Application
