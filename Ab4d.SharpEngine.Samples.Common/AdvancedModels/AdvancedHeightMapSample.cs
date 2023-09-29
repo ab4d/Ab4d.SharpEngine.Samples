@@ -28,8 +28,8 @@ public class AdvancedHeightMapSample : CommonSample
     private LinesType _linesType = LinesType.CombinedContourLines;
 
     private bool _useTransparentColor;
-    private bool _useHeightTexture = false;
-    
+    private bool _useGradientTexture = true;
+
     private GradientStop[]? _gradientData;
 
 
@@ -40,10 +40,10 @@ public class AdvancedHeightMapSample : CommonSample
         GeographicalSmooth,
         GeographicalHard,
     }
-    
+
     public enum LinesType
     {
-        None, 
+        None,
         WireGrid,
         CombinedContourLines,
         IndividualContourLines,
@@ -82,7 +82,7 @@ public class AdvancedHeightMapSample : CommonSample
                                                           useHeightValuesAsTextureCoordinates: true,
                                                           name: "HeightMapSurface")
         {
-            Material     = graySpecularMaterial,
+            Material = graySpecularMaterial,
             BackMaterial = graySpecularMaterial,
         };
 
@@ -119,9 +119,9 @@ public class AdvancedHeightMapSample : CommonSample
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading   = -30;
-            targetPositionCamera.Attitude  = -20;
-            targetPositionCamera.Distance  = 200;
+            targetPositionCamera.Heading = -30;
+            targetPositionCamera.Attitude = -20;
+            targetPositionCamera.Distance = 200;
 
             // Show height map on the left side so it is not behind the options:
             targetPositionCamera.TargetPosition = new Vector3(20, 0, 0);
@@ -140,32 +140,21 @@ public class AdvancedHeightMapSample : CommonSample
         // Create gradient
         _gradientData = CreateSampleGradient(_gradientType, _useTransparentColor);
 
-        if (_useHeightTexture)
+        if (_useGradientTexture)
         {
-            // Create 2D height data texture
-            var texture2 = TextureFactory.CreateHeightTexture(GpuDevice, _heightData, _gradientData);
+            // When using gradient texture and height map, we get more accurate results when height values are used for texture coordinates.
+            // In this case a one dimensional gradient texture is used (the color at position 0 defined the color for min value; the last position defines the color for max value).
+            // Then the texture coordinates are defined to point to the correct color for the height value at the specific position, for example
+            // texture coordinate (0, 0.5) is set the minimum height value and texture coordinate (1, 0.5) is set to the maximum height value.
+            // The texture coordinates are defined by creating the HeightMapSurfaceNode and setting the useHeightValuesAsTextureCoordinates to true.
+            // This should not be used for cases when a bitmap is shown on the height map.
 
-            if (_heigthMapMaterial1 == null)
-            {
-                _heigthMapMaterial1              = new StandardMaterial(texture2, CommonSamplerTypes.Clamp, $"2D height-data texture material ({_gradientType}, {_useTransparentColor})");
-                _heightMapSurfaceNode1.Material = _heigthMapMaterial1;
-            }
-            else
-            {
-                _heigthMapMaterial1.DiffuseTexture = texture2;
-            }
-
-            _heightMapSurfaceNode1.Visibility = SceneNodeVisibility.Visible;
-            _heightMapSurfaceNode2.Visibility = SceneNodeVisibility.Hidden;
-        }
-        else
-        {
             // Create 1D texture; "linear" texture that requires special texture coordinates
             var texture1 = TextureFactory.CreateGradientTexture(GpuDevice, _gradientData);
 
             if (_heigthMapMaterial2 == null)
             {
-                _heigthMapMaterial2              = new StandardMaterial(texture1, CommonSamplerTypes.Clamp, $"1D texture material ({_gradientType}, {_useTransparentColor})");
+                _heigthMapMaterial2 = new StandardMaterial(texture1, CommonSamplerTypes.Clamp, $"1D texture material ({_gradientType}, {_useTransparentColor})");
                 _heightMapSurfaceNode2.Material = _heigthMapMaterial2;
             }
             else
@@ -173,8 +162,28 @@ public class AdvancedHeightMapSample : CommonSample
                 _heigthMapMaterial2.DiffuseTexture = texture1;
             }
 
+            // Show _heightMapSurfaceNode2 that was created by setting useHeightValuesAsTextureCoordinates to true
             _heightMapSurfaceNode1.Visibility = SceneNodeVisibility.Hidden;
             _heightMapSurfaceNode2.Visibility = SceneNodeVisibility.Visible;
+        }
+        else
+        {
+            // Create 2D height data texture
+            var texture2 = TextureFactory.CreateHeightTexture(GpuDevice, _heightData, _gradientData);
+
+            if (_heigthMapMaterial1 == null)
+            {
+                _heigthMapMaterial1 = new StandardMaterial(texture2, CommonSamplerTypes.Clamp, $"2D height-data texture material ({_gradientType}, {_useTransparentColor})");
+                _heightMapSurfaceNode1.Material = _heigthMapMaterial1;
+            }
+            else
+            {
+                _heigthMapMaterial1.DiffuseTexture = texture2;
+            }
+
+            // Show _heightMapSurfaceNode1 that was created by setting useHeightValuesAsTextureCoordinates to false
+            _heightMapSurfaceNode1.Visibility = SceneNodeVisibility.Visible;
+            _heightMapSurfaceNode2.Visibility = SceneNodeVisibility.Hidden;
         }
     }
 
@@ -189,12 +198,12 @@ public class AdvancedHeightMapSample : CommonSample
                 _heightMapWireframeNode.Visibility = SceneNodeVisibility.Hidden;
                 _heightMapContoursNode.Visibility = SceneNodeVisibility.Hidden;
                 break;
-            
+
             case LinesType.WireGrid:
                 _heightMapWireframeNode.Visibility = SceneNodeVisibility.Visible;
                 _heightMapContoursNode.Visibility = SceneNodeVisibility.Hidden;
                 break;
-            
+
             case LinesType.IndividualContourLines:
             case LinesType.CombinedContourLines:
             case LinesType.ColoredContourLines:
@@ -210,7 +219,7 @@ public class AdvancedHeightMapSample : CommonSample
     {
         if (Scene == null || _heightMapSurfaceNode1 == null || _gradientData == null)
             return;
-        
+
         if (_heightMapContoursNode != null)
             Scene.RootNode.Remove(_heightMapContoursNode);
 
@@ -246,7 +255,7 @@ public class AdvancedHeightMapSample : CommonSample
                     var gradientColor = TextureFactory.GetGradientColor(heightPercent, _gradientData);
 
                     var multiLineNode = _heightMapContoursNode.GetLineNode(contourLineHeightValue);
-                    
+
                     if (multiLineNode != null)
                         multiLineNode.LineColor = gradientColor;
                 }
@@ -289,7 +298,7 @@ public class AdvancedHeightMapSample : CommonSample
                     stops[index] = new GradientStop(Colors.Blue, 0.0f);
                 }
                 break;
-                
+
             case GradientType.GeographicalSmooth:
                 stops = new GradientStop[addTransparentColor ? 8 : 6];
 
@@ -311,7 +320,7 @@ public class AdvancedHeightMapSample : CommonSample
                     stops[index] = new GradientStop(Colors.Blue, 0.0f);
                 }
                 break;
-                
+
             case GradientType.GeographicalHard:
                 stops = new GradientStop[addTransparentColor ? 12 : 10];
 
@@ -338,7 +347,7 @@ public class AdvancedHeightMapSample : CommonSample
                     stops[index] = new GradientStop(Colors.Blue, 0.0f);
                 }
                 break;
-                
+
             default:
                 throw new ArgumentException($"Invalid gradient type: {type}!", nameof(type));
         }
@@ -350,13 +359,13 @@ public class AdvancedHeightMapSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        
+
         ui.CreateLabel("Gradient:", isHeader: true);
         ui.CreateRadioButtons(new string[] { "None", "Technical", "GeographicalSmooth", "GeographicalHard" }, (itemIndex, itemText) =>
         {
             _gradientType = (GradientType)itemIndex;
             UpdateTexture();
-        }, 2); 
+        }, 2);
 
         ui.CreateCheckBox("Transparent colors", false, isChecked =>
         {
@@ -367,18 +376,19 @@ public class AdvancedHeightMapSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateCheckBox("Use TextureCoordinates as height values", false, isChecked =>
-        {
-            _useHeightTexture = isChecked;
-            UpdateTexture();
-        });
+        ui.CreateCheckBox("Use TextureCoordinates as height values (?):When checked, then one dimensional gradient texture is used to define the gradient colors.\nThen the TextureCoordinates in the mesh are used to define the color of each position.\nThis usually produce more accurate results when rendering height maps.",
+            _useGradientTexture, isChecked =>
+            {
+                _useGradientTexture = isChecked;
+                UpdateTexture();
+            });
 
 
         ui.CreateLabel("Lines:", isHeader: true);
 
         ui.CreateRadioButtons(new string[]
         {
-            "None", 
+            "None",
             "WireGrid",
             "Combined contours lines (?):Combined contour lines show all contour lines with two MultiLineNodes: one for major lines and one for minor lines. This is the best for performance, but contour lines cannot be colored by height.",
             "Individual contours lines (?):Individual contour lines create one MultiLineNode for each contour line.",
@@ -391,10 +401,8 @@ public class AdvancedHeightMapSample : CommonSample
 
         ui.CreateLabel("View:", isHeader: true);
 
-        ui.CreateSlider(0, 1, () => 0.2f, ambientValue => Scene?.SetAmbientLight(ambientValue), width: 150, 
-            keyText: "Ambient light:", 
+        ui.CreateSlider(0, 1, () => 0.2f, ambientValue => Scene?.SetAmbientLight(ambientValue), width: 150,
+            keyText: "Ambient light:",
             formatShownValueFunc: ambientValue => $"{ambientValue * 100:F0}%");
-
-        //ui.CreateLabel("Show:", isHeader: true);
     }
 }
