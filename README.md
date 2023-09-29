@@ -32,7 +32,8 @@ The following features are supported by the current version:
 **Linux** (including Raspberry PI 4):
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
-  - See "Vulkan on Resberry Pi 4" guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
+  - Off-screen rendering combined with Linux framebuffer display (FbDev or DRM/KMS).
+  - See ["Vulkan on Resberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
   
 **Android:**
   - Using SurfaceView in C# Android Application
@@ -124,6 +125,11 @@ The following Visual Studio solutions are available:
   Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
   See "Building for macOS and iOS" section for more information on how to compile for macOS and iOS.
 
+- **Ab4d.SharpEngine.Samples.LinuxFramebuffer**
+  This solution uses SharpEngine with off-screen Vulkan renderer, and displays
+  the rendered frames on Linux framebuffer display (FbDev or DRM/KMS). See
+  [the example's README](Ab4d.SharpEngine.Samples.LinuxFramebuffer/README.md)
+  for details.
 
 
 ## Quick Start
