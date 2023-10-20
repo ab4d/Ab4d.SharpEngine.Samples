@@ -69,7 +69,7 @@ public class MaterialsSample : CommonSample
 
         scene.RootNode.Add(modelNode1);
 
-        var textNode1 = textBlockFactory.CreateTextBlock(new Vector3(-250, -20, 50), "DiffuseMaterial", textAttitude: 30);
+        var textNode1 = textBlockFactory.CreateTextBlock("DiffuseMaterial", new Vector3(-250, -20, 50), textAttitude: 30);
         scene.RootNode.Add(textNode1);
 
 
@@ -104,7 +104,7 @@ public class MaterialsSample : CommonSample
 
         scene.RootNode.Add(modelNode2);
 
-        var textNode2 = textBlockFactory.CreateTextBlock(new Vector3(-150, -20, 50), "SpecularMaterial", textAttitude: 30);
+        var textNode2 = textBlockFactory.CreateTextBlock("SpecularMaterial", new Vector3(-150, -20, 50), textAttitude: 30);
         scene.RootNode.Add(textNode2);
 
 
@@ -144,7 +144,7 @@ public class MaterialsSample : CommonSample
 
         scene.RootNode.Add(modelNode3);
 
-        var textNode3 = textBlockFactory.CreateTextBlock(new Vector3(-50, -20, 50), "TextureMaterial", textAttitude: 30);
+        var textNode3 = textBlockFactory.CreateTextBlock("TextureMaterial", new Vector3(-50, -20, 50), textAttitude: 30);
         scene.RootNode.Add(textNode3);
 
 
@@ -177,7 +177,7 @@ public class MaterialsSample : CommonSample
 
         scene.RootNode.Add(modelNode4);
 
-        var textNode4 = textBlockFactory.CreateTextBlock(new Vector3(50, -15, 50), "SemiTransparent\r\nMaterial", textAttitude: 30);
+        var textNode4 = textBlockFactory.CreateTextBlock("SemiTransparent\r\nMaterial", new Vector3(50, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode4);
 
 
@@ -219,7 +219,7 @@ public class MaterialsSample : CommonSample
 
             scene.RootNode.Add(modelNode5);
 
-            var textNode5 = textBlockFactory.CreateTextBlock(new Vector3(150, -15, 50), "VertexColor\r\nMaterial", textAttitude: 30);
+            var textNode5 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
             scene.RootNode.Add(textNode5);
         }
 
@@ -245,7 +245,7 @@ public class MaterialsSample : CommonSample
 
         scene.RootNode.Add(modelNode6);
 
-        var textNode6 = textBlockFactory.CreateTextBlock(new Vector3(250, -15, 50), "SolidColor\r\nMaterial", textAttitude: 30);
+        var textNode6 = textBlockFactory.CreateTextBlock("SolidColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode6);
 
 

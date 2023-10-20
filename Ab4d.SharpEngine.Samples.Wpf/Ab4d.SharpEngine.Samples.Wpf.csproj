@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Wpf</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Wpf</RootNamespace>
-    <Version>0.9.0</Version>
+    <Version>0.9.18.0</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -16,11 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.16-beta5" />    
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.16-beta5" />    
-    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
+    <PackageReference Include="Ab4d.Assimp" Version="5.3.1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.18-beta6" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.18-beta6" />    
   </ItemGroup>
 
   <ItemGroup>
@@ -74,8 +73,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\"/>
-    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\"/>
+    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
   </ItemGroup>
 
   <ItemGroup>

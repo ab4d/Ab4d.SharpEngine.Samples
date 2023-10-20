@@ -106,14 +106,14 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             TitleTextBlock.Text = _currentCommonSample.Title;
             SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
-
-            MainSceneView.Visibility = Visibility.Visible;
-
+            
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
             UpdateMouseCameraController();
+
+            MainSceneView.Visibility = Visibility.Visible;
 
             _lastInitializedSample = _currentCommonSample;
         }

@@ -1,5 +1,5 @@
 ﻿using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Samples.Common.Utils;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common;

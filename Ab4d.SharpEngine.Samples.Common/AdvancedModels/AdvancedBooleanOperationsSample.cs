@@ -74,13 +74,13 @@ public class AdvancedBooleanOperationsSample : CommonSample
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
 
-        var textNode = textBlockFactory.CreateTextBlock(new Vector3(-120, 0, 150),
-                                                        $"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {subtractedMesh1!.TriangleIndices!.Length / 3}",
+        var textNode = textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {subtractedMesh1!.TriangleIndices!.Length / 3}",
+                                                        new Vector3(-120, 0, 150),
                                                         textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock(new Vector3(120, 0, 150),
-                                                    $"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {subtractedMesh2!.TriangleIndices!.Length / 3}",
+        textNode = textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {subtractedMesh2!.TriangleIndices!.Length / 3}",
+                                                    new Vector3(120, 0, 150),
                                                     textAttitude: 30);
         scene.RootNode.Add(textNode);
 

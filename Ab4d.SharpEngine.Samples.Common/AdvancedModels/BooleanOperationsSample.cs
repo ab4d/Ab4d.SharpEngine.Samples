@@ -50,13 +50,13 @@ public class BooleanOperationsSample : CommonSample
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
 
-        var textNode = textBlockFactory.CreateTextBlock(new Vector3(-150, -45, 100), "Subtract", textAttitude: 30);
+        var textNode = textBlockFactory.CreateTextBlock("Subtract", new Vector3(-150, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock(new Vector3(0, -45, 100), "Intersect", textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("Intersect", new Vector3(0, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock(new Vector3(150, -45, 100), "Union", textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("Union", new Vector3(150, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
 

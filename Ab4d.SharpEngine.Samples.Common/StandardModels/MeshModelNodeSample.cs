@@ -124,7 +124,7 @@ public class MeshModelNodeSample : StandardModelsSampleBase
             {
                 for (var i = 0; i < positions.Length; i++)
                 {
-                    var textNode1 = textBlockFactory.CreateTextBlock(positions[i] + new Vector3(0, 0.5f, 0), i.ToString()); // Add position index text slightly above the model
+                    var textNode1 = textBlockFactory.CreateTextBlock(i.ToString(), positions[i] + new Vector3(0, 0.5f, 0)); // Add position index text slightly above the model
                     scene.RootNode.Add(textNode1);
                 }
             }

@@ -99,6 +99,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
                 PlayAgainButton.IsVisible = true;
             }
+
+            this.Unloaded += delegate (object? sender, RoutedEventArgs args)
+            {
+                _sharpEngineLogoAnimation.Dispose();
+                MainSceneView.Dispose();
+            };
         }
 
         private void ShowInfoTextBlock()

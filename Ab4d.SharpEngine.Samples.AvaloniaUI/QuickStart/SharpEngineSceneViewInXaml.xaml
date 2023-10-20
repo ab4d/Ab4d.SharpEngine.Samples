@@ -15,7 +15,7 @@
             </Border.Background>
         </Border>
 
-        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" BackgroundColor="Transparent" />
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
 
         <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#AAFFFFFF" Margin="5">
             <StackPanel Orientation="Vertical" Margin="10 5 10 8">

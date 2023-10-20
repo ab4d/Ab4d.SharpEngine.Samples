@@ -79,15 +79,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             TitleTextBlock.Text = _currentCommonSample.Title;
             SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
-
-            MainSceneView.IsVisible = true;
-
+            
             _currentCommonSample.InitializeScene(MainSceneView.Scene);
             _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
             UpdateMouseCameraController();
+            
+            MainSceneView.IsVisible = true;
 
             _lastInitializedSample = _currentCommonSample;
         }

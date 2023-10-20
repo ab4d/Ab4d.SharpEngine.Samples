@@ -11,6 +11,7 @@
 		<!-- <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
+        <Version>0.9.18.0</Version>
 		<RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
@@ -69,7 +70,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0-preview.7.23364.3" />
-		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
+		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.5" />
 		<PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.32.0" />
 	</ItemGroup>

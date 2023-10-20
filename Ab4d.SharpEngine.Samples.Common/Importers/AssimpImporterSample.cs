@@ -59,32 +59,24 @@ public class AssimpImporterSample : CommonSample
 
     private void InitAssimpLibrary(VulkanDevice gpuDevice, string? assimpFolder)
     {
-        string? assimpLibFileName;
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            assimpLibFileName = Environment.Is64BitProcess ? "Assimp64.dll" : "Assimp32.dll";
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Environment.Is64BitProcess)
-        {
-            assimpLibFileName = "libassimp.so.5";
-        }
+        if (assimpFolder == null)
+            assimpFolder = AppDomain.CurrentDomain.BaseDirectory;
         else
-        {
-            assimpLibFileName = null;
-        }
+            assimpFolder = FileUtils.FixDirectorySeparator(assimpFolder);
+
+        string? assimpLibFileName = null;
+        
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            assimpLibFileName = Environment.Is64BitProcess ? "Assimp64.dll" : "Assimp32.dll";
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Environment.Is64BitProcess)
+            assimpLibFileName = "libassimp.so*"; // this will be uses as a search parameter to get the latest version
 
         if (assimpLibFileName == null)
         {
             ShowErrorMessage("AssimpImporter is not supported on this OS");
             return;
         }
-
-        if (assimpFolder == null)
-            assimpFolder = AppDomain.CurrentDomain.BaseDirectory;
-        else
-            assimpFolder = FileUtils.FixDirectorySeparator(assimpFolder);
-
+        
 
         if (assimpFolder.Contains(assimpLibFileName))
         {
@@ -103,13 +95,20 @@ public class AssimpImporterSample : CommonSample
             // try to find the assimp library file
             var assimpLibraries = System.IO.Directory.GetFiles(assimpFolder, assimpLibFileName, SearchOption.AllDirectories);
 
-            if (assimpLibraries == null || assimpLibraries.Length == 0)
+            if (assimpLibraries.Length == 0)
             {
                 ShowErrorMessage($"Cannot find the Assimp library ({assimpLibFileName}) in the folder {assimpFolder}");
                 return;
             }
-
-            assimpLibFileName = assimpLibraries[0];
+            else if (assimpLibraries.Length == 1)
+            {
+                assimpLibFileName = assimpLibraries[0];
+            }
+            else // more than 1 library found - get the last one (we may have files with different version - get the last one)
+            {
+                Array.Sort(assimpLibraries);
+                assimpLibFileName = assimpLibraries[^1]; // get last
+            }
         }
 
         try
@@ -343,6 +342,23 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         return false; // no drag and drop not supported
     }
 
+    private string GetSupportedFormatsInfo(AssimpImporter assimpImporter)
+    {
+        string assimpVersionText = assimpImporter.AssimpVersionString;
+        var gitCommitHash = assimpImporter.GitCommitHash;
+
+        // When Assimp library is complied from a source that if get the GutHub, then GitCommitHash is set to the source's last commit hash.
+        // When Assimp library is complied from a zip file in GitHub's releases, then the GitCommitHash is zero. In this case do not show the hash.
+        if (gitCommitHash != 0)
+            assimpVersionText += string.Format("; Git commit hash: {0:x7}", gitCommitHash);
+
+        var supportedExtensions = string.Join(", ", assimpImporter.SupportedImportFileExtensions);
+
+        string supportedFormatsInfo = $"Using native Assimp library v{assimpVersionText}{Environment.NewLine}{Environment.NewLine}Supported import file formats:{Environment.NewLine}{supportedExtensions}";
+
+        return supportedFormatsInfo;
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
@@ -370,8 +386,8 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
 
         if (_assimpImporter != null)
         {
-            var supportedExtensions = string.Join(", ", _assimpImporter.SupportedImportFileExtensions);
-            _infoLabel = ui.CreateLabel("Supported import file formats: " + supportedExtensions);
+            var supportedFormatsInfo = GetSupportedFormatsInfo(_assimpImporter);
+            _infoLabel = ui.CreateLabel(supportedFormatsInfo);
         }
 
 

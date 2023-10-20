@@ -114,14 +114,8 @@ public class TargetPositionCameraSample : CommonSample
                                            formatShownValueFunc: sliderValue => sliderValue.ToString("F0"))
                                         .SetIsVisible(false);
 
-
-        ui.AddSeparator();
-        ui.CreateCheckBox("Limit camera rotation", false, isChecked => UpdateLimitedCameraRotation(isChecked));
-
         ui.AddSeparator();
         ui.CreateButton("Reset camera", () => ResetCamera());
-        
-        //ui.CreateButton("Fit into view", () => FitIntoView());
     }
 
     private void OnProjectionTypeChanged(int itemIndex, string? itemText)
@@ -142,13 +136,4 @@ public class TargetPositionCameraSample : CommonSample
             _viewWidthSlider?.SetIsVisible(true);
         }
     }
-
-    private void UpdateLimitedCameraRotation(bool isLimited)
-    {
-
-    }
-    
-    //private void FitIntoView()
-    //{
-    //}
 }

@@ -415,8 +415,7 @@ class Program
             _sceneView.RenderToGpuBuffer(
                 preserveGpuImage: true,
                 stagingGpuImageReady: DisplayImage,
-                renderNewFrame: true,
-                format: _sceneView.Format);
+                renderNewFrame: true);
 
             /* FPS estimation */
             frameCount++;

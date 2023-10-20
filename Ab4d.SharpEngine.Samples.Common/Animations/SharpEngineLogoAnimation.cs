@@ -11,7 +11,7 @@ using Ab4d.SharpEngine.Animation;
 
 namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
-public class SharpEngineLogoAnimation
+public class SharpEngineLogoAnimation : IDisposable
 {
     public float AnimationDurationIsSeconds = 1.2f;
     
@@ -31,7 +31,7 @@ public class SharpEngineLogoAnimation
     #if DEBUG
     public TransformationAnimation? TransformationAnimation => _transformationAnimation;
     public MaterialAnimation? MaterialAnimation => _materialAnimation;
-#endif
+    #endif
 
     private MeshModelNode _hashModel;
     
@@ -183,5 +183,27 @@ public class SharpEngineLogoAnimation
         
         // When increasing transparency of the logo model, we also increase the EmissiveColor amount to prevent color bleeding
         _hashModelMaterial.EmissiveColor = new Color3(showLogoImageAmount, showLogoImageAmount, showLogoImageAmount);
+    }
+
+    public void Dispose()
+    {
+        if (!_hashModel.IsDisposed)
+        {
+            if (_hashModel.Parent != null)
+                _hashModel.Parent.Remove(_hashModel);
+
+            _hashModel.Dispose(); // This will also dispose the mesh
+        }
+        
+        if (!_logoPlaneModel.IsDisposed)
+        {
+            if (_logoPlaneModel.Parent != null)
+                _logoPlaneModel.Parent.Remove(_logoPlaneModel);
+
+            _logoPlaneModel.Dispose(); // This will also dispose the mesh
+        }
+
+        if (!_logoTextureMaterial.IsDisposed)
+            _logoTextureMaterial.Dispose();
     }
 }

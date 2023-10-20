@@ -5,9 +5,8 @@ using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Common;
-using Ab4d.SharpEngine.Samples.Common.Utils;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
@@ -76,10 +75,8 @@ public class AvaloniaSamplesContext : ICommonSamplesContext
 
         if (_textBlockFactory == null)
         {
-            _textBlockFactory = new TextBlockFactory(CurrentSharpEngineSceneView.Scene, this.BitmapIO);
-            //_textBlockFactory.BackgroundColor = Colors.LightYellow;
-            //_textBlockFactory.BorderThickness = 1;
-            //_textBlockFactory.BorderColor = Colors.DimGray;
+            // Create TextBlockFactory that will use the default BitmapTextCreator (get by BitmapTextCreator.GetDefaultBitmapTextCreator).
+            _textBlockFactory = new TextBlockFactory(CurrentSharpEngineSceneView.Scene);
         }
 
         return _textBlockFactory;

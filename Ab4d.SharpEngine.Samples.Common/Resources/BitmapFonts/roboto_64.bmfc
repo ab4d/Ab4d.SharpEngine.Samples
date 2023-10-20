@@ -1,0 +1,60 @@
+# AngelCode Bitmap Font Generator configuration file
+fileVersion=1
+
+# font settings
+fontName=Roboto
+fontFile=
+charSet=0
+fontSize=64
+aa=2
+scaleH=100
+useSmoothing=1
+isBold=0
+isItalic=0
+useUnicode=1
+disableBoxChars=1
+outputInvalidCharGlyph=0
+dontIncludeKerningPairs=0
+useHinting=1
+renderFromOutline=0
+useClearType=1
+autoFitNumPages=0
+autoFitFontSizeMin=0
+autoFitFontSizeMax=0
+
+# character alignment
+paddingDown=8
+paddingUp=8
+paddingRight=8
+paddingLeft=8
+spacingHoriz=0
+spacingVert=0
+useFixedHeight=0
+forceZero=0
+widthPaddingFactor=0.00
+
+# output file
+outWidth=1024
+outHeight=1024
+outBitDepth=32
+fontDescFormat=2
+fourChnlPacked=0
+textureFormat=png
+textureCompression=0
+alphaChnl=0
+redChnl=4
+greenChnl=4
+blueChnl=4
+invA=0
+invR=0
+invG=0
+invB=0
+
+# outline
+outlineThickness=0
+
+# selected chars
+chars=32-126,160-383,700,710-711,713,728-733,755,900-906,908,910-929,931-974,977-978,982,8355-8356,8358
+chars=8359-8364,8369,8377-8378,8380-8381,8706,8710,8719,8721-8722,8730,8734,8747,8776,8800,8804-8805
+
+# imported icon images

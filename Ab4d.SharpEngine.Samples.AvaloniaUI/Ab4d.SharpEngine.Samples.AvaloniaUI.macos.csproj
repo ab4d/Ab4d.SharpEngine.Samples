@@ -17,7 +17,7 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png">
       <Link>Resources\TreeTexture.png</Link>
     </Content>
-    <Content Include="..\lib\macOS\libMoltenVK.dylib">
+    <Content Include="..\lib\MoltenVK\macOS\libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -29,8 +29,8 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.16-beta5" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="0.9.18-beta6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,9 +77,9 @@
 
   <ItemGroup>
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
-    <None Remove="Samples.xml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
     <None Remove="Diagnostics\LogMessagesWindow.xaml" />
+    <None Remove="Samples.xml" />
     <None Remove="Titles\IntroductionPage.xaml" />
     <None Remove="Titles\QuickStartTitle.md" />
     <Content Include="Samples.xml">
@@ -97,11 +97,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\arial*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
   </ItemGroup>
-
 </Project>

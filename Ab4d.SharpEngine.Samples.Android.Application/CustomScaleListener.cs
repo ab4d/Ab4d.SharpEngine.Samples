@@ -42,6 +42,7 @@ public class CustomScaleListener : ScaleGestureDetector.SimpleOnScaleGestureList
             _mouseCameraController.ChangeCameraDistance(1f / oneStepScaleFactor);
 
             //System.Diagnostics.Debug.WriteLine($"ChangeCameraDistance({oneStepScaleFactor})");
+
         }
 
         return base.OnScale(detector);

@@ -132,7 +132,7 @@ public class TransformationsSample : CommonSample
         textBlockFactory.FontSize = 8;
 
         var textZPos = (_modelIndex % 2 == 0) ? 150 : 100;
-        var textNode1 = textBlockFactory.CreateTextBlock(_currentPosition + new Vector3(0, 20, textZPos), text, textAttitude: 30);
+        var textNode1 = textBlockFactory.CreateTextBlock(text, _currentPosition + new Vector3(0, 20, textZPos), textAttitude: 30);
         scene.RootNode.Add(textNode1);
 
 

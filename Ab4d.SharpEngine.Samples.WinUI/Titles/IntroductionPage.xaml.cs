@@ -83,6 +83,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
                 PlayAgainButton.Visibility = Visibility.Visible;
             }
+
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
+            {
+                _sharpEngineLogoAnimation.Dispose();
+                MainSceneView.Dispose();
+            };
         }
 
         private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)

@@ -9,7 +9,7 @@
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="1000">
     <Grid Name="RootGrid">
-        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" BackgroundColor="White" />
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="White" />
 
         <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#AAFFFFFF" Margin="5">
             <StackPanel Orientation="Vertical" Margin="10 5 10 8">

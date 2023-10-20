@@ -252,7 +252,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.QuickStart
 
                 await pixelStream.ReadAsync(pixels, 0, pixels.Length);
 
-                var pixelFormat = MainSceneView.SceneView.Format == StandardBitmapFormats.Bgra ? BitmapPixelFormat.Bgra8 : BitmapPixelFormat.Rgba8;
+                var pixelFormat = MainSceneView.SceneView.Format == StandardBitmapFormats.Rgba ? BitmapPixelFormat.Rgba8 : BitmapPixelFormat.Bgra8; // in case Format is set to Undefined, then Bgra is used
 
                 encoder.SetPixelData(pixelFormat, BitmapAlphaMode.Premultiplied,
                                      (uint)renderedBitmap.PixelWidth,

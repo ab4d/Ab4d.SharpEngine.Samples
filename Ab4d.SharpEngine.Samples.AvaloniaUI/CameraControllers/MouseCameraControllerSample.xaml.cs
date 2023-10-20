@@ -18,7 +18,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Cyotek.Drawing.BitmapFont;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CameraControllers
 {

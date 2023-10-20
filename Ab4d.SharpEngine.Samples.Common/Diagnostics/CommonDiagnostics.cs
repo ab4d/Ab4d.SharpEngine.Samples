@@ -398,6 +398,12 @@ public class CommonDiagnostics
             stagingUsageTime = $"StagingUsageTime: {renderingStatistics.StagingUsageTimeMs:0.00} ms" + Environment.NewLine;
         else
             stagingUsageTime = "";
+        
+        string frameCopyTime;
+        if (renderingStatistics.FrameCopyTimeMs > 0.01)
+            frameCopyTime = $"FrameCopyTime: {renderingStatistics.FrameCopyTimeMs:0.00} ms" + Environment.NewLine;
+        else
+            frameCopyTime = "";
 
         _renderingStatisticStringBuilder.AppendFormat(
             System.Globalization.CultureInfo.InvariantCulture,
@@ -408,7 +414,7 @@ Frame time: {3:0.00} ms {4}
 UpdateTime: {5:0.00} ms
 PrepareRenderTime: {6:0.00} ms
 {7}CompleteRenderTime: {8:0.00} ms
-{9}{10}UpdatedBuffers: Count: {11}; Size: {12}",
+{9}{10}{11}UpdatedBuffers: Count: {12}; Size: {13}",
             renderingStatistics.FrameNumber,
             renderingStatistics.CommandBuffersRecordedCount,
             renderingStatistics.RenderingLayersRecreateCount,
@@ -420,6 +426,7 @@ PrepareRenderTime: {6:0.00} ms
             renderingStatistics.CompleteRenderTimeMs,
             waitUntilRenderedTime,
             stagingUsageTime,
+            frameCopyTime,
             renderingStatistics.UpdatedBuffersCount,
             FormatMemorySize(renderingStatistics.UpdatedBuffersSize));
 

@@ -48,7 +48,7 @@ public class AndroidTextureLoader
         string? imageName = $"android_drawable_{drawableId}";
 
         if (cacheGpuTexture)
-            gpuImage = gpuDevice.GetCachedValue<GpuImage?>(imageName);
+            gpuImage = gpuDevice.GetCachedObject<GpuImage?>(imageName);
         else
             gpuImage = null;
 
@@ -72,7 +72,7 @@ public class AndroidTextureLoader
 #endif
 
             if (cacheGpuTexture)
-                gpuDevice.CacheValue(imageName, gpuImage);
+                gpuDevice.CacheObject(imageName, gpuImage);
         }
 
         return gpuImage;

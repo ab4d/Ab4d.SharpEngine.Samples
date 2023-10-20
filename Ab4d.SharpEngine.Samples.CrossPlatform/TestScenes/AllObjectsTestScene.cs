@@ -17,7 +17,6 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
-using Cyotek.Drawing.BitmapFont;
 
 namespace Ab4d.SharpEngine.Samples.TestScenes
 {
@@ -881,24 +880,18 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 }
             }
 
-            BitmapFont? arialBitmapFont;
+            BitmapFont? arialBitmapFont = null;
             if (usedFileName != null || fileStream != null)
             {
-                arialBitmapFont = new BitmapFont();
-
                 if (fileStream != null)
                 {
-                    arialBitmapFont.Load(fileStream); // load from stream
+                    arialBitmapFont = new BitmapFont(fileStream); // load from stream
                     fileStream.Close();
                 }
-                else
+                else if (usedFileName != null)
                 {
-                    arialBitmapFont.Load(usedFileName);
+                    arialBitmapFont = new BitmapFont(usedFileName);
                 }
-            }
-            else
-            {
-                arialBitmapFont = null;
             }
 
             return arialBitmapFont;

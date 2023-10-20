@@ -7,8 +7,6 @@
   <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
   <Sample Location="QuickStart.SharpEngineSceneViewInCode" Title="SharpEngineSceneView in code" />
   <Sample Location="QuickStart.SharpEngineSceneViewInXaml" Title="SharpEngineSceneView in XAML" />
-  <Sample IsSeparator="True" />
-  <Sample Location="QuickStart.MultiSceneNodesSample" Title="Multi SceneNodes" />
 
   <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
   <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
@@ -55,6 +53,7 @@
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
   <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
   <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
@@ -74,5 +73,8 @@
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
   <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
   <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
+
+  <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
+  <Sample Location="Advanced.MultiSceneNodesSample" Title="Multi SceneNodes" />
 
 </Samples>

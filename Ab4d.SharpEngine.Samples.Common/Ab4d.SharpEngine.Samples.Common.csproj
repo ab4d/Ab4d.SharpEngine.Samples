@@ -2,21 +2,22 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <Version>0.9.18.0</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.Assimp" Version="5.2.5" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.16-beta5" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.16-beta5" />
-    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.4" />
+    <PackageReference Include="Ab4d.Assimp" Version="5.3.1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.18-beta6" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
     <None Remove="StandardModels\OtherStandardModelsTitle.md" />
     <None Remove="Titles\AdvancedModelsTitle.md" />
+    <None Remove="Titles\AdvancedTitle.md" />   
     <None Remove="Titles\AnimationsTitle.md" />
     <None Remove="Titles\CamerasTitle.md" />
     <None Remove="Titles\HitTesting.md" />
@@ -36,6 +37,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="StandardModels\OtherStandardModelsTitle.md" />
+    <EmbeddedResource Include="Titles\AdvancedTitle.md" />   
     <EmbeddedResource Include="Titles\AnimationsTitle.md" />
     <EmbeddedResource Include="Titles\LightsTitle.md" />
     <EmbeddedResource Include="Titles\MaterialsTitle.md" />
@@ -51,7 +53,6 @@
   <ItemGroup>
     <Folder Include="Importers\" />
     <Folder Include="Materials\" />
-    <Folder Include="QuickStart\" />
   </ItemGroup>
 
   <ItemGroup>
