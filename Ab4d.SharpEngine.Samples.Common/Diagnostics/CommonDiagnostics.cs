@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using Ab4d.SharpEngine;
@@ -816,6 +817,37 @@ PipelineChangesCount: {8:#,##0}",
 
         try
         {
+            var assembly = typeof(VulkanInstance).Assembly;
+            var assemblyName = assembly.GetName();
+
+            string versionText;
+            if (assemblyName != null)
+            {
+                versionText = "v";
+
+                // Try to get full version info with version suffix, for example "0.7.1-20211214.alpha1"
+                var informationVersion = assembly.GetCustomAttributes(false).OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault();
+                if (informationVersion != null)
+                    versionText += informationVersion.InformationalVersion; // if this is not available then just show Version
+                else if (assemblyName.Version != null)
+                    versionText += assemblyName.Version.ToString();
+                else
+                    versionText += "<null>";
+            }
+            else
+            {
+                versionText = "";
+            }
+
+            sb.AppendLine($"Ab4d.SharpEngine {versionText} System Info:");
+            sb.AppendFormat("DateTime: {0:ddd}, {0:yyyy-MM-dd} {0:hh:mm:ss}{1}", DateTime.Now, Environment.NewLine);
+            sb.AppendFormat("Is64BitOS: {0}; Is64BitProcess: {1}; ProcessorCount: {2}; RuntimeIdentifier: {3}; OSDescription: {4}; OSArchitecture: {5}; FrameworkDescription: {6}; ProcessArchitecture: {7}",
+                Environment.Is64BitOperatingSystem, Environment.Is64BitProcess, Environment.ProcessorCount,
+                RuntimeInformation.RuntimeIdentifier, RuntimeInformation.OSDescription, RuntimeInformation.OSArchitecture, RuntimeInformation.FrameworkDescription, RuntimeInformation.ProcessArchitecture);
+            sb.AppendLine();
+            sb.AppendLine();
+
+
             sb.AppendLine("All graphics cards (PhysicalDevices):");
 
             var allPhysicalDeviceDetails = vulkanDevice.VulkanInstance.AllPhysicalDeviceDetails;
