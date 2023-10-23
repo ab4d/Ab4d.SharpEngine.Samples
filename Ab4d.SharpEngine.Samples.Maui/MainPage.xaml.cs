@@ -30,6 +30,9 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 
+        // To enable full Ab4d.SharpEngine logging uncomment the followig two lines:
+		//Ab4d.SharpEngine.Utilities.Log.LogLevel = Ab4d.SharpEngine.Common.LogLevels.All;
+		//Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
 
         _sharpEngineSceneView = new SharpEngineSceneView();
 
@@ -81,9 +84,14 @@ public partial class MainPage : ContentPage
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "libMoltenVK.dylib");
             bool fileExist = System.IO.File.Exists(fileName);
 
-            // If the libMoltenVK.dylib does not exist, then we try to read the file from the Vulkan SKD folder (if installed)
-            if (!fileExist)
+            if (fileExist)
+			{
+				// On macOS we need to set the CustomVulkanLoaderLibrary even if the library is present in the app's folder.
+				engineCreateOptions.CustomVulkanLoaderLibrary = fileName;
+			}
+			else
             {
+				// If the libMoltenVK.dylib does not exist, then we try to read the file from the Vulkan SKD folder (if installed)
                 var usersFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile); // get "/Users/[user_name]/
                 var vulkanSdkFolder = System.IO.Path.Combine(usersFolder, "VulkanSDK");
                 
