@@ -207,13 +207,10 @@ Ab3d.PowerToys and Ab3d.DXEngine will still be actively developed, will get new 
 ## Troubleshooting
 
 Known issues:
-- Vulkan requires very complex memory and object lifecycle management. If the application crashes or you get an error warning, please provide details about that.
-
 - Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
 
 - When using SharedTexture in a WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error. Set SharpEngineSceneView.PresentationType to WriteableBitmap as a workaround.
 
-- ReaderObj cannot read obj files from a stream (this makes it impossible to read obj files on Android)
 
 
 To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/
@@ -227,7 +224,7 @@ This means that it is possible to get Trace level log messages
 (production version will have only Warning and Error logging compiled into the assembly).
 
 When you have some problems, then please enable Trace level logging and writing log messages to a file or debug output.
-To do this please find the existing code that sets up logging an change it to:
+To do this please find the existing code that sets up logging and change it to:
   
     Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;       
     Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false; // write full log messages timestamp, thread id and other details
@@ -248,7 +245,35 @@ To do this please find the existing code that sets up logging an change it to:
 
 ## Change log
 
-v0.9.15 beta4 version (2023-08-23):
+**v0.9.18 beta6** (2023-10-20):
+- TextBlockFactory, BitmapTextCreator and BitmapFont are now part of SharpEngine. Also there is a build-in bitmap font that can be used without the need to provide your font.
+- Improved ways to manually dispose objects and resources by adding the following methods: GroupNode.DisposeAllChildren, GroupNode.DisposeWithAllChildren, GroupNode.DisposeChildren, ModelNode.DisposeWithMaterial, MeshModelNode.DisposeWithMeshAndMaterial, LineBaseNode.DisposeWithMaterial and StandardMaterial.DisposeWithTexture (see online help for more info: https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm)
+- Added support for rendering sprites - see SpritesSample
+- Renamed GroupNode.GetFirstChild to GetChild
+- Improved support for using SharedTexture for WPF on Intel graphics cards. Before WritableBitmap was used because Intel's Vulkan driver do not support sharing DirectX 9 texture (created by WPF) with Vulkan. Note that this requries copying to another texture and this means that for integrated Intel GPU this is not faster so for now WritableBitamp is used by default. SharedTexture can be forece by setting IsUsingSharedTextureForIntegratedIntelGpu to true.
+- When calling RenderToBitmap or similar method and when format parameter is omitted, them the currently used Format from SceneView is used (before Bgra was used).
+- Updated RenderingSteps that render objects: FillCommandBufferRenderingStep is now abstract; there are new RenderObjectsRenderingStep and RenderSpritesRenderingStep; renamed SceneView.DefaultFillCommandBufferRenderingStep to SceneView.DefaultRenderObjectsRenderingStep; renamed CompleteRenderingStep to CompleteRenderingRenderingStep; renamed SceneView.DefaultCompleteRenderingRenderingStep to SceneView.DefaultCompleteRenderingStep
+- Added ClampNoInterpolation to CommonSamplerTypes - can be used for height maps with hard gradient.
+- Fixed hit-testing for InstancedMeshNode
+- Fixed using transparency in WPF's WriteableBitmap.
+- Updated TextureLoader to add options to cache a loaded texture (GpuImage) in a Scene's cache and not only in GpuDevice's cache. This way the textures are disposed when the Scene is disposed.
+- ReaderObj and AssimpImporter now have new constructors that take Scene object. When used, then textures are cached by the Scene and not by the GpuDevice.
+
+- Updated native Assimp importer to v5.3.1.
+- Updated Ab3d.Assimp library to correctly read file with non-ascii file names
+
+Breaking change:
+- The cacheGpuTexture paramter in TextureLoader.CreateTexture has been renamed to useGpuDeviceCache. Note that the new version also allows using Scene's cache for texture. To use that call CreateTexture by providing the Scene object and setting the useSceneCache to true.
+
+**v0.9.16 beta5** (2023-09-15):
+- Improved ReaderObj to also read textures.
+- Swapped AssimpImporter constructor parameters (first parameter is now BitmapIO and not GpuDevice - BitmapIO is more important becuse it is required to load textures)
+- AssimpImporter can now read textures even when it is not created with a valid GpuDevice (in this case textures are lazily loaded)
+- Added RenderToBitmap method to SharpEngineSceneView that take WritableBitmap as parameter
+
+- Ab4d.SharpEngine.AvaloniaUI: removed dependency from SharpDX.DXGI and SharpDX.Direct3D11
+
+**v0.9.15 beta4** version (2023-08-23):
 - Engine can load the vulkan loader from the path that is set to the VK_DRIVER_FILES environment variable (see the following on how to use SharpEngine in a virtual machine or a web server: https://www.ab4d.com/SharpEngine/using-vulkan-in-virtual-machine-mesa-llvmpipe.aspx)
 - Removed isDeviceLocal parameter from GpuImage constructor and TextureLoader.CreateTexture method.
 - By default MSAA (multi-sampling anti-aliasing) is disabled for software renderer (Mesa's llvmpipe).
@@ -257,10 +282,10 @@ v0.9.15 beta4 version (2023-08-23):
 - Moved methods to create edge lines from Ab4d.SharpEngine.Utilities.EdgeLinesFactory class to Ab4d.SharpEngine.Utilities.LineUtils class.
 - Many other improvements and fixes
 
-v0.9.10 beta3 version (2023-05-10):
+**v0.9.10 beta3** version (2023-05-10):
 - Many improvements and fixes
 
-v0.9.7 beta2 version (2023-04-14): 
+**v0.9.7 beta2** version (2023-04-14): 
 - Added many samples to help you understand the SharpEngine and provide code templates for your projects
 - Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
 - Using SwapChainPanel for WinUI instead of SurfaceImageSource - this is faster and better supported by WinUI
@@ -268,33 +293,23 @@ v0.9.7 beta2 version (2023-04-14):
 - Objects and camera animation similar to Anime.js
 - Breaking change: Renamed StandardMaterial.Alpha property to Opacity
 
-v0.9.0 beta1 version (2022-12-14): 
+**v0.9.0 beta1** version (2022-12-14): 
 - first beta version
 
 
 ## Roadmap
 
-### Future beta versions
+### RC versions
 
-- Improve stability
-- Add many samples in a similar way as the samples for Ab3d.PowerToys and Ab3d.DXEngine
-- Port more functionality from Ab3d.PowerToys and Ab3d.DXEngine
-- Support for multiple SceneViews that show a single Scene
-- RenderToBitmap with custom bitmap size
-- SharpEngineSceneView control for WinForms and Android
-- Add support for iOS and ahead-of-time compilation for Android (this will require another build of Ab4d.SharpEngine)
-- Add MAUI support
-- Improve Ab4d.SharpEngine.AvaloniaUI library so it will also work on Android and iOS.
-- Add support for 2D sprites
-- Improve xml documentation and online reference help
+Version v0.9.18 beta6 was last beta version. The next version will be the first RC version.
 
-- Public tests project on GitHub
+### v1.0 release (November 2023)
 
+Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
 
-### v1.0 release (Q3 2023)
+See [current licensing plan](https://forum.ab4d.com/showthread.php?tid=4429)
 
-- Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
-- Full reference documentation (documenting all public classes, methods, properties and fields)
+  
 
 
 ### Later versions
@@ -303,8 +318,8 @@ v0.9.0 beta1 version (2022-12-14):
 - Add support for PhysicallyBasedRendering effect
 - Multi-threaded rendering
 - Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
-- Gltf 2 file reader included in SharpEngine
 - Shadows
+- Production ready version for Android, macOS and iOS
 - Python binding and samples
 
 
