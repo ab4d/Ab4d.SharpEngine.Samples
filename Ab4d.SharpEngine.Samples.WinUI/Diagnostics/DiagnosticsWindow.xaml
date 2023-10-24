@@ -45,6 +45,9 @@
                     <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
                     <MenuFlyoutItem Name="CaptureInRenderDocMenuItem" Text="Capture next frame in RenderDoc" Margin="0 -2" Tapped="CaptureInRenderDocMenuItem_OnTapped"/>
 
+                    <MenuFlyoutSeparator Name="FullLoggingSeparator" />
+                    <ToggleMenuFlyoutItem Name="FullLoggingCheckBox" Text="Full Logging" Click="FullLoggingCheckBox_OnClick" />
+
                     <MenuFlyoutSeparator />
                     <MenuFlyoutItem Name="OnlineReferenceHelpMenuItem" Text="Online reference help" Margin="0 -2" Tapped="OnlineReferenceHelpMenuItem_OnTapped" />
                 </MenuFlyout>

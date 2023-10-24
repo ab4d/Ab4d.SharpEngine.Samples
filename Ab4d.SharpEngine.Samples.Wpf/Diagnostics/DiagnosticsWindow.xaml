@@ -54,6 +54,8 @@
 
                 <Separator />
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" Checked="AlwaysOnTopCheckBoxChanged" Unchecked="AlwaysOnTopCheckBoxChanged"/>
+                <CheckBox Name="FullLoggingCheckBox" Content="Full Logging" Checked="FullLoggingCheckBoxChanged" Unchecked="FullLoggingCheckBoxChanged"
+                          ToolTip="When checked then full logging will be enabled (when SharpEngine is compiled with all log levels)&amp;#x0a;and log message will be written to Visual Studio Output window.&amp;#x0a;When unchecked then Warn log level is enabled."/>
                 
                 <Separator />
                 <MenuItem Name="OnlineReferenceHelpMenuItem" Header="Online reference help" Click="OnlineReferenceHelpMenuItem_OnClick" />

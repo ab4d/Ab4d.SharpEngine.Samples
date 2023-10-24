@@ -79,6 +79,14 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             _commonDiagnostics.OnSceneRenderedAction = UpdateStatistics;
 
 
+            // Only show "Full Logging" CheckBox when SharpEngine is compiled with full logging
+            if (Ab4d.SharpEngine.Utilities.Log.MinUsedLogLevel != LogLevels.Trace)
+            {
+                ActionsRootMenuItem.Items.Remove(FullLoggingSeparator);
+                ActionsRootMenuItem.Items.Remove(FullLoggingCheckBox);
+            }
+
+
             string dumpFolder;
             if (System.IO.Directory.Exists(@"C:\temp"))
                 dumpFolder = @"C:\temp\";
@@ -116,6 +124,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
         {
             // On each new scene reset the StartStopCameraRotationMenuItem text
             StartStopCameraRotationMenuItem.Text = "Toggle camera rotation";
+
+            if (Ab4d.SharpEngine.Utilities.Log.LogLevel == LogLevels.All)
+                FullLoggingCheckBox.IsChecked = true;
         }
         
         private void StartShowingStatistics()
@@ -516,6 +527,19 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
         {
             ShowRenderingStatisticsRadioButton.IsChecked = false;
             ShowStatisticsOrCameraInfo(showStatistics: false);
+        }
+
+        private void FullLoggingCheckBox_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (FullLoggingCheckBox.IsChecked)
+            {
+                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.All;
+                Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+            }
+            else
+            {
+                Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+            }
         }
     }
 }

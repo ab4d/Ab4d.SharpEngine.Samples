@@ -46,8 +46,9 @@
 
                 <Separator />
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" IsCheckedChanged="AlwaysOnTopCheckBoxChanged" />
+                <CheckBox Name="FullLoggingCheckBox" Content="Full Logging" IsCheckedChanged="FullLoggingCheckBoxChanged" />
 
-                <Separator />
+              <Separator />
                 <MenuItem Name="OnlineReferenceHelpMenuItem" Header="Online reference help" Click="OnlineReferenceHelpMenuItem_OnClick" />
 
             </MenuItem>
