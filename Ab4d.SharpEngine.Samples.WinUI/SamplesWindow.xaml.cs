@@ -627,7 +627,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             if (_currentSharpEngineSceneView == null)
                 return;
 
-            _diagnosticsWindow = new DiagnosticsWindow();
+            if (_diagnosticsWindow == null)
+            {
+                _diagnosticsWindow = new DiagnosticsWindow();
+                _diagnosticsWindow.Closed += (sender, args) => _diagnosticsWindow = null;
+            }
+
             _diagnosticsWindow.SharpEngineSceneView = _currentSharpEngineSceneView;
 
             // Position the Diagnostics window to the edge of the main window

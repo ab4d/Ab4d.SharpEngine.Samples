@@ -636,9 +636,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return;
             }
 
-            _diagnosticsWindow = new DiagnosticsWindow();
+            if (_diagnosticsWindow == null)
+            {
+                _diagnosticsWindow = new DiagnosticsWindow();
+                _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
+            }
+
             _diagnosticsWindow.SharpEngineSceneView = _currentSharpEngineSceneView;
-            _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
 
             // Position DiagnosticsWindow to the top-left corner of our window
 
@@ -669,6 +673,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 try
                 {
                     _diagnosticsWindow.Close();
+                    _diagnosticsWindow = null;
                 }
                 catch
                 {

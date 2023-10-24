@@ -33,8 +33,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "Advanced.MultiSceneNodesSample";
-        private string? _startupPage = null;
+        private string? _startupPage = "Advanced.MultiSceneNodesSample";
+        //private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
@@ -368,9 +368,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 return;
             }
 
-            _diagnosticsWindow =  new DiagnosticsWindow();
-            _diagnosticsWindow.SharpEngineSceneView =  sharpEngineSceneView;
-            _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
+            if (_diagnosticsWindow == null)
+            {
+                _diagnosticsWindow = new DiagnosticsWindow();
+                _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
+            }
+
+            _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
 
             // Position DiagnosticsWindow to the top-left corner of our window
             double left = this.Left + this.ActualWidth;
@@ -397,6 +401,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 try
                 {
                     _diagnosticsWindow.Close();
+                    _diagnosticsWindow = null;
                 }
                 catch
                 {
