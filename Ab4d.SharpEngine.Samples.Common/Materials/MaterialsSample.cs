@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;

@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common.StandardModels;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;

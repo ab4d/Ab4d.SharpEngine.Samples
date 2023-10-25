@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;

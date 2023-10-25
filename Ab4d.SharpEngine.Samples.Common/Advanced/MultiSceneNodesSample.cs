@@ -121,10 +121,10 @@ public class MultiSceneNodesSample : CommonSample
         var gpuDevice = scene.GpuDevice;
         
         var planeModel = new PlaneModelNode(centerPosition: new Vector3(0, -50, 0),
-                                size: new Vector2(800, 1000),
-                                normal: new Vector3(0, 1, 0),
-                                heightDirection: new Vector3(1, 0, 0),
-                                name: "Gray plane")
+                                            size: new Vector2(800, 1000),
+                                            normal: new Vector3(0, 1, 0),
+                                            heightDirection: new Vector3(1, 0, 0),
+                                            name: "Gray plane")
         {
             Material = StandardMaterials.Gray,
             BackMaterial = StandardMaterials.Black
