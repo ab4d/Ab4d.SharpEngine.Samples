@@ -16,6 +16,7 @@ using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
+using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.TestScenes
@@ -77,6 +78,9 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         public void CreateTestScene()
         {
+            if (_scene.GpuDevice == null)
+                return;
+
             _planeModel = new PlaneModelNode(centerPosition: new Vector3(0, -50, 0),
                                              size: new Vector2(800, 1000),
                                              normal: new Vector3(0, 1, 0),
@@ -263,7 +267,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
 
             // TEST crating custom texture
-            var customTexture = CreateCustomTexture(_scene, 256, 128, alphaValue: 1);
+            var customTexture = CreateCustomTexture(_scene.GpuDevice, 256, 128, alphaValue: 1);
 
             var customTextureMaterial = new StandardMaterial(customTexture, CommonSamplerTypes.Clamp, "CustomTextureMaterial");
 
@@ -792,7 +796,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 _specialMaterialGroupTransform.Y = MathF.Sin(totalTime * 2) * 20 + 15;
         }
 
-        private GpuImage CreateCustomTexture(Scene scene, int width, int height, float alphaValue)
+        private GpuImage CreateCustomTexture(VulkanDevice gpuDevice, int width, int height, float alphaValue)
         {
             int imageStride = width * 4;
             var imageBytes = new byte[imageStride * height];
@@ -847,7 +851,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             var rawImageData = new RawImageData(width, height, imageStride, Ab4d.Vulkan.Format.B8G8R8A8Unorm, imageBytes, checkTransparency: false);
 
-            var gpuImage = new GpuImage(scene.GpuDevice, rawImageData, generateMipMaps: true, imageSource: "CustomTexture")
+            var gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, imageSource: "CustomTexture")
             {
                 IsPreMultipliedAlpha = true,
                 HasTransparentPixels = alphaValue < 1,
