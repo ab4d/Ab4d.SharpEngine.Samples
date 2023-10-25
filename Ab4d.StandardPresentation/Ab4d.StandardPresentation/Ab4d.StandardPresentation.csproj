@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>Ab4d.StandardPresentation</AssemblyName>
+    <RootNamespace>Ab4d.StandardPresentation</RootNamespace>    
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Ab3d</RootNamespace>
   </PropertyGroup>

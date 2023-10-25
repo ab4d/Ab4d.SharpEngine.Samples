@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>Ab4d.SilkWindowingUI</AssemblyName>
+    <RootNamespace>Ab4d.SilkWindowingUI</RootNamespace>    
     <TargetFramework>net6.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -10,9 +12,9 @@
     <PackageReference Include="Silk.NET.Input" Version="2.15.0" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.15.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.csproj" />
-  </ItemGroup>
+  </ItemGroup>  
 
 </Project>

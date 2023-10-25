@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>	  
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
-    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine_logo.ico</PackageIcon>
   </PropertyGroup>
