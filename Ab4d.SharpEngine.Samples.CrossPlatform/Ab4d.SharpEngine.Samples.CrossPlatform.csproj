@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.CrossPlatform</AssemblyName>
@@ -25,8 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation\Ab4d.StandardPresentation.csproj" />
-    <ProjectReference Include="..\Ab4d.StandardPresentation\GlfwUI\GlfwUI.csproj" />
-    <ProjectReference Include="..\Ab4d.StandardPresentation\SilkWindowingUI\SilkWindowingUI.csproj" />
+    <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.GlfwUI\Ab4d.StandardPresentation.GlfwUI.csproj" />
+    <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.SilkWindowingUI\Ab4d.StandardPresentation.SilkWindowingUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,8 +41,8 @@
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
 
-    <ProjectReference Include="..\Ab4d.StandardPresentation\WinFormsUI\WinFormsUI.csproj" />
-    <ProjectReference Include="..\Ab4d.StandardPresentation\WpfUI\WpfUI.csproj" />
+    <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.WinFormsUI\Ab4d.StandardPresentation.WinFormsUI.csproj" />
+    <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.WpfUI\Ab4d.StandardPresentation.WpfUI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

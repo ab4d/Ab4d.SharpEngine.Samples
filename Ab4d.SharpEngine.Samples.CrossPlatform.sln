@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.Cr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.StandardPresentation", "Ab4d.StandardPresentation\Ab4d.StandardPresentation\Ab4d.StandardPresentation.csproj", "{6CEA982C-584E-4E76-938F-7EE4381EDAE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlfwUI", "Ab4d.StandardPresentation\GlfwUI\GlfwUI.csproj", "{DDCFE830-B9A4-4EE7-BD03-D06D6FCCBD0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.StandardPresentation.GlfwUI", "Ab4d.StandardPresentation\Ab4d.StandardPresentation.GlfwUI\Ab4d.StandardPresentation.GlfwUI.csproj", "{DDCFE830-B9A4-4EE7-BD03-D06D6FCCBD0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SilkWindowingUI", "Ab4d.StandardPresentation\SilkWindowingUI\SilkWindowingUI.csproj", "{E05AF63B-7D2C-44C4-A5AC-18E33D176122}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.StandardPresentation.SilkWindowingUI", "Ab4d.StandardPresentation\Ab4d.StandardPresentation.SilkWindowingUI\Ab4d.StandardPresentation.SilkWindowingUI.csproj", "{E05AF63B-7D2C-44C4-A5AC-18E33D176122}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsUI", "Ab4d.StandardPresentation\WinFormsUI\WinFormsUI.csproj", "{9B46F068-7B05-4FEA-A132-D348A86C6F2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.StandardPresentation.WinFormsUI", "Ab4d.StandardPresentation\Ab4d.StandardPresentation.WinFormsUI\Ab4d.StandardPresentation.WinFormsUI.csproj", "{9B46F068-7B05-4FEA-A132-D348A86C6F2B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfUI", "Ab4d.StandardPresentation\WpfUI\WpfUI.csproj", "{0F34CAD9-18B8-4236-B887-33CA0D8F3959}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.StandardPresentation.WpfUI", "Ab4d.StandardPresentation\Ab4d.StandardPresentation.WpfUI\Ab4d.StandardPresentation.WpfUI.csproj", "{0F34CAD9-18B8-4236-B887-33CA0D8F3959}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
