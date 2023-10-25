@@ -283,7 +283,11 @@ public class SceneNodeAnimationSample : CommonSample
 
     private void UpdatePlanarShadow()
     {
-        if (_planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
+        bool isAnyAnimationRunning = false;
+        foreach (var animation in _animations)
+            isAnyAnimationRunning |= animation.IsRunning;
+
+        if (isAnyAnimationRunning && _planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
         {
             _planarShadowMeshCreator.UpdateGroupNode();
             _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);

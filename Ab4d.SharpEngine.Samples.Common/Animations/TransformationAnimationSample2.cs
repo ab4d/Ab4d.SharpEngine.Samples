@@ -134,7 +134,7 @@ TranslateZ, RotateY";
 
     private void UpdatePlanarShadow()
     {
-        if (_planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
+        if (_animation != null && _animation.IsRunning && _planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
         {
             _planarShadowMeshCreator.UpdateGroupNode();
             _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
