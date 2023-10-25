@@ -23,9 +23,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using WinFormsUI.SharpDX.Collections;
+using Ab4d.StandardPresentation.WinFormsUI.SharpDX.Collections;
 
-namespace WinFormsUI.SharpDX.Windows.Desktop
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
 {
     /// <summary>
     /// Provides a hook to WndProc of an existing window handle using <see cref="IMessageFilter"/>.

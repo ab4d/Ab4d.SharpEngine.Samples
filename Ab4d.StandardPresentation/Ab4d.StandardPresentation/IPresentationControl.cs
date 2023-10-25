@@ -1,7 +1,7 @@
 ﻿using System;
 using Ab4d.SharpEngine.Common;
 
-namespace Ab4d
+namespace Ab4d.StandardPresentation
 {
     public interface IPresentationControl : IDisposable
     {

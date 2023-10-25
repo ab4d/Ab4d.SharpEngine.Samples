@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WpfUI.Common
+namespace Ab4d.StandardPresentation.WpfUI.Common
 {
     /// <summary>
     /// HandleCreatedEventHandler is a delegate for the <see cref="HandleCreatedEventArgs"/>.

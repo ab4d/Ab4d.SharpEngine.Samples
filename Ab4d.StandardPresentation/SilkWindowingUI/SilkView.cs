@@ -8,7 +8,7 @@ using Silk.NET.Input;
 using Silk.NET.Windowing;
 using MouseButtons = Ab4d.SharpEngine.Common.MouseButtons;
 
-namespace SilkWindowingUI
+namespace Ab4d.StandardPresentation.SilkWindowingUI
 {
     public class SilkView : IPresentationControl
     {
@@ -322,17 +322,17 @@ namespace SilkWindowingUI
 
         protected void OnMouseDown(MouseButtons button)
         {
-            MouseDown?.Invoke(this, new Ab4d.MouseButtonEventArgs(button));
+            MouseDown?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(button));
         }
 
         protected void OnMouseUp(MouseButtons button)
         {
-            MouseUp?.Invoke(this, new Ab4d.MouseButtonEventArgs(button));
+            MouseUp?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(button));
         }
 
         protected void OnMouseMove(double x, double y)
         {
-            MouseMove?.Invoke(this, new Ab4d.MouseMoveEventArgs((float)x, (float)y));
+            MouseMove?.Invoke(this, new Ab4d.StandardPresentation.MouseMoveEventArgs((float)x, (float)y));
         }
 
         protected void OnMouseWheel(double dx, double dy)

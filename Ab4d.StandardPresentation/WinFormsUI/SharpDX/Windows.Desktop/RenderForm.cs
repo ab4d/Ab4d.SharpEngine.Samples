@@ -49,7 +49,7 @@ using System.Drawing;
 using System.Windows.Forms;
 //using SharpDX.Mathematics.Interop;
 
-namespace WinFormsUI.SharpDX.Windows.Desktop
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
 {
     /// <summary>
     /// Default Rendering Form.

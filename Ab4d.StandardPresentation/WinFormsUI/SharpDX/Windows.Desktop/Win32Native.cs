@@ -27,7 +27,7 @@ using System.Security;
 //using SharpDX.Mathematics.Interop;
 //using SharpDX.Win32;
 
-namespace WinFormsUI.SharpDX.Windows.Desktop
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
 {
     /// <summary>
     /// Internal class to interact with Native Message

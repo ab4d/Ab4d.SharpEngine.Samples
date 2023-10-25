@@ -7,11 +7,11 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Ab4d;
 using Ab4d.SharpEngine.Common;
-using WpfUI.Common;
+using Ab4d.StandardPresentation.WpfUI.Common;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
-using MouseWheelEventArgs = Ab4d.MouseWheelEventArgs;
+using MouseWheelEventArgs = Ab4d.StandardPresentation.MouseWheelEventArgs;
 
-namespace WpfUI
+namespace Ab4d.StandardPresentation.WpfUI
 {
     public class WpfWindow : IPresentationControl
     {
@@ -57,10 +57,10 @@ namespace WpfUI
         public event SizeChangeEventHandler SizeChanged;
 
 
-        public event Ab4d.MouseButtonEventHandler MouseDown;
-        public event Ab4d.MouseButtonEventHandler MouseUp;
-        public event Ab4d.MouseMoveEventHandler MouseMove;
-        public event Ab4d.MouseWheelEventHandler MouseWheel;
+        public event Ab4d.StandardPresentation.MouseButtonEventHandler MouseDown;
+        public event Ab4d.StandardPresentation.MouseButtonEventHandler MouseUp;
+        public event Ab4d.StandardPresentation.MouseMoveEventHandler MouseMove;
+        public event Ab4d.StandardPresentation.MouseWheelEventHandler MouseWheel;
 
 
         public WpfWindow(int width, int height, string name = "")
@@ -136,7 +136,7 @@ namespace WpfUI
                 OnMouseUp(args);
             };
 
-            _rootBorder.MouseMove += delegate (object sender, MouseEventArgs args)
+            _rootBorder.MouseMove += delegate (object sender, System.Windows.Input.MouseEventArgs args)
             {
                 OnMouseMove(args);
             };
@@ -424,18 +424,18 @@ namespace WpfUI
 
         protected void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
         {
-            MouseDown?.Invoke(this, new Ab4d.MouseButtonEventArgs(ConvertMouseButton(e.ChangedButton)));
+            MouseDown?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(ConvertMouseButton(e.ChangedButton)));
         }
 
         protected void OnMouseUp(System.Windows.Input.MouseButtonEventArgs e)
         {
-            MouseUp?.Invoke(this, new Ab4d.MouseButtonEventArgs(ConvertMouseButton(e.ChangedButton)));
+            MouseUp?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(ConvertMouseButton(e.ChangedButton)));
         }
 
         protected void OnMouseMove(System.Windows.Input.MouseEventArgs e)
         {
             var position = e.GetPosition(_rootBorder);
-            MouseMove?.Invoke(this, new Ab4d.MouseMoveEventArgs((float)position.X, (float)position.Y));
+            MouseMove?.Invoke(this, new Ab4d.StandardPresentation.MouseMoveEventArgs((float)position.X, (float)position.Y));
         }
 
         protected void OnMouseWheel(System.Windows.Input.MouseWheelEventArgs e)

@@ -1,4 +1,4 @@
-﻿namespace Ab4d
+﻿namespace Ab4d.StandardPresentation
 {
     public delegate void MouseWheelEventHandler(object sender, MouseWheelEventArgs e);
 

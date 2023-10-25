@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ab4d
+namespace Ab4d.StandardPresentation
 {
     public delegate void SizeChangeEventHandler(object sender, SizeChangeEventArgs e);
 

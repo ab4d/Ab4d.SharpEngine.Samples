@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace WpfUI.Common
+namespace Ab4d.StandardPresentation.WpfUI.Common
 {
     [SuppressUnmanagedCodeSecurity]
     internal static class NativeMethods

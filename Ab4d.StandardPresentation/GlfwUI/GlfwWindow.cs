@@ -10,9 +10,9 @@ using Ab4d;
 using Ab4d.SharpEngine.Common;
 using GLFW;
 using Microsoft.Win32.SafeHandles;
-using SizeChangeEventArgs = Ab4d.SizeChangeEventArgs;
+using SizeChangeEventArgs = Ab4d.StandardPresentation.SizeChangeEventArgs;
 
-namespace GlfwUI
+namespace Ab4d.StandardPresentation.GlfwUI
 {
     public class GlfwWindow : IPresentationControl
     {
@@ -95,13 +95,13 @@ namespace GlfwUI
         public event EventHandler Closing;
         public event EventHandler Closed;
 
-        public event Ab4d.SizeChangeEventHandler SizeChanged;
+        public event Ab4d.StandardPresentation.SizeChangeEventHandler SizeChanged;
 
 
-        public event Ab4d.MouseButtonEventHandler MouseDown;
-        public event Ab4d.MouseButtonEventHandler MouseUp;
-        public event Ab4d.MouseMoveEventHandler MouseMove;
-        public event Ab4d.MouseWheelEventHandler MouseWheel;
+        public event Ab4d.StandardPresentation.MouseButtonEventHandler MouseDown;
+        public event Ab4d.StandardPresentation.MouseButtonEventHandler MouseUp;
+        public event Ab4d.StandardPresentation.MouseMoveEventHandler MouseMove;
+        public event Ab4d.StandardPresentation.MouseWheelEventHandler MouseWheel;
 
         //public int FrameRateLimit = 60; // Set to 0 to disable it
 
@@ -469,17 +469,17 @@ namespace GlfwUI
 
         protected void OnMouseDown(GLFW.MouseButton button)
         {
-            MouseDown?.Invoke(this, new Ab4d.MouseButtonEventArgs(ConvertMouseButton(button)));
+            MouseDown?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(ConvertMouseButton(button)));
         }
 
         protected void OnMouseUp(GLFW.MouseButton button)
         {
-            MouseUp?.Invoke(this, new Ab4d.MouseButtonEventArgs(ConvertMouseButton(button)));
+            MouseUp?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(ConvertMouseButton(button)));
         }
 
         protected void OnMouseMove(double x, double y)
         {
-            MouseMove?.Invoke(this, new Ab4d.MouseMoveEventArgs((float)x, (float)y));
+            MouseMove?.Invoke(this, new Ab4d.StandardPresentation.MouseMoveEventArgs((float)x, (float)y));
         }
 
         protected void OnMouseWheel(double dx, double dy)

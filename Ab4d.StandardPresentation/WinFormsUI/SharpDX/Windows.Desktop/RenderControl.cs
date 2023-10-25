@@ -21,7 +21,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace WinFormsUI.SharpDX.Windows.Desktop
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
 {
     /// <summary>
     /// A Renderable UserControl.

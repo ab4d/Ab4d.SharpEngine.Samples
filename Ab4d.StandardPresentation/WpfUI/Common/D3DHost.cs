@@ -6,7 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Ab4d.SharpEngine.Utilities;
 
-namespace WpfUI.Common
+namespace Ab4d.StandardPresentation.WpfUI.Common
 {
     // See a great article about problems of using HwndHost in WPF
     // http://blogs.msdn.com/b/dwayneneed/archive/2013/02/26/mitigating-airspace-issues-in-wpf-applications.aspx

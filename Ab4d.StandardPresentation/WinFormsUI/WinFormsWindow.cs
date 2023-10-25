@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Ab4d;
 using Ab4d.SharpEngine.Common;
-using WinFormsUI.SharpDX.Windows.Desktop;
+using Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop;
 using MouseButtons = System.Windows.Forms.MouseButtons;
 
-namespace WinFormsUI
+namespace Ab4d.StandardPresentation.WinFormsUI
 {
     public class WinFormsWindow : IPresentationControl
     {

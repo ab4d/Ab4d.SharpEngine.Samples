@@ -17,9 +17,10 @@ using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
+using Ab4d.StandardPresentation;
+using Ab4d.StandardPresentation.GlfwUI;
+using Ab4d.StandardPresentation.SilkWindowingUI;
 using Ab4d.Vulkan;
-using GlfwUI;
-using SilkWindowingUI;
 
 #if WPF
 using WpfUI;
@@ -209,7 +210,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             };
 
             // We need to update the ViewSize when the size of the view is changed (this is done above in the _presentationControl.SizeChanged)
-            _presentationControl.SizeChanged += delegate (object sender, Ab4d.SizeChangeEventArgs e)
+            _presentationControl.SizeChanged += delegate (object sender, Ab4d.StandardPresentation.SizeChangeEventArgs e)
             {
                 // SizeChanged is also called when _presentationControl.IsMinimized (in this case Size is still the same).
                 // We need to handle when IsMinimized is set to false (we need to force rendering)
@@ -308,7 +309,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
         {
             _isShuttingDown = true;
 
-            if (_scene != null)
+            if (_scene != null && _scene.GpuDevice != null)
             {
                 _scene.GpuDevice.WaitUntilIdle();
 
@@ -627,7 +628,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
 
         #region Mouse event handlers
 
-        private void OnMouseMove(object sender, Ab4d.MouseMoveEventArgs e)
+        private void OnMouseMove(object sender, Ab4d.StandardPresentation.MouseMoveEventArgs e)
         {
             if (_mouseCameraController != null)
             {
@@ -639,7 +640,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }            
         }
 
-        private void OnMouseUp(object sender, Ab4d.MouseButtonEventArgs e)
+        private void OnMouseUp(object sender, Ab4d.StandardPresentation.MouseButtonEventArgs e)
         {
             if (_mouseCameraController != null)
             {
@@ -651,7 +652,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-        private void OnMouseDown(object sender, Ab4d.MouseButtonEventArgs e)
+        private void OnMouseDown(object sender, Ab4d.StandardPresentation.MouseButtonEventArgs e)
         {
             if (_mouseCameraController != null)
             {
@@ -663,7 +664,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
         }
 
-        private void OnMouseWheel(object sender, Ab4d.MouseWheelEventArgs e)
+        private void OnMouseWheel(object sender, Ab4d.StandardPresentation.MouseWheelEventArgs e)
         {
             if (_mouseCameraController != null)
             {

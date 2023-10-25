@@ -21,7 +21,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WinFormsUI.SharpDX.Collections
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Collections
 {
     /// <summary>
     /// Provides <see cref="IEqualityComparer{T}"/> for default value types.

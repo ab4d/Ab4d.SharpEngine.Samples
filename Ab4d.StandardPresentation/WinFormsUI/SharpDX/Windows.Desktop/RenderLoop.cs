@@ -25,7 +25,7 @@ using System.Windows.Forms;
 
 //using SharpDX.Win32;
 
-namespace WinFormsUI.SharpDX.Windows.Desktop
+namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
 {
     /// <summary>
     /// RenderLoop provides a rendering loop infrastructure. See remarks for usage. 
