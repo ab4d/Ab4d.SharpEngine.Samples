@@ -228,15 +228,17 @@ public class MaterialsSample : CommonSample
         // 6) Solid-color material (material where no light-shading is applied)
         //
 
-        // We start from a StandardMaterials...
-        var solidColorMaterial = StandardMaterials.Orange;
+        //// We can also use texture:
+        //var solidColorMaterial = new SolidColorMaterial(textureFileName, this.BitmapIO);
+        
+        // We could also render solid color by using StandardMaterial and then setting Effect to SolidColorEffect:
+        //var solidColorMaterial = StandardMaterials.Orange;
+        //var solidColorMaterial = new StandardMaterial(Colors.Orange, "SolidColorMaterial");
+        //
+        //// ... and then change the default effect that is used to render that material to a SolidColorEffect
+        //solidColorMaterial.Effect = scene.EffectsManager.GetDefault<SolidColorEffect>();
 
-        // We can also use texture:
-        //var solidColorMaterial = new StandardMaterial(textureFileName, this.BitmapIO);
-
-        // ... and then change the default effect that is used to render that material to a SolidColorEffect
-        var solidColorEffect = scene.EffectsManager.GetDefault<SolidColorEffect>();
-        solidColorMaterial.Effect = solidColorEffect;
+        var solidColorMaterial = new SolidColorMaterial(Colors.Orange, "SolidColorMaterial");
 
         var modelNode6 = new MeshModelNode(sphereMesh, solidColorMaterial, "SolidColorModel")
         {

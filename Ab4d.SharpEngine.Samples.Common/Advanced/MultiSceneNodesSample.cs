@@ -392,12 +392,16 @@ public class MultiSceneNodesSample : CommonSample
 
 
         // 
-        // SolidColorEffect
+        // SolidColorMaterial
         //
-        var solidColorEffect = scene.EffectsManager.GetDefault<SolidColorEffect>();
+        var solidColorMaterial = new SolidColorMaterial(new Color3(0.3f, 0.9f, 0.3f));
 
-        var solidColorMaterial = new StandardMaterial(new Color3(0.3f, 0.9f, 0.3f));
-        solidColorMaterial.Effect = solidColorEffect;
+        // We could also render solid color by using StandardMaterial and then setting Effect to SolidColorEffect:
+        //var solidColorMaterial = StandardMaterials.Orange;
+        //var solidColorMaterial = new StandardMaterial(Colors.Orange, "SolidColorMaterial");
+        //
+        //// ... and then change the default effect that is used to render that material to a SolidColorEffect
+        //solidColorMaterial.Effect = scene.EffectsManager.GetDefault<SolidColorEffect>();
 
         var solidColorModel = new BoxModelNode(centerPosition: new Vector3(120, 0, -360), size: new Vector3(80, 80, 60), "SolidColorModel")
         {
@@ -408,11 +412,9 @@ public class MultiSceneNodesSample : CommonSample
 
 
         // 
-        // SolidColorEffect with texture
+        // SolidColorMaterial with texture
         //
-        var solidColorMaterial2 = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO);
-        solidColorMaterial2.Effect = solidColorEffect;
-
+        var solidColorMaterial2 = new SolidColorMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO);
         var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
         {
             Material = solidColorMaterial2,
