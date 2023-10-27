@@ -41,8 +41,8 @@ public class SpritesSample : CommonSample
         sceneSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // relative coordinates are from 0 to 1
-        sceneSpriteBatch.Draw(new Vector2(0.1f, 0.2f), new Vector2(0.2f, 0.2f));
-        sceneSpriteBatch.Draw(new Vector2(0.3f, 0.4f), scaleX: 0.1f, scaleY: 0.1f);
+        sceneSpriteBatch.DrawSprite(new Vector2(0.1f, 0.2f), new Vector2(0.2f, 0.2f));
+        sceneSpriteBatch.DrawSprite(new Vector2(0.3f, 0.4f), scaleX: 0.1f, scaleY: 0.1f);
 
         sceneSpriteBatch.End();
     }
@@ -64,19 +64,19 @@ public class SpritesSample : CommonSample
         sceneViewSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // Use color mask
-        sceneViewSpriteBatch.Draw(new Vector2(150, 400), new Vector2(50, 50), colorMask: Colors.Red);
-        sceneViewSpriteBatch.Draw(new Vector2(150, 460), new Vector2(50, 50), colorMask: Colors.Green);
-        sceneViewSpriteBatch.Draw(new Vector2(150, 520), new Vector2(50, 50), colorMask: Colors.Blue);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(150, 400), new Vector2(50, 50), colorMask: Colors.Red);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(150, 460), new Vector2(50, 50), colorMask: Colors.Green);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(150, 520), new Vector2(50, 50), colorMask: Colors.Blue);
 
 
         // Change texture
         sceneViewSpriteBatch.SetSpriteTexture(_treeTexture);
 
-        sceneViewSpriteBatch.Draw(new Vector2(410, 520), new Vector2(50, 90));
-        sceneViewSpriteBatch.Draw(new Vector2(405, 540), new Vector2(50, 90));
-        sceneViewSpriteBatch.Draw(new Vector2(400, 560), new Vector2(50, 90));
-        sceneViewSpriteBatch.Draw(new Vector2(380, 560), new Vector2(50, 90));
-        sceneViewSpriteBatch.Draw(new Vector2(360, 560), new Vector2(50, 90));
+        sceneViewSpriteBatch.DrawSprite(new Vector2(410, 520), new Vector2(50, 90));
+        sceneViewSpriteBatch.DrawSprite(new Vector2(405, 540), new Vector2(50, 90));
+        sceneViewSpriteBatch.DrawSprite(new Vector2(400, 560), new Vector2(50, 90));
+        sceneViewSpriteBatch.DrawSprite(new Vector2(380, 560), new Vector2(50, 90));
+        sceneViewSpriteBatch.DrawSprite(new Vector2(360, 560), new Vector2(50, 90));
 
 
         // Use SetCoordinateCenter to align to bottom or right corners
@@ -85,13 +85,13 @@ public class SpritesSample : CommonSample
         // When center position is vertically set to Top, then vertical axis is pointing down (distance from the top).
         // When Center or Bottom is used, then vertical axis is pointing Up (distance from the bottom or center).
         sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomRight);
-        sceneViewSpriteBatch.Draw(new Vector2(60, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(60, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
 
         sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopRight);
-        sceneViewSpriteBatch.Draw(new Vector2(60, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(60, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
 
         sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
-        sceneViewSpriteBatch.Draw(new Vector2(10, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(10, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
 
         // Hide top-left sprite so that the title of the sample is visible
         //sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopLeft);
@@ -107,7 +107,7 @@ public class SpritesSample : CommonSample
 
         dpiAwareSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
-        dpiAwareSpriteBatch.Draw(new Vector2(150, 520), new Vector2(50, 50));
+        dpiAwareSpriteBatch.DrawSprite(new Vector2(150, 520), new Vector2(50, 50));
 
         dpiAwareSpriteBatch.End();
 
@@ -146,7 +146,7 @@ public class SpritesSample : CommonSample
 
         _animatedSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
         
-        _animatedSpriteBatch.Draw(spritePosition, scaleX: scale, scaleY: scale, rotationAngleDegrees: animatedAngle);
+        _animatedSpriteBatch.DrawSprite(spritePosition, scaleX: scale, scaleY: scale, rotationAngleDegrees: animatedAngle);
 
         _animatedSpriteBatch.End();
     }
