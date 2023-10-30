@@ -23,7 +23,7 @@ public class AssimpImporterSample : CommonSample
     private ICommonSampleUIPanel? _infoPanel;
     private ICommonSampleUIElement? _infoLabel;
     private MultiLineNode? _objectLinesNode;
-    private SceneNode? _importedModelNodes;
+    private GroupNode? _importedModelNodes;
 
     private string? _importedFileName;
 
@@ -182,7 +182,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
 
         try
         {
-            _importedModelNodes = _assimpImporter.ImportSceneNodes(fileName);
+            _importedModelNodes = _assimpImporter.Import(fileName);
             _importedFileName = fileName;
 
             // To see the hierarchy of the imported models, execute the following in the Visual Studio's Immediate Window (first check that _importedModelNodes is GroupNode and not ModelMeshNode):
