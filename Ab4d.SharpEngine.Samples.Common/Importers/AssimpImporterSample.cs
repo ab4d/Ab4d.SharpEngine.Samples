@@ -170,7 +170,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             {
                 // Switch to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time
                 _currentViewType = ViewTypes.SolidObjectsOnly;
-                ShowErrorMessage("Switching view to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time");
+                ShowErrorMessage("Switching view to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time", showTimeMs: 3000);
             }
         }
 
