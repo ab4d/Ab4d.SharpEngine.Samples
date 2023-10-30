@@ -24,6 +24,7 @@ public abstract class CommonSample
     private ICommonSampleUIElement? _errorMessageLabel;
     private ICommonSampleUIPanel? _errorMessagePanel;
     private string? _errorMessageToShow;
+    private DateTime _timeToHideErrorMessage;
 
     public Scene? Scene { get; private set; }
     public SceneView? SceneView { get; private set; }
@@ -145,6 +146,8 @@ public abstract class CommonSample
 
     public void Dispose()
     {
+        UnsubscribeSceneUpdating();
+
         IsDisposed = true;
         OnDisposed();
     }
@@ -167,7 +170,7 @@ public abstract class CommonSample
         return textureImage;
     }
 
-    protected void ShowErrorMessage(string errorMessage)
+    protected void ShowErrorMessage(string errorMessage, int showTimeMs = 0)
     {
         if (_errorMessageLabel == null)
         {
@@ -190,7 +193,49 @@ public abstract class CommonSample
         {
             _errorMessageToShow = errorMessage;
         }
+
+        if (showTimeMs > 0)
+            SubscribeSceneUpdating(DateTime.Now.AddMilliseconds(showTimeMs));
     }
+
+    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
+    {
+        bool unsubscribe = false;
+
+        if (_timeToHideErrorMessage == DateTime.MinValue)
+        {
+            unsubscribe = true;
+        }
+        else if (DateTime.Now >= _timeToHideErrorMessage)
+        {
+            _errorMessagePanel?.SetIsVisible(false); // Hide error message
+            unsubscribe = true;
+        }
+
+        if (unsubscribe)
+            UnsubscribeSceneUpdating(); 
+    }
+
+    private void SubscribeSceneUpdating(DateTime timeToHideErrorMessage)
+    {
+        if (SceneView == null || timeToHideErrorMessage < DateTime.Now)
+            return;
+
+        if (_timeToHideErrorMessage == DateTime.MinValue) // not yet subscribed?
+            SceneView.SceneUpdating += SceneViewOnSceneUpdating;
+
+        _timeToHideErrorMessage = timeToHideErrorMessage;
+    }
+
+    private void UnsubscribeSceneUpdating()
+    {
+        if (SceneView == null || _timeToHideErrorMessage == DateTime.MinValue)
+            return;
+
+        SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+        _timeToHideErrorMessage = DateTime.MinValue;
+    }
+
 
     protected void ClearErrorMessage()
     {
