@@ -4,7 +4,6 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lights;
 
