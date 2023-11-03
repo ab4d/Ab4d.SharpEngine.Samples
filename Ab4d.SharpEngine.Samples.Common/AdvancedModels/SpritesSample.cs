@@ -39,12 +39,15 @@ public class SpritesSample : CommonSample
 
         sceneSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
-        // relative coordinates are from 0 to 1
-        sceneSpriteBatch.DrawSprite(new Vector2(0.1f, 0.2f), new Vector2(0.2f, 0.2f));
-        sceneSpriteBatch.DrawSprite(new Vector2(0.3f, 0.4f), scaleX: 0.1f, scaleY: 0.1f);
+        // Draw 2 sprites using relative coordinates (form 0 to 1).
+        // Note that the spriteSize has the same width and height, but it is rendered with bigger width than height because view's Width is bigger then Height 
+        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.08f, 0.2f), spriteSize: new Vector2(0.15f, 0.15f)); 
+
+        // When using scaleX and scaleY instead of spriteSize, the aspect ratio of the sprite is preserved
+        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.25f, 0.2f), scaleX: 0.1f, scaleY: 0.1f);
 
         // It is also possible to render 2D text
-        sceneSpriteBatch.DrawBitmapText("Relative coordinates:", new Vector2(0.1f, 0.175f), fontSize: 20, Color4.Black);
+        sceneSpriteBatch.DrawBitmapText("Relative coordinates:", new Vector2(0.08f, 0.175f), fontSize: 20, Color4.Black);
         
         sceneSpriteBatch.End();
     }
@@ -64,22 +67,22 @@ public class SpritesSample : CommonSample
         //sceneViewSpriteBatch.IsUsingAbsoluteCoordinates = false;
 
 
-        sceneViewSpriteBatch.DrawBitmapText("Absolute coordinates\nwith color mask:", new Vector2(100, 370), fontSize: 20, Color4.Black);
+        sceneViewSpriteBatch.DrawBitmapText("Absolute coordinates\nwith color mask:", new Vector2(100, 350), fontSize: 20, Color4.Black);
 
         sceneViewSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // Use color mask
-        sceneViewSpriteBatch.DrawSprite(new Vector2(100, 420), new Vector2(50, 50), colorMask: Colors.Red);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(160, 420), new Vector2(50, 50), colorMask: Colors.Green);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(220, 420), new Vector2(50, 50), colorMask: Colors.Blue);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(100, 400), new Vector2(50, 50), colorMask: Colors.Red);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(160, 400), new Vector2(50, 50), colorMask: Colors.Green);
+        sceneViewSpriteBatch.DrawSprite(new Vector2(220, 400), new Vector2(50, 50), colorMask: Colors.Blue);
 
 
         // Draw rectangles
-        sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(100, 520), fontSize: 20, Color4.Black);
+        sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(100, 490), fontSize: 20, Color4.Black);
 
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(100, 550), new Vector2(40, 40), Colors.Red);
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(160, 550), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(220, 550), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
+        sceneViewSpriteBatch.DrawRectangle(new Vector2(100, 520), new Vector2(40, 40), Colors.Red);
+        sceneViewSpriteBatch.DrawRectangle(new Vector2(160, 520), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
+        sceneViewSpriteBatch.DrawRectangle(new Vector2(220, 520), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
 
 
         // Advanced draw text with background and margin
@@ -87,6 +90,30 @@ public class SpritesSample : CommonSample
         sceneViewSpriteBatch.DrawBitmapText("Text with background", new Vector2(500, 150), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen);
         sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(500, 200), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
                                             marginLeft: 10, marginRight: 10, marginTop: 10, marginBottom: 10);
+
+        if (sceneView.GpuDevice != null)
+        {
+            // Use TextureFactory.CreateGradientTexture to create a gradient texture that can be shown as a spite.
+            // Note that CreateGradientTexture creates a horizontal texture with height 1 and width set to textureWidth.
+            // To show such texture a vertical, we need to rotate the spite by 90 degrees (using rotationAngleDegrees)
+            var gradientStops = new GradientStop[]
+            {
+                new GradientStop(Colors.Aqua,       offset: 0.25f),
+                new GradientStop(Colors.LightGreen, offset: 0.5f),
+                new GradientStop(Colors.Yellow,     offset: 0.75f),
+                new GradientStop(Colors.Red,        offset: 1.0f),
+            };
+
+            var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureWidth: 256);
+
+            // If we only need from two colors, we can also use startColor and endColor instead of gradientStops:
+            //var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, startColor: Colors.DeepSkyBlue, endColor: Colors.Yellow, textureWidth: 256);
+
+            sceneViewSpriteBatch.SetSpriteTexture(gradientTexture);
+            sceneViewSpriteBatch.DrawSprite(new Vector2(870, 90), new Vector2(100, 200), rotationAngleDegrees: 90);
+
+            sceneViewSpriteBatch.DrawBitmapText("Sprite with\ngradient", new Vector2(850, 170), fontSize: 20, textColor: Color4.Black);
+        }
 
 
         // Change texture
@@ -125,8 +152,8 @@ public class SpritesSample : CommonSample
         dpiAwareSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // Note that when there is some dpi scale, then this box will be bigger and not in line with other 3 sprites
-        dpiAwareSpriteBatch.DrawSprite(new Vector2(280, 470), new Vector2(50, 50));
-        dpiAwareSpriteBatch.DrawBitmapText("Dpi scaled:", new Vector2(250, 450), fontSize: 20, textColor: Color4.Black);
+        dpiAwareSpriteBatch.DrawSprite(new Vector2(280, 400), new Vector2(50, 50));
+        dpiAwareSpriteBatch.DrawBitmapText("Dpi scaled:", new Vector2(250, 380), fontSize: 20, textColor: Color4.Black);
 
         dpiAwareSpriteBatch.End();
 
