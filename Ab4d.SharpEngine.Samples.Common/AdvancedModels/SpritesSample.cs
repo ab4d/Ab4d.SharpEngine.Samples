@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class SpritesSample : CommonSample
 {
     public override string Title => "Sprites";
-    public override string Subtitle => "Absolutely and relatively positioned sprites (resize window to see the difference)";
+    public override string Subtitle => "SpriteBatch can be used to render sprites (textures), rectangles and 2D text.";
 
     private GpuImage? _uvCheckerTexture;
     private GpuImage? _treeTexture;
