@@ -75,13 +75,18 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
         _planeModelNode.Normal = _normal;
         _planeModelNode.HeightDirection = _heightDirection;
 
+        UpdateNormalAndHeightDirectionLines();
+
+        base.UpdateModelNode();
+    }
+
+    private void UpdateNormalAndHeightDirectionLines()
+    {
         if (_normalLine != null)
             _normalLine.EndPosition = _normalLine.StartPosition + _normal * _directionLinesLength;
 
         if (_heightDirectionLine != null)
             _heightDirectionLine.EndPosition = _heightDirectionLine.StartPosition + _heightDirection * _directionLinesLength;
-
-        base.UpdateModelNode();
     }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
@@ -142,6 +147,19 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
             formatShownValueFunc: newValue => ((int)newValue).ToString());
 
         ui.CreateLabel("(Default value for Segments is 1)").SetStyle("italic");
+
+        ui.AddSeparator();
+        ui.CreateButton("AlignWithCamera", () =>
+        {
+            if (_planeModelNode != null && SceneView != null && SceneView.Camera != null)
+            {
+                _planeModelNode.AlignWithCamera(SceneView.Camera);
+                _normal = _planeModelNode.Normal;
+                _heightDirection = _planeModelNode.HeightDirection;
+                UpdateNormalAndHeightDirectionLines();
+                base.UpdateModelNode();
+            }
+        }).SetToolTip("AlignWithCamera method sets Normal and HeightDirection\nproperties so that the plane is facing the camera.\nNote that in this sample the Normals and HeightDirections\nComboBoxes are not updated after clicking on this button.");
     }
 
     private void OnNormalChanged(int itemIndex, Vector3 selectedVector)
