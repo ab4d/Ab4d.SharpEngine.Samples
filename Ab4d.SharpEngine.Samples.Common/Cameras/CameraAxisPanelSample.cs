@@ -115,7 +115,6 @@ public class CameraAxisPanelSample : CommonSample
         ui.AddSeparator();
 
         ui.CreateCheckBox("ShowAxisNames", _cameraAxisPanel.ShowAxisNames, isChecked => _cameraAxisPanel.ShowAxisNames = isChecked);
-        ui.CreateCheckBox("AlignAxisCharsWithCamera", _cameraAxisPanel.AlignAxisCharsWithCamera, isChecked => _cameraAxisPanel.AlignAxisCharsWithCamera = isChecked);
         ui.CreateCheckBox("AdjustSizeByDpiScale", _adjustSizeByDpiScale, isChecked =>
         {
             _adjustSizeByDpiScale = isChecked;
