@@ -147,6 +147,7 @@ public abstract class CommonSample
     public void Dispose()
     {
         UnsubscribeSceneUpdating();
+        SceneView?.RemoveAllSpriteBatches();
 
         IsDisposed = true;
         OnDisposed();
