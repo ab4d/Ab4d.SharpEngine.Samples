@@ -10,9 +10,11 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class CameraAxisPanelSample : CommonSample
 {
     public override string Title => "CameraAxisPanel";
+    public override string? Subtitle => "CameraAxisPanel shows an orientation of the X, Y and Z axes (see the panel in the lower left corner)";
 
     private TargetPositionCamera? _targetPositionCamera;
     private CameraAxisPanel? _cameraAxisPanel;
+    private bool _adjustSizeByDpiScale = true;
 
     public CameraAxisPanelSample(ICommonSamplesContext context) 
         : base(context)
@@ -21,7 +23,7 @@ public class CameraAxisPanelSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        var boxModel = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), 
+        var boxModel = new BoxModelNode(centerPosition: new Vector3(0, 20, 0), 
                                         size: new Vector3(80, 40, 60), 
                                         name: "Gold BoxModel")
         {
@@ -29,6 +31,15 @@ public class CameraAxisPanelSample : CommonSample
         };
 
         scene.RootNode.Add(boxModel);
+
+
+        var wireGridNode = new WireGridNode()
+        {
+            CenterPosition = new Vector3(0, -0.1f, 0),
+            Size = new Vector2(200, 200),
+        };
+
+        scene.RootNode.Add(wireGridNode);
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
@@ -120,7 +131,62 @@ public class CameraAxisPanelSample : CommonSample
             _adjustSizeByDpiScale = isChecked;
             CreateCameraAxisPanel();
         });
-    }
 
-    private bool _adjustSizeByDpiScale = true;
+        ui.AddSeparator();
+
+        ui.CreateButton("Customize colors", () =>
+        {
+            // To customize colors call CustomizeAxes method and provide the default axes vectors and custom colors for them:
+            _cameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Gray,
+                                           yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Gray,
+                                           zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Gray);
+        });
+        
+        ui.CreateButton("Customize orientation (Z up)", () =>
+        {
+            // To show CameraAxisPanel with Z axis up, we need to change the axes:
+            _cameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                           yAxisVector: new Vector3(0, 0, -1), yAxisColor: Colors.Green,
+                                           zAxisVector: new Vector3(0, 1, 0), zAxisColor: Colors.Blue);
+        });
+        
+        ui.CreateButton("Customize models", () =>
+        {
+            // See default values in the comment for "Reset to defaults" buttons (below)
+            _cameraAxisPanel.CustomizeModels(arrowLength: 25,
+                                             arrowLineRadius: 1,
+                                             arrowTipRadius: 3,
+                                             arrowAngle: 40,
+                                             arrowSegmentsCount: 8,
+                                             axisCharDistance: 35,
+                                             axisCharScale: 1.5f,
+                                             axisCharLineThickness: 2,
+                                             ambientLightIntensity: 1f); // Set ambient light to 100% to disable shading of the arrows (make them solid color)
+
+            // You can set only the parameter that you want to change, for example:
+            //_cameraAxisPanel.CustomizeModels(ambientLightIntensity: 1f);
+        });
+        
+        ui.CreateButton("Reset to defaults", () =>
+        {
+            // Call CustomizeModels without any parameters - this will use the default values.
+            // This is the same as the commented call below:
+            _cameraAxisPanel.CustomizeModels();
+
+            //_cameraAxisPanel.CustomizeModels(arrowLength : 25,
+            //                                 arrowLineRadius : 1.8f,
+            //                                 arrowTipRadius : 4.4f,
+            //                                 arrowAngle : 50,
+            //                                 arrowSegmentsCount : 8,
+            //                                 axisCharDistance : 30,
+            //                                 axisCharScale : 1,
+            //                                 axisCharLineThickness : 3,
+            //                                 ambientLightIntensity: 0.15f);
+            
+
+            _cameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                           yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Green,
+                                           zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Blue);
+        });
+    }
 }
