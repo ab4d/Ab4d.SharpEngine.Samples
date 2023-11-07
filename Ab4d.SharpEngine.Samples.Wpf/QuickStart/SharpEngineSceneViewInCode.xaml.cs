@@ -187,7 +187,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             var boxModel = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), 
                                             size: new Vector3(80, 40, 60), 
-                                            name: "Silver BoxModel")
+                                            name: "Gold BoxModel")
             {
                 Material = StandardMaterials.Gold,
                 //Material = new StandardMaterial(Colors.Gold),
