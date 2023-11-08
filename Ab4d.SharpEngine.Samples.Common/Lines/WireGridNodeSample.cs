@@ -54,18 +54,14 @@ public class WireGridNodeSample : CommonSample
 
         scene.RootNode.Add(_wireGridNode);
 
-
-        // Axes for direction visualization
-        var axesNode = new AxisLineNode(length: 50);
-        scene.RootNode.Add(axesNode);
-
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 30;
             targetPositionCamera.Attitude = -30;
             targetPositionCamera.Distance = 600;
         }
+
+        ShowCameraAxisPanel = true;
     }
 
     private void UpdateWireGridSetting()

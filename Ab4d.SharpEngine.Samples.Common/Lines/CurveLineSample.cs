@@ -62,9 +62,7 @@ public class CurveLineSample : CommonSample
 
         UpdatePositionOnCurve(_positionOnCurveT);
 
-        // Axis arrows for direction visualization
-        var axesNode = new AxisLineNode();
-        scene.RootNode.Add(axesNode);
+        ShowCameraAxisPanel = true;
     }
 
     private void GenerateRandomControlPoints(out Vector3[] controlPoints, out float[] weights)

@@ -44,6 +44,8 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
+        ShowCameraAxisPanel = true;
+
         modelNode = CreateModelNode();
 
         UpdateModelNode();

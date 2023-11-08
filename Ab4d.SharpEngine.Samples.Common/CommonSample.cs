@@ -4,8 +4,10 @@ using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Lights;
+using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
+using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common;
 
@@ -34,14 +36,42 @@ public abstract class CommonSample
 
     public bool IsDisposed { get; private set; }
 
-
     public MouseAndKeyboardConditions RotateCameraConditions { get; set; } = MouseAndKeyboardConditions.LeftMouseButtonPressed;
     public MouseAndKeyboardConditions MoveCameraConditions { get; set; } = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
     public MouseAndKeyboardConditions QuickZoomConditions { get; set; } = MouseAndKeyboardConditions.Disabled;
     public bool RotateAroundMousePosition { get; set; }
     public CameraZoomMode ZoomMode { get; set; } = CameraZoomMode.CameraRotationCenterPosition;
 
+    private bool _showCameraAxisPanel;
 
+    /// <summary>
+    /// Gets or sets a Boolean that specifies if CameraAxisPanel is created for this sample.
+    /// If this is set before SceneView is created, then CameraAxisPanel will be created when SceneView is initialized (before calling <see cref="OnSceneViewInitialized"/>).
+    /// The created CameraAxisPanel is set to <see cref="CameraAxisPanel"/> property.
+    /// If SceneView was already initialized when this property is set, then the CameraAxisPanel will be created (or disposed when set to false) immediately.
+    /// </summary>
+    public bool ShowCameraAxisPanel
+    {
+        get => _showCameraAxisPanel;
+        set
+        {
+            if (!value && CameraAxisPanel != null)
+            {
+                CameraAxisPanel.Dispose(); // Remove it from SceneView
+                CameraAxisPanel = null;
+            }
+
+            // If SceneView is already initialized, then we can create the CameraAxisPanel here
+            if (value && SceneView != null && _createdCamera != null)
+                CameraAxisPanel = CreateCameraAxisPanel(_createdCamera);
+
+            _showCameraAxisPanel = value; // If SceneView is not yet initialized, then we will create CameraAxisPanel in InitializeSceneView
+        }
+    }
+
+    public CameraAxisPanel? CameraAxisPanel { get; private set; }
+
+    
     protected CommonSample(ICommonSamplesContext context)
     {
         this.context = context;
@@ -73,7 +103,24 @@ public abstract class CommonSample
 
         sceneView.Camera = _createdCamera;
 
+        if (ShowCameraAxisPanel && _createdCamera != null)
+            CameraAxisPanel = CreateCameraAxisPanel(_createdCamera);
+
         OnSceneViewInitialized(sceneView);
+    }
+
+    public virtual CameraAxisPanel CreateCameraAxisPanel(ICamera camera)
+    {
+        if (SceneView == null)
+            throw new InvalidOperationException("Cannot create CameraAxisPanel because SceneView is not yet initialized");
+
+        var cameraAxisPanel = new CameraAxisPanel(SceneView, camera, width: 100, height: 100, adjustSizeByDpiScale: true)
+        {
+            Position = new Vector2(10, 10),
+            Alignment = PositionTypes.BottomLeft
+        };
+
+        return cameraAxisPanel;
     }
 
     protected virtual void OnSceneViewInitialized(SceneView sceneView)

@@ -55,6 +55,8 @@ public class AssimpImporterSample : CommonSample
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
         ImportFile(fileName);
+
+        ShowCameraAxisPanel = true;
     }
 
     private void InitAssimpLibrary(VulkanDevice gpuDevice, string? assimpFolder)

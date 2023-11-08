@@ -46,6 +46,8 @@ public abstract class Point3DTo2DSample : CommonSample
 
             targetPositionCamera.StartRotation(headingChangeInSecond: 50);
         }
+
+        ShowCameraAxisPanel = true;
     }
 
     private void OnCameraChanged(object? sender, EventArgs e)

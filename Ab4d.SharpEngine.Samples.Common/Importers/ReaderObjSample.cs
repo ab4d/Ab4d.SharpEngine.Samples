@@ -40,6 +40,8 @@ public class ReaderObjSample : CommonSample
     {
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
         ImportFile(fileName);
+
+        ShowCameraAxisPanel = true;
     }
 
     protected void ImportFile(string? fileName)

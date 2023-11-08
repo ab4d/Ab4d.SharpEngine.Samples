@@ -30,6 +30,8 @@ public class FreeCameraSample : CommonSample
 
         _targetPositionCrossNode = new WireCrossNode(new Vector3(0, 0, 0), Colors.Red, lineLength: 50, lineThickness: 2);
         scene.RootNode.Add(_targetPositionCrossNode);
+
+        ShowCameraAxisPanel = true;
     }
 
     protected override Camera OnCreateCamera()
