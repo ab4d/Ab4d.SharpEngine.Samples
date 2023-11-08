@@ -153,15 +153,16 @@ public class CameraAxisPanelSample : CommonSample
         ui.CreateButton("Customize models", () =>
         {
             // See default values in the comment for "Reset to defaults" buttons (below)
-            _cameraAxisPanel.CustomizeModels(arrowLength: 25,
-                                             arrowLineRadius: 1,
-                                             arrowTipRadius: 3,
-                                             arrowAngle: 40,
-                                             arrowSegmentsCount: 8,
+            _cameraAxisPanel.CustomizeModels(axisLength: 25,
+                                             axisLineRadius: 1,
+                                             axisArrowRadius: 3,
+                                             axisArrowAngle: 40,
+                                             axisLineSegmentsCount: 8,
                                              axisCharDistance: 35,
                                              axisCharScale: 1.5f,
                                              axisCharLineThickness: 2,
-                                             ambientLightIntensity: 1f); // Set ambient light to 100% to disable shading of the arrows (make them solid color)
+                                             ambientLightIntensity: 1f, // Set ambient light to 100% to disable shading of the arrows (make them solid color)
+                                             cameraFieldOfView: 30);
 
             // You can set only the parameter that you want to change, for example:
             //_cameraAxisPanel.CustomizeModels(ambientLightIntensity: 1f);
@@ -173,17 +174,17 @@ public class CameraAxisPanelSample : CommonSample
             // This is the same as the commented call below:
             _cameraAxisPanel.CustomizeModels();
 
-            //_cameraAxisPanel.CustomizeModels(arrowLength : 25,
-            //                                 arrowLineRadius : 1.8f,
-            //                                 arrowTipRadius : 4.4f,
-            //                                 arrowAngle : 50,
-            //                                 arrowSegmentsCount : 8,
+            //_cameraAxisPanel.CustomizeModels(axisLength : 25,
+            //                                 axisLineRadius : 1.8f,
+            //                                 axisArrowRadius : 4.4f,
+            //                                 axisArrowAngle : 50,
+            //                                 axisLineSegmentsCount : 8,
             //                                 axisCharDistance : 30,
             //                                 axisCharScale : 1,
             //                                 axisCharLineThickness : 3,
-            //                                 ambientLightIntensity: 0.15f);
+            //                                 ambientLightIntensity: 0.15f,
+            //                                 cameraFieldOfView: 45);
             
-
             _cameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
                                            yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Green,
                                            zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Blue);
