@@ -132,7 +132,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         if (!AssimpLibrary.Instance.IsInitialized)
             throw new Exception("Cannot initialize native Assimp library");
 
-        _assimpImporter = new AssimpImporter(BitmapIO, GpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
+        _assimpImporter = new AssimpImporter(BitmapIO, gpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
     }
 
     protected void ImportFile(string? fileName)
