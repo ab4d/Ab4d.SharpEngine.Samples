@@ -66,6 +66,8 @@ public abstract class HitTestingSample : CommonSample
 
             targetPositionCamera.CameraChanged += (sender, args) => TestHitObjects(_lastMousePosition);
         }
+
+        ShowCameraAxisPanel = true;
     }
 
     protected void ProcessMouseMove(Vector2 mousePosition)
