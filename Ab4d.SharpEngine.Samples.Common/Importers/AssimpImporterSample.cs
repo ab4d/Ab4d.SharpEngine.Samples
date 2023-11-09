@@ -59,7 +59,9 @@ public class AssimpImporterSample : CommonSample
         ShowCameraAxisPanel = true;
     }
 
-    private void InitAssimpLibrary(VulkanDevice gpuDevice, string? assimpFolder)
+    // When calling InitAssimpLibrary, the gpuDevice may be null.
+    // In this case the textures will be created later when the materials with textures are initialized.
+    private void InitAssimpLibrary(VulkanDevice? gpuDevice, string? assimpFolder)
     {
         if (assimpFolder == null)
             assimpFolder = AppDomain.CurrentDomain.BaseDirectory;
