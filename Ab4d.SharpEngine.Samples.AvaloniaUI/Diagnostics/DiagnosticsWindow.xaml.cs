@@ -2,15 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Input;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
-using Ab4d.SharpEngine.Samples.Common.Animations;
 using Ab4d.SharpEngine.Samples.Common.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
