@@ -14,8 +14,9 @@
   <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
   <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
   <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
-  <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.WpfPoint3DTo2DSample" Title="Point3DTo2D"/>
+  <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
+  <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
 
   <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
   <Sample Location="CameraControllers/MouseCameraControllerSample.xaml" Title="MouseCameraController"/>
