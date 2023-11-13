@@ -13,7 +13,7 @@ public class LabelUIElement : WpfUIElement
 
     private string? _styleString;
 
-    public LabelUIElement(WpfUIProvider wpfUIProvider, string text, bool isHeader)
+    public LabelUIElement(WpfUIProvider wpfUIProvider, string text, bool isHeader, float width = 0)
         : base(wpfUIProvider)
     {
         var (textToShow, toolTip) = wpfUIProvider.ParseTextAndToolTip(text);
@@ -25,6 +25,9 @@ public class LabelUIElement : WpfUIElement
             VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap
         };
+
+        if (width > 0)
+            _textBlock.Width = width;
 
         if (toolTip != null)
             _textBlock.ToolTip = toolTip;

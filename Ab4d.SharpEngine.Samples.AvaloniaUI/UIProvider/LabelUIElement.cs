@@ -13,7 +13,7 @@ public class LabelUIElement : AvaloniaUIElement
 
     private string? _styleString;
 
-    public LabelUIElement(AvaloniaUIProvider avaloniaUIProvider, string text, bool isHeader)
+    public LabelUIElement(AvaloniaUIProvider avaloniaUIProvider, string text, bool isHeader, float width = 0)
         : base(avaloniaUIProvider)
     {
         var (textToShow, toolTip) = avaloniaUIProvider.ParseTextAndToolTip(text);
@@ -25,6 +25,9 @@ public class LabelUIElement : AvaloniaUIElement
             VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap
         };
+
+        if (width > 0)
+            _textBlock.Width = width;
 
         if (toolTip != null)
             ToolTip.SetTip(_textBlock, toolTip);
