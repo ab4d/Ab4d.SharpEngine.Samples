@@ -16,7 +16,7 @@ public interface ICommonSampleUIProvider
 
     void SetCurrentPanel(ICommonSampleUIPanel? panel);
 
-    ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0);
+    ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0, float height = 0);
 
     ICommonSampleUIElement CreateKeyValueLabel(string keyText, Func<string> getValueTextFunc, double keyTextWidth = 0);
 

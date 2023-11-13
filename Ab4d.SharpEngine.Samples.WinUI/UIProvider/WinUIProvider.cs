@@ -138,9 +138,9 @@ public class WinUIProvider : ICommonSampleUIProvider
         CurrentPanel = panel as WinUIPanel;
     }
 
-    public ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0)
+    public ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0, float height = 0)
     {
-        var newElement = new LabelUIElement(this, text, isHeader, width);
+        var newElement = new LabelUIElement(this, text, isHeader, width, height);
         AddToCurrentPanel(newElement);
 
         return newElement;
