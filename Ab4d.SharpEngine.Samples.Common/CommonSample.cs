@@ -62,8 +62,8 @@ public abstract class CommonSample
             }
 
             // If SceneView is already initialized, then we can create the CameraAxisPanel here
-            if (value && SceneView != null && _createdCamera != null)
-                CameraAxisPanel = CreateCameraAxisPanel(_createdCamera);
+            if (value && SceneView != null && SceneView.Camera != null)
+                CameraAxisPanel = CreateCameraAxisPanel(SceneView.Camera);
 
             _showCameraAxisPanel = value; // If SceneView is not yet initialized, then we will create CameraAxisPanel in InitializeSceneView
         }
@@ -131,7 +131,8 @@ public abstract class CommonSample
 
     protected virtual void OnCreateLights(Scene scene)
     {
-        if (scene.Lights.Count > 0) // In case any light is created in OnCreateScene, then do not change that in OnCreateLights
+        int lightsCount = scene.Lights.Count(l => l is not AmbientLight && l is not CameraLight);
+        if (lightsCount > 0) // In case any light is created in OnCreateScene, then do not change that in OnCreateLights
             return;
 
         // Set ambient light (illuminates the objects from all directions)
