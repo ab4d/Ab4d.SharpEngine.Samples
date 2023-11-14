@@ -74,7 +74,7 @@ public abstract class LineSelectionSample : CommonSample
         }
 
 
-        _isCameraChanged = true; // When true, the CalculateScreenSpacePositions method is called before calculating line distances
+        _isCameraChanged = true; // When true, the CalculateViewPositions method is called before calculating line distances
 
         if (targetPositionCamera != null)
         {
@@ -105,7 +105,7 @@ public abstract class LineSelectionSample : CommonSample
 
         if (_isCameraChanged)
         {
-            // Each time camera is changed, we need to call CalculateScreenSpacePositions method.
+            // Each time camera is changed, we need to call CalculateViewPositions method.
             // This will update the 2D screen positions of the 3D lines.
             for (var i = 0; i < _lineSelectorData.Count; i++)
                 _lineSelectorData[i].CalculateViewPositions(SceneView);
