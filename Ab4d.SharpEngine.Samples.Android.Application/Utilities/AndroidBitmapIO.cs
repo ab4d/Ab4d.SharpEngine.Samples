@@ -24,11 +24,8 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
         private int[]? _tempBitmapInts;
 
-        /// <summary>
-        /// When true (by default) then the loaded images are converted into 32 bit BGRA format.
-        /// When false then the loader tries to preserve the format of the bitmap (for example 8 bit for grayscale) but this is not guaranteed and the loader may still convert the image to BGRA.
-        /// </summary>
-        public bool ConvertToBgra { get; set; } = true;
+        /// <inheritdoc/>
+        public bool ConvertToSupportedFormat { get; set; } = true;
 
 
         /// <inheritdoc />

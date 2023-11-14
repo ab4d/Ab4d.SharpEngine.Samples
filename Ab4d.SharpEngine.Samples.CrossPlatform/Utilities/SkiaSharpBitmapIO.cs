@@ -24,11 +24,8 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             // TODO: Add other skia supported formats
         };
 
-        /// <summary>
-        /// When true (by default) then the loaded images are converted into 32 bit BGRA format.
-        /// When false then the loader tries to preserve the format of the bitmap (for example 8 bit for grayscale) but this is not guaranteed and the loader may still convert the image to BGRA.
-        /// </summary>
-        public bool ConvertToBgra { get; set; } = true;
+        /// <inheritdoc/>
+        public bool ConvertToSupportedFormat { get; set; } = true;
 
 
         /// <inheritdoc />
@@ -66,24 +63,11 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
             if (skBitmap.BytesPerPixel == 4)
             {
-                if (skBitmap.ColorType == SKColorType.Bgra8888)
-                {
-                    // The most common
-                    gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, Format.B8G8R8A8Unorm, skBitmap.Bytes, checkTransparency: false);
-                }
-                else
-                {
-                    Format vkFormat;
-                    if (!ConvertToBgra && skBitmap.ColorType == SKColorType.Rgba8888)
-                        vkFormat = Format.R8G8B8A8Unorm; // preserve RGBA format
-                    else
-                        vkFormat = Format.B8G8R8A8Unorm; // Otherwise set format to BGRA
+                Format vkFormat = skBitmap.ColorType == SKColorType.Rgba8888 ? Format.R8G8B8A8Unorm
+                                                                             : Format.B8G8R8A8Unorm;
 
-                    gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, vkFormat, skBitmap.Bytes, checkTransparency: false);
+                gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, vkFormat, skBitmap.Bytes, checkTransparency: false);
 
-                    if (skBitmap.ColorType == SKColorType.Rgba8888 && ConvertToBgra)
-                        ConvertRgbaToBgra(gpuImageData.Data);
-                }
 
                 if (skBitmap.AlphaType == SKAlphaType.Opaque)
                 {
@@ -107,7 +91,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             else if (skBitmap.BytesPerPixel == 1) //.ColorType == SKColorType.Gray8)
             {
                 // Single-channel grayscale image; needs to be converted to RGBA for compatibility with the rest of the code...
-                if (ConvertToBgra)
+                if (ConvertToSupportedFormat)
                 {
                     var rgbaBytes = ConvertGrayscaleImageDataToBgra(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, skBitmap.Bytes);
                     gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.Width * 4, Format.R8G8B8A8Unorm, rgbaBytes, checkTransparency: false);

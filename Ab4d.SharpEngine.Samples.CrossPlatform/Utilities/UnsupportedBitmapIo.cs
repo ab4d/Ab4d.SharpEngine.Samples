@@ -19,10 +19,8 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         /// <inheritdoc />
         public Func<string, Stream?>? FileStreamResolver { get; set; }
 
-        /// <summary>
-        /// When true (by default) then the loaded images are converted into 32 bit BGRA format.
-        /// </summary>
-        public bool ConvertToBgra { get; set; }
+        /// <inheritdoc/>
+        public bool ConvertToSupportedFormat { get; set; }
 
 
         /// <inheritdoc />
