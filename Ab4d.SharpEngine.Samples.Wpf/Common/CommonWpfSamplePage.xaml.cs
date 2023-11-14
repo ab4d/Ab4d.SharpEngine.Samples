@@ -105,6 +105,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
+            //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
+
             UpdateMouseCameraController();
 
             // Show MainSceneView - this will also render the scene

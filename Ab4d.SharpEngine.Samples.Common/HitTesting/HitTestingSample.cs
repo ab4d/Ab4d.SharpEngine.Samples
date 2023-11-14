@@ -58,7 +58,7 @@ public abstract class HitTestingSample : CommonSample
         scene.RootNode.Add(_wireCrossesGroup);
 
         ShowTeapot();
-
+        
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Distance = 500;
