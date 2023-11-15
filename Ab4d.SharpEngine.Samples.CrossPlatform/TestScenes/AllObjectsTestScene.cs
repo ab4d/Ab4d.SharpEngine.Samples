@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -198,16 +199,11 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             // Add textured sample when we support reading texture files
             if (_bitmapIO != null && _bitmapIO.IsFileFormatImportSupported("jpg") && _bitmapIO.IsFileFormatImportSupported("png"))
             {
-                var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
-                {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice, generateMipMaps: false),
-                };
+                // Create texture material by providing a texture file name to the StandardMaterial constructor.
+                // The texture will be loaded and GpuImage created when the StandardMaterial is initialized.
+                var textureMaterial = new StandardMaterial(@"Resources\uvchecker2.jpg", _bitmapIO);
 
-                texturedMaterialGroup.Add(geometryModel7);
-
-
-                var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker2.jpg", _bitmapIO, _scene.GpuDevice, generateMipMaps: true);
-                var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
+                var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 1")
                 {
                     Material = textureMaterial,
                 };
@@ -215,26 +211,42 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 texturedMaterialGroup.Add(geometryModel8);
 
 
-                var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
+                // Reuse the previous texture and apply a green color filter (Set DiffuseColor to green; by default when texture is show, the DiffuseColor is set to White to preserve all the colors).
+                // (by default texture created by StandardMaterial are cached in GpuDevice, this is controlled by static StandardMaterialBase.UseGpuDeviceCacheForTextures)
+                var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 2 (reused 2 material with green filter)")
                 {
-                    Material = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)) // Set color filter to green color only
+                    Material = new StandardMaterial(@"Resources\uvchecker2.jpg", _bitmapIO)
                     {
-                        DiffuseTexture = textureMaterial.DiffuseTexture
-                    },
+                        DiffuseColor = new Color3(0.0f, 1f, 0.0f) // Set color filter to green color only
+                    }
                 };
 
                 texturedMaterialGroup.Add(geometryModel9);
 
 
+                if (_scene.GpuDevice != null) // scene.GpuDevice is required to use TextureLoader.CreateTextureMaterial (we need to use that because we are not creating mipmaps)
+                {
+                    // Manually create texture by using TextureLoader.CreateTexture
+                    var gpuImageNoMips = TextureLoader.CreateTexture(@"Resources\10x10-texture.png", _scene.GpuDevice, _bitmapIO, generateMipMaps: false);
+
+                    var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 3 (nomips)")
+                    {
+                        Material = new StandardMaterial(gpuImageNoMips)
+                    };
+
+                    texturedMaterialGroup.Add(geometryModel7);
+                }
+
+
                 var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
                 {
-                    Material = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, _scene.GpuDevice),
+                    Material = new StandardMaterial(@"Resources\uvchecker.png", _bitmapIO),
                 };
 
                 texturedMaterialGroup.Add(geometryModel10);
 
 
-                var treePlaneMaterial = TextureLoader.CreateTextureMaterial(@"Resources\TreeTexture.png", _bitmapIO, _scene.GpuDevice);
+                var treePlaneMaterial = new StandardMaterial(@"Resources\TreeTexture.png", _bitmapIO);
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -363,7 +375,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             //
             if (_bitmapIO != null)
             {
-                var solidColorMaterial2 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial2 = new StandardMaterial(@"Resources\10x10-texture.png", _bitmapIO);
                 solidColorMaterial2.Effect = solidColorEffect;
 
                 var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -396,7 +408,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
-                var solidColorMaterial3 = TextureLoader.CreateTextureMaterial(@"Resources\10x10-texture.png", _bitmapIO, _scene.GpuDevice);
+                var solidColorMaterial3 = new StandardMaterial(@"Resources\10x10-texture.png", _bitmapIO);
                 solidColorMaterial3.Effect = customSolidColorEffect;
 
                 var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
