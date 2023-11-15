@@ -341,76 +341,91 @@ namespace AndroidDemo
             };
         }
 
-
         public override bool DispatchTouchEvent(MotionEvent? e)
         {
-            bool isScaleEvent;
+            if (_vulkanDevice == null)
+                return false;
 
-            if (e != null && _scaleGestureDetector != null)
+            if (_vulkanDevice.IsOnMainThread())
             {
-                float xPos = e.GetX();
-                float yPos = e.GetY();
-
-                Log.Trace?.Write($"TouchEvent: Action: {e.Action}; pos: {xPos} {yPos}; PointerCount: {e.PointerCount}");
-
-                isScaleEvent = _scaleGestureDetector.OnTouchEvent(e);
-
-
-                if (_mouseCameraController != null)
-                {
-                    MouseButtons simulatedMouseButtons;
-
-                    if (e.PointerCount == 1)
-                        simulatedMouseButtons = MouseButtons.Left;
-                    else if (e.PointerCount == 2)
-                        simulatedMouseButtons = MouseButtons.Left | MouseButtons.Right;
-                    else
-                        simulatedMouseButtons = MouseButtons.None;
-
-                    if (e.Action == MotionEventActions.Down ||
-                        e.Action == MotionEventActions.Pointer1Down ||
-                        e.Action == MotionEventActions.Pointer2Down)
-                    {
-                        // Start rotate
-                        _mouseCameraController.ProcessMouseDown(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
-                    }
-                    else if (e.Action == MotionEventActions.Up ||
-                             e.Action == MotionEventActions.Pointer1Up ||
-                             e.Action == MotionEventActions.Pointer2Up)
-                    {
-                        // End rotate
-                        // e.PointerCount value shows the value before the finger was lifted so we need to decrease the value by one
-                        // This means we have only 2 cases:
-                        if (e.PointerCount == 2)
-                        {
-                            if (e.Action == MotionEventActions.Pointer1Up)
-                                simulatedMouseButtons = MouseButtons.Right; // 1st is up so only right remains
-                            else if (e.Action == MotionEventActions.Pointer1Up)
-                                simulatedMouseButtons = MouseButtons.Left;  // 2nd is up so only left remains
-                            else
-                                simulatedMouseButtons = MouseButtons.None;
-                        }
-                        else
-                        {
-                            simulatedMouseButtons = MouseButtons.None;
-                        }
-
-                        _mouseCameraController.ProcessMouseUp(simulatedMouseButtons, KeyboardModifiers.None);
-                    }
-                    else if (e.Action == MotionEventActions.Move)
-                    {
-                        // Rotate / move
-
-                        _mouseCameraController.ProcessMouseMove(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
-                    }
-                }
+                ProcessTouchEvent(e);
             }
             else
             {
-                isScaleEvent = false;
+                this.RunOnUiThread(() =>
+                {
+                    ProcessTouchEvent(e);
+                });
             }
 
+            bool isScaleEvent;
+            if (_scaleGestureDetector != null && e != null)
+                isScaleEvent = _scaleGestureDetector.OnTouchEvent(e);
+            else
+                isScaleEvent = false;
+
             return base.DispatchTouchEvent(e) || isScaleEvent;
+        }
+
+        // This must be called on the same thread as the SharpEngineSceneView was created
+        private void ProcessTouchEvent(MotionEvent? e)
+        {
+            if (e == null || _scaleGestureDetector == null) 
+                return;
+
+            float xPos = e.GetX();
+            float yPos = e.GetY();
+
+            Log.Trace?.Write($"TouchEvent: Action: {e.Action}; pos: {xPos} {yPos}; PointerCount: {e.PointerCount}");
+
+            if (_mouseCameraController != null)
+            {
+                MouseButtons simulatedMouseButtons;
+
+                if (e.PointerCount == 1)
+                    simulatedMouseButtons = MouseButtons.Left;
+                else if (e.PointerCount == 2)
+                    simulatedMouseButtons = MouseButtons.Left | MouseButtons.Right;
+                else
+                    simulatedMouseButtons = MouseButtons.None;
+
+                if (e.Action == MotionEventActions.Down ||
+                    e.Action == MotionEventActions.Pointer1Down ||
+                    e.Action == MotionEventActions.Pointer2Down)
+                {
+                    // Start rotate
+                    _mouseCameraController.ProcessMouseDown(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+                }
+                else if (e.Action == MotionEventActions.Up ||
+                         e.Action == MotionEventActions.Pointer1Up ||
+                         e.Action == MotionEventActions.Pointer2Up)
+                {
+                    // End rotate
+                    // e.PointerCount value shows the value before the finger was lifted so we need to decrease the value by one
+                    // This means we have only 2 cases:
+                    if (e.PointerCount == 2)
+                    {
+                        if (e.Action == MotionEventActions.Pointer1Up)
+                            simulatedMouseButtons = MouseButtons.Right; // 1st is up so only right remains
+                        else if (e.Action == MotionEventActions.Pointer1Up)
+                            simulatedMouseButtons = MouseButtons.Left; // 2nd is up so only left remains
+                        else
+                            simulatedMouseButtons = MouseButtons.None;
+                    }
+                    else
+                    {
+                        simulatedMouseButtons = MouseButtons.None;
+                    }
+
+                    _mouseCameraController.ProcessMouseUp(simulatedMouseButtons, KeyboardModifiers.None);
+                }
+                else if (e.Action == MotionEventActions.Move)
+                {
+                    // Rotate / move
+
+                    _mouseCameraController.ProcessMouseMove(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+                }
+            }
         }
     }
 }
