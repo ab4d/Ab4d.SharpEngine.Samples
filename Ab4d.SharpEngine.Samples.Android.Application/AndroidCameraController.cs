@@ -10,16 +10,21 @@ namespace AndroidApp1;
 
 public class AndroidCameraController : ManualMouseCameraController
 {
+    private Activity _activity;
     private CustomScaleListener _myScaleListener;
     private ScaleGestureDetector _scaleGestureDetector;
 
-    public AndroidCameraController(Context androidContext, SceneView sceneView)
+    private System.Threading.Thread _uiThread;
+
+    public AndroidCameraController(Context androidContext, Activity activity, SceneView sceneView)
         : base(sceneView)
     {
+        _activity = activity;
+        _uiThread = System.Threading.Thread.CurrentThread;
+        
         // Set default rotate (single touch) and move (two finger touch) events:
         RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed;
         MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
-
 
         // See: https://developer.android.com/training/gestures/scale#java
         _myScaleListener = new CustomScaleListener();
@@ -33,14 +38,36 @@ public class AndroidCameraController : ManualMouseCameraController
         if (e == null)
             return false;
 
-        bool isHandled = false;
 
-        float xPos = e.GetX();
-        float yPos = e.GetY();
+        bool isHandled;
+
+        if (ReferenceEquals(System.Threading.Thread.CurrentThread, _uiThread))
+        {
+            isHandled = ProcessTouchEventInt(e);
+        }
+        else
+        {
+            _activity.RunOnUiThread(() =>
+            {
+                ProcessTouchEventInt(e);
+            });
+
+            isHandled = false;
+        }
+
+        bool isScaleEvent = _scaleGestureDetector.OnTouchEvent(e);
+
+        return isHandled || isScaleEvent;
+    }
+
+    private bool ProcessTouchEventInt(MotionEvent e) 
+    {
+        bool isHandled;
 
         //Log.Trace?.Write($"TouchEvent: Action: {e.Action}; pos: {xPos} {yPos}; PointerCount: {e.PointerCount}");
 
-        _scaleGestureDetector.OnTouchEvent(e);
+        float xPos = e.GetX();
+        float yPos = e.GetY();
 
         MouseButtons simulatedMouseButtons;
 
@@ -86,6 +113,10 @@ public class AndroidCameraController : ManualMouseCameraController
             // Rotate / move
 
             isHandled = base.ProcessMouseMove(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+        }
+        else
+        {
+            isHandled = false;
         }
 
         return isHandled;

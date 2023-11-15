@@ -210,7 +210,7 @@ namespace AndroidApp1
             if (this.ApplicationContext != null)
             {
                 // AndroidCameraController is implemented in this sample
-                _cameraController = new AndroidCameraController(this.ApplicationContext, _sceneView)
+                _cameraController = new AndroidCameraController(this.ApplicationContext, this, _sceneView)
                 {
                     ZoomMode = CameraZoomMode.ViewCenter,
                     //RotateAroundMousePosition = true
@@ -432,14 +432,26 @@ namespace AndroidApp1
 
         public override bool DispatchTouchEvent(MotionEvent? e)
         {
-            bool isHandled;
+            if (_vulkanDevice == null)
+                return false;
 
+            bool isHandled;
             if (_cameraController != null)
                 isHandled = _cameraController.ProcessTouchEvent(e);
             else
                 isHandled = false;
 
             return base.DispatchTouchEvent(e) || isHandled;
+        }
+
+
+        // This must be called on the same thread as the SharpEngineSceneView was created
+        private bool ProcessTouchEvent(MotionEvent? e)
+        {
+            if (_cameraController != null)
+                return _cameraController.ProcessTouchEvent(e);
+
+            return false;
         }
 
         // Setup SharpEngine logging
