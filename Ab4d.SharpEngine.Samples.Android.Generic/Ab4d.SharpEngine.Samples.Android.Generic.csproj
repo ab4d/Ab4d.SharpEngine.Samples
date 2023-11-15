@@ -13,9 +13,9 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
-    <PackageReference Include="Silk.NET.Input.Sdl" Version="2.17.1" />
-    <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.17.1" />
-    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+    <PackageReference Include="Silk.NET.Input.Sdl" Version="2.19.0" />
+    <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.19.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.6" />
   </ItemGroup>
 
   <ItemGroup>
