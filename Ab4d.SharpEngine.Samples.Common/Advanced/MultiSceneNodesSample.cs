@@ -240,7 +240,7 @@ public class MultiSceneNodesSample : CommonSample
             if (gpuDevice != null)
             {
                 // Manually load texture with TextureLoader (this way we can set generateMipMaps to false)
-                var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", BitmapIO, gpuDevice, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
+                var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", gpuDevice, BitmapIO, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
                 _disposables.Add(textureWithoutMipMaps);
 
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")

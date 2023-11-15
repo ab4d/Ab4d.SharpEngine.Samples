@@ -27,8 +27,8 @@ public class SpritesSample : CommonSample
         if (scene.GpuDevice == null)
             return;
 
-        _uvCheckerTexture = TextureLoader.CreateTexture(@"Resources/Textures/uvchecker.png", BitmapIO, scene.GpuDevice);
-        _treeTexture = TextureLoader.CreateTexture(@"Resources/Textures/TreeTexture.png", BitmapIO, scene.GpuDevice);
+        _uvCheckerTexture = TextureLoader.CreateTexture(@"Resources/Textures/uvchecker.png", scene.GpuDevice, BitmapIO);
+        _treeTexture = TextureLoader.CreateTexture(@"Resources/Textures/TreeTexture.png", scene.GpuDevice, BitmapIO);
 
 
         // Create SpriteBatch on the Scene object (note that there we CANNOT use absolute coordinates and can use only relative coordinates, that are in range from 0 to 1)

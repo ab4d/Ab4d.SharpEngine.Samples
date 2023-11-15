@@ -214,7 +214,7 @@ public abstract class CommonSample
             return null; 
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Textures", textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, BitmapIO, gpuDevice);
+        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO);
         
         return textureImage;
     }
