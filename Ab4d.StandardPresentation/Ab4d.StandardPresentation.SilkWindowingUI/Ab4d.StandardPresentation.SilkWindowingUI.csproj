@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SilkWindowingUI</AssemblyName>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
     <PackageReference Include="Silk.NET.Input" Version="2.15.0" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.15.0" />
   </ItemGroup>

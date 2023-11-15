@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.WpfUI</AssemblyName>
     <RootNamespace>Ab4d.WpfUI</RootNamespace>      
@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.18-beta6" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
   

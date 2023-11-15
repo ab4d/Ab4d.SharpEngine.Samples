@@ -9,6 +9,7 @@ Welcome to the Samples for Ab4d.SharpEngine.
 Vulkan is a high performance graphics and cross-platform API that is similar to DirectX 12 but can run on multiple platforms.
 
 The following features are supported by the current version:
+- Using any coordinate system (y-up or z-up, right-handed or left-handed)
 - Core SharpEngine objects (Scene, SceneView)
 - Many SceneNode objects (ported most of 3D objects from Ab3d.PowerToys)
 - Object instancing (InstancedMeshNode)
@@ -62,7 +63,7 @@ Online help:
 
 ### System requirements to run the samples:
 - NET 6.0+
-- NET 7.0 is required to use MAUI (.NET 8.0 is required to run MAUI on macOS and iOS)
+- NET 8.0 is required to use MAUI
 
 
 ### System requirements to open the sample projects:
@@ -245,6 +246,36 @@ To do this please find the existing code that sets up logging and change it to:
 
 ## Change log
 
+**v0.9.20 RC1** (2023-11-15):
+- Added support for custom coordinate system - it can be changed by calling Scene.SetCoordinateSystem. Supported coordinate systems: YUpRightHanded (default), YUpLeftHanded, ZUpRightHanded, ZUpLeftHanded. There are also new methods in Scene and CameraUtils that can help you get information about the coordinate system.
+- Added CameraAxisPanel, which can show a small panel displaying the orientation of the X, Y, and Z axes.
+- Added PngBitmapIO class to SharpEngine. It can read or write png images so no third-party library is needed anymore to import textures or save rendered bitmap to disk.
+- Added SolidColorMaterial to make it easier to use solid color material (before user need to use StandardMaterial and set Effect to SolidColorEffect).
+- Added PlaneModelNode.AlignWithCamera method that orients the plane model so that it is facing the camera.
+- Added GetCameraPlaneOrientation to camera classes.
+- Added support to load textures from stream with new overloads to LoadDiffuseTexture method in StandardMaterialBase (base class for StandardMaterial and SolidColorMaterial). Before TextureLoader was needed to create a texture from stream.
+- bitmapIO parameter is now optional in the LoadDiffuseTexture method in StandardMaterialBase. When bitmapIO is null, then DefaultBitmapIO from GpuDevice is used.
+- Removed SharpDX dependency from Ab4d.SharpEngine.WinUI library (add DirectX 11 interop code to the library).
+- Added SharpEngineSceneView.DisableWpfResizingOfRenderedImage in Ab4d.SharpEngine.Wpf. When set to default true value, it produces sharper rendered image.
+- Added EngineCreateOptions.AdditionalValidationFeatures
+- Fixed using model or parent Group transformation on InstancedMeshNode.
+- Fixed moving camera with MouseCameraController in some cases when using an orthographic camera
+- Fixed disposing DirectX 11 device (used by Ab4d.SharpEngine.Avalonia on Windows and can be used by Ab4d.SharpEngine.Wpf with Intel gpu).
+- Improved LineSelectorData so that in case the LineSelectorData is created with LineNode, then LineNode's WorldMatrix will be used to transform all the line positions.
+- Improved AssimpImporter - names that are assigned to created GroupNode and MeshModelNode from Assump's Nodes are assigned more correctly.
+- Updated SpriteBatch class:
+-   Renamed Draw method to DrawSprite
+-   Added DrawBitmapText method to render a 2D text behind or on top of 3D scene
+-   Added DrawRectangle method to render a 2D rectangle behind or on top of 3D scene
+
+Breaking changes:
+- Changed the order of parameters in TextureLoader.CreateTexture method - the bitmapIO is now optional and was moved after scene or gpuDevice parameters. When bitmapIO is not set, then DefaultBitmapIO from GpuDevice is used.
+- Removed CreateTextureMaterial methods from TextureLoader. StandardMaterial and SolidColorMaterial with texture can be easily created by using class constructor and providing file name or file stream.
+- Removed Scene.BitmapIO property and added VulkanDevice.DefaultBitmapIO property that is set to an instance of PngBitmapIO. This provides the default (and fallback) png loader to load textures from png files so not other third-party BitmapIO is needed.
+- Renamed IBitmapIO.ConvertToBgra to ConvertToSupportedFormat and updated the code accordingly (now the rgba images are not converted to bgra anymore but are shown by the engine in its original format).
+- Ranamed AssimpImporter.ImportSceneNodes method to Import. Also changed the return type from SceneNode to GroupNode.
+
+
 **v0.9.18 beta6** (2023-10-20):
 - TextBlockFactory, BitmapTextCreator and BitmapFont are now part of SharpEngine. Also there is a build-in bitmap font that can be used without the need to provide your font.
 - Improved ways to manually dispose objects and resources by adding the following methods: GroupNode.DisposeAllChildren, GroupNode.DisposeWithAllChildren, GroupNode.DisposeChildren, ModelNode.DisposeWithMaterial, MeshModelNode.DisposeWithMeshAndMaterial, LineBaseNode.DisposeWithMaterial and StandardMaterial.DisposeWithTexture (see online help for more info: https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm)
@@ -299,11 +330,7 @@ Breaking change:
 
 ## Roadmap
 
-### RC versions
-
-Version v0.9.18 beta6 was last beta version. The next version will be the first RC version.
-
-### v1.0 release (November 2023)
+### v1.0 release (first week in December 2023)
 
 Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
 
