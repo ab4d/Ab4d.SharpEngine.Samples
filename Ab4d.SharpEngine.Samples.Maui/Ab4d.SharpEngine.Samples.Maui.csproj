@@ -1,20 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-        <AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
-        <RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
-		<TargetFrameworks>net7.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+    <AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
+
+    <TargetFrameworks>net8.0-android</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
 		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifer>.
 		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
-		<!-- <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
-
+		<!--<RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers>-->
+		
 		<OutputType>Exe</OutputType>
-        <Version>0.9.18.0</Version>
+    <Version>0.9.20.0</Version>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -56,34 +58,42 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6" />
+		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
+	</ItemGroup>
+
+
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
       <RuntimeIdentifier>maccatalyst-arm64</RuntimeIdentifier> 
-      <MtouchLink>None</MtouchLink>
+      <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-      <!-- <CodesignKey>Apple Development: emial (id)</CodesignKey>
+    <!-- To start the app on iOS you will need a provisioning profile.
+	     See: https://learn.microsoft.com/en-us/xamarin/ios/get-started/installation/device-provisioning/manual-provisioning
+	     Another option is to use JetBrains Rider: open the project in Rider, right click on project and select "Open in XCode". 
+		   In XCode click on the root node in the hierarchy on the left and then on the center in the tab select "Signing & Capabilities".
+		   There enter the Bundle Identifier (copy it from csproj ApplicationIdcheck), check Automatically manage signing and select corresponding team.
+		   XCode will generate the provisioning profile. -->
+	  <!-- <CodesignKey>Apple Development: emial (id)</CodesignKey>
       <CodesignProvision>iOS Team Provisioning Profile: com.ab4d.sharpengine.samples.maui</CodesignProvision> -->
-      <MtouchLink>None</MtouchLink>
+      <MtouchLink>SdkOnly</MtouchLink>
       <MtouchFloat32>true</MtouchFloat32>
     </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-		<PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.5" />
-	</ItemGroup>
 
 	<!-- Mac Catalyst and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-	  <None Include="..\lib\MoltenVK\macOS\libMoltenVK.dylib">
+	  <None Include="..\lib\MoltenVK\macOS\libMoltenVK.dylib" PublishFolderType="Assembly">
 	    <Link>libMoltenVK.dylib</Link>
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
-
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-	  <None Include="..\lib\MoltenVK\iOS\libMoltenVK.dylib">
+	  <None Include="..\lib\MoltenVK\iOS\libMoltenVK.dylib" PublishFolderType="Assembly">
 	    <Link>libMoltenVK.dylib</Link>
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
@@ -92,7 +102,7 @@
 	
 	<!-- Build Properties must be defined within these property groups to ensure successful publishing
        to the Mac App Store. See: https://aka.ms/maui-publish-app-store#define-build-properties-in-your-project-file -->
-
+  
   <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Debug'">
     <CodesignEntitlements>Platforms/MacCatalyst/Entitlements.Debug.plist</CodesignEntitlements>
   </PropertyGroup>
@@ -101,10 +111,5 @@
     <CodesignEntitlements>Platforms/MacCatalyst/Entitlements.Release.plist</CodesignEntitlements>
     <UseHardenedRuntime>true</UseHardenedRuntime>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-    <CreatePackage>false</CreatePackage>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-    <CreatePackage>false</CreatePackage>
-  </PropertyGroup>
+
 </Project>
