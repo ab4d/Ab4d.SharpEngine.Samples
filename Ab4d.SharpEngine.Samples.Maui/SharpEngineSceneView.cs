@@ -191,6 +191,16 @@ public class SharpEngineSceneView : SKCanvasView
         {
             Log.LastVulkanValidationMessage = null; // reset LastVulkanValidationMessage (this is used in ShowVulkanDeviceCreationError)
 
+            if (string.IsNullOrEmpty(CreateOptions.ApplicationName))
+            {
+                var assembly = System.Reflection.Assembly.GetEntryAssembly();
+                if (assembly == null)
+                    assembly = this.GetType().Assembly;
+
+                CreateOptions.ApplicationName = assembly.GetName().Name ?? "Maui application";
+            }
+
+
             // Save VulkanDevice because we will also need to dispose it
             GpuDevice = VulkanDevice.Create(CreateOptions, vulkanSurfaceProvider);
             _isGpuDeviceCreatedHere = true;
