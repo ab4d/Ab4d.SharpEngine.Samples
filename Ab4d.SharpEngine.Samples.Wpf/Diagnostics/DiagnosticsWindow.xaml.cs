@@ -271,6 +271,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             ShowInfoText(_commonDiagnostics.GetResourcesForDelayedDisposalDumpString());
         }
 
+        private void DumpEngineSettingsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowInfoText(_commonDiagnostics.GetEngineSettingsDump());
+        }
+
         private void DumpSystemInfoMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());

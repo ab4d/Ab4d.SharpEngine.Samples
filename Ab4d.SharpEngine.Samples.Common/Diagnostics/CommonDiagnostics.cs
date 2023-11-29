@@ -680,30 +680,40 @@ PipelineChangesCount: {8:#,##0}",
         return reportText;
     }
 
-    private string GetEngineSettingsDump()
+    public string GetEngineSettingsDump(string indent = "")
     {
         if (SharpEngineSceneView == null)
             return "";
 
         var sb = new StringBuilder();
-
+        
         if (SharpEngineSceneView.GpuDevice != null)
         {
-            sb.Append("  VulkanDevice: ");
-            DumpObjectProperties(SharpEngineSceneView.GpuDevice, sb, "  ");
+            DumpObjectProperties(SharpEngineSceneView.GpuDevice.CreateOptions, sb, indent);
+            sb.AppendLine();
+            
+            DumpObjectProperties(SharpEngineSceneView.GpuDevice, sb, indent);
+            sb.AppendLine();
+            
+            // Manually dump some properties of EngineRuntimeOptions because this class is static and have no instance properties
+            sb.AppendLine($"{indent}EngineRuntimeOptions properties:");
+            sb.AppendLine($"{indent}  InitialBufferMemoryBlockSize: {EngineRuntimeOptions.InitialBufferMemoryBlockSize}");
+            sb.AppendLine($"{indent}  InitialImageMemoryBlockSize: {EngineRuntimeOptions.InitialImageMemoryBlockSize}");
+            sb.AppendLine($"{indent}  MaxAllocatedMemoryBlockSize: {EngineRuntimeOptions.MaxAllocatedMemoryBlockSize}");
+            sb.AppendLine($"{indent}  ReuseDisposedMemoryBlockIndexes: {EngineRuntimeOptions.ReuseDisposedMemoryBlockIndexes}");
+            sb.AppendLine($"{indent}  MeshTriangleIndicesCountRequiredForComplexGeometry: {EngineRuntimeOptions.MeshTriangleIndicesCountRequiredForComplexGeometry}");
+            sb.AppendLine($"{indent}  LinePositionsCountRequiredForComplexGeometry: {EngineRuntimeOptions.LinePositionsCountRequiredForComplexGeometry}");
+            sb.AppendLine($"{indent}  FramesCountToReleaseEmptyMemoryBlock: {EngineRuntimeOptions.FramesCountToReleaseEmptyMemoryBlock}");
             sb.AppendLine();
         }
 
-        sb.Append("  Scene: ");
-        DumpObjectProperties(SharpEngineSceneView.Scene, sb, "  ");
+        DumpObjectProperties(SharpEngineSceneView.Scene, sb, indent);
         sb.AppendLine();
 
-        sb.Append("  SceneView: ");
-        DumpObjectProperties(SharpEngineSceneView.SceneView, sb, "  ");
+        DumpObjectProperties(SharpEngineSceneView.SceneView, sb, indent);
         sb.AppendLine();
 
-        sb.Append("  SharpEngineSceneView: ");
-        DumpObjectProperties(SharpEngineSceneView, sb, "  ");
+        DumpObjectProperties(SharpEngineSceneView, sb, indent);
         sb.AppendLine();
 
         return sb.ToString();
@@ -719,7 +729,7 @@ PipelineChangesCount: {8:#,##0}",
 
         var type = objectToDump.GetType();
 
-        sb.AppendLine(type.Name + " properties:");
+        sb.AppendLine($"{indent}{type.Name} properties:");
 
         try
         {
@@ -727,11 +737,10 @@ PipelineChangesCount: {8:#,##0}",
 
             foreach (var propertyInfo in allProperties)
             {
-                if (propertyInfo.PropertyType.IsValueType ||
+                if (propertyInfo.PropertyType.IsValueType || 
                     propertyInfo.PropertyType == typeof(string) ||
-                    (propertyInfo.DeclaringType != null &&
-                     propertyInfo.DeclaringType.Assembly.FullName != null &&
-                     (propertyInfo.DeclaringType.Assembly.FullName.StartsWith("Ab3d.") || propertyInfo.DeclaringType.Assembly.FullName.StartsWith("Ab4d.")))) // Only show referenced objects for types that are declared in this class
+                    (propertyInfo.PropertyType.Assembly.FullName != null &&
+                     propertyInfo.PropertyType.Assembly.FullName.StartsWith("Ab4d."))) // Only show referenced objects for types that are declared in this class
                 {
                     string valueText;
 
@@ -741,6 +750,8 @@ PipelineChangesCount: {8:#,##0}",
 
                         if (propertyValue == null)
                             valueText = "<null>";
+                        else if (propertyInfo.PropertyType == typeof(string))
+                            valueText = '"' + (string)propertyValue + '"';
                         else
                             valueText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}", propertyValue);
                     }
@@ -749,7 +760,27 @@ PipelineChangesCount: {8:#,##0}",
                         valueText = "ERROR: " + e.Message;
                     }
 
-                    sb.AppendLine(indent + propertyInfo.Name + ": " + valueText);
+                    sb.AppendLine(indent + "  " + propertyInfo.Name + ": " + valueText);
+                }
+                else if (propertyInfo.PropertyType == typeof(string[]) || propertyInfo.PropertyType == typeof(List<string>))
+                {
+                    string valueText;
+
+                    try
+                    {
+                        var propertyValue = propertyInfo.GetValue(objectToDump, null);
+
+                        if (propertyInfo.PropertyType == typeof(string[]))
+                            valueText = string.Join(',', ((string[])propertyValue).Select(s => '"' + s + '"'));
+                        else
+                            valueText = string.Join(',', ((List<string>)propertyValue).Select(s => '"' + s + '"'));
+                    }
+                    catch (Exception e)
+                    {
+                        valueText = "ERROR: " + e.Message;
+                    }
+
+                    sb.AppendLine($"{indent}  {propertyInfo.Name}: {{{valueText}}}");
                 }
             }
         }
@@ -951,7 +982,7 @@ PipelineChangesCount: {8:#,##0}",
 
         try
         {
-            var sharpEngineSettingsDump = GetEngineSettingsDump();
+            var sharpEngineSettingsDump = GetEngineSettingsDump("  ");
 
             sb.AppendLine("Engine settings:").AppendLine(sharpEngineSettingsDump);
 

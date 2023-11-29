@@ -30,6 +30,7 @@
                 <MenuItem Name="DumpRenderingLayersMenuItem" Header="Dump RenderingLayers" Click="DumpRenderingLayersMenuItem_OnClick"/>
                 <MenuItem Name="DumpRenderingStepsMenuItem" Header="Dump RenderingSteps" Click="DumpRenderingStepsMenuItem_OnClick"/>
                 <MenuItem Name="DumpUsedMaterialsMenuItem" Header="Dump used materials" Click="DumpUsedMaterialsMenuItem_OnClick"/>
+                <MenuItem Name="DumpEngineSettingsMenuItem" Header="Dump engine settings" Click="DumpEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
                 <MenuItem Name="ShowFullSceneDumpMenuItem" Header="Get full scene dump" Click="ShowFullSceneDumpMenuItem_OnClick"/>
 

@@ -26,30 +26,31 @@
                     <RadioMenuFlyoutItem Name="ShowCameraInfoRadioButton" Text="Show camera info" Margin="0 -2" GroupName="StatisticsType" Click="ShowCameraInfoRadioButton_OnClick" />
 
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Name="DumpSceneNodesMenuItem" Text="Dump SceneNodes" Margin="0 -2" Tapped="DumpSceneNodesMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpCameraDetailsMenuItem" Text="Dump Camera details" Margin="0 -2" Tapped="DumpCameraDetailsMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpRenderingLayersMenuItem" Text="Dump RenderingLayers" Margin="0 -2" Tapped="DumpRenderingLayersMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpRenderingStepsMenuItem" Text="Dump RenderingSteps" Margin="0 -2" Tapped="DumpRenderingStepsMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpUsedMaterialsMenuItem" Text="Dump used materials" Margin="0 -2" Tapped="DumpUsedMaterialsMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpSystemInfoMenuItem" Text="Dump System info" Margin="0 -2" Tapped="DumpSystemInfoMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="ShowFullSceneDumpMenuItem" Text="Get full scene dump" Margin="0 -2" Tapped="ShowFullSceneDumpMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpSceneNodesMenuItem" Text="Dump SceneNodes" Margin="0 -2" Click="DumpSceneNodesMenuItem_OnTapped" Tapped="DumpSceneNodesMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpCameraDetailsMenuItem" Text="Dump Camera details" Margin="0 -2" Click="DumpCameraDetailsMenuItem_OnTapped" Tapped="DumpCameraDetailsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpRenderingLayersMenuItem" Text="Dump RenderingLayers" Margin="0 -2" Click="DumpRenderingLayersMenuItem_OnTapped" Tapped="DumpRenderingLayersMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpRenderingStepsMenuItem" Text="Dump RenderingSteps" Margin="0 -2" Click="DumpRenderingStepsMenuItem_OnTapped" Tapped="DumpRenderingStepsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpUsedMaterialsMenuItem" Text="Dump used materials" Margin="0 -2" Click="DumpUsedMaterialsMenuItem_OnTapped" Tapped="DumpUsedMaterialsMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpEngineSettingsMenuItem" Text="Dump engine settings" Margin="0 -2" Click="DumpEngineSettingsMenuItem_OnClick" Tapped="DumpEngineSettingsMenuItem_OnClick"/>
+                    <MenuFlyoutItem Name="DumpSystemInfoMenuItem" Text="Dump System info" Margin="0 -2" Click="DumpSystemInfoMenuItem_OnTapped" Tapped="DumpSystemInfoMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="ShowFullSceneDumpMenuItem" Text="Get full scene dump" Margin="0 -2" Click="ShowFullSceneDumpMenuItem_OnTapped" Tapped="ShowFullSceneDumpMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Name="DumpMemoryMenuItem" Text="Dump Memory" Margin="0 -2" Tapped="DumpMemoryMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpResourcesMenuItem" Text="Dump Resources" Margin="0 -2" Tapped="DumpResourcesMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpResourcesGroupByTypeMenuItem" Text="Dump resources (group by type)" Margin="0 -2" Tapped="DumpResourcesGroupByTypeMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="DumpResourcesForDelayedDisposalMenuItem" Text="Dump Resources for delayed disposal" Margin="0 -2" Tapped="DumpResourcesForDelayedDisposalMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="GarbageCollectMenuItem" Text="Garbage collect" Margin="0 -2" Tapped="GarbageCollectMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpMemoryMenuItem" Text="Dump Memory" Margin="0 -2" Click="DumpMemoryMenuItem_OnTapped" Tapped="DumpMemoryMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesMenuItem" Text="Dump Resources" Margin="0 -2" Click="DumpResourcesMenuItem_OnTapped" Tapped="DumpResourcesMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesGroupByTypeMenuItem" Text="Dump resources (group by type)" Margin="0 -2" Click="DumpResourcesGroupByTypeMenuItem_OnTapped" Tapped="DumpResourcesGroupByTypeMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="DumpResourcesForDelayedDisposalMenuItem" Text="Dump Resources for delayed disposal" Margin="0 -2" Click="DumpResourcesForDelayedDisposalMenuItem_OnTapped" Tapped="DumpResourcesForDelayedDisposalMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="GarbageCollectMenuItem" Text="Garbage collect" Margin="0 -2" Click="GarbageCollectMenuItem_OnTapped" Tapped="GarbageCollectMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="CaptureInRenderDocMenuItem" Text="Capture next frame in RenderDoc" Margin="0 -2" Tapped="CaptureInRenderDocMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Click="StartStopCameraRotationMenuItem_OnTapped" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="CaptureInRenderDocMenuItem" Text="Capture next frame in RenderDoc" Margin="0 -2" Click="CaptureInRenderDocMenuItem_OnTapped" Tapped="CaptureInRenderDocMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator Name="FullLoggingSeparator" />
                     <ToggleMenuFlyoutItem Name="FullLoggingCheckBox" Text="Full Logging" Click="FullLoggingCheckBox_OnClick" />
 
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Name="OnlineReferenceHelpMenuItem" Text="Online reference help" Margin="0 -2" Tapped="OnlineReferenceHelpMenuItem_OnTapped" />
+                    <MenuFlyoutItem Name="OnlineReferenceHelpMenuItem" Text="Online reference help" Margin="0 -2" Click="OnlineReferenceHelpMenuItem_OnTapped" Tapped="OnlineReferenceHelpMenuItem_OnTapped" />
                 </MenuFlyout>
             </Canvas.ContextFlyout>
         </Canvas>

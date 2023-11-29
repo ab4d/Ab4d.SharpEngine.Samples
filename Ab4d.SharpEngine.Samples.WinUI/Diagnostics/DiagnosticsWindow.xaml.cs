@@ -220,7 +220,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             }
         }
 
-        private void StartStopCameraRotationMenuItem_OnTapped(object sender, TappedRoutedEventArgs args)
+        private void StartStopCameraRotationMenuItem_OnTapped(object sender, RoutedEventArgs args)
         {
             bool isCameraRotating = _commonDiagnostics.ToggleCameraRotation();
 
@@ -230,52 +230,57 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
                 StartStopCameraRotationMenuItem.Text = "Start camera rotation";
         }
         
-        private void DumpSceneNodesMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpSceneNodesMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSceneNodesDumpString());
         }
 
-        private void DumpRenderingLayersMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpRenderingLayersMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetRenderingLayersDumpString());
         }
 
-        private void DumpRenderingStepsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpRenderingStepsMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetRenderingStepsDumpString());
         }
 
-        private void DumpUsedMaterialsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpUsedMaterialsMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetUsedMaterialsDumpString());
         }
 
-        private void DumpMemoryMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpMemoryMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetMemoryDumpString());
         }
         
-        private void DumpResourcesMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpResourcesMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesDumpString(groupByType: false));
         }
         
-        private void DumpResourcesGroupByTypeMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpResourcesGroupByTypeMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesDumpString(groupByType: true));
         }
         
-        private void DumpResourcesForDelayedDisposalMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpResourcesForDelayedDisposalMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetResourcesForDelayedDisposalDumpString());
         }
 
-        private void DumpSystemInfoMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpEngineSettingsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowInfoText(_commonDiagnostics.GetEngineSettingsDump());
+        }
+
+        private void DumpSystemInfoMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());
         }
         
-        private void ShowFullSceneDumpMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void ShowFullSceneDumpMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             if (SharpEngineSceneView == null)
                 return;
@@ -287,12 +292,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             StartProcess(DumpFileName);
         }
         
-        private void DumpCameraDetailsMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void DumpCameraDetailsMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetCameraDetailsDumpString());
         }
 
-        private void GarbageCollectMenuItem_OnTapped(object sender, TappedRoutedEventArgs e)
+        private void GarbageCollectMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             _commonDiagnostics.GarbageCollect();
         }
