@@ -300,7 +300,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             // In case when we have _vulkanSurface it is recommended to provide it when creating the VulkanDevice.
             // This way the correct settings for the device can be used (for example SwapChainImagesCount).
             // It is also possible not to specify surface when creating VulkanDevice and do that only when creating SceneView.
-            _vulkanDevice = VulkanDevice.Create(engineCreateOptions, defaultSurfaceProvider: _vulkanSurfaceProvider);
+            _vulkanDevice = VulkanDevice.Create(defaultSurfaceProvider: _vulkanSurfaceProvider, engineCreateOptions);
 
             return true;
         }
