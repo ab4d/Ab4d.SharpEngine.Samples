@@ -203,7 +203,7 @@ namespace AndroidDemo
 
             var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngineAndroidDemo", enableStandardValidation: enableStandardValidation);
 
-            _vulkanDevice = VulkanDevice.Create(engineCreateOptions, vulkanSurface);
+            _vulkanDevice = VulkanDevice.Create(vulkanSurface, engineCreateOptions);
 
             Log.Info?.Write("Vulkan device created!!!");
         }
