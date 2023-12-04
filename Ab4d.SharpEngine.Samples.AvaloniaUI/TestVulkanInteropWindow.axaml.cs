@@ -60,7 +60,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 try
                 {
                     var engineCreateOptions = new EngineCreateOptions(applicationName: "TestVulkanInteropWindow", enableStandardValidation: false);
-                    vulkanInstance = new VulkanInstance(engineCreateOptions);
+                    vulkanInstance = VulkanInstance.Create(engineCreateOptions);
                     
                     ShowInfoMessage($"VulkanInstance created. API version: {vulkanInstance.ApiVersion}");
                 }
@@ -134,7 +134,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 {
                     try
                     {
-                        var vulkanDevice = new VulkanDevice(vulkanInstance, allPhysicalDeviceDetails[0], SurfaceKHR.Null, vulkanInstance.CreateOptions);
+                        var vulkanDevice = VulkanDevice.Create(vulkanInstance, allPhysicalDeviceDetails[0], vulkanInstance.CreateOptions, SurfaceKHR.Null);
                         ShowInfoMessage("VulkanDevice created for the first physical device");
                     }
                     catch (Exception ex)
