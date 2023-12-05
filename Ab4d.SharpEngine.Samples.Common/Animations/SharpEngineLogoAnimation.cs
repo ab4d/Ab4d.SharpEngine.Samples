@@ -43,7 +43,7 @@ public class SharpEngineLogoAnimation : IDisposable
     private MaterialAnimation? _materialAnimation;
     
 
-    public SharpEngineLogoAnimation(Scene scene, IBitmapIO bitmapIO)
+    public SharpEngineLogoAnimation(Scene scene, IBitmapIO? bitmapIO = null)
     {
         // Create PlaneModelNode that will show the logo bitmap
         _logoTextureMaterial = new StandardMaterial(LogoImageResourceName, bitmapIO);

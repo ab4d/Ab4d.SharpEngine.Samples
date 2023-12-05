@@ -61,9 +61,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
             var scene = MainSceneView.Scene;
             var sceneView = MainSceneView.SceneView;
 
-            var bitmapIO = new SkiaSharpBitmapIO(); // _bitmapIO provides a cross-platform way to read bitmaps - in this sample we use WPF as backend
-
-            _sharpEngineLogoAnimation = new SharpEngineLogoAnimation(scene, bitmapIO);
+            _sharpEngineLogoAnimation = new SharpEngineLogoAnimation(scene, bitmapIO: null);
 
             scene.RootNode.Add(_sharpEngineLogoAnimation.LogoPlaneModel);
             scene.RootNode.Add(_sharpEngineLogoAnimation.HashModel);
