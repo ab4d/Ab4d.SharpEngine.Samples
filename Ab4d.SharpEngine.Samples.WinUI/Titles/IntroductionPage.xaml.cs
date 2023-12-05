@@ -19,7 +19,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
     public partial class IntroductionPage : UserControl
     {
         private const bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private const bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
+        private const bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WinUI controls will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 

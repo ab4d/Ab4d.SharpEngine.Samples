@@ -672,9 +672,9 @@ public class MultiSceneNodesSample : CommonSample
 
 
         // Create text node
-        // Usually this is a GeometryModel3D, but in case when bitmap font uses
+        // Usually this is a MeshModelNode, but in case when bitmap font uses
         // multiple pages (textures) to define font, then a GroupNode is returned 
-        // with multiple GeometryModel3D (each with its own texture)
+        // with multiple MeshModelNodes (each with its own texture)
         var textNode1 = normalBitmapTextCreator.CreateTextNode(text: "Text node\r\nwith default font",
                                                                position: text1Position,
                                                                positionType: PositionTypes.BottomLeft,
