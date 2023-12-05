@@ -60,7 +60,7 @@ public class FreeCameraSample : CommonSample
         _freeCamera.TargetPosition = new Vector3(0, 0, 0);
         
         //_freeCamera.UpDirection = new Vector3(0, 1, 0);
-        _freeCamera.CalculateUpDirectionFromPositions();
+        _freeCamera.CalculateCurrentUpDirection();
 
         _freeCamera.ViewWidth = 300;
     }
