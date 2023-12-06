@@ -225,7 +225,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             var geometryModel6 = new MeshModelNode(standardBoxMesh, "Red BackMaterial box")
             {
                 BackMaterial = new StandardMaterial(Colors.Red),
-                Transform = new StandardTransform(0, 0, 100, scale: 80) { ScaleZ = 40 }
+                Transform = new StandardTransform(0, 0, 100, uniformScale: 80) { ScaleZ = 40 }
             };
 
             _specialMaterialGroup.Add(geometryModel6);
@@ -362,7 +362,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _vertexColorModel = new MeshModelNode(boxMesh, "VertexColorBox")
             {
                 Material = _vertexColorMaterial,
-                Transform = new StandardTransform(0, 0, -360, scale: 80) { ScaleZ = 60 }
+                Transform = new StandardTransform(0, 0, -360, uniformScale: 80) { ScaleZ = 60 }
             };
 
             _scene.RootNode.Add(_vertexColorModel);
@@ -496,7 +496,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _thickLineOverrideModel = new MeshModelNode(simpleSphereMesh, "ThickLineModel")
             {
                 Material = _thickLineOverrideMaterial,
-                Transform = new StandardTransform(-200, 0, -200, scale: 1)
+                Transform = new StandardTransform(-200, 0, -200, uniformScale: 1)
             };
 
             _scene.RootNode.Add(_thickLineOverrideModel);
@@ -539,7 +539,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _thickLineOverrideModel = new MeshModelNode(simpleSphereMesh, "CustomThickLineModel")
             {
                 Material = _thickLineOverrideMaterial,
-                Transform = new StandardTransform(-200, 0, -280, scale: 1)
+                Transform = new StandardTransform(-200, 0, -280, uniformScale: 1)
             };
 
             _scene.RootNode.Add(_thickLineOverrideModel);
