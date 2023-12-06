@@ -39,7 +39,7 @@ public class TransformationsSample : CommonSample
 
 
         AddTeapot(scene, 
-                  transform: new StandardTransform(translateX: 0, translateY: -5, translateZ: 0, uniformScale: 1.3f, rotateX: 30, rotateY: 45, rotateZ: 0),
+                  transform: new StandardTransform(translateX: 0, translateY: -5, translateZ: 0, scale: 1.3f, rotateX: 30, rotateY: 45, rotateZ: 0),
                   text: "StandardTransform\ntranslateY:-5\nScale:1.3\nrotateX: 30, rotateY: 45", 
                   name: "StandardTransform");       
         
