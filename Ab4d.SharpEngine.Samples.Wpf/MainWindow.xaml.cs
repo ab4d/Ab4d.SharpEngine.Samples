@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +19,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
+using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
 using Ab4d.Vulkan;
 
@@ -33,8 +36,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "Advanced.MultiSceneNodesSample";
-        private string? _startupPage = null;
+        //private string? _startupPage = "QuickStart/SharpEngineSceneViewInXaml.xaml";
+        //private string? _startupPage = "AdvancedModels.SpritesSample";
+        private string? _startupPage = "AdvancedModels.TubesSample";
+        //private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
@@ -56,6 +61,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
         public MainWindow()
         {
+            // Ab4d.SharpEngine Samples License can be used only for Ab4d.SharpEngine samples.
+            // To use Ab4d.SharpEngine in your project, get a license from ab4d.com/trial or ab4d.com/purchase 
+            Ab4d.SharpEngine.Licensing.SetLicense(licenseOwner: "AB4D",
+                                                  licenseType: "SamplesLicense",
+                                                  platforms: "All",
+                                                  license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
+
+
             // The following is a sample global exception handler that can be used 
             // to get system info (with details about graphics card and drivers)
             // in case of exception in SharpEngine.
@@ -74,6 +87,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             };
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+
 
             InitializeComponent();
 

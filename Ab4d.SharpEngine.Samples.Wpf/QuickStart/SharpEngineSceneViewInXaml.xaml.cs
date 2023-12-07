@@ -17,7 +17,9 @@ using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
 using System.Windows.Media.Imaging;
 using System.IO;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
+using Colors = Ab4d.SharpEngine.Common.Colors;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 {
@@ -33,6 +35,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
         private TargetPositionCamera? _targetPositionCamera;
 
         private int _newObjectsCounter;
+        private SpriteBatch _overlaySpriteBatch;
 
 
         public SharpEngineSceneViewInXaml()
@@ -91,7 +94,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 Distance = 500,
                 ViewWidth = 500,
                 TargetPosition = new Vector3(0, 0, 0),
-                ShowCameraLight = ShowCameraLightType.Always
+                ShowCameraLight = ShowCameraLightType.Always,
             };
 
             MainSceneView.SceneView.Camera = _targetPositionCamera;
@@ -148,6 +151,34 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
                 _groupNode.Add(sphereModel3D);
             }
+
+
+            _spriteMatrix = Matrix3x2.Identity; 
+
+            _overlaySpriteBatch = MainSceneView.SceneView.CreateOverlaySpriteBatch();
+            UpdateSprite();
+        }
+
+        private Matrix3x2 _spriteMatrix;
+        private float _spriteRotate = 0;
+        private Vector2 _spriteOffset;
+        private Vector2 _spritePosition = new Vector2(50, 200);
+        //private Vector2 _spritePosition = new Vector2(0, 0);
+
+
+        private void UpdateSprite()
+        {
+            _spriteMatrix = Matrix3x2.CreateTranslation(-_spritePosition.X, -_spritePosition.Y) *
+                            Matrix3x2.CreateRotation(MathUtils.DegreesToRadians(_spriteRotate)) *
+                            Matrix3x2.CreateTranslation(_spritePosition);
+
+            //_spriteMatrix.M31 = _spriteOffset.X;
+            //_spriteMatrix.M32 = _spriteOffset.Y;
+
+            _overlaySpriteBatch.Begin(useAbsoluteCoordinates: true);
+            _overlaySpriteBatch.SetTransform(_spriteMatrix);
+            _overlaySpriteBatch.DrawBitmapText("Overlay TEXT", _spritePosition, 30, textColor: Colors.Black, backgroundColor: Colors.LightBlue);
+            _overlaySpriteBatch.End();
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)
@@ -201,6 +232,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
         
         private void ChangeMaterial1Button_OnClick(object sender, RoutedEventArgs e)
         {
+            _spriteRotate += 30;
+            UpdateSprite();
+            return;
+
+
             if (_groupNode == null || _groupNode.Count == 0)
                 return;
 

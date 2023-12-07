@@ -17,9 +17,9 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="5.3.1" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="0.9.20-rc1" />    
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="0.9.20-rc1" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="1.0.8740" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="1.0.8740" />    
   </ItemGroup>
 
   <ItemGroup>

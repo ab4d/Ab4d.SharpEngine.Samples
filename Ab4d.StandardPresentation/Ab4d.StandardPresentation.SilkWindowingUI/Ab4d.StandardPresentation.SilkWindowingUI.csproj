@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="0.9.20-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
     <PackageReference Include="Silk.NET.Input" Version="2.15.0" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.15.0" />
   </ItemGroup>
