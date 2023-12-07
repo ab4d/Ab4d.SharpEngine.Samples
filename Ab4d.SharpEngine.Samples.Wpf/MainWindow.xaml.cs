@@ -37,9 +37,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
         //private string? _startupPage = "QuickStart/SharpEngineSceneViewInXaml.xaml";
-        //private string? _startupPage = "AdvancedModels.SpritesSample";
-        private string? _startupPage = "AdvancedModels.TubesSample";
-        //private string? _startupPage = null;
+        private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
