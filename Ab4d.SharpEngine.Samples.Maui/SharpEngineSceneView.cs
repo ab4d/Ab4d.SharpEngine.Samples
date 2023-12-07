@@ -192,7 +192,7 @@ public class SharpEngineSceneView : SKCanvasView
             Log.LastVulkanValidationMessage = null; // reset LastVulkanValidationMessage (this is used in ShowVulkanDeviceCreationError)
 
             // Save VulkanDevice because we will also need to dispose it
-            GpuDevice = VulkanDevice.Create(CreateOptions, vulkanSurfaceProvider);
+            GpuDevice = VulkanDevice.Create(vulkanSurfaceProvider, CreateOptions);
             _isGpuDeviceCreatedHere = true;
 
             // Wait until we also initialize Scene before calling OnGpuDeviceCreated
