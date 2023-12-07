@@ -411,6 +411,10 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
                 _infoPanel?.SetIsVisible(false);
                 ImportFile(_textBoxElement.GetText());
             });
+
+            // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
+            if (CameraAxisPanel != null)
+                CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
         }
     }
 }
