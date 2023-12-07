@@ -10,8 +10,7 @@ Vulkan is a high performance graphics and cross-platform API that is similar to 
 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
-- Core SharpEngine objects (Scene, SceneView)
-- Many SceneNode objects (ported most of 3D objects from Ab3d.PowerToys)
+- Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
 - Object instancing (InstancedMeshNode)
 - Cameras: TargetPositionCamera, FirstPersonCamera, FreeCamera, MatrixCamera
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
@@ -246,6 +245,24 @@ To do this please find the existing code that sets up logging and change it to:
 
 ## Change log
 
+**v1.0.8740** (2023-12-07):
+- Simplified GetChild, GetAllChildren and ForEachChild in GroupNode. Removed search by regular expression. The wildcard (using '*') search is now automatically determined from the specified name.
+- Removed SerializeToJson and DeserializeJson from Camera because they were rarely used. This removed reference to System.Text.Json assembly.
+- Added Camera.Name property that can be set when creating the camera.
+- Prevented throwing "Value cannot be null" exception when CreateOptions.ApplicationName was null or empty string.
+- Fixed rendering semi-transparent rectangles with SpriteBatch
+- Fixed WpfBitmapIO to set HasTransparency property
+- Fixed WinUIBitmapIO by converting to pre-multiplied alpha
+- Changed default sampler type from Wrap to Mirror.
+- Documented many additional classes, properties and methods. See online help here: https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm
+
+Breaking changes:
+- Change the order of parameters in the VulkanDevice.Create methods - the EngineCreateOptions parameter was moved after surface parameters because it is now optional.
+- Removed IRotatedViewCamera interface and moved ViewRotation property from camera to SceneView
+- Removed public VulkanInstance and VulkanDevice constructors. Now it is possible to create VulkanInstance and VulkanDevice objects only by using static Create methods (before both constructor and Create method were available).
+- Renamed some parameter names in some methods in transformation classes (uniformScale to scale)
+- Renamed FreeCamera.CalculateUpDirectionFromPositions to CalculateCurrentUpDirection
+  
 **v0.9.20 RC1** (2023-11-15):
 - Added support for custom coordinate system - it can be changed by calling Scene.SetCoordinateSystem. Supported coordinate systems: YUpRightHanded (default), YUpLeftHanded, ZUpRightHanded, ZUpLeftHanded. There are also new methods in Scene and CameraUtils that can help you get information about the coordinate system.
 - Added CameraAxisPanel, which can show a small panel displaying the orientation of the X, Y, and Z axes.
@@ -320,7 +337,7 @@ Breaking change:
 - Added many samples to help you understand the SharpEngine and provide code templates for your projects
 - Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
 - Using SwapChainPanel for WinUI instead of SurfaceImageSource - this is faster and better supported by WinUI
-- Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented new much better way to share Vulkan texture with Avalonia
+- Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented a new and much better way to share Vulkan texture with Avalonia
 - Objects and camera animation similar to Anime.js
 - Breaking change: Renamed StandardMaterial.Alpha property to Opacity
 
@@ -328,25 +345,15 @@ Breaking change:
 - first beta version
 
 
-## Roadmap
 
-### v1.0 release (first week in December 2023)
+## Plans for later versions
 
-Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
-
-See [current licensing plan](https://forum.ab4d.com/showthread.php?tid=4429)
-
-  
-
-
-### Later versions
-
+- Pixel and point cloud rendering
 - Supersampling
 - Add support for PhysicallyBasedRendering effect
 - Multi-threaded rendering
 - Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
 - Shadows
-- Production ready version for Android, macOS and iOS
 - Python binding and samples
 
 
