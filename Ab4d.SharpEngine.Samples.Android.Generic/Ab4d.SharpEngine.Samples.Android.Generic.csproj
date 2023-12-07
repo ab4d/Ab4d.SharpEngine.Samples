@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Android.Generic</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Android.Generic</RootNamespace>  
     <TargetFramework>net8.0-android</TargetFramework>
-    <Version>0.9.0</Version>
+    <Version>1.0.8740</Version>
     <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion>  <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features does not work so it is recommended to use Vulkan 1.1 -->
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>

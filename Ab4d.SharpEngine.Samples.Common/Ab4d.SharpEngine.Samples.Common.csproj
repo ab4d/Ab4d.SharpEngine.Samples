@@ -4,7 +4,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>  
     <TargetFramework>net6.0</TargetFramework>
-    <Version>0.9.18.0</Version>
+    <Version>1.0.8740</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
