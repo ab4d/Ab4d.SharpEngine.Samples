@@ -13,6 +13,7 @@ The following features are supported by the current version:
 - Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
 - Object instancing (InstancedMeshNode)
 - Cameras: TargetPositionCamera, FirstPersonCamera, FreeCamera, MatrixCamera
+- Camera controllers with rotate around mouse position, zoom to position and other advanced functions
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - ReaderObj to read 3D models from obj files
