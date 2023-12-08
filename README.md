@@ -177,10 +177,16 @@ In my opinion, if you already have a complex application that is built by using 
 ### Advantages of Ab3d.DXEngine with Ab3d.PowerToys
 
 - Ab3d.DXEngine and Ab3d.PowerToys are very mature products that are tested and proven in the "field" by many customers.
-- Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
 - Ab3d.DXEngine supports multi-threading and currently provides faster 3D rendering in many use cases.
-- Ab3d.DXEngine can use software rendering when there is no graphics card present (for example in virtual machines or on a server).
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.5+.
+
+Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
+The following is a list of features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v1.0):
+- Rendering pixels and point clouds
+- Supersampling
+- PhysicallyBasedRendering effect
+- Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
+- Shadows
 
 
 ### Advantages of Ab4d.SharpEngine
