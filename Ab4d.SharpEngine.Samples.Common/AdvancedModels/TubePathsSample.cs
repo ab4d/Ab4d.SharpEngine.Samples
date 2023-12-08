@@ -1,5 +1,4 @@
 ﻿using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
@@ -10,11 +9,7 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class TubePathsSample : CommonSample
 {
     public override string Title => "3D Tube paths";
-    public override string Subtitle => "TubePathModelNode and TubeLineModelNode can be used to create a 3D tube along a path or line.";
-
-    private StandardMaterial _specularDarkBlueMaterial = StandardMaterials.DarkBlue.SetSpecular(Color3.White, 16);
-    private StandardMaterial _specularRedMaterial = StandardMaterials.IndianRed.SetSpecular(Color3.White, 16);
-    private StandardMaterial _specularGreenMaterial = StandardMaterials.ForestGreen.SetSpecular(Color3.White, 16);
+    public override string Subtitle => "TubePathModelNode can be used to create a 3D tube along a path";
 
     public TubePathsSample(ICommonSamplesContext context)
         : base(context)
@@ -23,220 +18,173 @@ public class TubePathsSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        CreateTubePaths(scene: scene, segments: 3,  zOffset: -150, material: _specularRedMaterial, generateTextureCoordinates: false);
-        CreateTubePaths(scene: scene, segments: 30, zOffset: -50,  material: _specularGreenMaterial, generateTextureCoordinates: false);
-
-        var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO);
-        CreateTubePaths(scene: scene, segments: 3,  zOffset: 50,  material: textureMaterial, generateTextureCoordinates: true);
-        CreateTubePaths(scene: scene, segments: 30, zOffset: 150, material: textureMaterial, generateTextureCoordinates: true);
-
-
-        // Lines
-        var node = new TubeLineModelNode(
-            startPosition: new Vector3(-150, -50, -300),
-            endPosition: new Vector3(-150, -50, 300),
-            radius: 2,
-            segments: 30,
-            generateTextureCoordinates: true,
-            isStartPositionClosed: true,
-            isEndPositionClosed: true,
-            material: _specularRedMaterial,
-            name: "3D line, red");
-
-        scene.RootNode.Add(node);
+        var pathPositions = CreateHelixPath(startCenter: new Vector3(0, 20, 70),
+                                            radius: 30,
+                                            height: 100,
+                                            totalDegrees: 360 * 3,
+                                            totalPathPositions: 100);
 
 
-        node = new TubeLineModelNode(
-            startPosition: new Vector3(-50, -50, -300),
-            endPosition: new Vector3(-50, -50, 300),
-            radius: 2,
-            segments: 30,
-            generateTextureCoordinates: true,
-            isStartPositionClosed: true,
-            isEndPositionClosed: true,
-            material: _specularGreenMaterial,
-            name: "3D line, green");
+        var polyLine = new PolyLineNode()
+        {
+            Positions = pathPositions,
+            LineThickness = 3,
+            LineColor = Colors.Red,
+            IsClosed = false
+        };
 
-        scene.RootNode.Add(node);
+        scene.RootNode.Add(polyLine);
 
 
-        node = new TubeLineModelNode(
-            startPosition: new Vector3(50, -50, -300),
-            endPosition: new Vector3(50, -50, 300),
-            radius: 2,
-            segments: 30,
-            generateTextureCoordinates: true,
-            isStartPositionClosed: true,
-            isEndPositionClosed: true,
-            material: _specularDarkBlueMaterial,
-            name: "3D line, blue");
+        var outerTubePathNode = new TubePathModelNode()
+        {
+            PathPositions = pathPositions,
+            Radius = 10,
+            Segments = 10,
+            IsTubeClosed = false,
+            IsPathClosed = polyLine.IsClosed,
+            GenerateTextureCoordinates = false,
+            Material = StandardMaterials.LightGreen.SetOpacity(0.5f)
+        };
 
-        scene.RootNode.Add(node);
+        outerTubePathNode.BackMaterial = outerTubePathNode.Material;
+
+        scene.RootNode.Add(outerTubePathNode);
 
 
-        node = new TubeLineModelNode(
-            startPosition: new Vector3(150, -50, -300),
-            endPosition: new Vector3(150, -50, 300),
-            radius: 2,
-            segments: 30,
-            generateTextureCoordinates: true,
-            isStartPositionClosed: true,
-            isEndPositionClosed: true,
-            material: textureMaterial,
-            name: "3D line, textured");
+        pathPositions = new Vector3[]
+        {
+            new Vector3(0, 0, 0),
+            new Vector3(0, 10, 0),
+            new Vector3(0, 20, 0),
+            new Vector3(0, 30, 0),
+            new Vector3(-20, 60, 0),
+            new Vector3(-50, 100, 0),
+            new Vector3(-120, 100, 0),
+        };
 
-        scene.RootNode.Add(node);
+        var openedTubePathNode = CreateOpenedTubePathNode(pathPositions: pathPositions,
+                                                          outerRadius: 16,
+                                                          innerRadius: 14,
+                                                          segmentsCount: 20,
+                                                          outerMaterial: StandardMaterials.Green,
+                                                          innerMaterial: StandardMaterials.DimGray);
+
+        openedTubePathNode.Transform = new TranslateTransform(50, 0, -70);
+
+        scene.RootNode.Add(openedTubePathNode);
+
+
+
+        var boxModelNode = new BoxModelNode(centerPosition: new Vector3(50, 0.5f, 0), size: new Vector3(200, 10, 300), material: StandardMaterials.LightGray);
+        scene.RootNode.Add(boxModelNode);
 
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading = -50;
+            targetPositionCamera.Heading = 70;
             targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 900;
-            targetPositionCamera.TargetPosition = new Vector3(70, 0, 0);
+            targetPositionCamera.Distance = 500;
+            targetPositionCamera.TargetPosition = new Vector3(0, 50, 0);
         }
+
+        ShowCameraAxisPanel = true;
     }
 
-    void CreateTubePaths(Scene scene, int segments, float zOffset, StandardMaterial material, bool generateTextureCoordinates)
+    private static GroupNode CreateOpenedTubePathNode(Vector3[] pathPositions, float outerRadius, float innerRadius, int segmentsCount, Material outerMaterial, Material innerMaterial)
     {
-        // Basic cylinder (one-segment path, non-closed)
-        var pathPoints = new Vector3[]
+        var rootGroupNode = new GroupNode();
+
+        // CreateOpenedTubePath is created from 4 different models:
+        // 1) Outer tube: TubePathModelNode with outer radius and Material set
+        // 2) Inner tube: TubePathModelNode with inner radius and BackMaterial - this means that triangles will be visible from inside the tube
+        // 3) start tube: TubeModelNode that will close the start of the tube - in the direction of the first path segment
+        // 4) end tube: TubeModelNode that will close the end of the tube - in the direction of the last path segment
+
+        // 1) Outer tube: TubePathModelNode with outer radius and Material set
+        var outerTubePathNode = new TubePathModelNode()
         {
-                new (0, 0, 0),
-                new (0, 100, 0)
+            PathPositions = pathPositions,
+            Radius = outerRadius,
+            Segments = segmentsCount,
+            Material = outerMaterial,
+            IsTubeClosed = false,
+            IsPathClosed = false
         };
 
-        var node = new TubePathModelNode(
-            pathPoints,
-            20,
-            true,
-            false,
-            segments,
-            null,
-            generateTextureCoordinates,
-            material,
-            $"Single-segment path, non-closed ({segments} side segments)")
+        rootGroupNode.Add(outerTubePathNode);
+
+        // 2) Inner tube: TubePathModelNode with inner radius and BackMaterial - this means that triangles will be visible from inside the tube
+        var innerTubePathNode = new TubePathModelNode()
         {
-            Transform = new TranslateTransform(-200, 0, zOffset)
+            PathPositions = pathPositions,
+            Radius = innerRadius,
+            Segments = segmentsCount,
+            BackMaterial = innerMaterial,
+            IsTubeClosed = false,
+            IsPathClosed = false
         };
 
-        scene.RootNode.Add(node);
+        rootGroupNode.Add(innerTubePathNode);
 
-
-        // Three-segment path, non-closed
-        pathPoints = new Vector3[]
+        // 3) start tube: TubeModelNode that will close the start of the tube - in the direction of the first path segment
+        var startTubeNode = new TubeModelNode()
         {
-                new (0, 0, 0),
-                new (30, 50, 0),
-                new (30, 100, 0),
-                new (0, 150, 0)
+            BottomCenterPosition = pathPositions[0],
+            Height = 0.01f, // Current version (v7.4) does not allow to have 0 height - this will be improved in the next version
+            BottomOuterRadius = outerRadius,
+            TopOuterRadius = outerRadius,
+            BottomInnerRadius = innerRadius,
+            TopInnerRadius = innerRadius,
+            Segments = segmentsCount,
+            HeightDirection = pathPositions[1] - pathPositions[0], // direction of the first path segment
+            Material = outerMaterial
         };
 
-        node = new TubePathModelNode(
-            pathPoints,
-            20,
-            true,
-            false,
-            segments,
-            null,
-            generateTextureCoordinates,
-            material,
-            $"Three-segment path, non-closed ({segments} side segments)")
+        rootGroupNode.Add(startTubeNode);
+
+        // 4) end tube: TubeModelNode that will close the end of the tube - in the direction of the last path segment
+        var endTubeNode = new TubeModelNode()
         {
-            Transform = new TranslateTransform(-100, 0, zOffset)
+            BottomCenterPosition = pathPositions[^1],
+            Height = 0.01f,  // Current version (v7.4) does not allow to have 0 height - this will be improved in the next version
+            BottomOuterRadius = outerTubePathNode.Radius,
+            TopOuterRadius = outerTubePathNode.Radius,
+            BottomInnerRadius = innerTubePathNode.Radius,
+            TopInnerRadius = innerTubePathNode.Radius,
+            Segments = segmentsCount,
+            HeightDirection = pathPositions[^1] - pathPositions[^2], // direction of the last path segment
+            Material = outerMaterial
         };
 
-        scene.RootNode.Add(node);
+        rootGroupNode.Add(endTubeNode);
 
-
-        // L-shape, non-closed
-        pathPoints = new Vector3[]
-        {
-                new (0, 0, 0),
-                new (0, 100, 0),
-                new (50, 100, 0),
-        };
-        node = new TubePathModelNode(
-            pathPoints,
-            20,
-            true,
-            false,
-            segments,
-            null,
-            generateTextureCoordinates,
-            material,
-            $"L-shape path, non-closed ({segments} side segments)")
-        {
-            Transform = new TranslateTransform(100, 0, zOffset)
-        };
-
-        scene.RootNode.Add(node);
-
-        // L-shape, closed
-        pathPoints = new Vector3[]
-        {
-                new (0, 0, 0),
-                new (0, 100, 0),
-                new (50, 100, 0),
-        };
-
-        node = new TubePathModelNode(
-            pathPoints,
-            20,
-            true,
-            true,
-            segments,
-            null,
-            generateTextureCoordinates,
-            material,
-            $"L-shape path, closed ({segments} side segments)")
-        {
-            Transform = new TranslateTransform(200, 0, zOffset)
-        };
-
-        scene.RootNode.Add(node);
-
-
-        // Path
-        pathPoints = new Vector3[]
-        {
-                new (250, 0, 45),
-                new (-250, 0, 45),
-                new (-250, 100, 45),
-                new (0, 150, 45),
-                new (0, 100, -45),
-                new (250, 100, -45),
-        };
-
-        node = new TubePathModelNode(
-            pathPoints,
-            5,
-            true,
-            false,
-            segments,
-            null,
-            generateTextureCoordinates,
-            material,
-            $"Longer path ({segments} side segments)")
-        {
-            Transform = new TranslateTransform(0, 0, zOffset)
-        };
-
-        scene.RootNode.Add(node);
+        return rootGroupNode;
     }
 
-    protected override void OnCreateLights(Scene scene)
+    // See: https://en.wikipedia.org/wiki/Helix
+    private static Vector3[] CreateHelixPath(Vector3 startCenter, float radius, float height, int totalDegrees, int totalPathPositions)
     {
-        scene.Lights.Clear();
+        float onePositionAngleRad = ((float) totalDegrees / (float) totalPathPositions) * MathF.PI / 180.0f;
 
-        // Add lights
-        scene.SetAmbientLight(intensity: 0.3f);
+        var positions = new Vector3[totalPathPositions];
 
-        var directionalLight = new DirectionalLight(new Vector3(-1, -0.3f, 0));
-        scene.Lights.Add(directionalLight);
+        Vector3 currentCenterPoint = startCenter;
+        float currentAngleRad = 0;
 
-        scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
+        var oneStepDirection = new Vector3(0, 1, 0) * (height / (float)totalPathPositions);
 
-        //base.OnCreateLights(scene);
+        for (int i = 0; i < totalPathPositions; i++)
+        {
+            float x = currentCenterPoint.X + MathF.Sin(currentAngleRad) * radius;
+            float z = currentCenterPoint.Z + MathF.Cos(currentAngleRad) * radius;
+
+            positions[i] = new Vector3(x, currentCenterPoint.Y, z);
+
+            currentAngleRad += onePositionAngleRad;
+            currentCenterPoint += oneStepDirection;
+        }
+
+        return positions;
     }
 }
