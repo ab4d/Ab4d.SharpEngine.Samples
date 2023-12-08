@@ -10,10 +10,10 @@ Vulkan is a high performance graphics and cross-platform API that is similar to 
 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
-- Core SharpEngine objects (Scene, SceneView)
-- Many SceneNode objects (ported most of 3D objects from Ab3d.PowerToys)
+- Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
 - Object instancing (InstancedMeshNode)
 - Cameras: TargetPositionCamera, FirstPersonCamera, FreeCamera, MatrixCamera
+- Camera controllers with rotate around mouse position, zoom to position and other advanced functions
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - ReaderObj to read 3D models from obj files
@@ -73,10 +73,6 @@ Online help:
 - Visual Studio Code on Windows, Linux and macOS
 
 
-### Expiration date:
-The beta version of Ab4d.SharpEngine will expire around 6 months after publishing. See warning log message for the exact date of expiration.
-
-
 
 ## Sample solutions
 
@@ -105,7 +101,7 @@ The following Visual Studio solutions are available:
 
 - **Ab4d.SharpEngine.Samples.CrossPlatform**
   This sample uses third-party Silk.Net library that provides support for SDL and GLFW.
-  SDL and GLFW are used to get platform independent way to create windows and views.
+  SDL and GLFW are used to get platform-independent way to create windows and views.
   The 3D scene here is shown in the whole window area.
   Because of this project can work on Windows and Linux.
   
@@ -116,7 +112,7 @@ The following Visual Studio solutions are available:
   The 3D scene here is shown on the whole view area.
 
 - **Ab4d.SharpEngine.Samples.Android.Application**
-  This solution uses a Xamarin based Android.Application project template for .Net 6.
+  This solution uses a Xamarin-based Android.Application project template for .Net 6.
   The 3D scene is shown on the part of the view that is defined by SurfaceView.
 
 - **Ab4d.SharpEngine.Samples.Maui**
@@ -152,50 +148,54 @@ To read 3D models from other file formats, use AssimpImporter.
 
 
 
-## Building for macOS and iOS
-  
-The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
-- .Net 8 is requried to use Ab4d.SharpEngine on iOS (because function pointers do not work with .Net 7 on iOS). Mac Catalyst can run on .Net 7, but it is recommended to use .Net 8. It is possible to use preview version of .Net 8 - at the time of writing this preview 7 was used.
+### Migration guide for Ab3d.PowerToys and Ab3d.DXEngine users
 
-- To use preview version of .Net 8 in Visual Studio for Mac, you need to enable .Net 8. This is done in Preferences / Preview Featrues / check "Use the .NEt 8 SDK if installed".
+Ab4d.SharpEngine is built on the same concepts as the Ab3d.PowerToys and Ab3d.DXEngine libraries. So users of those two libraries should feel very familiar. But there are some main differences:
 
-- The 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add reference to SkiaSharp.Views.Maui.Controls NuGet package. The add ".UseSkiaSharp()" to the bulder setup in the MauiProgram.cs file.
+For WPF, WinUI and Avalonia there is a special library ([Ab4d.SharpEngine.Wpf](https://www.nuget.org/packages/Ab4d.SharpEngine.Wpf), [Ab4d.SharpEngine.WinUI](https://www.nuget.org/packages/Ab4d.SharpEngine.WinUI), [Ab4d.SharpEngine.AvaloniaUI](https://www.nuget.org/packages/Ab4d.SharpEngine.AvaloniaUI)) that defines the `SharpEngineSceneView` class. This class hides the differences between those platforms under the hood and provides the same API for all platforms. The class also initializes the engine by creating the `VulkanDevice`. The main two properties that  `SharpEngineSceneView` provides are `Scene` and `SceneView`. The `Scene` is used to define the scene by adding the SceneNodes to the `Scene.RootNode` (similar as Viewport3D.Children in WPF) and adding lights to `Scene.Lights` collection. The `SceneView` defines the view of the scene and provides a camera that is set to the `SceneView.Camera` property. When working with `SharpEngineSceneView`, then **100% of the code** to show 3D graphics **can be the same for  WPF, WinUI and Avalonia**. Other platforms and UI frameworks require some special setup code that is different for each platform. But from there on, the code is the same regardless of the platform. See samples for more info.
 
-- Add libMoltenVK.dylib from the Vulkan SDK to the projects so that the library can be loaded at runtime. Note that there are different builds for iOS and for Catalyst (the lates use the version of macOS). When running the verson of Mac Catalyst the sample app can also use the library from the installed Vulkan SDK. The preview 7 version of .Net 8 and the Visual Studio for Mac v17.6 can sometimes produce "clang++ exited with code 1" error when compiling. I do not know why this happens and how to solve that. Sometimes it helps to delete obj and bin folder and restart the Visual Studio. If this do not help, remove the inclusion of libMoltenVK.dylib for catalyst - in this case install the Vulkan SKD to the computer and the Catalyst app will use the library from Vulkan SKD folder.
+Some other differences:
 
-- To run the app in iOS, the application need to have provisionining profile set. One option is to follow the instructions on the following page: https://learn.microsoft.com/en-us/dotnet/maui/ios/capabilities?tabs=vs Another option is to open the project in the Rider IDE, then right click on the project and select "Open in Xcode". Rider will create the Xcode project file and open it in Xcode. There you can click on the project file and in the "Certificates, Identifiers & Profiles" tab create an ad-hoc provisioning profile (allow having up to 3 development apps installed at the same time). See more: https://developer.apple.com/help/account/manage-profiles/create-a-development-provisioning-profile/ Note that to create the provisioning profile, the ApplicationId (in csproj file) needs to be in a form of "com.companyName.appName" - this is then used as a Bundle Id.
+`BoxVisual3D`, `SphereVisual3D` and other objects derived from `BaseVisual3D` are defined in `Ab4d.SharpEngine.SceneNodes` namespace
+(for example `BoxVisual3D` => `BoxModelNode`; `SphereVisual3D` => `SphereModelNode`).
 
+`GeometryModel3D` with custom `MeshGeometry3D` from WPF 3D is now defined by `MeshModelNode` and `StandardMesh` (see [MeshModelNodeSample](https://github.com/ab4d/Ab4d.SharpEngine.Samples/blob/main/Ab4d.SharpEngine.Samples.Common/StandardModels/MeshModelNodeSample.cs).
+Meshes for standard objects (box, sphere, cone, etc) can be created by using `Meshes.MeshFactory`.
 
+Cameras and lights are almost the same as in Ab3d.PowerToys. The cameras are `TargetPositionCamera`, `FirstPersonCamera`, `FreeCamera` and `MatrixCamera` with the same properties as in Ab3d.PowerToys. Also lights (`DirectionalLight`, `PointLight`, `Spotlight`, `AmbientLight` are the same as in Ab3d.PowerToys.
 
-### Comparing to Ab3d.PowerToys and Ab3d.DXEngine
+`MouseCameraController` for WPF, Avalonia or WinUI is almost the same as in Ab3d.PowerToys.
+For Android you can use `AndroidCameraController`.
+For other platforms you can use `ManualMouseCameraController` and then call the `ProcessMouseDown`, `ProcessMouseUp` and `ProcessMouseMove methods` - see samples.
 
-BoxVisual3D, SphereVisual3D and other objects derived from BaseVisual3D are defined in SceneNodes namespace
-(for example BoxVisual3D => BoxModelNode; SphereVisual3D => SphereModelNode).
+Just as Ab3d.PowerToys, the Ab3d.SharpEngine also defines the `ReaderObj` for reading 3D models from obj files. Also, to import models from other files, use the `Ab4d.SharpEngine.Assimp` library (similar to `Ab3d.PowerToys.Assimp` and `Ab3d.DXEngine.Assimp`).
 
-GeometryModel3D with custom MeshGeometry3D from WPF 3D are now defiend by MeshModelNode and StandardMesh.
-Meshes for standard objects can be created by using Meshes.MeshFactory.
+To provide cross-platform reading of texture files (2D bitmap) the Ab4d.SharpEngine uses the `IBitmapIO` interface that provides the common bitmap IO operations. Then, there are platform specific implementations, for example `WpfBitmapIO`, `WinUIBitmapIO`, `SystemDrawingBitmapIO`, `SkiaSharpBitmapIO`. There is also a build-in `PngBitmapIO` that can read or write png images and does not require any third-party or platform-specific implementation.
 
-Cameras and lights are almost the same as in Ab3d.PowerToys, for example there is also TargetPositionCamera with the same properties are in Ab3d.PowerToys.
+Ab4d.SharpEngine uses `float` as its main value type and `System.Numerics` for base math objects and functions. This means that you need to convert all `double` values to `float` values. Also, `Point3D` and `Vector3D` structs need to be converted to `Vector3`.
 
-MouseCameraController for WPF, Avalonia or WinUI is almost the same as in Ab3d.PowerToys.
-For Android you can use AndroidCameraController.
-For other platforms you can use ManualMouseCameraController and then call the ProcessMouseDown, ProcessMouseUp and ProcessMouseMove methods.
-
+In my opinion, if you already have a complex application that is built by using Ab3d.PowerToys and Ab3d.DXEngine and you are not required to use any other platform except Windows, then it is not worth converting that application to Ab4d.SharpEngine. But if you need to create a simpler version of the application that would also work on mobile devices, then Ab4d.SharpEngine gives you a great opportunity to port only a part of the code. Also, if you are starting to create an application that requires 3D graphics, then it is probably better to start with Ab4d.SharpEngine.
 
 ### Advantages of Ab3d.DXEngine with Ab3d.PowerToys
 
 - Ab3d.DXEngine and Ab3d.PowerToys are very mature products that are tested and proven in the "field" by many customers.
-- Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
 - Ab3d.DXEngine supports multi-threading and currently provides faster 3D rendering in many use cases.
-- Ab3d.DXEngine can use software rendering when there is no graphics card present (for example in virtual machines or on a server).
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.5+.
+
+Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
+The following is a list of features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v1.0):
+- Rendering pixels and point clouds
+- Supersampling
+- PhysicallyBasedRendering effect
+- Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
+- Shadows
 
 
 ### Advantages of Ab4d.SharpEngine
 
 - Ab4d.SharpEngine can run on multiple platforms. You can start writing code for Windows and later simply add support for Linux, macOS, Android and iOS. Or port just a smaller part of the application to other platforms.
 - Ab4d.SharpEngine uses Vulkan API that is the most advanced graphics API that is actively developed and gets new features as new versions of graphics cards are released. This provides options to support all current and future graphics features (for example Ray tracing - not possible with DirectX 11).
-- Ab4d.SharpEngine was built from the ground up and therefore has a very clean and easy to use programming API. For example, there is only a single set of 3D models (SceneNodes, Camera, Lights). When using Ab3d.DXEngine and Ab3d.PowerToys, the API is not very nice in all the cases. The Ab3d.PowerToy was built on top of WPF 3D objects that are not very extendable so some compromises were needed (for example cameras are derived from FrameworkElement and not from Camera). Also, Ab3d.DXEngine converts all WPF 3D and Ab3d.PowerToys objects into its own objects so the application has 2 versions of each object. In other cases, some tricks must be used to provide Ab3d.DXEngine features to Ab3d.PowerToys and WPF 3D objects (for example using SetDXAttribute).
+- Ab4d.SharpEngine was built from the ground up and therefore has a very clean and easy-to-use programming API. For example, there is only a single set of 3D models (SceneNodes, Camera, Lights). When using Ab3d.DXEngine and Ab3d.PowerToys, the API is not very nice in all the cases. The Ab3d.PowerToy was built on top of WPF 3D objects that are not very extendable so some compromises were needed (for example cameras are derived from FrameworkElement and not from Camera). Also, Ab3d.DXEngine converts all WPF 3D and Ab3d.PowerToys objects into its own objects so the application has 2 versions of each object. In other cases, some tricks must be used to provide Ab3d.DXEngine features to Ab3d.PowerToys and WPF 3D objects (for example using SetDXAttribute).
 - Working with WPF objects is very slow (accessing DependencyProperties has a lot of overhead). Also, Ab3d.DXEngine needs to convert all WPF objects into its own objects. Working with objects in Ab4d.SharpEngine is much faster.
 - Vulkan is a significantly faster graphics API than DirectX 11. Though the Ab4d.SharpEngine does not use all the fastest algorithms yet (no multi-threading), in the future the engine will be significantly faster than Ab3d.DXEngine.
 - Ab4d.SharpEngine is built on top of .NET 6 and that provides many performance benefits because of using System.Numerics, Span and other improved .NET features.
@@ -203,6 +203,23 @@ For other platforms you can use ManualMouseCameraController and then call the Pr
 
 NOTE:
 Ab3d.PowerToys and Ab3d.DXEngine will still be actively developed, will get new releases and features and will have full support in the future!
+
+
+
+## Building for macOS and iOS
+  
+The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
+- .Net 8 is requried to use Ab4d.SharpEngine on iOS (because function pointers do not work with .Net 7 on iOS). Mac Catalyst can run on .Net 7, but it is recommended to use .Net 8. It is possible to use preview version of .Net 8 - at the time of writing this preview 7 was used.
+
+- To use preview version of .Net 8 in Visual Studio for Mac, you need to enable .Net 8. This is done in Preferences / Preview Features / check "Use the .NEt 8 SDK if installed".
+
+- The 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add reference to SkiaSharp.Views.Maui.Controls NuGet package. The add ".UseSkiaSharp()" to the bulder setup in the MauiProgram.cs file.
+
+- Add libMoltenVK.dylib from the Vulkan SDK to the projects so that the library can be loaded at runtime. Note that there are different builds for iOS and for Catalyst (the lates use the version of macOS). When running the version of Mac Catalyst the sample app can also use the library from the installed Vulkan SDK. The preview 7 version of .Net 8 and the Visual Studio for Mac v17.6 can sometimes produce "clang++ exited with code 1" error when compiling. I do not know why this happens and how to solve that. Sometimes it helps to delete obj and bin folder and restart the Visual Studio. If this do not help, remove the inclusion of libMoltenVK.dylib for Catalyst - in this case install the Vulkan SKD to the computer and the Catalyst app will use the library from Vulkan SKD folder.
+
+- To run the app in iOS, the application need to have provisioning profile set. One option is to follow the instructions on the following page: https://learn.microsoft.com/en-us/dotnet/maui/ios/capabilities?tabs=vs Another option is to open the project in the Rider IDE, then right-click on the project and select "Open in Xcode". Rider will create the Xcode project file and open it in Xcode. There you can click on the project file and in the "Certificates, Identifiers & Profiles" tab create an ad-hoc provisioning profile (allow having up to 3 development apps installed at the same time). See more: https://developer.apple.com/help/account/manage-profiles/create-a-development-provisioning-profile/ Note that to create the provisioning profile, the ApplicationId (in csproj file) needs to be in a form of "com.companyName.appName" - this is then used as a Bundle Id.
+
+
 
 
 ## Troubleshooting
@@ -219,33 +236,52 @@ When Vulkan validation is installed and enabled by the SharpEngine (EnableStanda
 then each Vulkan call is checked by the validation error and this can give much better error reports
 (all Vulkan validation reports are logged at Warn log level).
 
+To enable logging use the following code:
+```
+Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+```
 
-The beta versions of Ab4d.SharpEngine are compiled with release build options but support full logging.
-This means that it is possible to get Trace level log messages
-(production version will have only Warning and Error logging compiled into the assembly).
 
-When you have some problems, then please enable Trace level logging and writing log messages to a file or debug output.
-To do this please find the existing code that sets up logging and change it to:
+Then you have multiple options to display or save log messages:
+```
+// Write log to file
+Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
   
-    Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;       
-    Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false; // write full log messages timestamp, thread id and other details
+// Write log messages to the output window (for example Visual Studio Debug window) 
+// Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
   
-    // Use one of the following:
-  
-    // Write log to file
-    Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
-  
-    // Write log messages to output window (for example Visual Studio Debug window) 
-    // Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
-  
-    // Write to local StringBuilder
-    private System.Text.StringBuilder _logStringBuilder;
-    Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+// Write to local StringBuilder
+private System.Text.StringBuilder _logStringBuilder;
+Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+```
 
+To get simplified log messages (without timestamp, thread ID and some other details) you can use:
+```
+Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false;
+```
 
 
 ## Change log
 
+**v1.0.8740** (2023-12-07):
+- Added licensing code. Now license must be activated by calling SetLicense method.
+- Simplified GetChild, GetAllChildren and ForEachChild in GroupNode. Removed search by regular expression. The wildcard (using '*') search is now automatically determined from the specified name.
+- Removed SerializeToJson and DeserializeJson from Camera because they were rarely used. This removed reference to System.Text.Json assembly.
+- Added Camera.Name property that can be set when creating the camera.
+- Prevented throwing "Value cannot be null" exception when CreateOptions.ApplicationName was null or empty string.
+- Fixed rendering semi-transparent rectangles with SpriteBatch
+- Fixed WpfBitmapIO to set HasTransparency property
+- Fixed WinUIBitmapIO by converting to pre-multiplied alpha
+- Changed default sampler type from Wrap to Mirror.
+- Documented many additional classes, properties and methods. See online help here: https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm
+
+Breaking changes:
+- Change the order of parameters in the VulkanDevice.Create methods - the EngineCreateOptions parameter was moved after surface parameters because it is now optional.
+- Removed IRotatedViewCamera interface and moved ViewRotation property from camera to SceneView
+- Removed public VulkanInstance and VulkanDevice constructors. Now it is possible to create VulkanInstance and VulkanDevice objects only by using static Create methods (before both constructor and Create method were available).
+- Renamed some parameter names in some methods in transformation classes (uniformScale to scale)
+- Renamed FreeCamera.CalculateUpDirectionFromPositions to CalculateCurrentUpDirection
+  
 **v0.9.20 RC1** (2023-11-15):
 - Added support for custom coordinate system - it can be changed by calling Scene.SetCoordinateSystem. Supported coordinate systems: YUpRightHanded (default), YUpLeftHanded, ZUpRightHanded, ZUpLeftHanded. There are also new methods in Scene and CameraUtils that can help you get information about the coordinate system.
 - Added CameraAxisPanel, which can show a small panel displaying the orientation of the X, Y, and Z axes.
@@ -320,7 +356,7 @@ Breaking change:
 - Added many samples to help you understand the SharpEngine and provide code templates for your projects
 - Improve SharedTexture support for integrated Intel graphic cards and older graphics cards
 - Using SwapChainPanel for WinUI instead of SurfaceImageSource - this is faster and better supported by WinUI
-- Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented new much better way to share Vulkan texture with Avalonia
+- Helped design [External GPU memory interop (OpenGL, Vulkan, DirectX)](https://github.com/AvaloniaUI/Avalonia/issues/9925) and then implemented a new and much better way to share Vulkan texture with Avalonia
 - Objects and camera animation similar to Anime.js
 - Breaking change: Renamed StandardMaterial.Alpha property to Opacity
 
@@ -328,25 +364,15 @@ Breaking change:
 - first beta version
 
 
-## Roadmap
 
-### v1.0 release (first week in December 2023)
+## Plans for later versions
 
-Production ready for Windows and major Linux distributions. Other platforms may still be in beta.
-
-See [current licensing plan](https://forum.ab4d.com/showthread.php?tid=4429)
-
-  
-
-
-### Later versions
-
+- Pixel and point cloud rendering
 - Supersampling
 - Add support for PhysicallyBasedRendering effect
 - Multi-threaded rendering
 - Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
 - Shadows
-- Production ready version for Android, macOS and iOS
 - Python binding and samples
 
 
