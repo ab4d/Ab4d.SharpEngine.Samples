@@ -73,10 +73,6 @@ Online help:
 - Visual Studio Code on Windows, Linux and macOS
 
 
-### Expiration date:
-The beta version of Ab4d.SharpEngine will expire around 6 months after publishing. See warning log message for the exact date of expiration.
-
-
 
 ## Sample solutions
 
@@ -219,34 +215,35 @@ When Vulkan validation is installed and enabled by the SharpEngine (EnableStanda
 then each Vulkan call is checked by the validation error and this can give much better error reports
 (all Vulkan validation reports are logged at Warn log level).
 
+To enable logging use the following code:
+```
+Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+```
 
-The beta versions of Ab4d.SharpEngine are compiled with release build options but support full logging.
-This means that it is possible to get Trace level log messages
-(production version will have only Warning and Error logging compiled into the assembly).
 
-When you have some problems, then please enable Trace level logging and writing log messages to a file or debug output.
-To do this please find the existing code that sets up logging and change it to:
+Then you have multiple options to display or save log messages:
+```
+// Write log to file
+Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
   
-    Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;       
-    Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false; // write full log messages timestamp, thread id and other details
+// Write log messages to the output window (for example Visual Studio Debug window) 
+// Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
   
-    // Use one of the following:
-  
-    // Write log to file
-    Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
-  
-    // Write log messages to output window (for example Visual Studio Debug window) 
-    // Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
-  
-    // Write to local StringBuilder
-    private System.Text.StringBuilder _logStringBuilder;
-    Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+// Write to local StringBuilder
+private System.Text.StringBuilder _logStringBuilder;
+Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+```
 
+To get simplified log messages (without timestamp, thread ID and some other details) you can use:
+```
+Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false;
+```
 
 
 ## Change log
 
 **v1.0.8740** (2023-12-07):
+- Added licensing code. Now license must be activated by calling SetLicense method.
 - Simplified GetChild, GetAllChildren and ForEachChild in GroupNode. Removed search by regular expression. The wildcard (using '*') search is now automatically determined from the specified name.
 - Removed SerializeToJson and DeserializeJson from Camera because they were rarely used. This removed reference to System.Text.Json assembly.
 - Added Camera.Name property that can be set when creating the camera.
