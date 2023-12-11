@@ -109,7 +109,7 @@
 
                     <StackPanel Orientation="Horizontal" Margin="5 5 0 0">
                         <TextBlock Text="ZoomMode:" VerticalAlignment="Center" />
-                        <ComboBox Name="ZoomModeComboBox" Width="170" SelectedIndex="0" SelectionChanged="ZoomModeComboBox_OnSelectionChanged">
+                        <ComboBox Name="ZoomModeComboBox" Width="170" SelectedIndex="2" SelectionChanged="ZoomModeComboBox_OnSelectionChanged">
                             <ComboBoxItem>ViewCenter</ComboBoxItem>
                             <ComboBoxItem>CameraRotationCenterPosition</ComboBoxItem>
                             <ComboBoxItem>MousePosition</ComboBoxItem>
