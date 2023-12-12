@@ -107,7 +107,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
-            UpdateMouseCameraController();
+            if (_mouseCameraController != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
 
             // Show MainSceneView - this will also render the scene
             MainSceneView.Visibility = Visibility.Visible;
@@ -126,20 +127,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             _mouseCameraController ??= new MouseCameraController(MainSceneView);
 
-            UpdateMouseCameraController();
+            if (_currentCommonSample != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
         }
 
-        private void UpdateMouseCameraController()
-        {
-            if (_mouseCameraController == null || _currentCommonSample == null)
-                return;
-
-            _mouseCameraController.RotateCameraConditions    = _currentCommonSample.RotateCameraConditions;
-            _mouseCameraController.MoveCameraConditions      = _currentCommonSample.MoveCameraConditions;
-            _mouseCameraController.QuickZoomConditions       = _currentCommonSample.QuickZoomConditions;
-            _mouseCameraController.RotateAroundMousePosition = _currentCommonSample.RotateAroundMousePosition;
-            _mouseCameraController.ZoomMode                  = _currentCommonSample.ZoomMode;
-        }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {

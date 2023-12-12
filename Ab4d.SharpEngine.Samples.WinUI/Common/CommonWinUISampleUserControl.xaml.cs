@@ -111,8 +111,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
-            UpdateMouseCameraController();
+            //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
+            if (_mouseCameraController != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+
+            // Show MainSceneView - this will also render the scene
             MainSceneView.Visibility = Visibility.Visible;
 
             _lastInitializedSample = _currentCommonSample;
@@ -129,7 +133,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             _mouseCameraController ??= new MouseCameraController(MainSceneView);
 
-            UpdateMouseCameraController();
+            if (_currentCommonSample != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
 
             _isLoaded = true;
         }
@@ -137,18 +142,6 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             _isLoaded = false;
-        }
-
-        private void UpdateMouseCameraController()
-        {
-            if (_mouseCameraController == null || _currentCommonSample == null)
-                return;
-
-            _mouseCameraController.RotateCameraConditions = _currentCommonSample.RotateCameraConditions;
-            _mouseCameraController.MoveCameraConditions = _currentCommonSample.MoveCameraConditions;
-            _mouseCameraController.QuickZoomConditions = _currentCommonSample.QuickZoomConditions;
-            _mouseCameraController.RotateAroundMousePosition = _currentCommonSample.RotateAroundMousePosition;
-            _mouseCameraController.ZoomMode = _currentCommonSample.ZoomMode;
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)

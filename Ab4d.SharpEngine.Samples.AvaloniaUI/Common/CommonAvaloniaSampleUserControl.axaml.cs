@@ -85,8 +85,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
-            UpdateMouseCameraController();
+            //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
+
+            if (_mouseCameraController != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
             
+            // Show MainSceneView - this will also render the scene
             MainSceneView.IsVisible = true;
 
             _lastInitializedSample = _currentCommonSample;
@@ -101,26 +105,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeCommonSample();
 
-            if (_mouseCameraController == null)
-            {
-                // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
-                // we need to set a custom eventsSourceElement when creating the MouseCameraController
-                _mouseCameraController = new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
-            }
+            // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
+            // we need to set a custom eventsSourceElement when creating the MouseCameraController
+            _mouseCameraController ??= new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
 
-            UpdateMouseCameraController();
-        }
-
-        private void UpdateMouseCameraController()
-        {
-            if (_mouseCameraController == null || _currentCommonSample == null)
-                return;
-
-            _mouseCameraController.RotateCameraConditions = _currentCommonSample.RotateCameraConditions;
-            _mouseCameraController.MoveCameraConditions = _currentCommonSample.MoveCameraConditions;
-            _mouseCameraController.QuickZoomConditions = _currentCommonSample.QuickZoomConditions;
-            _mouseCameraController.RotateAroundMousePosition = _currentCommonSample.RotateAroundMousePosition;
-            _mouseCameraController.ZoomMode = _currentCommonSample.ZoomMode;
+            if (_currentCommonSample != null)
+                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
         }
 
         private void OnUnloaded(object? sender, RoutedEventArgs e)

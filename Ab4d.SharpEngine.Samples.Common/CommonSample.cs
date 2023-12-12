@@ -21,7 +21,7 @@ public abstract class CommonSample
 
     private Camera? _createdCamera;
     protected TargetPositionCamera? targetPositionCamera;
-
+    
     private ICommonSampleUIProvider? _uiProvider;
     private ICommonSampleUIElement? _errorMessageLabel;
     private ICommonSampleUIPanel? _errorMessagePanel;
@@ -156,6 +156,15 @@ public abstract class CommonSample
         };
 
         return defaultTargetPositionCamera;
+    }
+
+    public virtual void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
+    {
+        mouseCameraController.RotateCameraConditions    = this.RotateCameraConditions;
+        mouseCameraController.MoveCameraConditions      = this.MoveCameraConditions;
+        mouseCameraController.QuickZoomConditions       = this.QuickZoomConditions;
+        mouseCameraController.RotateAroundMousePosition = this.RotateAroundMousePosition;
+        mouseCameraController.ZoomMode                  = this.ZoomMode;
     }
 
     public void CreateUI(ICommonSampleUIProvider uiProvider)
