@@ -19,7 +19,8 @@
 
   <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
   <Sample Location="CameraControllers.MouseCameraControllerSample" Title="MouseCameraController"/>
-
+  <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
+  
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
   <Sample Location="HitTesting.AvaloniaHitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.AvaloniaManualInputEventsSample" Title="Manual Input events"/>
