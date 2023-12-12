@@ -7,15 +7,14 @@ using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.CameraControllers;
 
-public class RotateAroundCustomPointSample : CommonSample
+public class ZoomToCustomPointSample : CommonSample
 {
-    public override string Title => "Rotate around a custom point";
-    public override string? Subtitle => "Use left mouse button to rotate the camera around the specified custom 3D position";
+    public override string Title => "Zoom to a custom point";
+    public override string? Subtitle => "Use mouse wheel or quick zoom (left and right mouse button) to zoom the camera around the specified custom 3D position";
 
     private ManualMouseCameraController? _mouseCameraController;
-    private WireCrossNode? _rotationCenterWireCross;
 
-    public RotateAroundCustomPointSample(ICommonSamplesContext context) 
+    public ZoomToCustomPointSample(ICommonSamplesContext context) 
         : base(context)
     {
     }
@@ -60,80 +59,55 @@ public class RotateAroundCustomPointSample : CommonSample
         // Note that MouseCameraController is platform specific because it needs to handle mouse events.
         // But processing of the events is done by a common ManualMouseCameraController.
 
+        this.QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
         this.RotateAroundMousePosition = false;
-        this.ZoomMode = CameraZoomMode.ViewCenter;
+        this.ZoomMode = CameraZoomMode.CameraRotationCenterPosition;
     }
 
     public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
     {
         // Save mouseCameraController so we can change it later
         _mouseCameraController = mouseCameraController;
-
-        // Show rotation center position
-        mouseCameraController.CameraRotateStarted += (sender, args) => ShowRotationCenterPosition();
-        mouseCameraController.CameraRotateEnded += (sender, args) => HideRotationCenterPosition();
         
         // Use standard initialization code for mouseCameraController
         base.InitializeMouseCameraController(mouseCameraController);
     }
-
-    private void ShowRotationCenterPosition()
-    {
-        if (Scene == null || targetPositionCamera == null)
-            return;
-
-        if (_rotationCenterWireCross == null)
-        {
-            _rotationCenterWireCross = new WireCrossNode(position: new Vector3(0, 0, 0), lineColor: Colors.Blue, lineLength: 30, lineThickness: 2);
-            Scene.RootNode.Add(_rotationCenterWireCross);
-        }
-
-        // When RotationCenterPosition is not set (is null), then camera is rotated around TargetPosition (shown at the center of the view)
-        _rotationCenterWireCross.Position = targetPositionCamera.RotationCenterPosition ?? targetPositionCamera.TargetPosition;
-        _rotationCenterWireCross.Visibility = SceneNodeVisibility.Visible;
-    }
-
-    private void HideRotationCenterPosition()
-    {
-        if (_rotationCenterWireCross == null)
-            return;
-
-        _rotationCenterWireCross.Visibility = SceneNodeVisibility.Hidden;
-    }
-
+    
     private void ChangeCenterPosition(int selectedIndex)
     {
-        Vector3? rotationCenterPosition; // RotationCenterPosition is nullable Vector3 type
-        bool rotateAroundMousePosition;
+        CameraZoomMode zoomMode;
+        Vector3? rotationCenterPosition = null; // RotationCenterPosition is nullable Vector3 type
+        bool rotateAroundMousePosition = false;
 
         switch (selectedIndex)
         {
-            case 0: // "None", 
-                rotationCenterPosition = null;
-                rotateAroundMousePosition = false;
+            case 0: // "Center to SceneView (default)", 
+                zoomMode = CameraZoomMode.ViewCenter;
                 break;
             
             case 1: // "Red box (-40 5 -30)", 
+                zoomMode = CameraZoomMode.CameraRotationCenterPosition;
                 rotationCenterPosition = new Vector3(-40, 5, -30);
-                rotateAroundMousePosition = false;
                 break;
             
             case 2: // "Yellow box (0 5 0)", 
+                zoomMode = CameraZoomMode.CameraRotationCenterPosition;
                 rotationCenterPosition = new Vector3(0, 5, 0);
-                rotateAroundMousePosition = false;
                 break;
             
             case 3: // "Orange box (40 5 30)", 
+                zoomMode = CameraZoomMode.CameraRotationCenterPosition;
                 rotationCenterPosition = new Vector3(40, 5, 30);
-                rotateAroundMousePosition = false;
                 break;
             
             case 4: // "Position under mouse", 
+                zoomMode = CameraZoomMode.MousePosition;
                 rotationCenterPosition = null;
                 rotateAroundMousePosition = true;
                 break;
 
             default:
+                zoomMode = CameraZoomMode.ViewCenter;
                 rotationCenterPosition = null;
                 rotateAroundMousePosition = false;
                 break;
@@ -143,22 +117,39 @@ public class RotateAroundCustomPointSample : CommonSample
             targetPositionCamera.RotationCenterPosition = rotationCenterPosition;
 
         if (_mouseCameraController != null)
+        {
+            _mouseCameraController.ZoomMode = zoomMode;
             _mouseCameraController.RotateAroundMousePosition = rotateAroundMousePosition;
+        }
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateLabel("RotationCenterPosition:", isHeader: true);
+        ui.CreateLabel("Zoom center position:", isHeader: true);
         ui.CreateRadioButtons(new string[]
             {
-                "None (rotate around center)", 
+                "Center to SceneView (default)", 
                 "Red box (-40 5 -30)", 
                 "Yellow box (0 5 0)", 
                 "Orange box (40 5 30)", 
                 "Position under the mouse",
             },
             (selectedIndex, selectedText) => ChangeCenterPosition(selectedIndex), selectedItemIndex: 1);
+
+        ui.AddSeparator();
+        ui.CreateCheckBox("QuickZoom (left + right button)", isInitiallyChecked: true, isChecked => SetupQuickZoom(isChecked));
+    }
+
+    private void SetupQuickZoom(bool isChecked)
+    {
+        if (_mouseCameraController == null)
+            return;
+
+        if (isChecked)
+            _mouseCameraController.QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
+        else
+            _mouseCameraController.QuickZoomConditions = MouseAndKeyboardConditions.Disabled;
     }
 }
