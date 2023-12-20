@@ -10,7 +10,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.UIProvider;
 
 public class KeyValueLabelUIElement : WinUIElement
 {
-    private string _keyText;
+    private string? _keyText;
     private Func<string> _getValueTextFunc;
 
     private StackPanel? _stackPanel;
@@ -21,7 +21,7 @@ public class KeyValueLabelUIElement : WinUIElement
 
     public override bool IsUpdateSupported => true;
 
-    public KeyValueLabelUIElement(WinUIProvider winUIProvider, string keyText, Func<string> getValueTextFunc, double keyTextWidth)
+    public KeyValueLabelUIElement(WinUIProvider winUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
         : base(winUIProvider)
     {
         _keyText = keyText;
@@ -79,9 +79,16 @@ public class KeyValueLabelUIElement : WinUIElement
         string newValueText = _getValueTextFunc();
 
         if (_valueTextBlock != null)
+        {
             _valueTextBlock.Text = newValueText;
+        }
         else if (_keyValueTextBlock != null)
-            _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        {
+            if (string.IsNullOrEmpty(_keyText))
+                _keyValueTextBlock.Text = newValueText;
+            else
+                _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        }
     }
 
 

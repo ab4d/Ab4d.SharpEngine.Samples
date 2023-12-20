@@ -18,7 +18,7 @@ public interface ICommonSampleUIProvider
 
     ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0, float height = 0);
 
-    ICommonSampleUIElement CreateKeyValueLabel(string keyText, Func<string> getValueTextFunc, double keyTextWidth = 0);
+    ICommonSampleUIElement CreateKeyValueLabel(string? keyText, Func<string> getValueTextFunc, double keyTextWidth = 0);
 
     ICommonSampleUIElement CreateButton(string text, Action clickedAction, double width = 0, bool alignLeft = false);
 

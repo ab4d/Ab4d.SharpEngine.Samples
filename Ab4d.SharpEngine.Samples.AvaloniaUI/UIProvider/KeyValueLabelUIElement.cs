@@ -10,7 +10,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 
 public class KeyValueLabelUIElement : AvaloniaUIElement
 {
-    private string _keyText;
+    private string? _keyText;
     private Func<string> _getValueTextFunc;
 
     private StackPanel? _stackPanel;
@@ -21,7 +21,7 @@ public class KeyValueLabelUIElement : AvaloniaUIElement
 
     public override bool IsUpdateSupported => true;
 
-    public KeyValueLabelUIElement(AvaloniaUIProvider avaloniaUIProvider, string keyText, Func<string> getValueTextFunc, double keyTextWidth)
+    public KeyValueLabelUIElement(AvaloniaUIProvider avaloniaUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
         : base(avaloniaUIProvider)
     {
         _keyText = keyText;
@@ -80,9 +80,16 @@ public class KeyValueLabelUIElement : AvaloniaUIElement
         string newValueText = _getValueTextFunc();
 
         if (_valueTextBlock != null)
+        {
             _valueTextBlock.Text = newValueText;
+        }
         else if (_keyValueTextBlock != null)
-            _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        {
+            if (string.IsNullOrEmpty(_keyText))
+                _keyValueTextBlock.Text = newValueText;
+            else
+                _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        }
     }
 
 

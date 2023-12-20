@@ -146,7 +146,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         return newElement;
     }
 
-    public ICommonSampleUIElement CreateKeyValueLabel(string keyText, Func<string> getValueTextFunc, double keyTextWidth = 0)
+    public ICommonSampleUIElement CreateKeyValueLabel(string? keyText, Func<string> getValueTextFunc, double keyTextWidth = 0)
     {
         var newElement = new KeyValueLabelUIElement(this, keyText, getValueTextFunc, keyTextWidth);
         AddToCurrentPanel(newElement);

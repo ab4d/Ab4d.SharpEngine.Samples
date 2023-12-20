@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 
 public class KeyValueLabelUIElement : WpfUIElement
 {
-    private string _keyText;
+    private string? _keyText;
     private Func<string> _getValueTextFunc;
 
     private StackPanel? _stackPanel;
@@ -19,7 +19,7 @@ public class KeyValueLabelUIElement : WpfUIElement
 
     public override bool IsUpdateSupported => true;
 
-    public KeyValueLabelUIElement(WpfUIProvider wpfUIProvider, string keyText, Func<string> getValueTextFunc, double keyTextWidth)
+    public KeyValueLabelUIElement(WpfUIProvider wpfUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
         : base(wpfUIProvider)
     {
         _keyText = keyText;
@@ -77,9 +77,16 @@ public class KeyValueLabelUIElement : WpfUIElement
         string newValueText = _getValueTextFunc();
 
         if (_valueTextBlock != null)
+        {
             _valueTextBlock.Text = newValueText;
+        }
         else if (_keyValueTextBlock != null)
-            _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        {
+            if (string.IsNullOrEmpty(_keyText))
+                _keyValueTextBlock.Text = newValueText;
+            else
+                _keyValueTextBlock.Text = _keyText + " " + newValueText;
+        }
     }
 
 
