@@ -58,6 +58,17 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             Log.IsLoggingToDebugOutput = true;
             MainSceneView.CreateOptions.EnableStandardValidation = true;
 
+            // To use Vulkan line rasterizer, uncomment the following lines:
+            //MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;
+            //MainSceneView.CreateOptions.EnableVulkanStippleLineRasterization = true;
+            //MainSceneView.Scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangular;
+
+            // To test the OverlayTexture presentation type (has the best performance, but does not allow rendering any WPF controls over the 3D graphics),
+            // uncomment the following code:
+            //MainSceneView.PresentationType = PresentationTypes.OverlayTexture;
+            //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
+
+
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
             // In case when VulkanDevice cannot be created, show an error message
