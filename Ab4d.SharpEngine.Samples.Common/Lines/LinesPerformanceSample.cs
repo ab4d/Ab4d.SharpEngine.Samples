@@ -41,10 +41,10 @@ public class LinesPerformanceSample : CommonSample
     //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
 
 
-    private int _numLinesInSpiralSliderValue = 50;
-    private int _numLinesInSpiral = 25000;
-    private int _xSpiralCount = 50;
-    private int _ySpiralCount = 50;
+    private int _numLinesInSpiralSliderValue = 5;
+    private int _numLinesInSpiral = 5000;
+    private int _xSpiralCount = 5;
+    private int _ySpiralCount = 5;
     private bool _isMeshReused = true;
 
     private enum SampleLineTypes
@@ -80,7 +80,7 @@ public class LinesPerformanceSample : CommonSample
         {
             targetPositionCamera.Heading = 15;
             targetPositionCamera.Attitude = 7;
-            targetPositionCamera.Distance = 4800;
+            targetPositionCamera.Distance = 800;
         }
     }
 
