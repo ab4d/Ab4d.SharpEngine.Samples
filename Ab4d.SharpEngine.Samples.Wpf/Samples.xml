@@ -70,6 +70,7 @@
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+  <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
   <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
