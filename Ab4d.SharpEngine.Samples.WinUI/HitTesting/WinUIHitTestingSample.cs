@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.HitTesting;
 
+// This class processes WinUI mouse events and routes them to the methods in the common HitTestingSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
+
 public class WinUIHitTestingSample : HitTestingSample
 {
     private UIElement? _subscribedElement;

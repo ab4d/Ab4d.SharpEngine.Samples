@@ -8,6 +8,8 @@ using Ab4d.SharpEngine.Samples.Common.HitTesting;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.HitTesting;
 
+// This class processes WPF mouse events and routes them to the methods in the common LineSelectionSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
+
 public class WpfLineSelectionSample : LineSelectionSample
 {
     private UIElement? _subscribedElement;

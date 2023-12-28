@@ -9,6 +9,8 @@ using Avalonia.Input;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
 
+// This class processes Avalonia mouse events and routes them to the methods in the common HitTestingSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
+
 public class AvaloniaHitTestingSample : HitTestingSample
 {
     private InputElement? _subscribedElement;

@@ -8,6 +8,8 @@ using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.HitTesting;
 
+// This class processes WPF mouse events and routes them to the methods in the common HitTestingSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
+
 public class WpfHitTestingSample : HitTestingSample
 {
     private UIElement? _subscribedElement;

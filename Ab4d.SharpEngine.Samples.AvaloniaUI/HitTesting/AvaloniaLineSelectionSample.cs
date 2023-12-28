@@ -5,10 +5,13 @@ using Ab4d.SharpEngine.Samples.Common.HitTesting;
 using Avalonia.Controls;
 using Avalonia.Input;
 using System.Numerics;
+using Ab4d.SharpEngine.Materials;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
+
+// This class processes Avalonia mouse events and routes them to the methods in the common LineSelectionSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
 
 public class AvaloniaLineSelectionSample : LineSelectionSample
 {
@@ -41,6 +44,8 @@ public class AvaloniaLineSelectionSample : LineSelectionSample
         {
             var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
             ProcessMouseMove(mousePosition);
+
+            StandardMaterials.Orange.SetSpecular()
         }
     }
 

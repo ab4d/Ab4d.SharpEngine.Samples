@@ -15,8 +15,7 @@ using Colors = Ab4d.SharpEngine.Common.Colors;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
 
-// This sample derives from a generic ManualInputEventsSample that handles the mouse events in a generic way
-// but here we need to use platform specific code to subscribe to mouse events
+// This class processes Avalonia mouse events and routes them to the methods in the common ManualInputEventsSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
 
 public class AvaloniaManualInputEventsSample : ManualInputEventsSample
 {

@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml.Input;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.HitTesting;
 
+// This class processes WinUI mouse events and routes them to the methods in the common LineSelectionSample that is defined in the Ab4d.SharpEngine.Samples.Common project.
+
 public class WinUILineSelectionSample : LineSelectionSample
 {
     private UIElement? _subscribedElement;
