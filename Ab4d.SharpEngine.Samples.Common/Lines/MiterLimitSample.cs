@@ -8,8 +8,8 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 
 public class MiterLimitSample : CommonSample
 {
-    public override string Title => "MiterLimit";
-    public override string Subtitle => "MiterLimit in PolyLineNode defines when mitered joint changes to beveled joint.";
+    public override string Title => "PolyLineNode with MiterLimit vs MultiLineNode";
+    public override string Subtitle => "MiterLimit in PolyLineNode defines when a mitered joint changes to a beveled joint.\nThe last two lines show the difference when line is rendered by using MultiLineNode.";
 
     public MiterLimitSample(ICommonSamplesContext context)
         : base(context)
@@ -22,12 +22,20 @@ public class MiterLimitSample : CommonSample
         textBlockFactory.TextColor = new Color4(0.3f, 0.3f, 0.3f, 1);
         textBlockFactory.FontSize = 30;
 
-
-        AddMiterLimitsSample(scene, textBlockFactory, 0, -100);
-        AddMiterLimitsSample(scene, textBlockFactory, 2, 0);
-        AddMiterLimitsSample(scene, textBlockFactory, 4, 100);
-        AddMiterLimitsSample(scene, textBlockFactory, 10, 200);
         
+        var positions = CreateSnakePositions(new Vector3(-100, 0, 0), 50, 20, 80);
+        
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: -100, miterLimit: 0);
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: 0, miterLimit: 2);
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: 100, miterLimit: 4);
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: 200, miterLimit: 10);
+                                  
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: 350, isPolyLine: false, isLineStrip: true);
+        AddMiterLimitsSample(scene, positions, textBlockFactory, zOffset: 430, isPolyLine: false, isLineStrip: false);
+
+
+        var textNode0 = textBlockFactory.CreateTextBlock("PolyLineNode:", new Vector3(-380, 0, -100), positionType: PositionTypes.Right);
+        scene.RootNode.Add(textNode0);
         
         var textNode1 = textBlockFactory.CreateTextBlock("Mitered joint:", new Vector3(-150, 0, -220), positionType: PositionTypes.Right);
         scene.RootNode.Add(textNode1);
@@ -55,48 +63,86 @@ public class MiterLimitSample : CommonSample
         scene.RootNode.Add(polyLineNode2);
 
 
-        var rectangleNode = new RectangleNode()
+        var rectangleNode1 = new RectangleNode()
         {
-            Position = new Vector3(-350, 0, 250),
+            Position = new Vector3(-360, 0, 250),
             PositionType = PositionTypes.TopLeft,
             HeightDirection = new Vector3(0, 0, 1),
             WidthDirection = new Vector3(1, 0, 0),
-            Size = new Vector2(700, 420),
+            Size = new Vector2(710, 430),
             LineColor = Colors.Gray,
             LineThickness = 2
         };
 
-        scene.RootNode.Add(rectangleNode);
+        scene.RootNode.Add(rectangleNode1);
+
+
+        var textNode3 = textBlockFactory.CreateTextBlock("MultiLineNode:", new Vector3(-380, 0, 350), positionType: PositionTypes.Right);
+        scene.RootNode.Add(textNode3);
+
+        var rectangleNode2 = new RectangleNode()
+        {
+            Position = new Vector3(-360, 0, 280),
+            PositionType = PositionTypes.BottomLeft,
+            HeightDirection = new Vector3(0, 0, 1),
+            WidthDirection = new Vector3(1, 0, 0),
+            Size = new Vector2(710, 200),
+            LineColor = Colors.Gray,
+            LineThickness = 2
+        };
+
+        scene.RootNode.Add(rectangleNode2);
+
+
 
 
         if (targetPositionCamera != null)
         {
+            targetPositionCamera.TargetPosition = new Vector3(-100, -70, 70);
             targetPositionCamera.Heading = 0;
-            targetPositionCamera.Attitude = -40;
-            targetPositionCamera.Distance = 1000;
+            targetPositionCamera.Attitude = -50;
+            targetPositionCamera.Distance = 1450;
         }
     }
 
-    private void AddMiterLimitsSample(Scene scene, TextBlockFactory textBlockFactory, float miterLimit, float zOffset)
+    private void AddMiterLimitsSample(Scene scene, Vector3[] positions, TextBlockFactory textBlockFactory, float zOffset, float miterLimit = 0, bool isPolyLine = true, bool isLineStrip = true)
     {
         var groupNode = new GroupNode();
         groupNode.Transform = new TranslateTransform(0, 0, zOffset);
         scene.RootNode.Add(groupNode);
 
+        
+        LineBaseNode lineNode;
+        string text;
 
-        var positions = CreateSnakePositions(new Vector3(-100, 0, 0), 50, 20, 80);
-        var polyLineNode = new PolyLineNode()
+        if (isPolyLine)
         {
-            Positions = positions,
-            LineColor = Colors.Black,
-            LineThickness = 15,
-            MiterLimit = miterLimit
-        };
+            lineNode = new PolyLineNode()
+            {
+                Positions = positions,
+                MiterLimit = miterLimit
+            };
 
-        groupNode.Add(polyLineNode);
+            text = $"MiterLimit: {miterLimit}";
+        }
+        else
+        {
+            lineNode = new MultiLineNode()
+            {
+                Positions = positions,
+                IsLineStrip = isLineStrip // when true, then Positions define connected lines; if false than lines are not connected and each line is defined by two positions
+            };
+
+            text = $"IsLineStrip: {isLineStrip}";
+        }
+
+        lineNode.LineColor = Colors.Black;
+        lineNode.LineThickness = 15;
+
+        groupNode.Add(lineNode);
 
 
-        var textNode2 = textBlockFactory.CreateTextBlock($"MiterLimit = {miterLimit}", new Vector3(-120, 0, 0), positionType: PositionTypes.Right);
+        var textNode2 = textBlockFactory.CreateTextBlock(text, new Vector3(-120, 0, 0), positionType: PositionTypes.Right);
         groupNode.Add(textNode2);
     }
 
