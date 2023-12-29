@@ -78,6 +78,18 @@ public class AvaloniaSamplesContext : ICommonSamplesContext
             // Create TextBlockFactory that will use the default BitmapTextCreator (get by BitmapTextCreator.GetDefaultBitmapTextCreator).
             _textBlockFactory = new TextBlockFactory(CurrentSharpEngineSceneView.Scene);
         }
+        else
+        {
+            // Reset existing TextBlockFactory to default values:
+            _textBlockFactory.TextColor = Color4.Black;
+            _textBlockFactory.FontSize = 14;
+            _textBlockFactory.BackgroundHorizontalPadding = 8;
+            _textBlockFactory.BackgroundVerticalPadding = 4;
+            _textBlockFactory.BackgroundColor = Color4.Transparent;
+            _textBlockFactory.BorderThickness = 0;
+            _textBlockFactory.BorderColor = Color4.Black;
+            _textBlockFactory.BackMaterialColor = Color4.Black;
+        }
 
         return _textBlockFactory;
     }
