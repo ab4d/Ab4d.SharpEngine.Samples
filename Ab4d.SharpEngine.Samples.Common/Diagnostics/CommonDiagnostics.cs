@@ -770,10 +770,17 @@ PipelineChangesCount: {8:#,##0}",
                     {
                         var propertyValue = propertyInfo.GetValue(objectToDump, null);
 
-                        if (propertyInfo.PropertyType == typeof(string[]))
-                            valueText = string.Join(',', ((string[])propertyValue).Select(s => '"' + s + '"'));
+                        if (propertyValue != null)
+                        {
+                            if (propertyInfo.PropertyType == typeof(string[]))
+                                valueText = string.Join(',', ((string[])propertyValue).Select(s => '"' + s + '"'));
+                            else
+                                valueText = string.Join(',', ((List<string>)propertyValue).Select(s => '"' + s + '"'));
+                        }
                         else
-                            valueText = string.Join(',', ((List<string>)propertyValue).Select(s => '"' + s + '"'));
+                        {
+                            valueText = "<null>";
+                        }
                     }
                     catch (Exception e)
                     {
