@@ -44,8 +44,6 @@ public class AvaloniaLineSelectionSample : LineSelectionSample
         {
             var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
             ProcessMouseMove(mousePosition);
-
-            StandardMaterials.Orange.SetSpecular()
         }
     }
 
