@@ -27,7 +27,7 @@ public class FitIntoViewSample : CommonSample
     private GroupNode? _boxesGroup;
     private WireGridNode? _wireGridNode;
 
-    private Vector3[] _corners;
+    private Vector3[]? _corners;
 
     public FitIntoViewSample(ICommonSamplesContext context)
         : base(context)
