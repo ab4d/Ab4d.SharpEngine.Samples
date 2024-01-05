@@ -26,6 +26,7 @@ public class AssimpImporterSample : CommonSample
     private GroupNode? _importedModelNodes;
 
     private string? _importedFileName;
+    private bool _isAssimpLoggingEnabled = false;
 
     private enum ViewTypes
     {
@@ -182,10 +183,29 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         // FixDirectorySeparator method returns file path with correctly sets backslash or slash as directory separator based on the current OS.
         fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
 
+        // Setting PreserveNativeResourcesAfterImporting will preserve the _assimpImporter.NativeAssimpScene after calling Import method.
+        // Otherwise (by default) the NativeAssimpScene is disposed in the Import method.
+        // Preserving the NativeAssimpScene can be useful to read the scene data from the Assimp object model
+        // or to export the Assimp scene to another file format (see commented ExportScene below).
         _assimpImporter.PreserveNativeResourcesAfterImporting = true;
+
+        if (_isAssimpLoggingEnabled)
+        {
+            _assimpImporter.LoggerCallback = (message, data) => System.Diagnostics.Debug.WriteLine($"Assimp: {message}");
+            _assimpImporter.IsVerboseLoggingEnabled = true;
+        }
+        else
+        {
+            _assimpImporter.LoggerCallback = null;
+            _assimpImporter.IsVerboseLoggingEnabled = false;
+        }
 
         try
         {
+            // To import file from stream use the following code:
+            //using (var fs = System.IO.File.OpenRead(fileName))
+            //    _importedModelNodes = _assimpImporter.Import(fs, formatHint: System.IO.Path.GetExtension(fileName));
+
             _importedModelNodes = _assimpImporter.Import(fileName);
             _importedFileName = fileName;
 
@@ -356,12 +376,42 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         if (gitCommitHash != 0)
             assimpVersionText += string.Format("; Git commit hash: {0:x7}", gitCommitHash);
 
-        var supportedExtensions = string.Join(", ", assimpImporter.SupportedImportFileExtensions);
+        var supportedImporterExtensions = string.Join(", ", assimpImporter.SupportedImportFileExtensions);
 
-        string supportedFormatsInfo = $"Using native Assimp library v{assimpVersionText}{Environment.NewLine}{Environment.NewLine}Supported import file formats:{Environment.NewLine}{supportedExtensions}";
+        // AssimpExporter provides information about supported export formats.
+        // The current version does not support exporting SharpEngine Scene objects.
+        // But it is possible to export and imported Assimp scene by using _assimpImporter.NativeAssimpScene.ExportScene method, for example commented ExportScene method below.
+
+        var assimpExporter = new AssimpExporter();
+        var supportedExporterExtensions = string.Join(", ", assimpExporter.SupportedExportFileExtensions);
+
+        string supportedFormatsInfo = 
+$@"Using native Assimp library v{assimpVersionText}
+
+Supported import file formats:
+{supportedImporterExtensions}
+
+Supported export file formats:
+{supportedExporterExtensions}
+
+Note: The current version does not support exporting SharpEngine Scene objects, but it is possible to export and imported Assimp scene by using AssimpImporter.NativeAssimpScene.ExportScene method (see commented ExportScene method).";
 
         return supportedFormatsInfo;
     }
+    
+    // To test this method uncomment the code below and the declaration of export button in OnCreateUI
+    //private void ExportScene()
+    //{
+    //    // To preserve the NativeAssimpScene after importing it, set the _assimpImporter.PreserveNativeResourcesAfterImporting to true
+    //    // and do not call _assimpImporter.DisposeNativeAssimpScene()
+    //    if (_assimpImporter == null || _assimpImporter.NativeAssimpScene == null)
+    //        return;
+
+    //    string exportedFileExtension = "obj"; // This value should be from assimpExporter.SupportedExportFileExtensions
+    //    string exportedFileName = System.IO.Path.ChangeExtension(_importedFileName, exportedFileExtension)!;
+
+    //    bool success = _assimpImporter.NativeAssimpScene.ExportScene(exportedFileName, exportedFileExtension);
+    //}
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -375,6 +425,9 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         }, selectedItemIndex: (int)_currentViewType);
 
         ui.AddSeparator();
+        ui.CreateCheckBox("Assimp logging (see VS Output)", _isAssimpLoggingEnabled, isChecked => _isAssimpLoggingEnabled = isChecked);
+
+        ui.AddSeparator();
         ui.CreateButton("Show supported formats", () =>
         {
             if (_infoPanel != null)
@@ -383,6 +436,9 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
                 _infoPanel.SetIsVisible(!currentlyVisible);
             }
         });
+
+        //ui.AddSeparator();
+        //ui.CreateButton("Export scene", ExportScene);
 
 
         _infoPanel = ui.CreateStackPanel(PositionTypes.Center, addBorder: true, isSemiTransparent: true);
