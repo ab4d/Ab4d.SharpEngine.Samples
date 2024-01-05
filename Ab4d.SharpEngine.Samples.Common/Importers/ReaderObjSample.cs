@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Numerics;
-using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
