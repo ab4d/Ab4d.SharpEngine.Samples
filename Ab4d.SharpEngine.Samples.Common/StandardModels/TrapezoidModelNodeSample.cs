@@ -105,14 +105,14 @@ public class TrapezoidModelNodeSample : StandardModelsSampleBase
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 60, 0), new Vector3(0, 40, 0), new Vector3(0, 20, 0), new Vector3(40, 40, 0), new Vector3(-20, 40, 0) },
             itemChangedAction: OnTopCenterPositionChanged,
             selectedItemIndex: 1,
-            width: 100,
+            width: 125,
             keyText: "TopCenterPosition: ",
             keyTextWidth: 140).SetColor(Colors.Red);
         
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 0, 0), new Vector3(0, -20, 0), new Vector3(0, -40, 0), new Vector3(40, -20, 0), new Vector3(-20, -20, 0) },
             itemChangedAction: OnBottomCenterPositionChanged,
             selectedItemIndex: 1,
-            width: 100,
+            width: 125,
             keyText: "BottomCenterPosition: ",
             keyTextWidth: 140).SetColor(Colors.Blue);
 
@@ -121,14 +121,14 @@ public class TrapezoidModelNodeSample : StandardModelsSampleBase
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector2[] { new Vector2(0, 0), new Vector2(20, 20), new Vector2(50, 20), new Vector2(50, 50), new Vector2(70, 30), new Vector2(100, 50), new Vector2(50, 100) },
             itemChangedAction: OnTopSizeChanged,
             selectedItemIndex: 2,
-            width: 100,
+            width: 125,
             keyText: "TopSize: ",
             keyTextWidth: 140);
         
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector2[] { new Vector2(0, 0), new Vector2(20, 20), new Vector2(50, 20), new Vector2(50, 50), new Vector2(70, 30), new Vector2(100, 50), new Vector2(50, 100) },
             itemChangedAction: OnBottomSizeChanged,
             selectedItemIndex: 5,
-            width: 100,
+            width: 125,
             keyText: "BottomSize: ",
             keyTextWidth: 140);
     }
