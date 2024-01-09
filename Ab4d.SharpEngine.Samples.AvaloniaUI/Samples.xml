@@ -26,6 +26,7 @@
   <Sample Location="HitTesting.AvaloniaHitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.AvaloniaManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.AvaloniaLineSelectionSample" Title="Line selection"/>
+  <Sample Location="HitTesting.AvaloniaRayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
