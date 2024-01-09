@@ -38,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="StandardModels\OtherStandardModelsTitle.md" />
     <EmbeddedResource Include="Titles\AdvancedTitle.md" />   
     <EmbeddedResource Include="Titles\AnimationsTitle.md" />
     <EmbeddedResource Include="Titles\LightsTitle.md" />
