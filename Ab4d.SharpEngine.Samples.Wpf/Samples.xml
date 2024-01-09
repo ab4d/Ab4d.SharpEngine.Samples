@@ -45,6 +45,7 @@
   <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
   <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
   <Sample Location="StandardModels.ConeModelNodeSample" Title="ConeModelNode"/>
+  <Sample Location="StandardModels.PyramidModelNodeSample" Title="PyramidModelNode"/>
   <Sample Location="StandardModels.OtherStandardModelsTitle.md" Title="Other models"/>
   <Sample IsSeparator="True" />
   <Sample Location="StandardModels.TransformationsSample" Title="Transformations"/>
