@@ -666,7 +666,7 @@ public class MultiSceneNodesSample : CommonSample
         // Text in SharpEngine is rendered by using bitmap fonts.
         // Bitmap font is defined by one or more textures with rendered characters and font data that define where on the texture the character is.
 
-        // GetDefaultBitmapTextCreator gets the the BitmapTextCreator with the default bitmap font that is build into the Ab4d.SharpEngine.
+        // GetDefaultBitmapTextCreator gets the BitmapTextCreator with the default bitmap font that is build into the Ab4d.SharpEngine.
         // The bitmap font is created from Roboto font (Google's Open Font) with size of character set to 64 pixels (see roboto_64 in the Resources\BitmapFonts)
         var normalBitmapTextCreator = BitmapTextCreator.GetDefaultBitmapTextCreator(scene);
 
@@ -728,11 +728,12 @@ public class MultiSceneNodesSample : CommonSample
 
         string fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
 
-        var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+        //var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+        var blackBitmapFont = CreateBitmapFont(fontFileName, scene.GpuDevice.DefaultBitmapIO);
 
         if (blackBitmapFont != null)
         {
-            var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, BitmapIO)
+            var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO)
             {
                 CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
             };
@@ -762,7 +763,7 @@ public class MultiSceneNodesSample : CommonSample
 
         if (blackWithOutlineBitmapFont != null)
         {
-            var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, blackWithOutlineBitmapFont, BitmapIO)
+            var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, blackWithOutlineBitmapFont, scene.GpuDevice.DefaultBitmapIO)
             {
                 AdditionalLineSpace = -20, // Decrease default line space
                 CacheFontGpuImages = false // Do not cache the font bitmaps for black_with_outline font version (this will also dispose the font bitmaps when this sample is not shown any more)
