@@ -281,4 +281,24 @@ public abstract class StandardModelsSampleBase : CommonSample
 
         return comboBox;
     }
+    
+    protected ICommonSampleUIElement CreateComboBoxWithVectors(ICommonSampleUIProvider ui,
+                                                               Vector2[] vectors,
+                                                               Action<int, Vector2> itemChangedAction,
+                                                               int selectedItemIndex,
+                                                               double width = 0,
+                                                               string? keyText = null,
+                                                               double keyTextWidth = 0)
+    {
+        var itemTexts = vectors.Select(v => $"({v.X}, {v.Y})").ToArray();
+
+        var comboBox = ui.CreateComboBox(itemTexts,
+                                         (index, itemText) => itemChangedAction(index, vectors[index]),
+                                         selectedItemIndex,
+                                         width,
+                                         keyText,
+                                         keyTextWidth);
+
+        return comboBox;
+    }
 }
