@@ -76,7 +76,7 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected virtual void UpdateTriangles(StandardMesh? mesh, Transform? modelTransform)
     {
-        if (Scene == null)
+        if (Scene == null || !isShowTrianglesChecked)
             return;
 
         if (wireframeLineNode != null)
@@ -104,7 +104,7 @@ public abstract class StandardModelsSampleBase : CommonSample
     
     protected virtual void UpdateNormals(StandardMesh? mesh, Transform? modelTransform)
     {
-        if (Scene == null)
+        if (Scene == null || !isShowNormalsChecked)
             return;
 
         if (normalsLineNode != null)
