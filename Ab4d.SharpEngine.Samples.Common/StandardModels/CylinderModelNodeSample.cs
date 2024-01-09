@@ -8,7 +8,7 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "CylinderModelNode";
 
-    private int _sphereSegmentsCount = 15;
+    private int _segmentsCount = 15;
     private bool _isSmooth = false;
     private float _radius = 50;
     private float _height = 50;
@@ -23,7 +23,7 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
     {
         _cylinderModelNode = new CylinderModelNode("SampleCylinder")
         {
-            BottomCenterPosition = new Vector3(0, 0, 0),
+            BottomCenterPosition = new Vector3(0, -25, 0),
             Radius = 50,
             Height = 50,
         };
@@ -38,7 +38,7 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
         if (_cylinderModelNode == null)
             return;
 
-        _cylinderModelNode.Segments = _sphereSegmentsCount;
+        _cylinderModelNode.Segments = _segmentsCount;
         _cylinderModelNode.IsSmooth = _isSmooth;
         _cylinderModelNode.Radius = _radius;
         _cylinderModelNode.Height = _height;
@@ -48,7 +48,7 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
-        ui.CreateKeyValueLabel("BottomCenterPosition:", () => "(0, -25, 0)", keyTextWidth: 110);
+        ui.CreateLabel("BottomCenterPosition: (0, -25, 0)");
 
         ui.AddSeparator();
 
@@ -82,10 +82,10 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
 
         ui.AddSeparator();
         ui.CreateSlider(3, 40,
-                        () => _sphereSegmentsCount,
+                        () => _segmentsCount,
                         newValue =>
                         {
-                            _sphereSegmentsCount = (int)newValue;
+                            _segmentsCount = (int)newValue;
                             UpdateModelNode();
                         },
                         120,
