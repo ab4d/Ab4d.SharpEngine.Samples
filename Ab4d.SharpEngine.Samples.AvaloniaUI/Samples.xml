@@ -46,7 +46,8 @@
   <Sample Location="StandardModels.OtherStandardModelsTitle.md" Title="Other models"/>
   <Sample IsSeparator="True" />
   <Sample Location="StandardModels.TransformationsSample" Title="Transformations"/>
-
+  <Sample Location="StandardModels.PositionAndScaleSample" Title="Position and scale"/>
+  
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
