@@ -60,6 +60,7 @@
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
+  <Sample Location="AdvancedModels.StreamlinesSample" Title="Streamlines"/>
   <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
   <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>

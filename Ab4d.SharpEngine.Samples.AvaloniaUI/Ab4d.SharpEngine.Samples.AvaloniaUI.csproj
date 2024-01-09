@@ -84,6 +84,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
     <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
   </ItemGroup>
