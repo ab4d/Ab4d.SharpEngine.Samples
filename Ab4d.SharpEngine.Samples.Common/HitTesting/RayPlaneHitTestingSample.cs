@@ -57,7 +57,8 @@ public abstract class RayPlaneHitTestingSample : CommonSample
             Position = new Vector3(0, 0, 0),
             LineColor = Colors.Red,
             LineThickness = 3,
-            LinesLength = 50
+            LinesLength = 50,
+            Visibility = SceneNodeVisibility.Hidden
         };
 
         scene.RootNode.Add(_hitWireCrossNode);
