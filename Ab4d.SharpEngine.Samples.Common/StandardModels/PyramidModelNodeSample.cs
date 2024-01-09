@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -24,6 +25,9 @@ public class PyramidModelNodeSample : StandardModelsSampleBase
             BottomCenterPosition = new Vector3(0, -20, 0),
             Size = new Vector3(_sizeX, _sizeY, _sizeZ),
         };
+
+        // Use MeshFactory.CreatePyramidMesh to create a pyramid mesh, for example:
+        //StandardMesh pyramidMesh = MeshFactory.CreatePyramidMesh(bottomCenterPosition: new Vector3(0, -25, 0), size: new Vector3(_sizeX, _sizeY, _sizeZ), name: "PyramidMesh");
 
         UpdateModelNode();
 

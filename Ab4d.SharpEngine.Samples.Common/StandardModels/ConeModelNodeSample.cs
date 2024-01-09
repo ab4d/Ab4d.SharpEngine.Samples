@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.Vulkan;
 
@@ -32,6 +33,9 @@ public class ConeModelNodeSample : StandardModelsSampleBase
             IsSmooth     = _isSmooth
         };
 
+        // Use MeshFactory.CreateConeMesh to create a cone mesh, for example:
+        //StandardMesh coneMesh = MeshFactory.CreateConeMesh(bottomCenterPosition: new Vector3(0, -20, 0), _topRadius, _bottomRadius, _height, _segmentsCount, _isSmooth, name: "ConeMesh");
+
         UpdateModelNode();
 
         return _coneModelNode;
@@ -42,8 +46,6 @@ public class ConeModelNodeSample : StandardModelsSampleBase
         if (_coneModelNode == null)
             return;
 
-        
-        
         _coneModelNode.TopRadius    = _topRadius;
         _coneModelNode.BottomRadius = _bottomRadius;
         _coneModelNode.Height       = _height;

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.Vulkan;
 
@@ -27,6 +28,9 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
             Radius = 50,
             Height = 50,
         };
+
+        // Use MeshFactory.CreateCylinderMesh to create a cylinder mesh, for example:
+        //StandardMesh cylinderMesh = MeshFactory.CreateCylinderMesh(bottomCenterPosition: new Vector3(0, -25, 0), radius: 50, height: 50, _segmentsCount, _isSmooth, name: "CylinderMesh");
 
         UpdateModelNode();
 

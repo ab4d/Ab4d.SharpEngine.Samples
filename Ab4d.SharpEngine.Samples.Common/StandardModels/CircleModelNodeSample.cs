@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -30,6 +31,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             CenterPosition = new Vector3(0, 0, 0),
             Radius = 50,
         };
+
+        // Use MeshFactory.CreateCircleMesh to create a circle mesh, for example:
+        //StandardMesh circleMesh = MeshFactory.CreateCircleMesh(centerPosition: new Vector3(0, 0, 0), _normal, _upDirection, radius: 50, _segmentsCount, name: "CircleMesh");
 
         UpdateModelNode();
 

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -21,8 +22,16 @@ public class SphereModelNodeSample : StandardModelsSampleBase
         _sphereModelNode = new SphereModelNode("SampleSphere")
         {
             CenterPosition = new Vector3(0, 0, 0),
-            Radius = 50
+            Radius = 50,
+            UseSharedSphereMesh = true // When true (by default) then a shared sphere mesh is used for all SphereModelNode - then the sphere is transformed to be positioned and scaled; when false then a new mesh is generated for this SphereModelNode
         };
+
+        // Use MeshFactory.CreateSphereMesh to create a sphere mesh, for example:
+        //StandardMesh sphere = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 50, segments: 30, name: "SphereMesh");
+
+        // Use GetSharedSphereMesh to get a shared sphere mesh with centerPosition: (0, 0, 0), radius: 1 and segments count set to 30.
+        // This mesh cannot be changed and is by default used for SphereModelNode (when UseSharedSphereMesh is true - by default).
+        //var sharedMesh = MeshFactory.GetSharedSphereMesh(Scene);
 
         UpdateModelNode();
 

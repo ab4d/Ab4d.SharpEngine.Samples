@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -24,7 +25,15 @@ public class BoxModelNodeSample : StandardModelsSampleBase
         {
             Position = new Vector3(0, 0, 0),
             Size = new Vector3(100, 40, 80),
+            UseSharedBoxMesh = true // When true (by default) then a shared box mesh is used for all BoxModelNodes - then MeshTransform is used to position and scale the box; when false then a new mesh is generated for this BoxModelNode
         };
+
+        // Use MeshFactory.CreateBoxMesh to create a box mesh, for example:
+        //StandardMesh boxMesh = MeshFactory.CreateBoxMesh(centerPosition: new Vector3(0, 0, 0), size: new Vector3(100, 40, 80), _xSegmentsCount, _ySegmentsCount, _zSegmentsCount, name: "BoxMesh");
+
+        // Use GetSharedBoxMesh to get a shared box mesh with centerPosition: (0, 0, 0), size: (1, 1, 1) and all segments count set to 1.
+        // This mesh cannot be changed and is by default used for BoxModelNode (when UseSharedBoxMesh is true - by default).
+        //var sharedMesh = MeshFactory.GetSharedBoxMesh(Scene);
 
         UpdateModelNode();
 

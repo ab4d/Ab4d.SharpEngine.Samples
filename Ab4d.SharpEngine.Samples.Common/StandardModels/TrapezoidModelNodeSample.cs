@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -25,6 +26,9 @@ public class TrapezoidModelNodeSample : StandardModelsSampleBase
     {
         _trapezoidModelNode = new TrapezoidModelNode("SampleTrapezoid");
         UpdateModelNode();
+
+        // Use MeshFactory.CreateTrapezoidMesh to create a trapezoid mesh, for example:
+        //StandardMesh trapezoidMesh = MeshFactory.CreateTrapezoidMesh(_bottomCenterPosition, _bottomSize, _topCenterPosition, _topSize, sizeXVector: new Vector3(1, 0, 0), sizeYVector: new Vector3(0, 0, 1), name: "TrapezoidMesh");
 
         return _trapezoidModelNode;
     }

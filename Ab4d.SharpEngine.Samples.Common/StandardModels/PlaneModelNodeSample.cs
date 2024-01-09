@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
@@ -30,7 +31,15 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
         {
             Position = new Vector3(0, 0, 0),
             Size = new Vector2(100, 80),
+            UseSharedPlaneMesh = true // When true (by default) then a shared plane mesh is used for all PlaneModelNode - then MeshTransform is used to position and scale the sphere; when false then a new mesh is generated for this PlaneModelNode
         };
+
+        // Use MeshFactory.CreatePlaneMesh to create a plane mesh, for example:
+        //StandardMesh planeMesh = MeshFactory.CreatePlaneMesh(centerPosition: new Vector3(0, 0, 0), _normal, _heightDirection, width: 100, height: 80, name: "PlaneMesh");
+
+        // Use GetSharedPlaneMesh to get a shared plane mesh with centerPosition: (0, 0, 0), planeNormal as (0,0,1), planeHeightDirection as (0, 1, 0) and size as (1, 1).
+        // This mesh cannot be changed and is by default used for PlaneModelNode (when UseSharedPlaneMesh is true - by default).
+        //var sharedMesh = MeshFactory.GetSharedPlaneMesh(Scene);
 
         UpdateModelNode();
 

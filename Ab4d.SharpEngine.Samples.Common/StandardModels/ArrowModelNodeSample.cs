@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.Vulkan;
 
@@ -24,6 +25,9 @@ public class ArrowModelNodeSample : StandardModelsSampleBase
     {
         _arrowModelNode = new ArrowModelNode("SampleArrow");
         UpdateModelNode();
+
+        // Use MeshFactory.CreateArrowMesh to create an arrow mesh, for example:
+        //StandardMesh arrowMesh = MeshFactory.CreateArrowMesh(_startPosition, _endPosition, _radius, _arrowRadius, arrowAngle: 30, maxArrowLength: 0.3f, _segmentsCount, generateTextureCoordinates: false, name: "ArrowMesh");
 
         return _arrowModelNode;
     }
