@@ -64,17 +64,40 @@ public class RotateAroundCustomPointSample : CommonSample
         this.ZoomMode = CameraZoomMode.ViewCenter;
     }
 
+    protected override void OnDisposed()
+    {
+        if (_mouseCameraController != null)
+        {
+            // Unsubscribe event handlers
+            _mouseCameraController.CameraRotateStarted -= OnCameraRotateStarted;
+            _mouseCameraController.CameraRotateEnded   -= OnCameraRotateEnded;
+            _mouseCameraController =  null;
+        }
+
+        base.OnDisposed();
+    }
+
     public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
     {
         // Save mouseCameraController so we can change it later
         _mouseCameraController = mouseCameraController;
 
         // Show rotation center position
-        mouseCameraController.CameraRotateStarted += (sender, args) => ShowRotationCenterPosition();
-        mouseCameraController.CameraRotateEnded += (sender, args) => HideRotationCenterPosition();
+        mouseCameraController.CameraRotateStarted += OnCameraRotateStarted;
+        mouseCameraController.CameraRotateEnded   += OnCameraRotateEnded;
         
         // Use standard initialization code for mouseCameraController
         base.InitializeMouseCameraController(mouseCameraController);
+    }
+
+    private void OnCameraRotateStarted(object? sender, EventArgs args)
+    {
+        ShowRotationCenterPosition();
+    }
+    
+    private void OnCameraRotateEnded(object? sender, EventArgs args)
+    {
+        HideRotationCenterPosition();
     }
 
     private void ShowRotationCenterPosition()
