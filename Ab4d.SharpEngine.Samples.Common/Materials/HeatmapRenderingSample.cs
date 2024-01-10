@@ -45,6 +45,8 @@ public class HeatmapRenderingSample : CommonSample
 
     private WireCrossNode? _hitWireCrossNode;
 
+    private SceneView? _subscribedSceneView;
+
     private DateTime _animationStartTime;
 
     private static readonly GradientStop[] _gradient1 = new GradientStop[]
@@ -105,13 +107,20 @@ public class HeatmapRenderingSample : CommonSample
             _gradientTexture = null;
         }
 
+        if (_subscribedSceneView != null)
+        {
+            _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+            _subscribedSceneView = null;
+        }
+
         base.OnDisposed();
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         sceneView.SceneUpdating += SceneViewOnSceneUpdating;
-        
+        _subscribedSceneView = sceneView;
+
         base.OnSceneViewInitialized(sceneView);
     }
 
