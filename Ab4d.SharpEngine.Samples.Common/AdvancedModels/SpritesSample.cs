@@ -16,6 +16,8 @@ public class SpritesSample : CommonSample
     private SpriteBatch? _animatedSpriteBatch;
     private DateTime _animationStartTime;
 
+    private SceneView? _subscribedSceneView;
+
     public SpritesSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -167,13 +169,16 @@ public class SpritesSample : CommonSample
 
         UpdateAnimatedSpriteBatch();
 
-        sceneView.SceneUpdating += delegate (object? sender, EventArgs args)
-        {
-           UpdateAnimatedSpriteBatch();
-        };
+        sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        _subscribedSceneView = sceneView;
     }
 
-    
+    private void OnSceneViewOnSceneUpdating(object? sender, EventArgs args)
+    {
+        UpdateAnimatedSpriteBatch();
+    }
+
+
     private void UpdateAnimatedSpriteBatch()
     {
         if (_animatedSpriteBatch == null || _uvCheckerTexture == null || SceneView == null)
@@ -207,6 +212,12 @@ public class SpritesSample : CommonSample
 
     protected override void OnDisposed()
     {
+        if (_subscribedSceneView != null)
+        {
+            _subscribedSceneView.SceneUpdating -= OnSceneViewOnSceneUpdating;
+            _subscribedSceneView = null;
+        }
+
         Scene?.RemoveAllSpriteBatches();
         SceneView?.RemoveAllSpriteBatches();
 

@@ -86,9 +86,22 @@ public class LinesPerformanceSample : CommonSample
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        sceneView.SceneUpdating += (sender, args) => CheckToRegenerateLines();
+        sceneView.SceneUpdating += OnSceneUpdating;
         
         base.OnSceneViewInitialized(sceneView);
+    }
+
+    protected override void OnDisposed()
+    {
+        if (SceneView != null)
+            SceneView.SceneUpdating -= OnSceneUpdating;
+
+        base.OnDisposed();
+    }
+
+    private void OnSceneUpdating(object? sender, EventArgs args)
+    {
+        CheckToRegenerateLines();
     }
 
     private void RecreateLinesWithDelay()

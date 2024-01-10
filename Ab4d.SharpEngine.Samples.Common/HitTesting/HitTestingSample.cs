@@ -64,10 +64,23 @@ public abstract class HitTestingSample : CommonSample
             targetPositionCamera.Distance = 500;
             targetPositionCamera.StartRotation(50);
 
-            targetPositionCamera.CameraChanged += (sender, args) => TestHitObjects(_lastMousePosition);
+            targetPositionCamera.CameraChanged += OnCameraChanged;
         }
 
         ShowCameraAxisPanel = true;
+    }
+
+    protected override void OnDisposed()
+    {
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged -= OnCameraChanged;
+
+        base.OnDisposed();
+    }
+
+    private void OnCameraChanged(object? sender, EventArgs args)
+    {
+        TestHitObjects(_lastMousePosition);
     }
 
     protected void ProcessMouseMove(Vector2 mousePosition)

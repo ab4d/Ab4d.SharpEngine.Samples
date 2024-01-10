@@ -80,16 +80,26 @@ public abstract class LineSelectionSample : CommonSample
         {
             targetPositionCamera.Distance = 400;
 
-            targetPositionCamera.CameraChanged += delegate(object? sender, EventArgs args)
-            {
-                _isCameraChanged = true;
-                UpdateClosestLine();
-            };
+            targetPositionCamera.CameraChanged += OnCameraChanged;
 
             targetPositionCamera.StartRotation(headingChangeInSecond: 20);
         }
 
         base.OnSceneViewInitialized(sceneView);
+    }
+
+    protected override void OnDisposed()
+    {
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged -= OnCameraChanged;
+
+        base.OnDisposed();
+    }
+
+    private void OnCameraChanged(object? sender, EventArgs args)
+    {
+        _isCameraChanged = true;
+        UpdateClosestLine();
     }
 
     protected void ProcessMouseMove(Vector2 mousePosition)
