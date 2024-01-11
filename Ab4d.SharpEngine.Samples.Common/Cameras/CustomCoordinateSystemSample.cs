@@ -4,7 +4,6 @@ using System.Numerics;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
@@ -78,8 +77,8 @@ public class CustomCoordinateSystemSample : CommonSample
         {
             targetPositionCamera.Heading = 220;
             targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 400;
-            targetPositionCamera.ViewWidth = 400;
+            targetPositionCamera.Distance = 500;
+            targetPositionCamera.ViewWidth = 500;
         }
     }
 
