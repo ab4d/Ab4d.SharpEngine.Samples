@@ -37,6 +37,9 @@ public class ExtrudedMeshSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
+        // scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded); // Used to test the orientation of triangulated triangles (see comment in UpdateCurrentShape)
+
+
         _generatedObjectsGroup = new GroupNode("GeneratedObjects");
 
         scene.RootNode.Add(_generatedObjectsGroup);
@@ -58,6 +61,8 @@ public class ExtrudedMeshSample : CommonSample
             targetPositionCamera.Attitude = -40;
             targetPositionCamera.Distance = 550;
         }
+
+        ShowCameraAxisPanel = true;
     }
 
     private void UpdateCurrentShape()
@@ -70,10 +75,32 @@ public class ExtrudedMeshSample : CommonSample
         // Get 2D shape positions
         var shape2DPositions = GetShapePositions(_currentShapeType);
 
-        // Convert 2D shape to 3D positions
+        // Convert 2D positions to 3D positions (set y to zero)
+
+        // IMPORTANT:
+        // In this sample the shape2DPositions are oriented in anti-clockwise orientation.
+        // If we map: x2 = x1, y2 = 0, z2 = y1 this changes the order of 3D position to clockwise.
+        // The reason for this is that by default the Z axis is pointing to the viewer
+        // (but if 2D coordinate system is put to the XY plane, then Y is pointing into the screen).
+        // To prevent flipping the orientation, we need to negate the 2D y value when it is set to 3D z position.
+        //
+        // The code below shows how to correctly convert 2D positions to 3D position for all 4 possible coordinate systems.
+        //
+        // This can be tested by unchecking the "Show individual triangles" checkbox.
+        // In this case the front triangles are shown with orange material and back triangles are shown with red material.
+
+        float yInvertFactor = 1;
+
+        if (Scene != null)
+        {
+            var coordinateSystem = Scene.GetCoordinateSystem();
+            if (coordinateSystem == CoordinateSystems.YUpRightHanded || coordinateSystem == CoordinateSystems.ZUpLeftHanded)
+                yInvertFactor = -1;
+        }
+
         var shape3DPositions = new Vector3[shape2DPositions.Length];
         for (var i = 0; i < shape2DPositions.Length; i++)
-            shape3DPositions[i] = new Vector3(shape2DPositions[i].X, 0, shape2DPositions[i].Y); // Set y to zero
+            shape3DPositions[i] = new Vector3(shape2DPositions[i].X, 0, shape2DPositions[i].Y * yInvertFactor); // Negate y to preserve the anti-clockwise orientation
 
 
         // Show shape as a poly-line
@@ -230,7 +257,7 @@ public class ExtrudedMeshSample : CommonSample
             UpdateCurrentShape();
         }, selectedItemIndex: 1, keyText: "Extrude vector:", keyTextWidth: 95, width: 90);
 
-        ui.CreateCheckBox("Show individual triangles", isInitiallyChecked: _showIndividualTriangles, isChecked =>
+        ui.CreateCheckBox("Show individual triangles (?):When unchecked then the front triangles are shown with orange material and back triangles are shown with red material.", isInitiallyChecked: _showIndividualTriangles, isChecked =>
         {
             _showIndividualTriangles = isChecked;
             UpdateCurrentShape();
