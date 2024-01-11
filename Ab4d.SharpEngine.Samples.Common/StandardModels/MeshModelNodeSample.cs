@@ -14,7 +14,7 @@ namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 public class MeshModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "MeshModelNode";
-    public override string Subtitle => "MeshModelNode defines a 3D model from Positions, Normals, TextureCoordinates and TriangleIndices.\nNote that the order of triangles is important: Material shows front site; BackMaterial shows back side (red in this sample).";
+    public override string Subtitle => "MeshModelNode defines a 3D model from Positions, Normals, TextureCoordinates and TriangleIndices.\nNote that the order of triangles is important: Material shows front side; BackMaterial shows back side (red in this sample; see bottom side of the plane).";
 
     private StandardMesh? _mesh;
 
