@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Title="SharpEngine Diagnostics"
              Icon="../Resources/sharp-engine-logo.ico"
-             Width="310" SizeToContent="Height">
+             Width="330" SizeToContent="Height">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

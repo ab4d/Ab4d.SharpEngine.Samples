@@ -21,7 +21,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
     /// </summary>
     public partial class DiagnosticsWindow : Window
     {
-        public const double InitialWindowWidth = 310;
+        public const double InitialWindowWidth = 330;
 
         private DispatcherTimer? _updateStatisticsTimer;
 
