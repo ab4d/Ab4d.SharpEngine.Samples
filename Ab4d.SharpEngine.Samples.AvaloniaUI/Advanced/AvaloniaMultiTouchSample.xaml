@@ -1,0 +1,39 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced.AvaloniaMultiTouchSample" >
+    <Grid Name="RootGrid">
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                    <GradientStop Offset="0" Color="White" />
+                    <GradientStop Offset="1" Color="LightSkyBlue" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent">
+            <sharpEngine:SharpEngineSceneView.GestureRecognizers>
+                <PinchGestureRecognizer/>
+                <ScrollGestureRecognizer
+                    CanHorizontallyScroll="true"
+                    CanVerticallyScroll="true" />
+            </sharpEngine:SharpEngineSceneView.GestureRecognizers>
+        </sharpEngine:SharpEngineSceneView>
+
+        <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#AAFFFFFF" Margin="5">
+            <StackPanel Orientation="Vertical" Margin="10 5 10 8">
+                <CheckBox Name="PinchGestureCheckBox" Content="Pinch gesture" IsChecked="True" Margin="0 2 0 2" IsCheckedChanged="PinchGestureCheckBox_OnIsCheckedChanged"></CheckBox>
+                <CheckBox Name="ScrollGestureCheckBox" Content="Scroll gesture" IsChecked="True" Margin="0 2 0 2" IsCheckedChanged="ScrollGestureCheckBox_OnIsCheckedChanged"></CheckBox>
+                <CheckBox Name="RotateWithScrollCheckBox" Content="Rotate with scroll gesture" IsChecked="False" Margin="0 2 0 2" IsCheckedChanged="RotateWithScrollCheckBox_OnIsCheckedChanged"></CheckBox>
+            </StackPanel>
+        </Border>
+
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
+            <TextBlock Text="Avalonia multi-touch test" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" />
+        </StackPanel>
+    </Grid>
+</UserControl>
