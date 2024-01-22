@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaXaml Include="Advanced\AvaloniaMultiTouchSample.xaml" />
     <AvaloniaXaml Include="CameraControllers\MouseCameraControllerSample.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -68,6 +69,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
     <None Remove="Diagnostics\LogMessagesWindow.xaml" />    
