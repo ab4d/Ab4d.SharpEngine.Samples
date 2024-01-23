@@ -157,8 +157,7 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
             IsChecked = true
         };
 
-        checkBox1.Checked += OnMouseDraggingCheckBoxCheckedChanged;
-        checkBox1.Unchecked += OnMouseDraggingCheckBoxCheckedChanged;
+        checkBox1.IsCheckedChanged += OnMouseDraggingCheckBoxCheckedChanged;
 
         stackPanel.Children.Add(checkBox1);
 
@@ -169,8 +168,7 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
             IsChecked = true
         };
 
-        checkBox2.Checked += OnCheckCollisionCheckBoxCheckedChanged;
-        checkBox2.Unchecked += OnCheckCollisionCheckBoxCheckedChanged;
+        checkBox2.IsCheckedChanged += OnCheckCollisionCheckBoxCheckedChanged;
 
         stackPanel.Children.Add(checkBox2);
 
@@ -203,15 +201,15 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
         base.OnDisposed();
     }
 
-    private void OnMouseDraggingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+    private void OnMouseDraggingCheckBoxCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        var checkBox = (CheckBox)sender;
-        isMouseDraggingEnabled = checkBox.IsChecked ?? false;
+        if (sender is CheckBox checkBox) 
+            isMouseDraggingEnabled = checkBox.IsChecked ?? false;
     }
 
-    private void OnCheckCollisionCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
+    private void OnCheckCollisionCheckBoxCheckedChanged(object? sender, RoutedEventArgs e)
     {
-        var checkBox = (CheckBox)sender;
-        isCollisionDetectionEnabled = checkBox.IsChecked ?? false;
+        if (sender is CheckBox checkBox) 
+            isCollisionDetectionEnabled = checkBox.IsChecked ?? false;
     }
 }
