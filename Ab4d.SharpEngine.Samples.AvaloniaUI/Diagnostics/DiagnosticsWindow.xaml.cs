@@ -99,7 +99,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             this.Closing += OnClosing;
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        private void OnLoaded(object? sender, RoutedEventArgs routedEventArgs)
         {
             UpdateEnabledMenuItems();
         }
