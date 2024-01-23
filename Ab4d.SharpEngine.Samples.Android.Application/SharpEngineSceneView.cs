@@ -86,7 +86,10 @@ namespace AndroidApp1
 
         public override void Draw(Canvas? canvas)
         {
-			if (SceneView != null && canvas != null && (SceneView.Width != canvas.Width || SceneView.Height != canvas.Height))
+			if (canvas == null)
+				return;
+
+			if (SceneView != null && (SceneView.Width != canvas.Width || SceneView.Height != canvas.Height))
             {
                 Log.Info?.Write(LogArea, $"SurfaceSizeChanged: SceneView: {SceneView.Width} x {SceneView.Height}; Surface: {canvas.Width} x {canvas.Height}");
                 SurfaceSizeChangedAction?.Invoke();
