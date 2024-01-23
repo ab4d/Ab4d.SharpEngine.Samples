@@ -36,15 +36,17 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             InitializeComponent();
 
             _winUIMarkdownTextCreator = new WinUIMarkdownTextCreator();
-            _winUIMarkdownTextCreator.ErrorWriterAction = delegate (string errorMessage)
-            {
-                var messageDialog = new MessageDialog("Markdown error:\r\n" + errorMessage);
-                messageDialog.ShowAsync();
-            };
+            _winUIMarkdownTextCreator.ErrorWriterAction = ErrorWriterAction;
 
             var textBlock = _winUIMarkdownTextCreator.Create("");
 
             MarkdownScrollViewer.Content = textBlock;
+        }
+
+        private async void ErrorWriterAction(string errorMessage)
+        {
+            var messageDialog = new MessageDialog("Markdown error:\r\n" + errorMessage);
+            await messageDialog.ShowAsync();
         }
 
         private void UpdateMarkdownText()
