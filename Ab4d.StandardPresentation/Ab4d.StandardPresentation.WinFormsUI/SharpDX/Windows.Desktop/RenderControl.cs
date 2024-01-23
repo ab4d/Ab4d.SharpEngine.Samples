@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -56,7 +57,7 @@ namespace Ab4d.StandardPresentation.WinFormsUI.SharpDX.Windows.Desktop
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            if (DesignMode)
+            if (DesignMode && OperatingSystem.IsWindows())
             {
                 if (fontForDesignMode == null)
                     fontForDesignMode = new Font("Calibri", 24, FontStyle.Regular);
