@@ -89,14 +89,21 @@ namespace AndroidDemo
 
 
             // Check if the BLUETOOTH_CONNECT permission is granted (this is required when using SilkActivity in Android 12+)
-            if (CheckSelfPermission(Android.Manifest.Permission.BluetoothConnect) != Android.Content.PM.Permission.Granted)
+            if (Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.S) // BluetoothConnect is only supported on Android 31+
             {
-                RequestPermissions(new string[] { Android.Manifest.Permission.BluetoothConnect }, 0);
+                #pragma warning disable CA1416 // Prevent warning: "This call site is reachable on: 'Android' 28.0 and later. 'Manifest.Permission.BluetoothConnect' is only supported on: 'android' 31.0 and later." - this was prevented in the "if" above
+                if (CheckSelfPermission(Android.Manifest.Permission.BluetoothConnect) != Android.Content.PM.Permission.Granted)
+                {
+                    RequestPermissions(new string[] { Android.Manifest.Permission.BluetoothConnect }, 0);
+                }
+                #pragma warning restore CA1416
             }
 
             // See: https://developer.android.com/training/gestures/scale#java
             _myScaleListener = new MyScaleListener();
-            _scaleGestureDetector = new ScaleGestureDetector(this.ApplicationContext, _myScaleListener);
+
+            if (this.ApplicationContext != null)
+                _scaleGestureDetector = new ScaleGestureDetector(this.ApplicationContext, _myScaleListener);
 
             base.OnCreate(savedInstanceState);
         }
