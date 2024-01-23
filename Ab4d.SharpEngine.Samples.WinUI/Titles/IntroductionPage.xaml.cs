@@ -23,6 +23,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
+#pragma warning disable CS0162 // Unreachable code detected
+
         public IntroductionPage()
         {
             // Setup logger (before calling InitializeComponent so log events from SharpEngineSceneView can be also logged)
@@ -37,6 +39,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
                 MainSceneView.PresentationType = PresentationTypes.None;
                 return;
             }
+
             
 
 #if DEBUG
@@ -90,6 +93,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
                 MainSceneView.Dispose();
             };
         }
+
+#pragma warning restore CS0162 // Unreachable code detected
 
         private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)
         {

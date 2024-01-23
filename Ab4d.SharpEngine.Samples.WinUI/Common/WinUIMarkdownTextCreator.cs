@@ -171,23 +171,23 @@ public class WinUIMarkdownTextCreator : MarkdownTextCreator<TextBlock>
 
         AddCurrentTextToInline();
 
-        return; // UH: When adding InlineUIContainer with Image, an exception is thrown: Item does not fall withing a valid range
-
-        source = FileUtils.FixDirectorySeparator(source);
-
-        if (!System.IO.Path.IsPathRooted(source))
-            source = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, source);
-
-        var bitmapImage = new BitmapImage(new Uri(source, UriKind.Absolute));
+        // UH: When adding InlineUIContainer with Image, an exception is thrown: Item does not fall withing a valid range
         
-        var image = new Image();
-        image.Source = bitmapImage;
-        image.Stretch = Stretch.None;
+        //source = FileUtils.FixDirectorySeparator(source);
 
-        var inlineUiContainer = new InlineUIContainer();
-        inlineUiContainer.Child = image;
+        //if (!System.IO.Path.IsPathRooted(source))
+        //    source = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, source);
 
-        _textBlock.Inlines.Add(inlineUiContainer);
+        //var bitmapImage = new BitmapImage(new Uri(source, UriKind.Absolute));
+        
+        //var image = new Image();
+        //image.Source = bitmapImage;
+        //image.Stretch = Stretch.None;
+
+        //var inlineUiContainer = new InlineUIContainer();
+        //inlineUiContainer.Child = image;
+
+        //_textBlock.Inlines.Add(inlineUiContainer);
     }
 
     [MemberNotNull(nameof(_textBlock))]
