@@ -729,27 +729,30 @@ public class MultiSceneNodesSample : CommonSample
         string fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
 
         //var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
-        var blackBitmapFont = CreateBitmapFont(fontFileName, scene.GpuDevice.DefaultBitmapIO);
-
-        if (blackBitmapFont != null)
+        if (scene.GpuDevice != null && scene.GpuDevice.DefaultBitmapIO != null)
         {
-            var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO)
+            var blackBitmapFont = CreateBitmapFont(fontFileName, scene.GpuDevice.DefaultBitmapIO);
+
+            if (blackBitmapFont != null)
             {
-                CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
-            };
+                var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO)
+                {
+                    CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
+                };
 
-            _disposables.Add(blackBitmapTextCreator);
+                _disposables.Add(blackBitmapTextCreator);
 
-            var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
-                                                                  position: text1Position - new Vector3(0, textSize.Y + 20, 0),
-                                                                  positionType: PositionTypes.TopLeft,
-                                                                  textDirection: new Vector3(1, 0, 0),
-                                                                  upDirection: new Vector3(0, 1, 0),
-                                                                  fontSize: 50,
-                                                                  textColor: Colors.Orange,
-                                                                  isSolidColorMaterial: false);
+                var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
+                                                                      position: text1Position - new Vector3(0, textSize.Y + 20, 0),
+                                                                      positionType: PositionTypes.TopLeft,
+                                                                      textDirection: new Vector3(1, 0, 0),
+                                                                      upDirection: new Vector3(0, 1, 0),
+                                                                      fontSize: 50,
+                                                                      textColor: Colors.Orange,
+                                                                      isSolidColorMaterial: false);
 
-            scene.RootNode.Add(textNode3);
+                scene.RootNode.Add(textNode3);
+            }
         }
 
 
@@ -761,7 +764,7 @@ public class MultiSceneNodesSample : CommonSample
 
         var blackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
 
-        if (blackWithOutlineBitmapFont != null)
+        if (blackWithOutlineBitmapFont != null && scene.GpuDevice != null && scene.GpuDevice.DefaultBitmapIO != null)
         {
             var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, blackWithOutlineBitmapFont, scene.GpuDevice.DefaultBitmapIO)
             {
