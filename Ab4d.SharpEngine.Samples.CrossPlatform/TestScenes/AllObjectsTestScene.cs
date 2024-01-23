@@ -279,21 +279,24 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
 
             // TEST crating custom texture
-            var customTexture = CreateCustomTexture(_scene.GpuDevice, 256, 128, alphaValue: 1);
-
-            var customTextureMaterial = new StandardMaterial(customTexture, CommonSamplerTypes.Clamp, "CustomTextureMaterial");
-
-            var planeModelNode = new PlaneModelNode("TestCustomTexturePlane")
+            if (_scene.GpuDevice != null)
             {
-                Position = new Vector3(0, 100, 0),
-                Size = new Vector2(100, 50),
-                Normal = new Vector3(0, 0, 1),
-                HeightDirection = new Vector3(0, 1, 0),
-                Material = customTextureMaterial,
-                BackMaterial = StandardMaterials.Black,
-            };
+                var customTexture = CreateCustomTexture(_scene.GpuDevice, 256, 128, alphaValue: 1);
 
-            texturedMaterialGroup.Add(planeModelNode);
+                var customTextureMaterial = new StandardMaterial(customTexture, CommonSamplerTypes.Clamp, "CustomTextureMaterial");
+
+                var planeModelNode = new PlaneModelNode("TestCustomTexturePlane")
+                {
+                    Position = new Vector3(0, 100, 0),
+                    Size = new Vector2(100, 50),
+                    Normal = new Vector3(0, 0, 1),
+                    HeightDirection = new Vector3(0, 1, 0),
+                    Material = customTextureMaterial,
+                    BackMaterial = StandardMaterials.Black,
+                };
+
+                texturedMaterialGroup.Add(planeModelNode);
+            }
 
 
             //// Test code that created a texture material that is never used and will be disposed in finalizer:
