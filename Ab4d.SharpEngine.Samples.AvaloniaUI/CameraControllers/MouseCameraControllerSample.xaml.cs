@@ -232,7 +232,10 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             if (_mouseCameraController == null)
                 return;
 
-            _mouseCameraController.MouseWheelDistanceChangeFactor = (float)MouseWheelDistanceChangeFactorComboBox.SelectedItem;
+            var selectedItem = MouseWheelDistanceChangeFactorComboBox.SelectedItem;
+
+            if (selectedItem != null)
+                _mouseCameraController.MouseWheelDistanceChangeFactor = (float)selectedItem;
         }
 
         private void MouseMoveThresholdComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -240,7 +243,10 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             if (_mouseCameraController == null)
                 return;
 
-            _mouseCameraController.MouseMoveThreshold = (float)MouseMoveThresholdComboBox.SelectedItem;
+            var selectedItem = MouseMoveThresholdComboBox.SelectedItem;
+
+            if (selectedItem != null)
+                _mouseCameraController.MouseMoveThreshold = (float)selectedItem;
         }
 
         private void MaxCameraDistanceComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
