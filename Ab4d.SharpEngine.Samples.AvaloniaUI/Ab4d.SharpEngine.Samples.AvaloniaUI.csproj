@@ -14,9 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.6" />
+    <PackageReference Include="Avalonia" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.7" />
     <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
     <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="1.0.8740" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
