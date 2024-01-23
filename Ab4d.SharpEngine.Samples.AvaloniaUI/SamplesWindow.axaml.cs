@@ -34,21 +34,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         //private string? _startupPage = "CameraControllers.MouseCameraControllerSample";        
         private string? _startupPage = null;
 
-        private DirectionalLight? _directionalLight;
-        private TargetPositionCamera? _targetPositionCamera;
-        private MouseCameraController? _mouseCameraController;
-        private SkiaSharpBitmapIO? _skiaSharpBitmapIo;
-
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
         private CommonTitleUserControl? _commonTitlePage;
         private Dictionary<Assembly, string[]>? _assemblyEmbeddedResources;
 
-        private AxisLineNode? _axisLineNode;
-
         private SolidColorBrush _samplesListTextBrush = new SolidColorBrush(Color.FromRgb(204, 204, 204));        // #CCC
         private SolidColorBrush _samplesListHeaderTextBrush = new SolidColorBrush(Color.FromRgb(238, 238, 238));  // #EEE
-        private SolidColorBrush _samplesListSelectedTextBrush = new SolidColorBrush(Color.FromRgb(255, 187, 88)); // #FFBC57
 
         private bool _applySeparator;
 
@@ -606,7 +598,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 // Check each child of a Panel
                 if (itemsControl.Items != null)
                 {
-                    foreach (object oneItem in itemsControl.Items)
+                    foreach (object? oneItem in itemsControl.Items)
                     {
                         if (oneItem is Control control)
                         {
@@ -621,15 +613,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             else if (element is Panel panel)
             {
                 // Check each child of a Panel
-                foreach (object oneChild in panel.Children)
+                foreach (var oneControl in panel.Children.OfType<Control>())
                 {
-                    if (oneChild is Control control)
-                    {
-                        foundDViewportView = FindSharpEngineSceneView(control);
+                    foundDViewportView = FindSharpEngineSceneView(oneControl);
 
-                        if (foundDViewportView != null)
-                            break;
-                    }
+                    if (foundDViewportView != null)
+                        break;
                 }
             }
 

@@ -36,8 +36,6 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
     private List<AvaloniaUIElement> _rootUIElements;
 
-    private Func<string, bool>? _keyDownFunc;
-
     public double StandardMargin { get; private set; }
     public double HeaderTopMargin { get; private set; }
     public double HeaderBottomMarin { get; private set; }
