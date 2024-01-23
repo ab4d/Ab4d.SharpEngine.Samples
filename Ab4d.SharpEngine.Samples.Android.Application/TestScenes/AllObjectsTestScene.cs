@@ -68,8 +68,6 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private DisposeList _disposables;
 
-        private int _loadedObjectsCount;
-
 #if ADVANCED_TIME_MEASUREMENT
         private DateTime _startTime;
         private static double _loadBitmapFontsTime;
