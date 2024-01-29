@@ -74,6 +74,9 @@ public class SphereModelNodeSample : StandardModelsSampleBase
                         () => _sphereSegmentsCount,
                         newValue =>
                         {
+                            if (_sphereSegmentsCount == (int)newValue)
+                                return; // Do no update when only decimal part of the value is changed
+                            
                             _sphereSegmentsCount = (int)newValue;
                             UpdateModelNode();
                         },

@@ -104,6 +104,9 @@ public class ArrowModelNodeSample : StandardModelsSampleBase
             () => _segmentsCount,
             newValue =>
             {
+                if (_segmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _segmentsCount = (int)newValue;
                 UpdateModelNode();
             },

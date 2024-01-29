@@ -9,9 +9,9 @@ public class BoxModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "BoxModelNode";
 
-    private int _xSegmentsCount = 5;
-    private int _ySegmentsCount = 2;
-    private int _zSegmentsCount = 4;
+    private int _xSegmentsCount = 1;
+    private int _ySegmentsCount = 1;
+    private int _zSegmentsCount = 1;
 
     private BoxModelNode? _boxModelNode;
 
@@ -87,6 +87,9 @@ public class BoxModelNodeSample : StandardModelsSampleBase
             () => _xSegmentsCount,
             newValue =>
             {
+                if (_xSegmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _xSegmentsCount = (int)newValue;
                 UpdateModelNode();
             },
@@ -98,6 +101,9 @@ public class BoxModelNodeSample : StandardModelsSampleBase
             () => _ySegmentsCount,
             newValue =>
             {
+                if (_ySegmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _ySegmentsCount = (int)newValue;
                 UpdateModelNode();
             },
@@ -109,6 +115,9 @@ public class BoxModelNodeSample : StandardModelsSampleBase
             () => _zSegmentsCount,
             newValue =>
             {
+                if (_zSegmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _zSegmentsCount = (int)newValue;
                 UpdateModelNode();
             },

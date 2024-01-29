@@ -135,6 +135,9 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
             () => _widthSegmentsCount,
             newValue =>
             {
+                if (_widthSegmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _widthSegmentsCount = (int)newValue;
                 UpdateModelNode();
             },
@@ -147,6 +150,9 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
             () => _heighSegmentsCount,
             newValue =>
             {
+                if (_heighSegmentsCount == (int)newValue)
+                    return; // Do no update when only decimal part of the value is changed
+                
                 _heighSegmentsCount = (int)newValue;
                 UpdateModelNode();
             },
