@@ -74,7 +74,14 @@ public class WireframeRenderingSample : CommonSample
 
         base.OnSceneViewInitialized(sceneView);
     }
-    
+
+    //protected override void OnDisposed()
+    //{
+    //    RemoveWireframeRenderingStep();
+
+    //    base.OnDisposed();
+    //}
+
     private void RecreateWireframe()
     {
         switch (_wireframeRenderingTechnique)
@@ -89,12 +96,12 @@ public class WireframeRenderingSample : CommonSample
             case WireframeRenderingTechniques.UseLineMaterial:
                 CreateSceneNodesWithLineMaterial();
                 break;
-            
+
             // The following will be available with v1.1:
-            // case WireframeRenderingTechniques.WireframeRenderingStep:
-            //     CreateWireframeRenderingStep();
-            //     break;            
-            
+            //case WireframeRenderingTechniques.WireframeRenderingStep:
+            //    CreateWireframeRenderingStep();
+            //    break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -154,6 +161,14 @@ public class WireframeRenderingSample : CommonSample
                             allColoredLinePositions.Add(lineColor, linePositions);
                         }
 
+                        // Some ModelNodes use mesh transform to transform a mesh without changing the Transform property.
+                        // For example this is used for BoxModelNode where shared 1x1x1 box mesh is used and this is then transformed to its final position and size by mesh transform.
+                        // In case this modelNode us mesh transform, add it to the current transformation.
+                        var meshTransform = modelNode.GetMeshTransform();
+                        if (meshTransform != null && !meshTransform.IsIdentity)
+                            transformMatrix *= meshTransform.Value;
+
+
                         // Add wireframe positions for the current SceneNode's Mesh to the linePositions
 
                         // NOTE:
@@ -205,6 +220,13 @@ public class WireframeRenderingSample : CommonSample
                         // Create a new MeshModelNode from each ModelNode but use LineMaterial instead of StandardMaterial
                         var wireframeModelNode = new MeshModelNode(mesh, lineMaterial);
 
+                        // Some ModelNodes use mesh transform to transform a mesh without changing the Transform property.
+                        // For example this is used for BoxModelNode where shared 1x1x1 box mesh is used and this is then transformed to its final position and size by mesh transform.
+                        // In case this modelNode us mesh transform, add it to the current transformation.
+                        var meshTransform = modelNode.GetMeshTransform();
+                        if (meshTransform != null && !meshTransform.IsIdentity)
+                            transformMatrix *= meshTransform.Value;
+
                         if (!transformMatrix.IsIdentity)
                             wireframeModelNode.Transform = new MatrixTransform(transformMatrix);
 
@@ -214,31 +236,39 @@ public class WireframeRenderingSample : CommonSample
             });
     }
 
-    // The following will be available with v1.1:
-    // private void CreateWireframeRenderingStep()
-    // {
-    //     if (Scene == null || SceneView == null || _testSceneNode == null || SceneView.DefaultRenderObjectsRenderingStep == null)
-    //         return;
-    //
-    //     Scene.RootNode.Clear();
-    //     Scene.RootNode.Add(_testSceneNode);
-    //
-    //     var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(Scene, "CustomWireframeRenderingEffectTechnique")
-    //     {
-    //         UseLineColorFromDiffuseColor = false,
-    //
-    //         LineColor = Color4.Black,
-    //         LineThickness = _lineThickness,
-    //         
-    //         // Use default values:
-    //         DepthBias = 0,
-    //         LinePattern = 0,
-    //         LinePatternScale = 1,
-    //         LinePatternOffset = 0,
-    //     };
-    //
-    //     SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
-    // }
+    //// The following will be available with v1.1:
+    //private void CreateWireframeRenderingStep()
+    //{
+    //    if (Scene == null || SceneView == null || _testSceneNode == null || SceneView.DefaultRenderObjectsRenderingStep == null)
+    //        return;
+
+    //    Scene.RootNode.Clear();
+    //    Scene.RootNode.Add(_testSceneNode);
+
+    //    var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(Scene, "CustomWireframeRenderingEffectTechnique")
+    //    {
+    //        UseLineColorFromDiffuseColor = !_useSingleColorLines,
+
+    //        LineColor = Color4.Black,
+    //        LineThickness = _lineThickness,
+
+    //        // Use default values:
+    //        DepthBias = 0,
+    //        LinePattern = 0,
+    //        LinePatternScale = 1,
+    //        LinePatternOffset = 0,
+    //    };
+
+    //    SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
+    //}
+
+    //private void RemoveWireframeRenderingStep()
+    //{
+    //    if (SceneView == null || SceneView.DefaultRenderObjectsRenderingStep == null)
+    //        return;
+
+    //    SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = null;
+    //}
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -246,13 +276,16 @@ public class WireframeRenderingSample : CommonSample
 
         ui.CreateLabel("Wireframe rendering technique:", isHeader: true);
 
-        ui.CreateComboBox(new string[] {"Create wireframe positions", "Use LineMaterial"}, 
+        ui.CreateComboBox(new string[] {"Create wireframe positions", "Use LineMaterial", "WireframeRenderingStep"}, 
             (selectedIndex, selectedText) =>
             {
+                //if (_wireframeRenderingTechnique == WireframeRenderingTechniques.WireframeRenderingStep)
+                //    RemoveWireframeRenderingStep();
+
                 _wireframeRenderingTechnique = (WireframeRenderingTechniques)selectedIndex;
                 RecreateWireframe();
             },
-            selectedItemIndex: 0);
+            selectedItemIndex: 2);
         
                 
         ui.AddSeparator();
