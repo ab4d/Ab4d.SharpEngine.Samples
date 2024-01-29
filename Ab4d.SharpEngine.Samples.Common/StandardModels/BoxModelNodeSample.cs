@@ -127,6 +127,9 @@ public class BoxModelNodeSample : StandardModelsSampleBase
 
 
         ui.CreateLabel("(Default value for Segments is 1)").SetStyle("italic");
+
+
+        AddMeshStatisticsControls(ui, addSharpEdgeInfo: true, sharpEdgeInfoWidth: 240);
     }
 
     private void OnPositionTypeChanged(int index, string? itemText)

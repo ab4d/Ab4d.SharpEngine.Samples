@@ -83,5 +83,7 @@ public class SphereModelNodeSample : StandardModelsSampleBase
                         200);
 
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
+
+        AddMeshStatisticsControls(ui);
     }
 }

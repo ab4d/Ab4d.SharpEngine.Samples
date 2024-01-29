@@ -106,6 +106,8 @@ public class CylinderModelNodeSample : StandardModelsSampleBase
 @"Cylinder is always oriented along Y axis (up).
 If you want to define cylinder in some other 
 direction use TubeLine").SetStyle("italic");
+
+        AddMeshStatisticsControls(ui, addSharpEdgeInfo: true, sharpEdgeInfoWidth: 280);
     }
 
     private void OnIsSmoothChanged(bool isChecked)

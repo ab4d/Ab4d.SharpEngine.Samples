@@ -89,5 +89,6 @@ public class PyramidModelNodeSample : StandardModelsSampleBase
             keyTextWidth: 50,
             formatShownValueFunc: newValue => newValue.ToString("F0"));
 
+        AddMeshStatisticsControls(ui, addSharpEdgeInfo: true);
     }
 }

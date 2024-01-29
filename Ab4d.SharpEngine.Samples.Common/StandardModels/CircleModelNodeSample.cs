@@ -123,6 +123,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             formatShownValueFunc: newValue => ((int)newValue).ToString());
 
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
+
+        AddMeshStatisticsControls(ui);
     }
 
     private void OnNormalChanged(int itemIndex, Vector3 selectedVector)

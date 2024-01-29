@@ -135,5 +135,8 @@ public class TrapezoidModelNodeSample : StandardModelsSampleBase
             width: 125,
             keyText: "BottomSize: ",
             keyTextWidth: 140);
+
+
+        AddMeshStatisticsControls(ui, addSharpEdgeInfo: true, sharpEdgeInfoWidth: 280);
     }
 }

@@ -37,6 +37,11 @@ public abstract class StandardModelsSampleBase : CommonSample
     
     protected GpuImage? textureImage;
 
+    protected string positionsCountText = "0";
+    protected string trianglesCountText = "0";
+    private ICommonSampleUIElement? _positionsCountLabel;
+    private ICommonSampleUIElement? _trianglesCountLabel;
+
     public StandardModelsSampleBase(ICommonSamplesContext context)
         : base(context)
     {
@@ -72,6 +77,8 @@ public abstract class StandardModelsSampleBase : CommonSample
 
         UpdateTriangles(standardMesh, meshTransform);
         UpdateNormals(standardMesh, meshTransform);
+
+        UpdateMeshStatistics(standardMesh);
     }
 
     protected virtual void UpdateTriangles(StandardMesh? mesh, Transform? modelTransform)
@@ -151,6 +158,34 @@ public abstract class StandardModelsSampleBase : CommonSample
             ui.CreateLabel(propertiesTitleText, isHeader: true);
 
         OnCreatePropertiesUI(ui);
+    }
+
+    protected virtual void AddMeshStatisticsControls(ICommonSampleUIProvider ui, bool addSharpEdgeInfo = false, float sharpEdgeInfoWidth =  220)
+    {
+        ui.CreateLabel("Stats", isHeader: true);
+        _positionsCountLabel = ui.CreateKeyValueLabel("Positions:", () => positionsCountText, keyTextWidth: 70);
+        _trianglesCountLabel = ui.CreateKeyValueLabel("Triangles:", () => trianglesCountText, keyTextWidth: 70);
+
+        if (addSharpEdgeInfo)
+        {
+            ui.AddSeparator();
+            ui.CreateLabel("To create sharp edges, the positions need to be duplicated so that each position can have normal vector in its own direction (see orange normal lines).", width: sharpEdgeInfoWidth).SetStyle("italic");
+        }
+    }
+    
+    protected virtual void UpdateMeshStatistics(StandardMesh? standardMesh)
+    {
+        uint positionsCount = standardMesh?.VertexCount ?? 0;
+        positionsCountText = positionsCount.ToString();
+
+        uint trianglesCount = (uint)(standardMesh?.IndexCount ?? 0) / 3;
+        trianglesCountText = trianglesCount.ToString();
+
+        if (_positionsCountLabel != null)
+            _positionsCountLabel.UpdateValue();
+        
+        if (_trianglesCountLabel != null)
+            _trianglesCountLabel.UpdateValue();
     }
 
     protected abstract void OnCreatePropertiesUI(ICommonSampleUIProvider ui);

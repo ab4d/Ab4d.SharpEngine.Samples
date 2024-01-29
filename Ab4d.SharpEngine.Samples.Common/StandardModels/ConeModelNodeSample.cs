@@ -119,6 +119,8 @@ public class ConeModelNodeSample : StandardModelsSampleBase
                         formatShownValueFunc: newValue => ((int)newValue).ToString());
 
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
+
+        AddMeshStatisticsControls(ui, addSharpEdgeInfo: true, sharpEdgeInfoWidth: 250);
     }
 
     private void OnIsSmoothChanged(bool isChecked)

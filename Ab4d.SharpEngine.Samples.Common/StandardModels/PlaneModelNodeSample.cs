@@ -175,6 +175,8 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
                 base.UpdateModelNode();
             }
         }).SetToolTip("AlignWithCamera method sets Normal and HeightDirection\nproperties so that the plane is facing the camera.\nNote that in this sample the Normals and HeightDirections\nComboBoxes are not updated after clicking on this button.");
+
+        AddMeshStatisticsControls(ui);
     }
 
     private void OnNormalChanged(int itemIndex, Vector3 selectedVector)
