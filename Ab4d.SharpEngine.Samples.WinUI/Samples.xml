@@ -79,6 +79,7 @@
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
+  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
   <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
   
