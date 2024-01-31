@@ -105,12 +105,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeCommonSample();
 
-            // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
-            // we need to set a custom eventsSourceElement when creating the MouseCameraController
-            _mouseCameraController ??= new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
+            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            {
+                // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
+                // we need to set a custom eventsSourceElement when creating the MouseCameraController
+                _mouseCameraController ??= new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
 
-            if (_currentCommonSample != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                if (_currentCommonSample != null)
+                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            }
         }
 
         private void OnUnloaded(object? sender, RoutedEventArgs e)

@@ -131,10 +131,13 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         {
             InitializeCommonSample();
 
-            _mouseCameraController ??= new MouseCameraController(MainSceneView);
+            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            {
+                _mouseCameraController = new MouseCameraController(MainSceneView);
 
-            if (_currentCommonSample != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                if (_currentCommonSample != null)
+                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            }
 
             _isLoaded = true;
         }
