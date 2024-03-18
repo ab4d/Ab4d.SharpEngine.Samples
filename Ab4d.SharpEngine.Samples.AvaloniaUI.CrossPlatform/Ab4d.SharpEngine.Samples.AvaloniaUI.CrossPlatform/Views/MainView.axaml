@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.ViewModels"
+             xmlns:avaloniaUi="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+    <Grid Name="RootGrid">
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                    <GradientStop Offset="0" Color="White" />
+                    <GradientStop Offset="1" Color="LightSkyBlue" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+      <avaloniaUi:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" />
+
+      <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" BorderBrush="Black" BorderThickness="2" Background="#AAFFFFFF" Margin="5">
+          <StackPanel Orientation="Vertical" Margin="10 5 10 8">
+              <TextBlock Text="Actions:" FontWeight="Bold" Margin="0 5 0 2" />
+
+              <Button Name="AddNewButton" Content="Add new" Margin="0 2 0 2" Click="AddNewButton_OnClick" />
+              <Button Name="RemoveButton" Content="Remove" Margin="0 2 0 2" Click="RemoveButton_OnClick" />
+              <Button Name="ChangeMaterial1Button" Content="Change material 1" Margin="0 2 0 2" Click="ChangeMaterial1Button_OnClick" />
+              <Button Name="ChangeMaterial2Button" Content="Change material 2" Margin="0 2 0 2" Click="ChangeMaterial2Button_OnClick" />
+              <Button Name="ChangeBackgroundButton" Content="Change background" Margin="0 2 0 2" Click="ChangeBackgroundButton_OnClick" />
+          </StackPanel>
+      </Border>
+
+      <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
+          <TextBlock Text="Ab4d.SharpEngine in a cross-platform Avalonia app" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" />
+      </StackPanel>
+    </Grid>
+</UserControl>

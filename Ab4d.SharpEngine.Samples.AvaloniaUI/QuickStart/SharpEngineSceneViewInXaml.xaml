@@ -8,7 +8,7 @@
     <Grid Name="RootGrid">
         <Border>
             <Border.Background>
-                <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                     <GradientStop Offset="0" Color="White" />
                     <GradientStop Offset="1" Color="LightSkyBlue" />
                 </LinearGradientBrush>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-ios</TargetFramework>
+    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <!--Generate CodesignKey: one way to do that is to open the project in Rider. Then right click on project and select open in XCode. There in the Sign tab generate the key.-->
+    <!--<CodesignKey>Apple Development: ...</CodesignKey>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.iOS" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../../lib/MoltenVK/iOS/libMoltenVK.dylib">
+      <Link>libMoltenVK.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
+</Project>
