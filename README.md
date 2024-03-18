@@ -17,7 +17,7 @@ The following features are supported by the current version:
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - ReaderObj to read 3D models from obj files
-- Assimp importer that uses third-party library to import 3D models from almost any file format
+- Assimp importer that uses a third-party library to import 3D models from almost any file format
 
 
 ### Platforms and UI frameworks:
@@ -34,7 +34,7 @@ The following features are supported by the current version:
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
   - Off-screen rendering combined with Linux framebuffer display (FbDev or DRM/KMS).
-  - See ["Vulkan on Resberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Resberry Pi 4 with an external monitor.
+  - See ["Vulkan on Raspberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Raspberry Pi 4 with an external monitor.
   
 **Android:**
   - Using SurfaceView in C# Android Application
@@ -92,6 +92,12 @@ The following Visual Studio solutions are available:
   compose the 3D scene with the Avalonia UI objects (for example showing buttons on top of 3D scene).
   The sample can be started on Windows, Linux and on macOS (use special macos solution).
   See also "Building for macOS and iOS" section for more information on how to compile for macOS.
+
+- **Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform**
+  This sample shows how to create an Avalonia app that can run on Windows, Android and iOS.
+  This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
+  Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
+  See also "Building for macOS and iOS" section for more information on how to compile for isOS.
   
 - **Ab4d.SharpEngine.Samples.WinUI**
   This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
@@ -117,8 +123,7 @@ The following Visual Studio solutions are available:
 
 - **Ab4d.SharpEngine.Samples.Maui**
   This solution uses a NET Maui and can work on Windows, Android, macOS and iOS.
-  Compiling for Windows, Android and macOS requires .Net 7 or newer.
-  Compiling for iOS requires .Net 8 (at the time of writing this preview7 is required).
+  Compiling for Windows, Android and macOS requires .Net 8.
   Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
   See "Building for macOS and iOS" section for more information on how to compile for macOS and iOS.
 
@@ -138,7 +143,7 @@ The main two objects in SharpEngine are:
 
 When using WPF, Avalonia or WinUI, then Scene and SceneView are created by the SharpEngineSceneView control.
 
-3D objects are defined in the SceneNodes namespace, for example BoxModelNode, SphereModelNode, LineNode, MeshModelNode, ect.
+3D objects are defined in the SceneNodes namespace, for example BoxModelNode, SphereModelNode, LineNode, MeshModelNode, etc.
 
 Common materials are defined by using StandardMaterial object. 
 For each color there are predefined StandardMaterials, for example StandardMaterials.Blue.
@@ -210,15 +215,13 @@ Ab3d.PowerToys and Ab3d.DXEngine will still be actively developed, will get new 
 ## Building for macOS and iOS
   
 The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
-- .Net 8 is requried to use Ab4d.SharpEngine on iOS (because function pointers do not work with .Net 7 on iOS). Mac Catalyst can run on .Net 7, but it is recommended to use .Net 8. It is possible to use preview version of .Net 8 - at the time of writing this preview 7 was used.
+- .Net 8 is requried to use Ab4d.SharpEngine on iOS (because function pointers do not work with .Net 7 and previous .Net versions on iOS).
 
-- To use preview version of .Net 8 in Visual Studio for Mac, you need to enable .Net 8. This is done in Preferences / Preview Features / check "Use the .NEt 8 SDK if installed".
+- The 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add a reference to SkiaSharp.Views.Maui.Controls NuGet package. The add ".UseSkiaSharp()" to the builder setup in the MauiProgram.cs file.
 
-- The 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add reference to SkiaSharp.Views.Maui.Controls NuGet package. The add ".UseSkiaSharp()" to the bulder setup in the MauiProgram.cs file.
+- Add libMoltenVK.dylib from the Vulkan SDK to the projects so that the library can be loaded at runtime. Note that there are different builds for iOS and for Catalyst (the latest use the version of macOS).
 
-- Add libMoltenVK.dylib from the Vulkan SDK to the projects so that the library can be loaded at runtime. Note that there are different builds for iOS and for Catalyst (the lates use the version of macOS). When running the version of Mac Catalyst the sample app can also use the library from the installed Vulkan SDK. The preview 7 version of .Net 8 and the Visual Studio for Mac v17.6 can sometimes produce "clang++ exited with code 1" error when compiling. I do not know why this happens and how to solve that. Sometimes it helps to delete obj and bin folder and restart the Visual Studio. If this do not help, remove the inclusion of libMoltenVK.dylib for Catalyst - in this case install the Vulkan SKD to the computer and the Catalyst app will use the library from Vulkan SKD folder.
-
-- To run the app in iOS, the application need to have provisioning profile set. One option is to follow the instructions on the following page: https://learn.microsoft.com/en-us/dotnet/maui/ios/capabilities?tabs=vs Another option is to open the project in the Rider IDE, then right-click on the project and select "Open in Xcode". Rider will create the Xcode project file and open it in Xcode. There you can click on the project file and in the "Certificates, Identifiers & Profiles" tab create an ad-hoc provisioning profile (allow having up to 3 development apps installed at the same time). See more: https://developer.apple.com/help/account/manage-profiles/create-a-development-provisioning-profile/ Note that to create the provisioning profile, the ApplicationId (in csproj file) needs to be in a form of "com.companyName.appName" - this is then used as a Bundle Id.
+- To run the app in iOS, the application needs to have a provisioning profile set. One option is to follow the instructions on the following page: [Create a provisioning profile](https://learn.microsoft.com/en-us/dotnet/maui/ios/capabilities?view=net-maui-8.0&tabs=vs#create-a-provisioning-profile). Another option is to open the project in the Rider IDE, then right-click on the project and select "Open in Xcode". Rider will create the Xcode project file and open it in Xcode. There you can click on the project file and in the "Certificates, Identifiers & Profiles" tab create an ad-hoc provisioning profile (allow having up to 3 development apps installed at the same time). See more: [Create a development provisioning profile](https://developer.apple.com/help/account/manage-profiles/create-a-development-provisioning-profile/). Note that to create the provisioning profile, the ApplicationId (in csproj file) needs to be in a form of "com.companyName.appName" - this is then used as a Bundle Id.
 
 
 
