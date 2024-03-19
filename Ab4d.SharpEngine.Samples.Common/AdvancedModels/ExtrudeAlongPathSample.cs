@@ -122,14 +122,27 @@ public class ExtrudeAlongPathSample : CommonSample
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
 
-        var textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: true\nisSmooth: true", new Vector3(-170, 0, 20), textAttitude: 30);
+        var textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: true\nisSmooth: true", new Vector3(-170, 10, 30), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: false\nisSmooth: false", new Vector3(-20, 0, 20), textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: false\nisSmooth: false", new Vector3(-20, 10, 30), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock("T shape\nisClosed: true\nisSmooth: false", new Vector3(130, 0, 20), textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("T shape\nisClosed: true\nisSmooth: false", new Vector3(130, 10, 30), textAttitude: 30);
         scene.RootNode.Add(textNode);
+
+
+        var wireGridNode = new WireGridNode()
+        {
+            CenterPosition = new Vector3(0, -5, -50),
+            Size = new Vector2(600, 300),
+            WidthCellsCount = 12,
+            HeightCellsCount = 6,
+            MajorLineColor = Colors.DimGray,
+            MajorLineThickness = 2
+        };
+
+        scene.RootNode.Add(wireGridNode);
         
 
         if (targetPositionCamera != null)
