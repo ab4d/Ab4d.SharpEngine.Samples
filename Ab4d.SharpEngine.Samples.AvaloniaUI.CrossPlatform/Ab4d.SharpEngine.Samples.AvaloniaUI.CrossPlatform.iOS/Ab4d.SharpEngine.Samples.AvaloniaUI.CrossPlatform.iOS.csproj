@@ -23,5 +23,10 @@
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>  
+  </ItemGroup>
+  
+	<!-- Minimum .Net app Privacy manifest for ios. See: https://devblogs.microsoft.com/dotnet/apple-privacy-manifest-support/ -->
+	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<BundleResource Include="PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
+	</ItemGroup>	    
 </Project>
