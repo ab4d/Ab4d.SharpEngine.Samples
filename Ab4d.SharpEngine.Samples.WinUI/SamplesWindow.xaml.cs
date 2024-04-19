@@ -356,15 +356,19 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 return;
             }
 
-
-            RightSideBorder.Child = _currentSampleControl;
-
+            // Set WinUISamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
             if (_currentSampleControl != null)
             {
-                // Find SharpEngineSceneView
-                var sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+                SharpEngineSceneView? sharpEngineSceneView;
+                if (ReferenceEquals(_currentSampleControl, _commonWinUISampleUserControl))
+                    sharpEngineSceneView = _commonWinUISampleUserControl.MainSharpEngineSceneView;
+                else
+                    sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+
                 WinUISamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             }
+
+            RightSideBorder.Child = _currentSampleControl;
         }
 
         private string? GetMarkdownText(string location)

@@ -56,6 +56,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                     InitializeCommonSample();
             }
         }
+        
+        public SharpEngineSceneView MainSharpEngineSceneView => MainSceneView;
 
         public CommonWinUISampleUserControl()
         {

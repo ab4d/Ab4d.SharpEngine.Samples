@@ -355,15 +355,19 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return;
             }
 
-
-            SelectedSampleContentControl.Content = _currentSampleControl;
-
+            // Set AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
             if (_currentSampleControl != null)
             {
-                // Find SharpEngineSceneView
-                var sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+                SharpEngineSceneView? sharpEngineSceneView;
+                if (ReferenceEquals(_currentSampleControl, _commonAvaloniaSampleUserControl))
+                    sharpEngineSceneView = _commonAvaloniaSampleUserControl.MainSceneView;
+                else
+                    sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+
                 AvaloniaSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             }
+
+            SelectedSampleContentControl.Content = _currentSampleControl;
         }
 
         private string? GetMarkdownText(string location)
