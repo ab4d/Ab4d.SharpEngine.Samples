@@ -101,9 +101,17 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 // When content of ContentFrame is changed, we try to find the SharpEngineSceneView control
                 // that is defined by the newly shown content.
 
-                // Find SharpEngineSceneView
-                var sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
-                WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+                // Set WpfSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
+                if (_currentCommonSample != null)
+                {
+                    SharpEngineSceneView? sharpEngineSceneView;
+                    if (_commonWpfSamplePage != null && ReferenceEquals(_commonWpfSamplePage.CurrentCommonSample, _currentCommonSample))
+                        sharpEngineSceneView = _commonWpfSamplePage.MainSceneView;
+                    else
+                        sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
+
+                    WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+                }                
             };
 
 
@@ -176,7 +184,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 var commonSamplesContext = WpfSamplesContext.Current;
                 var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
 
-                _commonWpfSamplePage ??= new CommonWpfSamplePage();
+                if (_commonWpfSamplePage == null)
+                {
+                    _commonWpfSamplePage = new CommonWpfSamplePage();
+                    WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(_commonWpfSamplePage.MainSceneView);
+                }
                 
                 if (_currentSampleXaml != null || ContentFrame.Content == null)
                 {
