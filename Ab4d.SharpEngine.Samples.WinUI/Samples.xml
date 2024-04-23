@@ -27,6 +27,7 @@
   <Sample Location="HitTesting.WinUIManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.WinUILineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.WinUIRayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.WinUIHitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>

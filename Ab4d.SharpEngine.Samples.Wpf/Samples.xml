@@ -28,6 +28,7 @@
   <Sample Location="HitTesting.WpfManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.WpfLineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.WpfRayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.WpfHitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
