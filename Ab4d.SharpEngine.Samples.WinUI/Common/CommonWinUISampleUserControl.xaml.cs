@@ -68,7 +68,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
 
 
-            _wpfUiProvider = new WinUIProvider(RootGrid);
+            _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;

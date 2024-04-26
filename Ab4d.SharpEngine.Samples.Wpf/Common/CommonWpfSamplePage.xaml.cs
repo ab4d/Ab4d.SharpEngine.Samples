@@ -48,7 +48,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         {
             InitializeComponent();
 
-            _wpfUiProvider = new WpfUIProvider(RootGrid);
+            _wpfUiProvider = new WpfUIProvider(RootGrid, mouseEventsSource: MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;

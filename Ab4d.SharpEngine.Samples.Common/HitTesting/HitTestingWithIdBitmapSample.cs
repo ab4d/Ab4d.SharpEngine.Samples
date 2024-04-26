@@ -25,7 +25,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // - when camera is rotated, then new ID bitmap must be generated for each frame.
 
 
-public abstract class HitTestingWithIdBitmapSample : CommonSample
+public class HitTestingWithIdBitmapSample : CommonSample
 {
     public override string Title => "Hit-testing with rendering to ID bitmap";
     public override string? Subtitle => "Rotate the camera with left mouse button to render new ID bitmap.";
@@ -64,14 +64,11 @@ public abstract class HitTestingWithIdBitmapSample : CommonSample
     private DateTime _lastCameraChangedTime;
     private Stopwatch _renderStopwatch = new Stopwatch();
 
-    
-    protected HitTestingWithIdBitmapSample(ICommonSamplesContext context)
+
+    public HitTestingWithIdBitmapSample(ICommonSamplesContext context)
         : base(context)
     {
     }
-
-    // The following method need to be implemented in a derived class:
-    protected abstract void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView);
 
     protected override void OnCreateScene(Scene scene)
     {
@@ -128,12 +125,12 @@ public abstract class HitTestingWithIdBitmapSample : CommonSample
         }
     }
 
-    protected void ProcessMouseMove(Vector2 mousePosition)
+    protected void ProcessPointerMove(Vector2 pointerPosition)
     {
         if (SceneView == null)
             return;
 
-        _lastMousePosition = mousePosition;
+        _lastMousePosition = pointerPosition;
 
         _mousePositionLabel?.UpdateValue();
 
@@ -148,8 +145,8 @@ public abstract class HitTestingWithIdBitmapSample : CommonSample
         if (_rawRenderedBitmap != null && !_isIdBitmapDirty)
         {
             // Adjust for DPI scale (rendered image is bigger than max mouse coordinate)
-            int idBitmapX = (int)(mousePosition.X * SceneView.DpiScaleX);
-            int idBitmapY = (int)(mousePosition.Y * SceneView.DpiScaleY);
+            int idBitmapX = (int)(pointerPosition.X * SceneView.DpiScaleX);
+            int idBitmapY = (int)(pointerPosition.Y * SceneView.DpiScaleY);
 
             if (idBitmapX < 0 || idBitmapX > _rawRenderedBitmap.Width ||
                 idBitmapY < 0 || idBitmapY > _rawRenderedBitmap.Height)
@@ -403,7 +400,6 @@ public abstract class HitTestingWithIdBitmapSample : CommonSample
         return objectIndex;
     }
 
-
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
@@ -428,7 +424,7 @@ public abstract class HitTestingWithIdBitmapSample : CommonSample
             SaveIdBitmap();
         }, width: 185);
         
-        if (context.CurrentSharpEngineSceneView != null)
-            SubscribeMouseEvents(context.CurrentSharpEngineSceneView);
+        // Subscribe to mouse (pointer) moved
+        ui.RegisterPointerMoved(ProcessPointerMove);
     }
 }

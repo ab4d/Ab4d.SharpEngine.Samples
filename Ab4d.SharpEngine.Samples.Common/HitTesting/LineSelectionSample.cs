@@ -7,10 +7,7 @@ using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-// This sample must be derived from to subscribe to mouse events - this is platform specific and 
-// needs to be done differently for WPF, Avalonia and WinUI
-
-public abstract class LineSelectionSample : CommonSample
+public class LineSelectionSample : CommonSample
 {
     public override string Title => "Line Selection sample";
 
@@ -45,9 +42,6 @@ public abstract class LineSelectionSample : CommonSample
         RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
         MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
     }
-
-    // The following method need to be implemented in a derived class:
-    protected abstract void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView);
 
     protected override void OnCreateScene(Scene scene)
     {
@@ -102,7 +96,7 @@ public abstract class LineSelectionSample : CommonSample
         UpdateClosestLine();
     }
 
-    protected void ProcessMouseMove(Vector2 mousePosition)
+    protected void ProcessPointerMove(Vector2 mousePosition)
     {
         _lastMousePosition = mousePosition;
         UpdateClosestLine();
@@ -333,7 +327,7 @@ public abstract class LineSelectionSample : CommonSample
 
         _startStopCameraButton = ui.CreateButton("Stop camera rotation", () => StartStopCameraRotation());
 
-        if (context.CurrentSharpEngineSceneView != null)
-            SubscribeMouseEvents(context.CurrentSharpEngineSceneView);
+        // Subscribe to mouse (pointer) moved
+        ui.RegisterPointerMoved(ProcessPointerMove); 
     }
 }

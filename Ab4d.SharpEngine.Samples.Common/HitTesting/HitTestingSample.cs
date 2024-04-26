@@ -9,10 +9,7 @@ using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-// This sample must be derived from to subscribe to mouse events - this is platform specific and 
-// needs to be done differently for WPF, Avalonia and WinUI
-
-public abstract class HitTestingSample : CommonSample
+public class HitTestingSample : CommonSample
 {
     public override string Title => "Simple hit-testing sample";
 
@@ -44,10 +41,6 @@ public abstract class HitTestingSample : CommonSample
         RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
         MoveCameraConditions= MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
     }
-
-
-    // The following method need to be implemented in a derived class:
-    protected abstract void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView);
 
     protected override void OnCreateScene(Scene scene)
     {
@@ -81,12 +74,6 @@ public abstract class HitTestingSample : CommonSample
     private void OnCameraChanged(object? sender, EventArgs args)
     {
         TestHitObjects(_lastMousePosition);
-    }
-
-    protected void ProcessMouseMove(Vector2 mousePosition)
-    {
-        TestHitObjects(mousePosition);
-        _lastMousePosition = mousePosition;
     }
 
     private void TestHitObjects(Vector2 mousePosition)
@@ -187,19 +174,11 @@ public abstract class HitTestingSample : CommonSample
 
         _testObjectsGroup.Add(_teapotModelNode);
     }
-
-    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    
+    private void ProcessPointerMove(Vector2 pointerPosition)
     {
-        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
-
-        ui.CreateRadioButtons(new string[] { "Get only closest hit positions", "Get all hit positions" }, (selectedIndex, selectedText) => _getAllHitObjects = selectedIndex == 1, 0);
-
-        _hitPositionsTextBox = ui.CreateTextBox(width: 0, height: 140);
-
-        _startStopCameraButton = ui.CreateButton("Stop camera rotation", () => StartStopCameraRotation());
-
-        if (context.CurrentSharpEngineSceneView != null)
-            SubscribeMouseEvents(context.CurrentSharpEngineSceneView);
+        TestHitObjects(pointerPosition);
+        _lastMousePosition = pointerPosition;
     }
 
     private void StartStopCameraRotation()
@@ -217,5 +196,19 @@ public abstract class HitTestingSample : CommonSample
             targetPositionCamera.StartRotation(50);
             _startStopCameraButton.SetText("Stop camera rotation");
         }
+    }
+
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateRadioButtons(new string[] { "Get only closest hit positions", "Get all hit positions" }, (selectedIndex, selectedText) => _getAllHitObjects = selectedIndex == 1, 0);
+
+        _hitPositionsTextBox = ui.CreateTextBox(width: 0, height: 140);
+
+        _startStopCameraButton = ui.CreateButton("Stop camera rotation", () => StartStopCameraRotation());
+
+        // Subscribe to mouse (pointer) moved
+        ui.RegisterPointerMoved(ProcessPointerMove); 
     }
 }

@@ -23,11 +23,11 @@
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
   
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
-  <Sample Location="HitTesting.WinUIHitTestingSample" Title="Hit-testing"/>
+  <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.WinUIManualInputEventsSample" Title="Manual Input events"/>
-  <Sample Location="HitTesting.WinUILineSelectionSample" Title="Line selection"/>
-  <Sample Location="HitTesting.WinUIRayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
-  <Sample Location="HitTesting.WinUIHitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
+  <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
+  <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>

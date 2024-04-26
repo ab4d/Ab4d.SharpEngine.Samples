@@ -6,10 +6,7 @@ using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-// See also ManualInputEventsSample:
-// ray to plane intersection is used to move the objects on a horizontal plane - see GetPositionOnHorizontalPlane method
-
-public abstract class RayPlaneHitTestingSample : CommonSample
+public class RayPlaneHitTestingSample : CommonSample
 {
     public override string Title => "Ray - Plane hit testing";
 
@@ -28,10 +25,6 @@ public abstract class RayPlaneHitTestingSample : CommonSample
         : base(context)
     {
     }
-
-
-    // The following method need to be implemented in a derived class:
-    protected abstract void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView);
 
     protected override void OnCreateScene(Scene scene)
     {
@@ -69,7 +62,7 @@ public abstract class RayPlaneHitTestingSample : CommonSample
         ShowCameraAxisPanel = true;
     }
 
-    protected void ProcessMouseMove(Vector2 mousePosition)
+    protected void ProcessPointerMove(Vector2 mousePosition)
     {
         if (SceneView == null || _planeModelNode == null || _hitWireCrossNode == null)
             return;
@@ -199,7 +192,7 @@ public abstract class RayPlaneHitTestingSample : CommonSample
         _mousePositionLabel = ui.CreateKeyValueLabel("Mouse position: ", () => _lastMousePositionText);
         _positionOnPlaneLabel = ui.CreateKeyValueLabel("Position on plane: ", () => _lastPositionOnPlaneText);
 
-        if (context.CurrentSharpEngineSceneView != null)
-            SubscribeMouseEvents(context.CurrentSharpEngineSceneView);
+        // Subscribe to mouse (pointer) moved
+        ui.RegisterPointerMoved(ProcessPointerMove); 
     }
 }

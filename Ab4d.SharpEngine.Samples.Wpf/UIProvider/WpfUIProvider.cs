@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.PortableExecutable;
 using System.Windows;
 using System.Windows.Automation;
@@ -32,6 +33,10 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
     public WpfUIPanel? CurrentPanel { get; private set; }
 
+    private FrameworkElement? MouseEventsSource { get; }
+    
+    private Action<Vector2>? _pointerMovedAction;
+
     public Panel BaseWpfPanel { get; }
 
     private double _lastSeparator;
@@ -48,9 +53,11 @@ public class WpfUIProvider : ICommonSampleUIProvider
     private double GetDefaultHeaderTopMargin() => StandardMargin * 2;
     private double GetDefaultHeaderBottomMarin() => StandardMargin * 1.3;
 
-    public WpfUIProvider(Panel basePanel)
+    public WpfUIProvider(Panel basePanel, FrameworkElement mouseEventsSource)
     {
         BaseWpfPanel = basePanel;
+        MouseEventsSource = mouseEventsSource;
+
         _rootUIElements = new List<WpfUIElement>();
 
         _settings = new Dictionary<string, string?>();
@@ -112,6 +119,12 @@ public class WpfUIProvider : ICommonSampleUIProvider
         _lastSeparator = 0;
 
         UnRegisterKeyDown();
+
+        if (_pointerMovedAction != null && MouseEventsSource != null)
+        {
+            MouseEventsSource.MouseMove -= PointerEventsSourceOnMouseMove;
+            _pointerMovedAction = null;
+        }
 
         ResetSettings();
     }
@@ -315,6 +328,29 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
             _keyDownFunc = null;
         }
+    }
+
+    
+    public bool RegisterPointerMoved(Action<Vector2> pointerMovedAction)
+    {
+        if (MouseEventsSource == null || _pointerMovedAction != null)
+            return false;
+
+        MouseEventsSource.MouseMove += PointerEventsSourceOnMouseMove;
+        _pointerMovedAction = pointerMovedAction;
+
+        return true;
+    }
+
+    private void PointerEventsSourceOnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (MouseEventsSource == null || _pointerMovedAction == null)
+            return;
+
+        var currentPoint = e.GetPosition(MouseEventsSource);
+        var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+
+        _pointerMovedAction(pointerPosition);
     }
 
 

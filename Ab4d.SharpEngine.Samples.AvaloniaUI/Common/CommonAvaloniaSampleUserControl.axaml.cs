@@ -34,7 +34,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeComponent();
 
-            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid);
+            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid, pointerEventsSource: RootBorder);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
