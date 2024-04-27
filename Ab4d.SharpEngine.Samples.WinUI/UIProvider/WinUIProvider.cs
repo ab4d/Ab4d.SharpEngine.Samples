@@ -321,6 +321,14 @@ public class WinUIProvider : ICommonSampleUIProvider
         _pointerMovedAction(pointerPosition);
     }
 
+    public bool RegisterFileDropped(string? filePattern, Action<string>? fileDroppedAction)
+    {
+        // TODO:
+        // If you know how to support file drag and drop in WinUI, please provide a PR for that
+        return false; // unsupported
+    }
+
+
     public string[] GetAllSettingKeys() => _settings.Keys.ToArray();
 
     public string? GetSettingText(string settingKey)

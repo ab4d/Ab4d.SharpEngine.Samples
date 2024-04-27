@@ -45,6 +45,9 @@ public interface ICommonSampleUIProvider
     // Returns false, if not supported
     bool RegisterPointerMoved(Action<Vector2> pointerMovedAction);
 
+    // returns false is UI does not provide file drag and drop
+    bool RegisterFileDropped(string? filePattern, Action<string> fileDroppedAction);
+
 
     string[] GetAllSettingKeys();
     

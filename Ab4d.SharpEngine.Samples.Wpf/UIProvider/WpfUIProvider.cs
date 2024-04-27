@@ -14,7 +14,6 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 
@@ -36,6 +35,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
     private FrameworkElement? MouseEventsSource { get; }
     
     private Action<Vector2>? _pointerMovedAction;
+    private Action<string>? _fileDroppedAction;
 
     public Panel BaseWpfPanel { get; }
 
@@ -44,6 +44,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
     private List<WpfUIElement> _rootUIElements;
 
     private Func<string, bool>? _keyDownFunc;
+    private DragAndDropHelper? _dragAndDropHelper;
 
     public double StandardMargin { get; private set; }
     public double HeaderTopMargin { get; private set; }
@@ -124,6 +125,14 @@ public class WpfUIProvider : ICommonSampleUIProvider
         {
             MouseEventsSource.MouseMove -= PointerEventsSourceOnMouseMove;
             _pointerMovedAction = null;
+        }
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+            _fileDroppedAction = null;
         }
 
         ResetSettings();
@@ -351,6 +360,35 @@ public class WpfUIProvider : ICommonSampleUIProvider
         var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
 
         _pointerMovedAction(pointerPosition);
+    }
+
+
+    public bool RegisterFileDropped(string? filePattern, Action<string>? fileDroppedAction)
+    {
+        if (MouseEventsSource == null)
+            return false;
+
+        _fileDroppedAction = fileDroppedAction;
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+        }
+
+        if (fileDroppedAction == null)
+            return false;
+
+        _dragAndDropHelper = new DragAndDropHelper(MouseEventsSource, filePattern ?? ".*");
+        _dragAndDropHelper.FileDropped += DragAndDropHelperOnFileDropped;
+
+        return true;
+    }
+
+    private void DragAndDropHelperOnFileDropped(object? sender, FileDroppedEventArgs e)
+    {
+        _fileDroppedAction?.Invoke(e.FileName);
     }
 
 

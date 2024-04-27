@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.Vulkan;
 using Avalonia;
@@ -37,6 +38,8 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
     private Control? PointerEventsSource { get; }
     
     private Action<Vector2>? _pointerMovedAction;
+    private Action<string>? _fileDroppedAction;
+    private DragAndDropHelper? _dragAndDropHelper;
 
     private double _lastSeparator;
     
@@ -121,6 +124,14 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         {
             PointerEventsSource.PointerMoved -= PointerEventsSourceOnPointerMoved;
             _pointerMovedAction = null;
+        }
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+            _fileDroppedAction = null;
         }
 
         ResetSettings();
@@ -349,6 +360,35 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
         _pointerMovedAction(pointerPosition);
     }
+
+
+    public bool RegisterFileDropped(string? filePattern, Action<string>? fileDroppedAction)
+    {
+        if (PointerEventsSource == null)
+            return false;
+
+        _fileDroppedAction = fileDroppedAction;
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper = null;
+        }
+
+        if (fileDroppedAction == null)
+            return false;
+
+        _dragAndDropHelper = new DragAndDropHelper(PointerEventsSource, filePattern ?? ".*");
+        _dragAndDropHelper.FileDropped += DragAndDropHelperOnFileDropped;
+
+        return true;
+    }
+
+    private void DragAndDropHelperOnFileDropped(object? sender, FileDroppedEventArgs e)
+    {
+        _fileDroppedAction?.Invoke(e.FileName);
+    }
+
 
 
     public string[] GetAllSettingKeys() => _settings.Keys.ToArray();

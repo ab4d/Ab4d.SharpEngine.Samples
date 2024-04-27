@@ -14,7 +14,9 @@ namespace Ab4d.SharpEngine.Samples.Common.Importers;
 public class AssimpImporterSample : CommonSample
 {
     public override string Title => "AssimpImporter - import 3D models from almost any file format";
-    public override string? Subtitle => "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).";
+
+    private string _subtitle = "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).";
+    public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\planetary-gear.FBX";
 
@@ -361,12 +363,6 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         }
     }
 
-    // Drag and drop is platform specific function and needs to be implemented on per-platform sample
-    protected virtual bool SetupDragAndDrop(ICommonSampleUIProvider ui)
-    {
-        return false; // no drag and drop not supported
-    }
-
     private string GetSupportedFormatsInfo(AssimpImporter assimpImporter)
     {
         string assimpVersionText = assimpImporter.AssimpVersionString;
@@ -452,9 +448,14 @@ Note: The current version does not support exporting SharpEngine Scene objects, 
         }
 
 
-        bool isDragAndDropSupported = SetupDragAndDrop(ui);
+        // Try to register for file drag-and-drop
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".*", ImportFile);
 
-        if (!isDragAndDropSupported)
+        if (isDragAndDropSupported)
+        {
+            _subtitle += "\nDrag and drop file here to open it.";
+        }
+        else
         {
             // If drag and drop is not supported, then show TextBox so user can enter file name to import
 
