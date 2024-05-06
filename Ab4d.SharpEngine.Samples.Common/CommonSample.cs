@@ -203,6 +203,12 @@ public abstract class CommonSample
 
     public void Dispose()
     {
+        if (CameraAxisPanel != null)
+        {
+            CameraAxisPanel.Dispose();
+            CameraAxisPanel = null;
+        }
+
         UnsubscribeSceneUpdating();
         SceneView?.RemoveAllSpriteBatches();
 
