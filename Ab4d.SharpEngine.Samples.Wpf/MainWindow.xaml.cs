@@ -101,17 +101,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 // When content of ContentFrame is changed, we try to find the SharpEngineSceneView control
                 // that is defined by the newly shown content.
 
-                // Set WpfSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
-                if (_currentCommonSample != null)
-                {
-                    SharpEngineSceneView? sharpEngineSceneView;
-                    if (_commonWpfSamplePage != null && ReferenceEquals(_commonWpfSamplePage.CurrentCommonSample, _currentCommonSample))
-                        sharpEngineSceneView = _commonWpfSamplePage.MainSceneView;
-                    else
-                        sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
-
-                    WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
-                }                
+                SharpEngineSceneView? sharpEngineSceneView;
+                if (_commonWpfSamplePage != null && ReferenceEquals(_commonWpfSamplePage.CurrentCommonSample, _currentCommonSample))
+                    sharpEngineSceneView = _commonWpfSamplePage.MainSceneView;
+                else
+                    sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
+                
+                WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             };
 
 
