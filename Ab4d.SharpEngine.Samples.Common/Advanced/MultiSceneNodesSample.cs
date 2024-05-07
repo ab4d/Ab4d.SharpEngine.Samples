@@ -457,10 +457,10 @@ public class MultiSceneNodesSample : CommonSample
         scene.RootNode.Add(solidColorModel3);
 
 
-        // BoxModel3D
+        // BoxModelNode
         for (int i = 1; i <= 5; i++)
         {
-            var boxModel3D = new BoxModelNode($"BoxModel3D_{i}")
+            var boxModelNode = new BoxModelNode($"BoxModelNode_{i}")
             {
                 Position = new Vector3(-100, 200 - i * 40, -280),
                 Size = new Vector3(i * 10, 20, i * 10),
@@ -468,14 +468,14 @@ public class MultiSceneNodesSample : CommonSample
                 UseSharedBoxMesh = i % 2 == 0
             };
 
-            scene.RootNode.Add(boxModel3D);
+            scene.RootNode.Add(boxModelNode);
         }
 
 
-        // SphereModel3D
+        // SphereModelNode
         for (int i = 1; i <= 5; i++)
         {
-            var sphereModel3D = new SphereModelNode($"SphereModel3D_{i}")
+            var sphereModelNode = new SphereModelNode($"SphereModelNode_{i}")
             {
                 CenterPosition = new Vector3(-100, 200 - i * 40, -360),
                 Radius = (i + 1) * 3,
@@ -483,7 +483,7 @@ public class MultiSceneNodesSample : CommonSample
                 UseSharedSphereMesh = i % 2 == 0
             };
 
-            scene.RootNode.Add(sphereModel3D);
+            scene.RootNode.Add(sphereModelNode);
         }
 
 
