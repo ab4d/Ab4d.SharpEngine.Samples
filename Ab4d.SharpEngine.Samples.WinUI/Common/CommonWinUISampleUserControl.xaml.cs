@@ -56,6 +56,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                     InitializeCommonSample();
             }
         }
+        
+        public SharpEngineSceneView MainSharpEngineSceneView => MainSceneView;
 
         public CommonWinUISampleUserControl()
         {
@@ -66,7 +68,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
 
 
-            _wpfUiProvider = new WinUIProvider(RootGrid);
+            _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
@@ -103,13 +105,14 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             if (_currentCommonSample == null)
                 return;
-
-            TitleTextBlock.Text = _currentCommonSample.Title;
-            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
             
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
+
+            // Set Title and Subtitle after initializing UI, because they can be changed there
+            TitleTextBlock.Text = _currentCommonSample.Title;
+            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 

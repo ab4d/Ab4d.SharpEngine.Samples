@@ -24,10 +24,11 @@
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
 
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
-  <Sample Location="HitTesting.WpfHitTestingSample" Title="Hit-testing"/>
+  <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.WpfManualInputEventsSample" Title="Manual Input events"/>
-  <Sample Location="HitTesting.WpfLineSelectionSample" Title="Line selection"/>
-  <Sample Location="HitTesting.WpfRayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
+  <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
@@ -59,6 +60,7 @@
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
@@ -72,8 +74,8 @@
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
-  <Sample Location="Importers.ReaderObjWpfSample" Title="ReaderObj"/>
-  <Sample Location="Importers.AssimpImporterWpfSample" Title="AssimpImporter"/>
+  <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>

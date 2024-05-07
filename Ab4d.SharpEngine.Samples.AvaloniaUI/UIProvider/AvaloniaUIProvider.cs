@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.PortableExecutable;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.Vulkan;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -32,8 +35,14 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
 
     public Panel BaseAvaloniaPanel { get; }
 
-    private double _lastSeparator;
+    private Control? PointerEventsSource { get; }
+    
+    private Action<Vector2>? _pointerMovedAction;
+    private Action<string>? _fileDroppedAction;
+    private DragAndDropHelper? _dragAndDropHelper;
 
+    private double _lastSeparator;
+    
     private List<AvaloniaUIElement> _rootUIElements;
 
     public double StandardMargin { get; private set; }
@@ -44,9 +53,11 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
     private double GetDefaultHeaderTopMargin() => StandardMargin * 2;
     private double GetDefaultHeaderBottomMarin() => StandardMargin * 1.3;
 
-    public AvaloniaUIProvider(Panel basePanel)
+    public AvaloniaUIProvider(Panel basePanel, Control? pointerEventsSource)
     {
         BaseAvaloniaPanel = basePanel;
+        PointerEventsSource = pointerEventsSource;
+
         _rootUIElements = new List<AvaloniaUIElement>();
 
         _settings = new Dictionary<string, string?>();
@@ -108,6 +119,20 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         _lastSeparator = 0;
 
         UnRegisterKeyDown();
+        
+        if (_pointerMovedAction != null && PointerEventsSource != null)
+        {
+            PointerEventsSource.PointerMoved -= PointerEventsSourceOnPointerMoved;
+            _pointerMovedAction = null;
+        }
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+            _fileDroppedAction = null;
+        }
 
         ResetSettings();
     }
@@ -313,6 +338,57 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         //    _keyDownFunc = null;
         //}
     }
+
+    public bool RegisterPointerMoved(Action<Vector2> pointerMovedAction)
+    {
+        if (PointerEventsSource == null || _pointerMovedAction != null)
+            return false;
+
+        PointerEventsSource.PointerMoved += PointerEventsSourceOnPointerMoved;
+        _pointerMovedAction = pointerMovedAction;
+
+        return true;
+    }
+
+    private void PointerEventsSourceOnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (PointerEventsSource == null || _pointerMovedAction == null)
+            return;
+
+        var currentPoint = e.GetPosition(PointerEventsSource);
+        var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+
+        _pointerMovedAction(pointerPosition);
+    }
+
+
+    public bool RegisterFileDropped(string? filePattern, Action<string>? fileDroppedAction)
+    {
+        if (PointerEventsSource == null)
+            return false;
+
+        _fileDroppedAction = fileDroppedAction;
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper = null;
+        }
+
+        if (fileDroppedAction == null)
+            return false;
+
+        _dragAndDropHelper = new DragAndDropHelper(PointerEventsSource, filePattern ?? ".*");
+        _dragAndDropHelper.FileDropped += DragAndDropHelperOnFileDropped;
+
+        return true;
+    }
+
+    private void DragAndDropHelperOnFileDropped(object? sender, FileDroppedEventArgs e)
+    {
+        _fileDroppedAction?.Invoke(e.FileName);
+    }
+
 
 
     public string[] GetAllSettingKeys() => _settings.Keys.ToArray();

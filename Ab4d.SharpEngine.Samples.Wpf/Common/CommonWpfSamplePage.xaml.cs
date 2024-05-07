@@ -48,7 +48,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         {
             InitializeComponent();
 
-            _wpfUiProvider = new WpfUIProvider(RootGrid);
+            _wpfUiProvider = new WpfUIProvider(RootGrid, mouseEventsSource: MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
@@ -108,13 +108,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             if (_currentCommonSample == null)
                 return;
-
-            TitleTextBlock.Text    = _currentCommonSample.Title;
-            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
-
+            
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
+
+            // Set Title and Subtitle after initializing UI, because they can be changed there
+            TitleTextBlock.Text    = _currentCommonSample.Title;
+            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 

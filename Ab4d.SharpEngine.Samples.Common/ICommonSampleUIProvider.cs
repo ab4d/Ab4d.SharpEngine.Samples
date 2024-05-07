@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using System.Numerics;
+using Ab4d.SharpEngine.Common;
 
 namespace Ab4d.SharpEngine.Samples.Common;
 
@@ -40,6 +41,12 @@ public interface ICommonSampleUIProvider
 
     // returns false is UI does not provide keyboard support
     bool RegisterKeyDown(Func<string, bool>? keyDownFunc);
+
+    // Returns false, if not supported
+    bool RegisterPointerMoved(Action<Vector2> pointerMovedAction);
+
+    // returns false is UI does not provide file drag and drop
+    bool RegisterFileDropped(string? filePattern, Action<string> fileDroppedAction);
 
 
     string[] GetAllSettingKeys();

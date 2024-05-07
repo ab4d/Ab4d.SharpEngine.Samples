@@ -10,7 +10,9 @@ namespace Ab4d.SharpEngine.Samples.Common.Importers;
 public class ReaderObjSample : CommonSample
 {
     public override string Title => "ReaderObj - import 3D models from obj files";
-    public override string? Subtitle => "ReaderObj is written in C# and is part of the Ab4d.SharpEngine library.";
+
+    private string _subtitle = "ReaderObj is written in C# and is part of the Ab4d.SharpEngine library.";
+    public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
 
@@ -181,12 +183,6 @@ public class ReaderObjSample : CommonSample
         }
     }
 
-    // Drag and drop is platform specific function and needs to be implemented on per-platform sample
-    protected virtual bool SetupDragAndDrop(ICommonSampleUIProvider ui)
-    {
-        return false; // no drag and drop not supported
-    }
-
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
@@ -199,9 +195,14 @@ public class ReaderObjSample : CommonSample
         }, selectedItemIndex: (int)_currentViewType);
 
 
-        bool isDragAndDropSupported = SetupDragAndDrop(ui);
+        // Try to register for file drag-and-drop
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".obj", ImportFile);
 
-        if (!isDragAndDropSupported)
+        if (isDragAndDropSupported)
+        {
+            _subtitle += "\nDrag and drop .obj file here to open it.";
+        }
+        else
         {
             // If drag and drop is not supported, then show TextBox so user can enter file name to import
 

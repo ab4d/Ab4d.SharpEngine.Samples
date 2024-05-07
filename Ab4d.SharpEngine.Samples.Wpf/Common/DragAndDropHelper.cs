@@ -32,6 +32,22 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
         public event EventHandler<FileDroppedEventArgs>? FileDropped;
 
+        private bool _isEnabled;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value)
+                    return;
+
+                _isEnabled = value;
+
+                if (_subscribedFrameworkElement != null)
+                    _subscribedFrameworkElement.AllowDrop = true;
+            }
+        }
+
         // set usePreviewEvents to true for TextBox or some other controls that handle dropping by themselves
         public DragAndDropHelper(FrameworkElement controlToAddDragAndDrop, string? allowedFileExtensions = null, bool usePreviewEvents = false)
         {
@@ -47,26 +63,30 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                                                               .Select(e => e.StartsWith(".") ? e : '.' + e) // make sure that each extension has leading '.' because Path.GetExtension also gets such extension
                                                               .ToArray();
             }
-
-            controlToAddDragAndDrop.AllowDrop = true;
-
+            
             if (usePreviewEvents)
             {
-                controlToAddDragAndDrop.PreviewDrop += pageToAddDragAndDrop_Drop;
-                controlToAddDragAndDrop.PreviewDragOver += pageToAddDragAndDrop_DragOver;
+                controlToAddDragAndDrop.PreviewDrop += OnDrop;
+                controlToAddDragAndDrop.PreviewDragOver += OnDragOver;
             }
             else
             {
-                controlToAddDragAndDrop.Drop += pageToAddDragAndDrop_Drop;
-                controlToAddDragAndDrop.DragOver += pageToAddDragAndDrop_DragOver;
+                controlToAddDragAndDrop.Drop += OnDrop;
+                controlToAddDragAndDrop.DragOver += OnDragOver;
             }
+
+            controlToAddDragAndDrop.AllowDrop = true;
+            _isEnabled = true;
 
             _subscribedFrameworkElement = controlToAddDragAndDrop;
             _usePreviewEvents = usePreviewEvents;
         }
 
-        public void pageToAddDragAndDrop_DragOver(object sender, DragEventArgs args)
+        public void OnDragOver(object sender, DragEventArgs args)
         {
+            if (!_isEnabled)
+                return;
+
             args.Effects = DragDropEffects.None;
 
             if (args.Data.GetDataPresent("FileNameW"))
@@ -79,23 +99,19 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                     var fileName = dropFileNames[0];
                     var fileExtension = System.IO.Path.GetExtension(fileName);
 
-                    if (_allowedFileExtensions == null)
-                    {
+                    if (_allowedFileExtensions == null || _allowedFileExtensions.Any(e => e.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
                         args.Effects = DragDropEffects.Move;
-                    }
-                    else
-                    {
-                        if (_allowedFileExtensions.Any(e => e.Equals(fileExtension, StringComparison.OrdinalIgnoreCase)))
-                            args.Effects = DragDropEffects.Move;
-                    }
                 }
             }
 
             args.Handled = true;
         }
 
-        public void pageToAddDragAndDrop_Drop(object sender, DragEventArgs args)
+        public void OnDrop(object sender, DragEventArgs args)
         {
+            if (!_isEnabled)
+                return;
+
             if (args.Data.GetDataPresent("FileNameW"))
             {
                 var dropData = args.Data.GetData("FileNameW");
@@ -122,13 +138,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             if (_usePreviewEvents)
             {
-                _subscribedFrameworkElement.PreviewDrop -= pageToAddDragAndDrop_Drop;
-                _subscribedFrameworkElement.PreviewDragOver -= pageToAddDragAndDrop_DragOver;
+                _subscribedFrameworkElement.PreviewDrop -= OnDrop;
+                _subscribedFrameworkElement.PreviewDragOver -= OnDragOver;
             }
             else
             {
-                _subscribedFrameworkElement.Drop -= pageToAddDragAndDrop_Drop;
-                _subscribedFrameworkElement.DragOver -= pageToAddDragAndDrop_DragOver;
+                _subscribedFrameworkElement.Drop -= OnDrop;
+                _subscribedFrameworkElement.DragOver -= OnDragOver;
             }
 
             _subscribedFrameworkElement = null;

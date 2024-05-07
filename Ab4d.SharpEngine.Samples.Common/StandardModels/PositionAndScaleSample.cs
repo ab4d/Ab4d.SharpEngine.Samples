@@ -41,8 +41,7 @@ public class PositionAndScaleSample: CommonSample
 
     private void AddSceneNode(Mesh mesh, Scene scene, Vector3 position, PositionTypes positionType, Vector3 size, bool preserveAspectRatio = true, float wireCrossLineLength = 50)
     {
-        // Create a new Model3DGroup that will hold the originalModel3D.
-        // This allows us to have different transformation for each originalModel3D (transformation is on Model3DGroup)
+        // Create a new MeshModelNode that will define the 3D model.
         var teapotModel = new MeshModelNode(mesh, StandardMaterials.Orange);
 
 

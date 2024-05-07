@@ -133,7 +133,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             
             for (int i = 1; i <= 8; i++)
             {
-                var boxModel3D = new BoxModelNode($"BoxModel3D_{i}")
+                var boxModelNode = new BoxModelNode($"BoxModelNode_{i}")
                 {
                     Position = new Vector3(-240 + i * 40, 5, 50),
                     PositionType = PositionTypes.Bottom,
@@ -141,17 +141,17 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                     Material = new StandardMaterial(new Color3(1f, i * 0.0625f + 0.5f, i * 0.125f)), // orange to white
                 };
 
-                _groupNode.Add(boxModel3D);
+                _groupNode.Add(boxModelNode);
 
 
-                var sphereModel3D = new SphereModelNode($"SphereModel3D_{i}")
+                var sphereModelNode = new SphereModelNode($"SphereModelNode_{i}")
                 {
                     CenterPosition = new Vector3(-240 + i * 40, 20, -10),
                     Radius = 15,
                     Material = new StandardMaterial(new Color3(1f, i * 0.0625f + 0.5f, i * 0.125f)), // orange to white
                 };
 
-                _groupNode.Add(sphereModel3D);
+                _groupNode.Add(sphereModelNode);
             }
         }
 

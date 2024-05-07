@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Reflection.PortableExecutable;
 using System.Windows;
 using System.Windows.Automation;
@@ -13,7 +14,6 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 
@@ -32,6 +32,11 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
     public WpfUIPanel? CurrentPanel { get; private set; }
 
+    private FrameworkElement? MouseEventsSource { get; }
+    
+    private Action<Vector2>? _pointerMovedAction;
+    private Action<string>? _fileDroppedAction;
+
     public Panel BaseWpfPanel { get; }
 
     private double _lastSeparator;
@@ -39,6 +44,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
     private List<WpfUIElement> _rootUIElements;
 
     private Func<string, bool>? _keyDownFunc;
+    private DragAndDropHelper? _dragAndDropHelper;
 
     public double StandardMargin { get; private set; }
     public double HeaderTopMargin { get; private set; }
@@ -48,9 +54,11 @@ public class WpfUIProvider : ICommonSampleUIProvider
     private double GetDefaultHeaderTopMargin() => StandardMargin * 2;
     private double GetDefaultHeaderBottomMarin() => StandardMargin * 1.3;
 
-    public WpfUIProvider(Panel basePanel)
+    public WpfUIProvider(Panel basePanel, FrameworkElement mouseEventsSource)
     {
         BaseWpfPanel = basePanel;
+        MouseEventsSource = mouseEventsSource;
+
         _rootUIElements = new List<WpfUIElement>();
 
         _settings = new Dictionary<string, string?>();
@@ -112,6 +120,20 @@ public class WpfUIProvider : ICommonSampleUIProvider
         _lastSeparator = 0;
 
         UnRegisterKeyDown();
+
+        if (_pointerMovedAction != null && MouseEventsSource != null)
+        {
+            MouseEventsSource.MouseMove -= PointerEventsSourceOnMouseMove;
+            _pointerMovedAction = null;
+        }
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+            _fileDroppedAction = null;
+        }
 
         ResetSettings();
     }
@@ -315,6 +337,58 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
             _keyDownFunc = null;
         }
+    }
+
+    
+    public bool RegisterPointerMoved(Action<Vector2> pointerMovedAction)
+    {
+        if (MouseEventsSource == null || _pointerMovedAction != null)
+            return false;
+
+        MouseEventsSource.MouseMove += PointerEventsSourceOnMouseMove;
+        _pointerMovedAction = pointerMovedAction;
+
+        return true;
+    }
+
+    private void PointerEventsSourceOnMouseMove(object sender, MouseEventArgs e)
+    {
+        if (MouseEventsSource == null || _pointerMovedAction == null)
+            return;
+
+        var currentPoint = e.GetPosition(MouseEventsSource);
+        var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+
+        _pointerMovedAction(pointerPosition);
+    }
+
+
+    public bool RegisterFileDropped(string? filePattern, Action<string>? fileDroppedAction)
+    {
+        if (MouseEventsSource == null)
+            return false;
+
+        _fileDroppedAction = fileDroppedAction;
+
+        if (_dragAndDropHelper != null)
+        {
+            _dragAndDropHelper.FileDropped -= DragAndDropHelperOnFileDropped;
+            _dragAndDropHelper.Dispose(); // Unsubscribe
+            _dragAndDropHelper = null;
+        }
+
+        if (fileDroppedAction == null)
+            return false;
+
+        _dragAndDropHelper = new DragAndDropHelper(MouseEventsSource, filePattern ?? ".*");
+        _dragAndDropHelper.FileDropped += DragAndDropHelperOnFileDropped;
+
+        return true;
+    }
+
+    private void DragAndDropHelperOnFileDropped(object? sender, FileDroppedEventArgs e)
+    {
+        _fileDroppedAction?.Invoke(e.FileName);
     }
 
 

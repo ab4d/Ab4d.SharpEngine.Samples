@@ -34,7 +34,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeComponent();
 
-            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid);
+            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid, pointerEventsSource: RootBorder);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
@@ -77,13 +77,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             if (_currentCommonSample == null)
                 return;
 
-            TitleTextBlock.Text = _currentCommonSample.Title;
-            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
-            
             _currentCommonSample.InitializeScene(MainSceneView.Scene);
             _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
+
+            // Set Title and Subtitle after initializing UI, because they can be changed there
+            TitleTextBlock.Text = _currentCommonSample.Title;
+            SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 

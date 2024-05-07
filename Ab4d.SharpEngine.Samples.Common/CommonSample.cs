@@ -203,6 +203,12 @@ public abstract class CommonSample
 
     public void Dispose()
     {
+        if (CameraAxisPanel != null)
+        {
+            CameraAxisPanel.Dispose();
+            CameraAxisPanel = null;
+        }
+
         UnsubscribeSceneUpdating();
         SceneView?.RemoveAllSpriteBatches();
 
@@ -228,7 +234,12 @@ public abstract class CommonSample
         return textureImage;
     }
 
-    protected void ShowErrorMessage(string errorMessage, int showTimeMs = 0)
+    protected void ShowErrorMessage(string errorMessage)
+    {
+        ShowErrorMessage(errorMessage, showTimeMs: 0);
+    }
+
+    protected void ShowErrorMessage(string errorMessage, int showTimeMs)
     {
         if (_errorMessageLabel == null)
         {

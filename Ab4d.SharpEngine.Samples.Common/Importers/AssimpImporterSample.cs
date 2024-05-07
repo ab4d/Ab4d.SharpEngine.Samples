@@ -14,7 +14,9 @@ namespace Ab4d.SharpEngine.Samples.Common.Importers;
 public class AssimpImporterSample : CommonSample
 {
     public override string Title => "AssimpImporter - import 3D models from almost any file format";
-    public override string? Subtitle => "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).";
+
+    private string _subtitle = "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).";
+    public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\planetary-gear.FBX";
 
@@ -45,8 +47,7 @@ public class AssimpImporterSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        if (scene.GpuDevice != null)
-            InitAssimpLibrary(scene.GpuDevice, "assimp-lib");
+        _assimpImporter = InitAssimpLibrary(scene.GpuDevice, this.BitmapIO, "assimp-lib", ShowErrorMessage);
 
         if (targetPositionCamera != null)
         {
@@ -62,7 +63,7 @@ public class AssimpImporterSample : CommonSample
 
     // When calling InitAssimpLibrary, the gpuDevice may be null.
     // In this case the textures will be created later when the materials with textures are initialized.
-    private void InitAssimpLibrary(VulkanDevice? gpuDevice, string? assimpFolder)
+    public static AssimpImporter? InitAssimpLibrary(VulkanDevice? gpuDevice, IBitmapIO? bitmapIO, string? assimpFolder, Action<string>? showErrorMessageAction)
     {
         if (assimpFolder == null)
             assimpFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -78,8 +79,8 @@ public class AssimpImporterSample : CommonSample
 
         if (assimpLibFileName == null)
         {
-            ShowErrorMessage("AssimpImporter is not supported on this OS");
-            return;
+            showErrorMessageAction?.Invoke("AssimpImporter is not supported on this OS");
+            return null;
         }
         
 
@@ -102,8 +103,8 @@ public class AssimpImporterSample : CommonSample
 
             if (assimpLibraries.Length == 0)
             {
-                ShowErrorMessage($"Cannot find the Assimp library ({assimpLibFileName}) in the folder {assimpFolder}");
-                return;
+                showErrorMessageAction?.Invoke($"Cannot find the Assimp library ({assimpLibFileName}) in the folder {assimpFolder}");
+                return null;
             }
             else if (assimpLibraries.Length == 1)
             {
@@ -122,20 +123,22 @@ public class AssimpImporterSample : CommonSample
         }
         catch (Exception ex)
         {
-            ShowErrorMessage(@$"Error loading native Assimp library:
+            showErrorMessageAction?.Invoke(@$"Error loading native Assimp library:
 {ex.Message}
 
 The most common cause of this error is that the Visual C++ Redistributable for Visual Studio 2019 is not installed on the system. 
 See the following web page for more info:
 https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170");
 
-            return;
+            return null;
         }
 
         if (!AssimpLibrary.Instance.IsInitialized)
             throw new Exception("Cannot initialize native Assimp library");
 
-        _assimpImporter = new AssimpImporter(BitmapIO, gpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
+        var assimpImporter = new AssimpImporter(bitmapIO, gpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
+
+        return assimpImporter;
     }
 
     protected void ImportFile(string? fileName)
@@ -360,12 +363,6 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
         }
     }
 
-    // Drag and drop is platform specific function and needs to be implemented on per-platform sample
-    protected virtual bool SetupDragAndDrop(ICommonSampleUIProvider ui)
-    {
-        return false; // no drag and drop not supported
-    }
-
     private string GetSupportedFormatsInfo(AssimpImporter assimpImporter)
     {
         string assimpVersionText = assimpImporter.AssimpVersionString;
@@ -451,9 +448,14 @@ Note: The current version does not support exporting SharpEngine Scene objects, 
         }
 
 
-        bool isDragAndDropSupported = SetupDragAndDrop(ui);
+        // Try to register for file drag-and-drop
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".*", ImportFile);
 
-        if (!isDragAndDropSupported)
+        if (isDragAndDropSupported)
+        {
+            _subtitle += "\nDrag and drop file here to open it.";
+        }
+        else
         {
             // If drag and drop is not supported, then show TextBox so user can enter file name to import
 
