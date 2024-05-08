@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.AvaloniaUI;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
@@ -20,7 +21,10 @@ public class AvaloniaInputEventsManagerSample : CommonSample
     public AvaloniaInputEventsManagerSample(ICommonSamplesContext context)
         : base(context)
     {
-        
+        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
+        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+
+        ShowCameraAxisPanel = true;
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -41,15 +45,27 @@ public class AvaloniaInputEventsManagerSample : CommonSample
 
         _inputEventsManager.RegisterExcludedSceneNode(glassBox);
 
+
+        var dragPlane = new PlaneModelNode(new Vector3(0, 0, -100), new Vector2(300, 300), new Vector3(0, 0, 1), new Vector3(0, 1, 0), "DragPlane")
+        {
+            Material = StandardMaterials.LightGreen.SetOpacity(0.3f),
+        };
+
+        dragPlane.BackMaterial = dragPlane.Material;
+
+        scene.RootNode.Add(dragPlane);
+
         
+        _inputEventsManager.RegisterDragSurface(baseBox);
+        _inputEventsManager.RegisterDragSurface(planeNormal: new Vector3(0, 0, 1), pointOnPlane: new Vector3(0, 0, -100));
 
         
         for (int i = 0; i < 10; i++)
         {
             var oneBox = new BoxModelNode(new Vector3(i * 50, 20, 0), new Vector3(40, 40, 40), StandardMaterials.Silver, $"Box_{i}")
             {
-                UseSharedBoxMesh = false,
-                Transform = new TranslateTransform(0, 100, 0)
+                //UseSharedBoxMesh = false,
+                //Transform = new TranslateTransform(0, 100, 0)
             };
             scene.RootNode.Add(oneBox);
 
@@ -60,7 +76,10 @@ public class AvaloniaInputEventsManagerSample : CommonSample
                 oneBox.Material = StandardMaterials.Orange;
             };
 
-            modelNodeEventsSource.PointerLeave += (sender, args) => oneBox.Material = _savedMaterial;
+            modelNodeEventsSource.PointerLeave += (sender, args) =>
+            {
+                oneBox.Material = _savedMaterial;
+            };
             
             modelNodeEventsSource.PointerClick += (sender, args) =>
             {
@@ -72,6 +91,22 @@ public class AvaloniaInputEventsManagerSample : CommonSample
             {
                 oneBox.Material = StandardMaterials.Gold;
                 _savedMaterial = oneBox.Material;
+            };
+
+            modelNodeEventsSource.BeginPointerDrag += (sender, args) =>
+            {
+                _savedMaterial = oneBox.Material;
+                oneBox.Material = StandardMaterials.Green;
+            };
+            
+            modelNodeEventsSource.EndPointerDrag += (sender, args) =>
+            {
+                oneBox.Material = _savedMaterial;
+            };
+
+            modelNodeEventsSource.PointerDrag += (sender, args) =>
+            {
+                System.Diagnostics.Debug.WriteLine(args.SurfaceHitPointDiff);
             };
 
             _inputEventsManager.RegisterEventsSource(modelNodeEventsSource);
