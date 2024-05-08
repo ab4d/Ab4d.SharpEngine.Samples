@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -31,7 +30,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        //private string? _startupPage = "CameraControllers.MouseCameraControllerSample";        
+        //private string? _startupPage = "CameraControllers.MouseCameraControllerSample";
         private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;

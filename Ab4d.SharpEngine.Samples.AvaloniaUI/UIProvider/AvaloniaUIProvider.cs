@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Reflection.PortableExecutable;
-using System.Windows;
-using System.Windows.Input;
-using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
@@ -14,7 +10,6 @@ using Ab4d.Vulkan;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 
