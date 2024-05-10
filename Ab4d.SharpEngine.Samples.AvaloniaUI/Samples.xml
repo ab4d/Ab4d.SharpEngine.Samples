@@ -26,6 +26,7 @@
   <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.AvaloniaManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.AvaloniaInputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.AvaloniaInputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>

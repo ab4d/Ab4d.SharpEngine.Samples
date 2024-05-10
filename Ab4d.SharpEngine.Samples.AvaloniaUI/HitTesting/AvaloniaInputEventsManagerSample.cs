@@ -36,7 +36,10 @@ public class AvaloniaInputEventsManagerSample : CommonSample
         _inputEventsManager = new InputEventsManager(sharpEngineSceneView, eventsSourceElement);
 
 
-        var baseBox = new BoxModelNode(centerPosition: new Vector3(0, -10, 0), size: new Vector3(400, 20, 400), material: StandardMaterials.Green, "Base box");
+        var baseBox = new BoxModelNode(centerPosition: new Vector3(0, -10, 0), size: new Vector3(400, 20, 400), material: StandardMaterials.Green, "Base box")
+        {
+            Transform = new TranslateTransform(0, -50, 0)
+        };
         scene.RootNode.Add(baseBox);
 
 
@@ -64,8 +67,8 @@ public class AvaloniaInputEventsManagerSample : CommonSample
         {
             var oneBox = new BoxModelNode(new Vector3(i * 50, 20, 0), new Vector3(40, 40, 40), StandardMaterials.Silver, $"Box_{i}")
             {
-                //UseSharedBoxMesh = false,
-                //Transform = new TranslateTransform(0, 100, 0)
+                UseSharedBoxMesh = false,
+                Transform = new TranslateTransform(0, 100, 0)
             };
             scene.RootNode.Add(oneBox);
 
