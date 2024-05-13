@@ -73,6 +73,7 @@ public class AvaloniaInputEventsManagerSample : CommonSample
             scene.RootNode.Add(oneBox);
 
             var modelNodeEventsSource = new ModelNodeEventsSource(oneBox);
+
             modelNodeEventsSource.PointerEnter += (sender, args) =>
             {
                 _savedMaterial = oneBox.Material;
