@@ -53,7 +53,7 @@ public class ModelMoverSample : CommonSample
 
 
         var groupNode = new GroupNode("TestGroupNode");
-        groupNode.Transform = new AxisAngleRotateTransform(new Vector3(0, 1, 0), 180);
+        //groupNode.Transform = new AxisAngleRotateTransform(new Vector3(0, 1, 0), 45);
         groupNode.Add(_modelMover.ModelMoverGroupNode);
         scene.RootNode.Add(groupNode);
 
@@ -62,7 +62,9 @@ public class ModelMoverSample : CommonSample
 
         var wireGridNode = new WireGridNode()
         {
-            Size = new Vector2(300, 300),
+            Size = new Vector2(400, 400),
+            WidthCellsCount = 8,
+            HeightCellsCount = 8
         };
 
         scene.RootNode.Add(wireGridNode);
