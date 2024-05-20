@@ -1,7 +1,7 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using System;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using System.Numerics;
-using System;
 using Ab4d.SharpEngine.RenderingLayers;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
@@ -68,6 +68,7 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
     /// <inheritdoc />
     public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
     {
+        // Show wire-cross that shows the RotationCenterPosition when rotating the camera
         mouseCameraController.CameraRotateStarted += (sender, args) =>
         {
             if (_rotationCenterWireCross != null && targetPositionCamera != null)
@@ -148,112 +149,38 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
 
         Ab4d.SharpEngine.Utilities.ModelUtils.SetCustomRenderingLayer(overlayTeapotModel, scene.OverlayRenderingLayer);
         scene.RootNode.Add(overlayTeapotModel);
-
-        //var meshGeometry3D = (MeshGeometry3D) originalDragonModel3D.Geometry;
-
-        //// Update positions in MeshGeometry3D to a desired size
-        //var transformedMeshGeometry3D = Ab3d.Utilities.MeshUtils.PositionAndScaleMeshGeometry3D(meshGeometry3D,
-        //                                                                                        position: new Point3D(0, 0, 0),
-        //                                                                                        positionType: PositionTypes.Bottom,
-        //                                                                                        finalSize: new Size3D(50, 50, 50),
-        //                                                                                        preserveAspectRatio: true,
-        //                                                                                        transformNormals: true);
-
-        //var backgroundDragonModel3D = new GeometryModel3D(transformedMeshGeometry3D, new DiffuseMaterial(Brushes.Blue));
-        //backgroundDragonModel3D.Transform = new TranslateTransform3D(-30, 0, 0);
-
-        //// We could also use:
-        ////var backgroundDragonModel3D = originalDragonModel3D.Clone();
-        ////Ab3d.Utilities.ModelUtils.ChangeMaterial(backgroundDragonModel3D, newMaterial: new DiffuseMaterial(Brushes.Blue), newBackMaterial: null);
-        ////Ab3d.Utilities.TransformationsHelper.AddTransformation(backgroundDragonModel3D, new TranslateTransform3D(-30, 0, 0));
-
-        //AddBackgroundObject(backgroundDragonModel3D);
-
-
-        //var overlayDragonModel3D = new GeometryModel3D(transformedMeshGeometry3D, new DiffuseMaterial(Brushes.Red));
-        //overlayDragonModel3D.Transform = new TranslateTransform3D(30, 0, 0);
-
-        //AddOverlayObject(overlayDragonModel3D);
     }
 
     private void AddCustomRenderedLines(Scene scene)
     {
         // Add 3D lines to the background
         // The most important is to render those lines before any other objects are rendered.
-        // This is done with setting CustomRenderingQueue property where we specify the BackgroundRenderingQueue.
-        // We can also disable depth reading and writing (to render them regardless of any previously rendered objects).
+        // This is done with setting CustomRenderingLayer property where we specify the BackgroundRenderingLayer.
+        // We also need to clear the depth buffer after BackgroundRenderingLayer is rendered (this is done in UpdateClearingDepthBuffer method).
         AddLines(scene,
                  new Vector3(-90, 0, 30), 
                  positionsCount: 10, 
                  lineColor: Colors.Blue, 
-                 customRenderingQueue: scene.BackgroundRenderingLayer);
+                 customRenderingLayer: scene.BackgroundRenderingLayer);
 
-        // First add 3D lines that are rendered without any special setting
-        // readZBuffer and writeZBuffer will be set to true so they will "obey" the depth rules - will be hidden behind objects closer to the camera.
+        // Add Gray lines that are rendered normally.
         AddLines(scene,
                  new Vector3(-25, 0, 30), 
                  positionsCount: 10, 
                  lineColor: Colors.LightGray, 
-                 customRenderingQueue: null);
+                 customRenderingLayer: null);
 
         // Add 3D lines that will be rendered on top of other 3D objects.
-        // This is achieved with disabling depth reading and writing.
-        // We also put that line into the OverlayRenderingQueue
-        // (though this is not needed, because the ThickLineEffect that renders the 3D lines can use the ReadZBuffer and WriteZBuffer values from LineMaterial)
+        // This is done by putting them into the OverlayRenderingLayer.
+        // We also need to clear the depth buffer after BackgroundRenderingLayer is rendered (this is done in UpdateClearingDepthBuffer method).
         AddLines(scene,
                  new Vector3(40, 0, 30), 
                  positionsCount: 10, 
                  lineColor: Colors.Red, 
-                 customRenderingQueue: scene.OverlayRenderingLayer);
-
-
-        //// Instead of using ScreenSpaceLineNode and LineMaterial that support ReadZBuffer and WriteZBuffer,
-        //// we could also use out custom rendering steps and then define standard WPF lines
-        //// and use SetDXAttribute to set CustomRenderingQueue to BackgroundRenderingQueue or OverlayRenderingQueue:
-        //var lineVisual3D = new LineVisual3D()
-        //{
-        //    StartPosition = new Point3D(-100, 10, 20),
-        //    EndPosition   = new Point3D(100,  10, 20),
-        //    LineColor     = Colors.Orange,
-        //    LineThickness = 10
-        //};
-
-        ////lineVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.BackgroundRenderingQueue);
-        //lineVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
-
-        //MainViewport.Children.Add(lineVisual3D);
-
-
-        // Using SetDXAttribute will not work on TextVisual3D, CenteredTextVisual3D and WireGridVisual3D
-        // (the reason is that those objects create a more complex hierarchy and the DXAttribute are not propagated to the child objects).
-        // To solve this you can use the following trick:
-
-        //var textVisual3D = new TextVisual3D()
-        //{
-        //    Position = new Point3D(-90, 50, -20),
-        //    Text = "TextVisual3D",
-        //    FontSize = 30,
-        //    LineThickness = 4,
-        //    TextColor = Colors.Silver
-        //};
-
-        //// OnDXResourcesInitializedAction is called when the DXEngine creates the SceneNode from the and initializes it (so its children are created)
-        //textVisual3D.SetDXAttribute(DXAttributeType.OnDXResourcesInitializedAction, new Action<object>(node =>
-        //{
-        //    var sceneNode = node as SceneNode;
-        //    if (sceneNode == null)
-        //        return;
-
-        //    sceneNode.ForEachChildNode(new Action<SceneNode>(childSceneNode =>
-        //    {
-        //        var screenSpaceLineNode = childSceneNode as ScreenSpaceLineNode;
-        //        if (screenSpaceLineNode != null)
-        //            screenSpaceLineNode.CustomRenderingQueue = MainDXViewportView.DXScene.OverlayRenderingQueue;
-        //    }));
-        //}));
+                 customRenderingLayer: scene.OverlayRenderingLayer);
     }
 
-    private void AddLines(Scene scene, Vector3 startPosition, int positionsCount, Color4 lineColor, RenderingLayer? customRenderingQueue = null)
+    private void AddLines(Scene scene, Vector3 startPosition, int positionsCount, Color4 lineColor, RenderingLayer? customRenderingLayer = null)
     {
         Vector3[] positions = new Vector3[positionsCount * 2];
         Vector3 position = startPosition;
@@ -268,80 +195,13 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
             position += new Vector3(0, 0, 10);
         }
 
-        //// ThickLineEffect that renders the 3D lines can use the ReadZBuffer and WriteZBuffer values from LineMaterial.
-        ////
-        //// When ReadZBuffer is false (true by default), then line is rendered without checking the depth buffer -
-        //// so it is always rendered even it is is behind some other 3D object and should not be visible from the camera).
-        ////
-        //// When WriteZBuffer is false (true by default), then when rendering the 3D line, the depth of the line is not
-        //// written to the depth buffer. So No other object will be made hidden by the line even if that object is behind the line.
-        //var lineMaterial = new LineMaterial()
-        //{
-        //    LineColor     = lineColor,
-        //    LineThickness = 2,
-        //};
-
-        //_disposables.Add(lineMaterial);
-
         var multiLineNode = new MultiLineNode(positions, isLineStrip: false, lineThickness: 2, lineColor: lineColor, name: $"Lines_{lineColor.ToKnownColorString()}");
 
-        if (customRenderingQueue != null)
-            multiLineNode.CustomRenderingLayer = customRenderingQueue;
+        if (customRenderingLayer != null)
+            multiLineNode.CustomRenderingLayer = customRenderingLayer;
 
         scene.RootNode.Add(multiLineNode);
-
-
-        //var screenSpaceLineNode = new ScreenSpaceLineNode(positions, isLineStrip: false, isLineClosed: false, lineMaterial: lineMaterial);
-        
-        //// It is also needed that the 3D line is put to the Background or Overlay rendering queue so that it is rendered before or after other 3D objects.
-        //screenSpaceLineNode.CustomRenderingQueue = customRenderingQueue;
-
-        //var sceneNodeVisual3D = new SceneNodeVisual3D(screenSpaceLineNode);
-        //MainViewport.Children.Add(sceneNodeVisual3D);
     }
-
-    //private void AddBackgroundObject(RenderedNode renderedNode, Scene scene)
-    //{
-    //    renderedNode
-
-    //    geometryModel3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.BackgroundRenderingQueue);
-
-    //    var modelVisual3D = geometryModel3D.CreateModelVisual3D();
-    //    MainViewport.Children.Add(modelVisual3D);
-    //}
-
-    //private void AddOverlayObject(Model3D geometryModel3D)
-    //{
-    //    geometryModel3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
-
-    //    var modelVisual3D = geometryModel3D.CreateModelVisual3D();
-    //    MainViewport.Children.Add(modelVisual3D);
-    //}
-
-    //private void AddOverlayObject(ModelVisual3D modelVisual3D)
-    //{
-    //    modelVisual3D.SetDXAttribute(DXAttributeType.CustomRenderingQueue, MainDXViewportView.DXScene.OverlayRenderingQueue);
-    //    MainViewport.Children.Add(modelVisual3D);
-    //}
-
-    //private void AddStandardRenderedObjects()
-    //{
-    //    for (int x = -3; x <= 3; x++)
-    //    {
-    //        for (int y = -3; y <= 3; y++)
-    //        {
-    //            var boxVisual3D = new BoxVisual3D()
-    //            {
-    //                CenterPosition = new Point3D(x * 30, 0, y * 30),
-    //                Size = new Size3D(10, 10, 10),
-    //                Material = new DiffuseMaterial(Brushes.Yellow)
-    //            };
-
-    //            MainViewport.Children.Add(boxVisual3D);
-    //        }
-    //    }
-    //}
-
 
     private void UpdateClearingDepthBuffer(Scene? scene)
     {
@@ -373,41 +233,6 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         scene.DefaultHitTestOptions.BackgroundRenderingLayer = _lowerPriorityBackgroundHitTesting ? scene.BackgroundRenderingLayer : null;
         scene.DefaultHitTestOptions.OverlayRenderingLayer = _higherPriorityOverlayHitTesting ? scene.OverlayRenderingLayer : null;
     }
-
-    //private void ClearDepthBufferRadioButton_OnChecked(object sender, RoutedEventArgs e)
-    //{
-    //    if (MainDXViewportView.DXScene == null)
-    //        return;
-
-    //    SetupClearingDepthBuffer();
-    //    MainDXViewportView.Refresh();
-    //}
-
-    //private void DisableDepthReadRadioButton_OnChecked(object sender, RoutedEventArgs e)
-    //{
-    //    if (MainDXViewportView.DXScene == null)
-    //        return;
-
-    //    SetupDisabledDepthRead();
-    //    MainDXViewportView.Refresh();
-    //}
-
-    //private void OnOverlayHitTestingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
-    //{
-    //    if (MainDXViewportView.DXScene == null)
-    //        return;
-
-    //    UpdateHitTestingOverlay();
-    //}
-
-    //private void OnBackgroundHitTestingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
-    //{
-    //    if (MainDXViewportView.DXScene == null)
-    //        return;
-
-    //    UpdateHitTestingBackground();
-    //}
-
 
     /// <inheritdoc />
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
@@ -446,7 +271,7 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         ui.CreateLabel("Legend:", isHeader: true);
         ui.CreateLabel("BLUE: Background objects").SetColor(Colors.Blue);
         ui.CreateLabel("GRAY: Standard rendered objects").SetColor(Colors.DimGray);
-        ui.CreateLabel("RED: Overlay objects").SetColor(Colors.Red);
+        ui.CreateLabel("RED: Overlay objects (always on top)").SetColor(Colors.Red);
         ui.AddSeparator();
         ui.CreateLabel("BLACK CROSS: Rotation center");
     }
