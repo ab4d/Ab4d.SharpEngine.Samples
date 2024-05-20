@@ -31,6 +31,8 @@ public abstract class CommonSample
     public Scene? Scene { get; private set; }
     public SceneView? SceneView { get; private set; }
 
+    public ManualInputEventsManager? InputEventsManager { get; private set; }
+
     public abstract string Title { get; }
     public virtual string? Subtitle { get; }
 
@@ -109,6 +111,12 @@ public abstract class CommonSample
         OnSceneViewInitialized(sceneView);
     }
 
+    public void InitializeInputEventsManager(ManualInputEventsManager inputEventsManager)
+    {
+        InputEventsManager = inputEventsManager;
+        OnInputEventsManagerInitialized(inputEventsManager);
+    }
+
     public virtual CameraAxisPanel CreateCameraAxisPanel(ICamera camera)
     {
         if (SceneView == null)
@@ -128,6 +136,10 @@ public abstract class CommonSample
     }
 
     protected abstract void OnCreateScene(Scene scene);
+
+    protected virtual void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
+    {
+    }
 
     protected virtual void OnCreateLights(Scene scene)
     {

@@ -15,6 +15,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private MouseCameraController? _mouseCameraController;
+        private InputEventsManager _inputEventsManager;
 
         private AvaloniaUIProvider _avaloniaUiProvider;
 
@@ -53,6 +54,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
+
+
+            _inputEventsManager = new InputEventsManager(MainSceneView, RootBorder);
         }
 
         private void ResetSample()
@@ -79,6 +83,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             _currentCommonSample.InitializeScene(MainSceneView.Scene);
             _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
+            _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
