@@ -3,30 +3,37 @@ using System.Collections.Generic;
 using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
+using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
 public class ModelMoverSample : CommonSample
 {
     public override string Title => "ModelMover sample";
+    public override string Subtitle => "Move selected sphere around. Click on other sphere, to select it.";
 
     private ModelMover? _modelMover;
 
     private readonly StandardMaterial _commonMaterial;
     private readonly StandardMaterial _selectedMaterial;
+    private readonly StandardMaterial _invalidPositionMaterial;
 
     private SphereModelNode? _movingSphere;
     private Vector3 _startCenterPosition;
     private GroupNode? _testSpheresGroupNode;
+    private PlanarShadowMeshCreator? _planarShadowMeshCreator;
+    private MeshModelNode? _shadowModel;
+
+    private bool _preventCollisions = true;
 
     public ModelMoverSample(ICommonSamplesContext context)
         : base(context)
     {
         _commonMaterial = StandardMaterials.Silver;
         _selectedMaterial = StandardMaterials.Orange;
+        _invalidPositionMaterial = StandardMaterials.Red;
 
         RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
         MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
@@ -39,9 +46,15 @@ public class ModelMoverSample : CommonSample
         _testSpheresGroupNode = new GroupNode("TestSpheresGroup");
         scene.RootNode.Add(_testSpheresGroupNode);
 
-        for (int i = 0; i < 10; i++)
+        // Add 10 test spheres (we use while because some random positions may be already occupied by other spheres so we need more random positions)
+        while (_testSpheresGroupNode.Count < 10)
         {
-            var sphereModelNode = new SphereModelNode(GetRandomPosition(new Vector3(0, 0, 0), new Vector3(400, 200, 400)), radius: 20, material: _commonMaterial);
+            var randomPosition = GetRandomPosition(new Vector3(0, 75, 0), new Vector3(350, 100, 350));
+
+            if (!IsPositionFree(randomPosition, freeRadius: 50, _testSpheresGroupNode))
+                continue; // Find another position
+
+            var sphereModelNode = new SphereModelNode(randomPosition, radius: 20, material: _commonMaterial);
             _testSpheresGroupNode.Add(sphereModelNode);
         }
 
@@ -58,6 +71,9 @@ public class ModelMoverSample : CommonSample
 
         if (targetPositionCamera != null)
             targetPositionCamera.Distance = 800;
+
+
+        SetupPlanarShadow(scene);
     }
 
     /// <inheritdoc />
@@ -104,8 +120,39 @@ public class ModelMoverSample : CommonSample
 
         _modelMover.ModelMoved += (sender, args) =>
         {
-            if (_movingSphere != null)
-                _movingSphere.CenterPosition = _startCenterPosition + args.MoveVector;
+            if (_movingSphere == null)
+                return;
+
+            var newPosition = _startCenterPosition + args.MoveVector;
+
+            int sphereIndex = _testSpheresGroupNode.IndexOf(_movingSphere);
+
+            // prevent moving sphere below plane with y = 0
+            if (newPosition.Y < 25)
+            {
+                args.PreventMove = true; // Set PreventMove to true to prevent automatic moving of ModelMover
+                return;
+            }
+            
+            // prevent collision
+            if (_preventCollisions && !IsPositionFree(newPosition, 40, _testSpheresGroupNode, skippedSphereIndex: sphereIndex))
+            {
+                _movingSphere.Material = _invalidPositionMaterial; // Show red material
+                args.PreventMove = true; // Set PreventMove to true to prevent automatic moving of ModelMover
+                return;
+            }
+
+            _movingSphere.Material = _selectedMaterial;
+            _movingSphere.CenterPosition = newPosition;
+
+
+            if (_planarShadowMeshCreator != null && _shadowModel != null)
+            {
+                _planarShadowMeshCreator.UpdateGroupNode();
+                _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
+
+                _shadowModel.Mesh = _planarShadowMeshCreator.ShadowMesh;
+            }
         };
 
         _modelMover.ModelMoveEnded += (sender, args) =>
@@ -113,10 +160,6 @@ public class ModelMoverSample : CommonSample
             // Nothing to do here in this sample
         };
 
-        //var groupNode = new GroupNode("TestGroupNode");
-        //groupNode.Transform = new AxisAngleRotateTransform(new Vector3(0, 1, 0), 45);
-        //groupNode.Add(_modelMover.ModelMoverGroupNode);
-        //scene.RootNode.Add(groupNode);
 
 
         // !!! IMPORTAMT !!!
@@ -155,6 +198,47 @@ public class ModelMoverSample : CommonSample
         _modelMover.Position = newMovingSphere.GetCenterPosition();
         _modelMover.IsEnabled = true;
     }
+    
+    private bool IsPositionFree(Vector3 spherePosition, float freeRadius, GroupNode groupNode, int skippedSphereIndex = -1)
+    {
+        bool isFree = true;
+
+        for (int i = 0; i < groupNode.Count; i++)
+        {
+            if (i == skippedSphereIndex)
+                continue;
+
+            if (groupNode[i] is SphereModelNode oneSphere &&
+                (spherePosition - oneSphere.CenterPosition).Length() < freeRadius)
+            {
+                isFree = false; 
+                break;
+            }
+        }
+
+        return isFree;
+    }
+
+    private void SetupPlanarShadow(Scene scene)
+    {
+        if (_testSpheresGroupNode == null)
+            return;
+
+        // Create PlanarShadowMeshCreator
+        _planarShadowMeshCreator = new PlanarShadowMeshCreator(_testSpheresGroupNode);
+        _planarShadowMeshCreator.SetPlane(planeCenterPosition: new Vector3(0, 0, 0), planeNormal: new Vector3(0, 1, 0), planeHeightVector: new Vector3(0, 0, 1), planeSize: new Vector2(1000, 1000));
+        _planarShadowMeshCreator.ClipToPlane = false; // No need to clip shadow to plane because plane is big enough (when having smaller plane, turn this on - this creates a lot of additional objects on GC)
+
+        _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
+
+        if (_planarShadowMeshCreator.ShadowMesh != null)
+        {
+            _shadowModel = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, StandardMaterials.DimGray, "PlanarShadowModel");
+            _shadowModel.Transform = new Ab4d.SharpEngine.Transformations.TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
+
+            scene.RootNode.Add(_shadowModel);
+        }
+    }
 
     /// <inheritdoc />
     protected override void OnDisposed()
@@ -172,7 +256,11 @@ public class ModelMoverSample : CommonSample
         ui.CreateCheckBox("Show Z axis", _modelMover!.IsZAxisShown, isChecked => _modelMover!.IsZAxisShown = isChecked);
 
         ui.AddSeparator();
-
+        
         ui.CreateCheckBox("Show movable planes", _modelMover!.ShowMovablePlanes, isChecked => _modelMover!.ShowMovablePlanes = isChecked);
+        
+        ui.AddSeparator();
+        
+        ui.CreateCheckBox("Prevent collisions", _preventCollisions, isChecked => _preventCollisions = isChecked);
     }
 }
