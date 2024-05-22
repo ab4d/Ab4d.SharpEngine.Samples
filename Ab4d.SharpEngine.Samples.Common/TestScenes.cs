@@ -12,6 +12,7 @@ public static class TestScenes
     public enum StandardTestScenes
     {
         Teapot = 0,
+        TeapotLowResolution,
         HouseWithTrees,
         Dragon
     }
@@ -19,6 +20,7 @@ public static class TestScenes
     private static string[] _standardTestScenesFileNames = new string[]
     {
         "teapot-hires.obj",
+        "Teapot.obj",
         "house with trees.obj",
         "dragon_vrip_res3.obj"
     };
