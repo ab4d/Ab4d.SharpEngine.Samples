@@ -69,10 +69,17 @@ public class PlanarShadowsSample : CommonSample
         CreateTestSpheres();
 
 
-        // Create PlanarShadowMeshCreator
+        // Create PlanarShadowMeshCreator.
+        // It can be used to create a planar shadow mesh.
+        // This is a mesh that is created by squishing the SceneNodes specified in the PlanarShadowMeshCreator.OriginalGroupNode to the specified plane.
+        // The squished mesh has zero height. The mesh can be used to create a MeshModelNode that shows the shadow (see UpdateShadowModel method below).
         _planarShadowMeshCreator = new PlanarShadowMeshCreator(_sampleObjectsGroupNode);
         _planarShadowMeshCreator.SetPlane(_planeModelNode.GetCenterPosition(), _planeModelNode.Normal, _planeModelNode.HeightDirection, _planeModelNode.Size);
         _planarShadowMeshCreator.ClipToPlane = true;
+
+        // When MeshModelNode that shows the shadow mesh uses both front and back shadow material, we need to disable simplified normal calculation.
+        // See also: https://www.ab4d.com/help/SharpEngine/html/P_Ab4d_SharpEngine_Utilities_PlanarShadowMeshCreator_SimplifyNormalCalculation.htm
+        //_planarShadowMeshCreator.SimplifyNormalCalculation = false; 
 
 
         _lightHorizontalAngle = -60;
