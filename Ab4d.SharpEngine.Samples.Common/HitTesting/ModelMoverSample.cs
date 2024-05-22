@@ -116,6 +116,8 @@ public class ModelMoverSample : CommonSample
         {
             if (_movingSphere != null)
                 _startCenterPosition = _movingSphere.CenterPosition;
+            else
+                _startCenterPosition = Vector3.Zero;
         };
 
         _modelMover.ModelMoved += (sender, args) =>

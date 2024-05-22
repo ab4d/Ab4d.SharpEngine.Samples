@@ -6,27 +6,29 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-public class ModelScalarSample : CommonSample
+public class ModelRotatorSample : CommonSample
 {
-    public override string Title => "ModelScalar sample";
-    public override string Subtitle => "Scale the selected teapot. Click on other teapot to select it.\nRotate the camera with the right mouse button.";
+    public override string Title => "ModelRotator sample";
+    public override string Subtitle => "Rotate the selected teapot. Click on other teapot to select it.\nRotate the camera with the right mouse button.";
 
-    private ModelScalar? _modelScalar;
+    private ModelRotator? _modelRotator;
 
     private readonly StandardMaterial _commonMaterial;
     private readonly StandardMaterial _selectedMaterial;
 
-    private ModelNode? _scalingModel;
+    private float _startRotateX;
+    private float _startRotateY;
+    private float _startRotateZ;
+
+    private ModelNode? _rotatingModel;
     private GroupNode? _testModelsGroupNode;
     private PlanarShadowMeshCreator? _planarShadowMeshCreator;
     private MeshModelNode? _shadowModel;
-    private Vector3 _startScaleFactors;
 
-    public ModelScalarSample(ICommonSamplesContext context)
+    public ModelRotatorSample(ICommonSamplesContext context)
         : base(context)
     {
         _commonMaterial = StandardMaterials.Silver;
@@ -95,52 +97,56 @@ public class ModelScalarSample : CommonSample
         {
             // start moving object on left click
             if (args.RayHitResult != null && args.PressedButtons == MouseButtons.Left)
-                StartScalingObject(args.RayHitResult.HitSceneNode);
+                StartRotatingObject(args.RayHitResult.HitSceneNode);
         };
 
         inputEventsManager.RegisterEventsSource(multiModelNodesEventsSource);
 
 
-        // In this sample we show ModelScalar on top of all other objects.
+        // In this sample we show ModelRotator on top of all other objects.
         // This is done by enabling clearing depth buffer before rendering OverlayRenderingLayer.
-        // Also, the objects shown by the ModelScalar need to be put into the OverlayRenderingLayer (setting CustomRenderingLayer below).
+        // Also, the objects shown by the ModelRotator need to be put into the OverlayRenderingLayer (setting CustomRenderingLayer below).
         // See also Advanced/BackgroundAndOverlayRenderingSample for more information.
         if (Scene.OverlayRenderingLayer != null)
             Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = true;
 
-        // Create ModelScalar
-        // Note that ModelScalar is not a SceneNode and cannot be added to the RootNote.
-        // Instead, the models that are added to the scene are defined in _modelScalar.ModelScalarGroupNode (see below).
-        _modelScalar = new ModelScalar(inputEventsManager);
+        // Create ModelRotator
+        // Note that ModelRotator is not a SceneNode and cannot be added to the RootNote.
+        // Instead, the models that are added to the scene are defined in _modelRotator.ModelRotatorGroupNode (see below).
+        _modelRotator = new ModelRotator(inputEventsManager);
         
-        // To show ModelScalar on top of other objects, se the CustomRenderingLayer to OverlayRenderingLayer.
-        _modelScalar.CustomRenderingLayer = Scene.OverlayRenderingLayer;
+        // To show ModelRotator on top of other objects, se the CustomRenderingLayer to OverlayRenderingLayer.
+        _modelRotator.CustomRenderingLayer = Scene.OverlayRenderingLayer;
 
         // Handle events:
-        _modelScalar.ModelScaleStarted += (sender, args) =>
+        _modelRotator.ModelRotateStarted += (sender, args) =>
         {
-            if (_scalingModel != null && _scalingModel.Transform is StandardTransform standardTransform)
-                _startScaleFactors = standardTransform.GetScaleFactors();
+            if (_rotatingModel != null && _rotatingModel.Transform is StandardTransform standardTransform)
+            {
+                _startRotateX = standardTransform.RotateX;
+                _startRotateY = standardTransform.RotateY;
+                _startRotateZ = standardTransform.RotateZ;
+            }
             else
-                _startScaleFactors = new Vector3(1, 1, 1); // no initial scale
+            {
+                _startRotateX = 0;
+                _startRotateY = 0;
+                _startRotateZ = 0;
+            }
         };
 
-        _modelScalar.ModelScaled += (sender, args) =>
+        _modelRotator.ModelRotated += (sender, args) =>
         {
-            if (_scalingModel == null)
+            if (_rotatingModel == null)
                 return;
 
-            var newScaleFactors = args.ScaleFactors;
-            newScaleFactors *= _startScaleFactors;
-
-            // prevent scaling below 5% of the initial size
-            if (newScaleFactors.X < 0.05 || newScaleFactors.Y < 0.05 || newScaleFactors.Z < 0.05)
-                return;
-
-
-            _scalingModel.Material = _selectedMaterial;
-            if (_scalingModel.Transform is StandardTransform standardTransform)
-                standardTransform.SetScale(newScaleFactors);
+            _rotatingModel.Material = _selectedMaterial;
+            if (_rotatingModel.Transform is StandardTransform standardTransform)
+            {
+                standardTransform.RotateX = _startRotateX + args.RotateX;
+                standardTransform.RotateY = _startRotateY + args.RotateY;
+                standardTransform.RotateZ = _startRotateZ + args.RotateZ;
+            }
 
 
             if (_planarShadowMeshCreator != null && _shadowModel != null)
@@ -152,7 +158,7 @@ public class ModelScalarSample : CommonSample
             }
         };
 
-        _modelScalar.ModelScaleEnded += (sender, args) =>
+        _modelRotator.ModelRotateEnded += (sender, args) =>
         {
             // Nothing to do here in this sample
         };
@@ -160,40 +166,40 @@ public class ModelScalarSample : CommonSample
 
 
         // !!! IMPORTAMT !!!
-        // To show ModelScalar we need to add ModelScalarGroupNode (as GroupNode) to the Scene.RootNode
+        // To show ModelRotator we need to add ModelRotatorGroupNode (as GroupNode) to the Scene.RootNode
 
-        Scene.RootNode.Add(_modelScalar.ModelScalarGroupNode);
+        Scene.RootNode.Add(_modelRotator.ModelRotatorGroupNode);
 
 
-        // Start scaling the first teapot
-        StartScalingObject(allTestModels[0]);
+        // Start rotating the first teapot
+        StartRotatingObject(allTestModels[0]);
     }
 
-    private void StartScalingObject(SceneNode? sceneNode)
+    private void StartRotatingObject(SceneNode? sceneNode)
     {
-        if (_modelScalar == null)
+        if (_modelRotator == null)
             return;
 
-        if (_scalingModel != null)
+        if (_rotatingModel != null)
         {
-            _scalingModel.Material = _commonMaterial;
-            _scalingModel = null;
+            _rotatingModel.Material = _commonMaterial;
+            _rotatingModel = null;
         }
 
-        var newScalingModel = sceneNode as ModelNode;
+        var newRotatingModel = sceneNode as ModelNode;
 
-        if (newScalingModel == null)
+        if (newRotatingModel == null)
         {
-            _modelScalar.IsEnabled = false; // This will also hide _modelScalar.ModelScalarGroupNode
+            _modelRotator.IsEnabled = false; // This will also hide _modelScalar.ModelScalarGroupNode
             return;
         }
 
-        newScalingModel.Material = _selectedMaterial;
+        newRotatingModel.Material = _selectedMaterial;
 
-        _scalingModel = newScalingModel;
+        _rotatingModel = newRotatingModel;
 
-        _modelScalar.Position = newScalingModel.GetCenterPosition();
-        _modelScalar.IsEnabled = true;
+        _modelRotator.Position = newRotatingModel.GetCenterPosition();
+        _modelRotator.IsEnabled = true;
     }
     
     private bool IsPositionFree(Vector3 spherePosition, float freeRadius, GroupNode groupNode, int skippedSphereIndex = -1)
@@ -242,7 +248,7 @@ public class ModelScalarSample : CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
-        _modelScalar?.Dispose(); // This will unsubscribe all pointer / mouse events from InputEventsManager
+        _modelRotator?.Dispose(); // This will unsubscribe all pointer / mouse events from InputEventsManager
         base.OnDisposed();
     }
 
@@ -250,12 +256,8 @@ public class ModelScalarSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateCheckBox("Show X axis", _modelScalar!.IsXAxisShown, isChecked => _modelScalar!.IsXAxisShown = isChecked);
-        ui.CreateCheckBox("Show Y axis", _modelScalar!.IsYAxisShown, isChecked => _modelScalar!.IsYAxisShown = isChecked);
-        ui.CreateCheckBox("Show Z axis", _modelScalar!.IsZAxisShown, isChecked => _modelScalar!.IsZAxisShown = isChecked);
-        
-        ui.AddSeparator();
-
-        ui.CreateCheckBox("Show center box", _modelScalar!.IsCenterBoxShown, isChecked => _modelScalar!.IsCenterBoxShown = isChecked);
+        ui.CreateCheckBox("Show rotation X axis", _modelRotator!.IsXAxisRotationCircleShown, isChecked => _modelRotator!.IsXAxisRotationCircleShown = isChecked);
+        ui.CreateCheckBox("Show rotation Y axis", _modelRotator!.IsYAxisRotationCircleShown, isChecked => _modelRotator!.IsYAxisRotationCircleShown = isChecked);
+        ui.CreateCheckBox("Show rotation Z axis", _modelRotator!.IsZAxisRotationCircleShown, isChecked => _modelRotator!.IsZAxisRotationCircleShown = isChecked);
     }
 }

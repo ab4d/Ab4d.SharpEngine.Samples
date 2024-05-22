@@ -33,6 +33,7 @@
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
   <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
