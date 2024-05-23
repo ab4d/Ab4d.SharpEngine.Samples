@@ -1,14 +1,10 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.ObjFile;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
-using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
@@ -17,14 +13,11 @@ public class MaterialsSample : CommonSample
     public override string Title => "Materials";
     public override string Subtitle => "See code behind to see different ways to assign each material type";
 
-    private bool _isFrontMaterial = true;
-
     private GroupNode? _testModelsGroup;
     private StandardMesh? _sphereMesh;
     private StandardMesh? _boxMesh;
     private MeshModelNode? _vertexColorModelNode;
-    private VertexColorMaterial? _sphereVertexColorMaterial;
-    private VertexColorMaterial? _boxVertexColorMaterial;
+
 
     public MaterialsSample(ICommonSamplesContext context)
         : base(context)
@@ -33,9 +26,26 @@ public class MaterialsSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        var sphereRadius = 30;
+        int sphereRadius = 30;
+
         _sphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: sphereRadius);
         _boxMesh    = MeshFactory.CreateBoxMesh(new Vector3(0, 0, 0), new Vector3(60, 25, 50));
+
+        // Set VertexColors to meshes so that we can use VertexColorMaterial to render those two meshes
+        
+        // Generate colors for each vertex (position).
+        // Then set positionColors to VertexColors data channel on the mesh
+        // VertexColors data channel can be set to an array of Color3 or Color4 items.
+        //
+        // If we later change the values in the positionColors array, then we need to call
+        // boxMesh.UpdateDataChannel(MeshDataChannelTypes.VertexColors);
+        // after changing the data for the changes to take effect.
+
+        var vertexColors = GetSphereVertexColors(_sphereMesh, sphereRadius);
+        _sphereMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
+
+        vertexColors = GetBoxVertexColors(_boxMesh);
+        _boxMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
 
 
         var textBlockFactory = context.GetTextBlockFactory();
@@ -198,67 +208,34 @@ public class MaterialsSample : CommonSample
         // 5) VertexColor material (specify different color for each vertex)
         //
 
-        if (_sphereMesh.Vertices != null)
+        // The easiest option to render VertexColor material is to set an array of Color3 or Color4 data
+        // to the mesh's VertexColors data channel. See SetSphereVertexColorData or SetBoxVertexColorData methods below.
+        //
+        // Another option is to set the PositionColors array in the VertexColorMaterial object.
+        // This will also overwrite the data in the VertexColors data channel.
+        //
+        // It is recommended to use VertexColors data channel instead of PositionColors in VertexColorMaterial
+        // because in this case the color is just another property of each position in the mesh
+        // and therefore that data belongs to the mesh.
+        //
+        // In case of using PositionColors in VertexColorMaterial we need new VertexColorMaterial for each mesh.
+        //
+        // The following code shows how to set up PositionColors for VertexColorMaterial:
+        //
+        //var positionColors = GetSphereVertexColors(_sphereMesh, sphereRadius);
+        //var vertexColorMaterial = new VertexColorMaterial(positionColors, "SphereVertexColorMaterial");
+
+        var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial");
+
+        _vertexColorModelNode = new MeshModelNode(_sphereMesh, vertexColorMaterial, "VertexColorModel")
         {
-            var positionsCount = _sphereMesh.VertexCount;
-            var positionColors = new Color4[positionsCount];
+            Transform = new TranslateTransform(150, 0, 0)
+        };
 
-            var sphereDiameter = sphereRadius * 2;
+        _testModelsGroup.Add(_vertexColorModelNode);
 
-            for (int i = 0; i < positionsCount; i++)
-            {
-                var position = _sphereMesh.Vertices[i].Position;
-
-                // Get colors based on the relative position inside the Sphere
-                float red   = (position.X + sphereRadius) / sphereDiameter;
-                float green = (position.Y + sphereRadius) / sphereDiameter;
-                float blue  = (position.Z + sphereRadius) / sphereDiameter;
-
-                // Set Color this position
-                positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
-            }
-
-            _sphereVertexColorMaterial = new VertexColorMaterial(positionColors, "SphereVertexColorMaterial");
-
-            _sphereVertexColorMaterial.HasTransparency = false; // When we also have transparent colors, we need to set HasTransparency to true
-
-            // If later the positions colors are changed, we also need to call UpdatePositionColors:
-            //vertexColorMaterial.UpdatePositionColors();
-
-
-            // We also need to define VertexColorMaterial for boxMesh:
-            // Create positionColorsArray that will define colors for each position
-            positionsCount = _boxMesh.VertexCount;
-            positionColors = new Color4[positionsCount];
-
-            var boxBounds = _boxMesh.BoundingBox;
-
-            for (int i = 0; i < positionsCount; i++)
-            {
-                var position = _boxMesh.Vertices[i].Position;
-
-                // Get colors based on the relative position inside the Bounds - in range from (0, 0, 0) to (1, 1, 1)
-                float red   = (position.X - boxBounds.Minimum.X) / boxBounds.SizeX;
-                float green = (position.Y - boxBounds.Minimum.Y) / boxBounds.SizeY;
-                float blue  = (position.Z - boxBounds.Minimum.Z) / boxBounds.SizeZ;
-
-                // Set Color this position
-                positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
-            }
-
-            _boxVertexColorMaterial = new VertexColorMaterial(positionColors, "BoxVertexColorMaterial");
-
-
-            _vertexColorModelNode = new MeshModelNode(_sphereMesh, _sphereVertexColorMaterial, "VertexColorModel")
-            {
-                Transform = new TranslateTransform(150, 0, 0)
-            };
-
-            _testModelsGroup.Add(_vertexColorModelNode);
-
-            var textNode5 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
-            scene.RootNode.Add(textNode5);
-        }
+        var textNode5 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode5);
 
 
         //
@@ -309,6 +286,59 @@ public class MaterialsSample : CommonSample
         base.OnCreateLights(scene);
     }
 
+    
+    private Color4[]? GetSphereVertexColors(StandardMesh sphereMesh, float sphereRadius)
+    {
+        if (sphereMesh.Vertices == null)
+            return null;
+
+        var positionsCount = sphereMesh.VertexCount;
+        var positionColors = new Color4[positionsCount];
+
+        var sphereDiameter = sphereRadius * 2;
+
+        for (int i = 0; i < positionsCount; i++)
+        {
+            var position = sphereMesh.Vertices[i].Position;
+
+            // Get colors based on the relative position inside the Sphere
+            float red = (position.X + sphereRadius) / sphereDiameter;
+            float green = (position.Y + sphereRadius) / sphereDiameter;
+            float blue = (position.Z + sphereRadius) / sphereDiameter;
+
+            // Set Color this position
+            positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
+        }
+
+        return positionColors;
+    }
+    
+    private Color4[]? GetBoxVertexColors(StandardMesh boxMesh)
+    {
+        if (boxMesh.Vertices == null)
+            return null;
+
+        var positionsCount = boxMesh.VertexCount;
+        var positionColors = new Color4[positionsCount];
+
+        var boxBounds = boxMesh.BoundingBox;
+
+        for (int i = 0; i < positionsCount; i++)
+        {
+            var position = boxMesh.Vertices[i].Position;
+
+            // Get colors based on the relative position inside the Bounds - in range from (0, 0, 0) to (1, 1, 1)
+            float red = (position.X - boxBounds.Minimum.X) / boxBounds.SizeX;
+            float green = (position.Y - boxBounds.Minimum.Y) / boxBounds.SizeY;
+            float blue = (position.Z - boxBounds.Minimum.Z) / boxBounds.SizeZ;
+
+            // Set Color this position
+            positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
+        }
+
+        return positionColors;
+    }
+
     private void UpdateMesh(bool isSphereMesh)
     {
         if (_testModelsGroup == null || _sphereMesh == null || _boxMesh == null)
@@ -317,18 +347,7 @@ public class MaterialsSample : CommonSample
         foreach (var sceneNode in _testModelsGroup)
         {
             if (sceneNode is MeshModelNode meshModelNode)
-            {
                 meshModelNode.Mesh = isSphereMesh ? _sphereMesh : _boxMesh;
-
-                if (meshModelNode == _vertexColorModelNode)
-                {
-                    var material = isSphereMesh ? _sphereVertexColorMaterial : _boxVertexColorMaterial;
-                    if (_isFrontMaterial)
-                        meshModelNode.Material = material;
-                    else
-                        meshModelNode.BackMaterial = material;
-                }
-            }
         }
     }
     
@@ -356,8 +375,6 @@ public class MaterialsSample : CommonSample
                 }
             }
         }
-
-        _isFrontMaterial = isFrontMaterial;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
