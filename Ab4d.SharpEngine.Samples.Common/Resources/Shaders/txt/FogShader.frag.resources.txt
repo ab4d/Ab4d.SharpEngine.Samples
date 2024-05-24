@@ -1,0 +1,109 @@
+Entry points:
+  main (fragment)
+
+Execution modes:
+  OriginUpperLeft
+
+subpass inputs
+=============
+
+=============
+
+inputs
+=============
+
+ ID 056 : inNormalW (Location : 1)
+ ID 070 : inPosW (Location : 0)
+ ID 195 : inUV (Location : 2)
+=============
+
+outputs
+=============
+
+ ID 181 : outColor (Location : 0)
+=============
+
+textures
+=============
+
+=============
+
+separate images
+=============
+
+=============
+
+separate samplers
+=============
+
+=============
+
+images
+=============
+
+=============
+
+ssbos
+=============
+
+ ID 027 : FogMaterialsBuffer (Set : 3) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 48 bytes)
+ ID 097 : AllLightsBuffer (Set : 1) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 80 bytes)
+=============
+
+ubos
+=============
+
+ ID 066 : sceneUniformBuffer (Set : 0) (Binding : 0) (BlockSize : 132 bytes)
+=============
+
+push
+=============
+
+ ID 011 : pushConstants
+=============
+
+counters
+=============
+
+=============
+
+acceleration structures
+=============
+
+=============
+
+record buffers
+=============
+
+=============
+
+builtin inputs
+=============
+
+=============
+
+builtin outputs
+=============
+
+=============
+
+Active members in buffer: pushConstants
+==================
+
+Member #  0 (materialIndex): Offset:    4, Range:    4
+==================
+
+Specialization constants
+==================
+
+==================
+
+Capabilities
+============
+Capability: 1
+============
+
+Extensions
+============
+============
+

@@ -106,5 +106,6 @@
   <Sample Location="Advanced.MultiSceneNodesSample" Title="Multi SceneNodes" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Multi-touch" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
+  <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
 
 </Samples>

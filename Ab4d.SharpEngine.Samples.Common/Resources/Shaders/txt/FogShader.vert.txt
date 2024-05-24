@@ -1,0 +1,45 @@
+#version 450
+
+layout(set = 2, binding = 0, std430) readonly buffer modelMatricesBuffer
+{
+    mat4 world[];
+} matricesBuffer;
+
+layout(set = 0, binding = 0, std140) uniform sceneUniformBuffer
+{
+    mat4 viewProjection;
+    vec3 eyePosW;
+    vec2 viewSize;
+    float dpiScale;
+    float superSampling;
+    vec3 ambientColor;
+    int dirLightStart;
+    int dirLightCount;
+    int pointLightStart;
+    int pointLightCount;
+    int spotLightStart;
+    int spotLightCount;
+} scene;
+
+layout(push_constant, std430) uniform indexSetup
+{
+    int matrixIndex;
+} pushConstants;
+
+layout(location = 0) in vec3 inPosition;
+layout(location = 0) out vec3 outWorldPos;
+layout(location = 1) out vec3 outNormal;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) out vec2 outUV;
+layout(location = 2) in vec2 inUV;
+
+void main()
+{
+    mat4 modelWorld = matricesBuffer.world[pushConstants.matrixIndex];
+    vec4 posWorld4 = modelWorld * vec4(inPosition, 1.0);
+    gl_Position = scene.viewProjection * posWorld4;
+    outWorldPos = posWorld4.xyz;
+    outNormal = (modelWorld * vec4(inNormal, 0.0)).xyz;
+    outUV = inUV;
+}
+
