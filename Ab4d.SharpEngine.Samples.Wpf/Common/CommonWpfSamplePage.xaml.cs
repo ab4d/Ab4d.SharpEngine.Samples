@@ -29,6 +29,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private MouseCameraController? _mouseCameraController;
+        private InputEventsManager _inputEventsManager;
 
         private WpfUIProvider _wpfUiProvider;
 
@@ -78,6 +79,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
+
+            _inputEventsManager = new InputEventsManager(MainSceneView);
         }
 
         private void ResetSample()
@@ -110,6 +113,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 return;
             
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
+
+            _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
