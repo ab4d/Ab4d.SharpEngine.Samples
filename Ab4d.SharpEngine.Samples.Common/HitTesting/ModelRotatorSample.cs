@@ -96,7 +96,7 @@ public class ModelRotatorSample : CommonSample
         multiModelNodesEventsSource.PointerClick += (sender, args) =>
         {
             // start moving object on left click
-            if (args.RayHitResult != null && args.PressedButtons == MouseButtons.Left)
+            if (args.PressedButtons == MouseButtons.Left)
                 StartRotatingObject(args.RayHitResult.HitSceneNode);
         };
 
