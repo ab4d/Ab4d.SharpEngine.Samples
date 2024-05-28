@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Numerics;
-using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using Avalonia.Input;
 
-namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
+namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
+public class InputEventsManagerWithSurfaceSample : CommonSample
 {
     public override string Title => "InputEventsManager with surface dragging";
     
-    public override string Subtitle => "Drag the yellow sphere around";
+    public override string Subtitle => "Drag the yellow sphere around to see the BeginPointerDrag, PointerDrag and EndPointerDrag events in action.";
 
-
-    private InputEventsManager? _inputEventsManager;
 
     private SphereModelNode? _movableSphere;
     private Material? _savedMaterial;
+
+    private BoxModelNode? _baseBox;
+    private SphereModelNode? _baseSphere;
+    private PlaneModelNode? _dragPlane;
 
     private Vector3 _startDragPosition;
 
@@ -35,7 +35,7 @@ public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
     private readonly Vector3[] _xzRightAnglePositions = new Vector3[] { Vector3.Zero, Vector3.Zero, Vector3.Zero };
     private PolyLineNode? _zyRightAngleLine, _yxRightAngleLine, _xzRightAngleLine;
 
-    public AvaloniaInputEventsManagerWithSurfaceSample(ICommonSamplesContext context)
+    public InputEventsManagerWithSurfaceSample(ICommonSamplesContext context)
         : base(context)
     {
         RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
@@ -46,43 +46,48 @@ public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        if (context.CurrentSharpEngineSceneView is not SharpEngineSceneView sharpEngineSceneView)
-            return;
-
-        var eventsSourceElement = sharpEngineSceneView.Parent as IInputElement;
-        _inputEventsManager = new InputEventsManager(sharpEngineSceneView, eventsSourceElement);
+        _baseBox = new BoxModelNode(centerPosition: new Vector3(0, -5, 50), size: new Vector3(1000, 10, 600), material: StandardMaterials.LightGray, "Box base");
+        scene.RootNode.Add(_baseBox);
 
 
-        var baseBox = new BoxModelNode(centerPosition: new Vector3(0, -5, 50), size: new Vector3(1000, 10, 600), material: StandardMaterials.LightGray, "Box base");
-        scene.RootNode.Add(baseBox);
+        _baseSphere = new SphereModelNode(new Vector3(0, -100, 0), 200, material: StandardMaterials.LightGray, "Sphere base");
+        scene.RootNode.Add(_baseSphere);
 
 
-        var baseSphere = new SphereModelNode(new Vector3(0, -100, 0), 200, material: StandardMaterials.LightGray, "Sphere base");
-        scene.RootNode.Add(baseSphere);
-
-
-        var dragPlane = new PlaneModelNode(centerPosition: new Vector3(0, 0, -200), 
-                                           size: new Vector2(1000, 1000), 
-                                           normal: new Vector3(0, 0, 1), 
-                                           heightDirection: new Vector3(0, 1, 0), 
-                                           name: "DragPlane")
+        _dragPlane = new PlaneModelNode(centerPosition: new Vector3(0, 0, -200), 
+                                        size: new Vector2(1000, 1000), 
+                                        normal: new Vector3(0, 0, 1), 
+                                        heightDirection: new Vector3(0, 1, 0), 
+                                        name: "DragPlane")
         {
             Material = StandardMaterials.Gray.SetOpacity(opacity: 0.4f),
         };
 
-        dragPlane.BackMaterial = dragPlane.Material;
+        _dragPlane.BackMaterial = _dragPlane.Material;
 
-        scene.RootNode.Add(dragPlane);
+        scene.RootNode.Add(_dragPlane);
+    }
 
+    /// <inheritdoc />
+    protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
+    {
+        var scene = inputEventsManager.SceneView.Scene;
 
         // Register baseBox and baseSphere as ModelNodes that user can drag on
-        _inputEventsManager.RegisterDragSurface(baseBox);
-        _inputEventsManager.RegisterDragSurface(baseSphere);
+        
+        if (_baseBox != null)
+            inputEventsManager.RegisterDragSurface(_baseBox);
 
-        // We also register an INFINITE PLANE as a drag surface (defined by normal and position on a plane)
-        // Note that if we would register the dragPlane (as PlaneModelNode), then the drag surface would be limiter to only that model, 
-        // but in case of registering a pane with normal and position, that drag surface is infinite.
-        _inputEventsManager.RegisterDragSurface(planeNormal: dragPlane.Normal, pointOnPlane: dragPlane.Position);
+        if (_baseSphere != null)
+            inputEventsManager.RegisterDragSurface(_baseSphere);
+
+        if (_dragPlane != null)
+        {
+            // We also register an INFINITE PLANE as a drag surface (defined by normal and position on a plane)
+            // Note that if we would register the dragPlane (as PlaneModelNode), then the drag surface would be limiter to only that model, 
+            // but in case of registering a pane with normal and position, that drag surface is infinite.
+            inputEventsManager.RegisterDragSurface(planeNormal: _dragPlane.Normal, pointOnPlane: _dragPlane.Position);
+        }
 
         
         //
@@ -166,10 +171,6 @@ public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
         
         modelNodeEventsSource.BeginPointerDrag += (sender, args) =>
         {
-            if (args.RayHitResult == null)
-                return;
-
-
             _startDragPosition = args.RayHitResult.HitPosition;
 
             if (_movableSphere.Transform is TranslateTransform translateTransform)
@@ -182,9 +183,6 @@ public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
         
         modelNodeEventsSource.EndPointerDrag += (sender, args) =>
         {
-            if (args.RayHitResult == null)
-                return;
-
             _movableSphere.Material = _savedMaterial;
         };
 
@@ -200,7 +198,7 @@ public class AvaloniaInputEventsManagerWithSurfaceSample : CommonSample
             UpdateDragLines(newTranslatePosition);
         };
 
-        _inputEventsManager.RegisterEventsSource(modelNodeEventsSource);
+        inputEventsManager.RegisterEventsSource(modelNodeEventsSource);
     }
 
     private void UpdateDragLines(Vector3 currentDragPosition)

@@ -26,9 +26,15 @@
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
   <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.WpfManualInputEventsSample" Title="Manual Input events"/>
+  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
