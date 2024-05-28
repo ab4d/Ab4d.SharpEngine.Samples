@@ -43,6 +43,7 @@ public abstract class CommonSample
     public MouseAndKeyboardConditions QuickZoomConditions { get; set; } = MouseAndKeyboardConditions.Disabled;
     public bool RotateAroundMousePosition { get; set; }
     public CameraZoomMode ZoomMode { get; set; } = CameraZoomMode.CameraRotationCenterPosition;
+    public bool IsMouseWheelZoomEnabled { get; set; } = true;
 
     private bool _showCameraAxisPanel;
 
@@ -137,6 +138,10 @@ public abstract class CommonSample
 
     protected abstract void OnCreateScene(Scene scene);
 
+    /// <summary>
+    /// OnInputEventsManagerInitialized can be overridden to initialize the InputEventsManager.
+    /// </summary>
+    /// <param name="inputEventsManager">ManualInputEventsManager</param>
     protected virtual void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
     {
     }
@@ -177,6 +182,7 @@ public abstract class CommonSample
         mouseCameraController.QuickZoomConditions       = this.QuickZoomConditions;
         mouseCameraController.RotateAroundMousePosition = this.RotateAroundMousePosition;
         mouseCameraController.ZoomMode                  = this.ZoomMode;
+        mouseCameraController.IsMouseWheelZoomEnabled   = this.IsMouseWheelZoomEnabled;
     }
 
     public void CreateUI(ICommonSampleUIProvider uiProvider)
