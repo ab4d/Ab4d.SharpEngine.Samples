@@ -86,7 +86,7 @@ public class ModelMoverSample : CommonSample
         var allTestModels = _testSpheresGroupNode.GetAllChildren<ModelNode>();
         var multiModelNodesEventsSource = new MultiModelNodesEventsSource(allTestModels);
 
-        multiModelNodesEventsSource.PointerClick += (sender, args) =>
+        multiModelNodesEventsSource.PointerClicked += (sender, args) =>
         {
             // start moving object on left click
             if (args.PressedButtons == MouseButtons.Left)

@@ -101,7 +101,7 @@ public class InputEventsManagerSample : CommonSample
 
             // After that we can subscribe to many pointer events:
             
-            baseBoxEventsSource.PointerEnter += (sender, args) =>
+            baseBoxEventsSource.PointerEntered += (sender, args) =>
             {
                 if (_wireCrossNode != null)
                 {
@@ -110,13 +110,13 @@ public class InputEventsManagerSample : CommonSample
                 }
             };
 
-            baseBoxEventsSource.PointerLeave += (sender, args) =>
+            baseBoxEventsSource.PointerExited += (sender, args) =>
             {
                 if (_wireCrossNode != null)
                     _wireCrossNode.Visibility = SceneNodeVisibility.Hidden;
             };
 
-            baseBoxEventsSource.PointerMove += (sender, args) =>
+            baseBoxEventsSource.PointerMoved += (sender, args) =>
             {
                 if (_wireCrossNode != null)
                     _wireCrossNode.Position = args.RayHitResult.HitPosition;
@@ -140,27 +140,27 @@ public class InputEventsManagerSample : CommonSample
             inputEventsManager.RegisterEventsSource(modelNodeEventsSource);
 
             // ... and then we can subscribe to various pointer / mouse events on that 3D objects.
-            modelNodeEventsSource.PointerEnter += (sender, args) =>
+            modelNodeEventsSource.PointerEntered += (sender, args) =>
             {
                 ProcessSelect(onePyramid);
             };
 
-            modelNodeEventsSource.PointerLeave += (sender, args) =>
+            modelNodeEventsSource.PointerExited += (sender, args) =>
             {
                 ProcessDeSelect();
             };
             
-            modelNodeEventsSource.PointerClick += (sender, args) =>
+            modelNodeEventsSource.PointerClicked += (sender, args) =>
             {
                 ProcessClick(onePyramid);  
             };
 
-            modelNodeEventsSource.PointerDoubleClick += (sender, args) =>
+            modelNodeEventsSource.PointerDoubleClicked += (sender, args) =>
             {
                 ProcessDoubleClick(onePyramid);  
             };
             
-            modelNodeEventsSource.MouseWheel += (sender, args) =>
+            modelNodeEventsSource.PointerWheelChanged += (sender, args) =>
             {
                 //ProcessScale(oneBox, args.MouseWheelDelta);  
                 ProcessRotate(onePyramid, args.MouseWheelDelta);  
@@ -212,30 +212,30 @@ public class InputEventsManagerSample : CommonSample
         inputEventsManager.RegisterEventsSource(multiModelNodesEventsSource);
 
 
-        multiModelNodesEventsSource.PointerEnter += (sender, args) =>
+        multiModelNodesEventsSource.PointerEntered += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessSelect(modelNode);
         };
 
-        multiModelNodesEventsSource.PointerLeave += (sender, args) =>
+        multiModelNodesEventsSource.PointerExited += (sender, args) =>
         {
             ProcessDeSelect();
         };
             
-        multiModelNodesEventsSource.PointerClick += (sender, args) =>
+        multiModelNodesEventsSource.PointerClicked += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessClick(modelNode);  
         };
 
-        multiModelNodesEventsSource.PointerDoubleClick += (sender, args) =>
+        multiModelNodesEventsSource.PointerDoubleClicked += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessDoubleClick(modelNode);  
         };
 
-        multiModelNodesEventsSource.MouseWheel += (sender, args) =>
+        multiModelNodesEventsSource.PointerWheelChanged += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
             {
@@ -263,30 +263,30 @@ public class InputEventsManagerSample : CommonSample
         var namedModelNodesEventsSource = new NamedModelNodesEventsSource("Box_*");
         inputEventsManager.RegisterEventsSource(namedModelNodesEventsSource);
 
-        namedModelNodesEventsSource.PointerEnter += (sender, args) =>
+        namedModelNodesEventsSource.PointerEntered += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessSelect(modelNode);
         };
 
-        namedModelNodesEventsSource.PointerLeave += (sender, args) =>
+        namedModelNodesEventsSource.PointerExited += (sender, args) =>
         {
             ProcessDeSelect();
         };
             
-        namedModelNodesEventsSource.PointerClick += (sender, args) =>
+        namedModelNodesEventsSource.PointerClicked += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessClick(modelNode);  
         };
 
-        namedModelNodesEventsSource.PointerDoubleClick += (sender, args) =>
+        namedModelNodesEventsSource.PointerDoubleClicked += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
                 ProcessDoubleClick(modelNode);  
         };
 
-        namedModelNodesEventsSource.MouseWheel += (sender, args) =>
+        namedModelNodesEventsSource.PointerWheelChanged += (sender, args) =>
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
             {

@@ -145,23 +145,23 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         // The yellow sphere will be an event's source so user can subscribe to many pointer or mouse events
         //
         var modelNodeEventsSource = new ModelNodeEventsSource(_movableSphere);
-        modelNodeEventsSource.PointerEnter += (sender, args) =>
+        modelNodeEventsSource.PointerEntered += (sender, args) =>
         {
             _savedMaterial = _movableSphere.Material;
             _movableSphere.Material = StandardMaterials.Orange;
         };
 
-        modelNodeEventsSource.PointerLeave += (sender, args) =>
+        modelNodeEventsSource.PointerExited += (sender, args) =>
         {
             _movableSphere.Material = _savedMaterial;
         };
 
-        modelNodeEventsSource.PointerDown += (sender, args) =>
+        modelNodeEventsSource.PointerPressed += (sender, args) =>
         {
             _movableSphere.Material = StandardMaterials.Red;
         };
         
-        modelNodeEventsSource.PointerUp += (sender, args) =>
+        modelNodeEventsSource.PointerReleased += (sender, args) =>
         {
             _movableSphere.Material = StandardMaterials.Orange;
         };
