@@ -13,11 +13,13 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
 {
     public override string Title => "InputEventsManager with surface dragging";
     
-    public override string Subtitle => "Drag the yellow sphere around to see the BeginPointerDrag, PointerDrag and EndPointerDrag events in action.";
+    public override string Subtitle => "Drag the yellow sphere around the specified drag surface.\nThe following pointer / mouse events are demonstrated here:\n- BeginPointerDrag\n- PointerDrag\n- EndPointerDrag";
 
 
     private SphereModelNode? _movableSphere;
     private Material? _savedMaterial;
+    
+    private ManualInputEventsManager? _inputEventsManager;
 
     private BoxModelNode? _baseBox;
     private SphereModelNode? _baseSphere;
@@ -28,12 +30,18 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
     private WireCrossNode? _startDragWireCrossNode;
     private LineNode? _mainDragLine;
     private LineNode? _xDragLine, _yDragLine, _zDragLine;
+    
+    private bool _isPlaneDragSurface = true;
+    private bool _isBottomBoxDragSurface = true;
+    private bool _isBottomSphereDragSurface = true;
+    private int _registeredDragPlaneIndex;
 
     private readonly float _rightAngleLineLength = 10;
     private readonly Vector3[] _zyRightAnglePositions = new Vector3[] { Vector3.Zero, Vector3.Zero, Vector3.Zero }; // define some temp positions, that will be later replaces by actual positions
     private readonly Vector3[] _yxRightAnglePositions = new Vector3[] { Vector3.Zero, Vector3.Zero, Vector3.Zero };
     private readonly Vector3[] _xzRightAnglePositions = new Vector3[] { Vector3.Zero, Vector3.Zero, Vector3.Zero };
     private PolyLineNode? _zyRightAngleLine, _yxRightAngleLine, _xzRightAngleLine;
+    
 
     public InputEventsManagerWithSurfaceSample(ICommonSamplesContext context)
         : base(context)
@@ -71,24 +79,13 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
     /// <inheritdoc />
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
     {
+        _inputEventsManager = inputEventsManager;
+
+        // UpdateDragSurfaces registers or removes drag surfaces from InputEventsManager
+        UpdateDragSurfaces();
+
+
         var scene = inputEventsManager.SceneView.Scene;
-
-        // Register baseBox and baseSphere as ModelNodes that user can drag on
-        
-        if (_baseBox != null)
-            inputEventsManager.RegisterDragSurface(_baseBox);
-
-        if (_baseSphere != null)
-            inputEventsManager.RegisterDragSurface(_baseSphere);
-
-        if (_dragPlane != null)
-        {
-            // We also register an INFINITE PLANE as a drag surface (defined by normal and position on a plane)
-            // Note that if we would register the dragPlane (as PlaneModelNode), then the drag surface would be limiter to only that model, 
-            // but in case of registering a pane with normal and position, that drag surface is infinite.
-            inputEventsManager.RegisterDragSurface(planeNormal: _dragPlane.Normal, pointOnPlane: _dragPlane.Position);
-        }
-
         
         //
         // Define lines that will show where we moved the sphere
@@ -100,7 +97,7 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         scene.RootNode.Add(_mainDragLine);
 
         // Drag lines are shows in the following order: z, y and x
-        var smallDragLineMaterial = new LineMaterial(_mainDragLine.LineColor, lineThickness: 1)
+        var smallDragLineMaterial = new LineMaterial(Colors.SkyBlue, lineThickness: 1)
         {
             DepthBias = 0.0005f, // defining DepthBias will show lines on top of 3D models 
         };
@@ -179,11 +176,19 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
                 _movableSphere.Transform = new TranslateTransform(_startDragPosition);
 
             HideDragLines();
+
+            // To continue getting mouse events when mouse leaves the SharpEngineSceneView or the current Windows,
+            // we need to capture the mouse. This is required in WPF, WinUI and WinForms,
+            // but on Avalonia this is done automatically by Avalonia (here calling CapturePointer is a no-op).
+            _inputEventsManager.CapturePointer();
         };
         
         modelNodeEventsSource.EndPointerDrag += (sender, args) =>
         {
             _movableSphere.Material = _savedMaterial;
+
+            // Release mouse capture
+            _inputEventsManager.EndPointerCapture();
         };
 
         modelNodeEventsSource.PointerDrag += (sender, args) =>
@@ -199,6 +204,44 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         };
 
         inputEventsManager.RegisterEventsSource(modelNodeEventsSource);
+    }
+
+    private void UpdateDragSurfaces()
+    {
+        if (_inputEventsManager == null)
+            return;
+
+        // Register baseBox and baseSphere as ModelNodes that user can drag on
+
+        if (_baseBox != null)
+        {
+            if (_isBottomBoxDragSurface)
+                _inputEventsManager.RegisterDragSurface(_baseBox);
+            else
+                _inputEventsManager.RemoveDragSurface(_baseBox);
+        }
+
+        if (_baseSphere != null)
+        {
+            if (_isBottomSphereDragSurface)
+                _inputEventsManager.RegisterDragSurface(_baseSphere);
+            else
+                _inputEventsManager.RemoveDragSurface(_baseSphere);
+        }
+
+        if (_dragPlane != null)
+        {
+            // We also register an INFINITE PLANE as a drag surface (defined by normal and position on a plane)
+            // Note that if we would register the dragPlane (as PlaneModelNode), then the drag surface would be limiter to only that model, 
+            // but in case of registering a pane with normal and position, that drag surface is infinite.
+            //
+            // When RegisterDragSurface is called with planeNormal and pointOnPlane as parameters,
+            // the method returns an index (int) that can be passed to the RemoveDragSurface to remove the drag plane.
+            if (_isPlaneDragSurface)
+                _registeredDragPlaneIndex = _inputEventsManager.RegisterDragSurface(planeNormal: _dragPlane.Normal, pointOnPlane: _dragPlane.Position);
+            else
+                _inputEventsManager.RemoveDragSurface(_registeredDragPlaneIndex);
+        }
     }
 
     private void UpdateDragLines(Vector3 currentDragPosition)
@@ -324,5 +367,17 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         
         if (_xzRightAngleLine != null)
             _xzRightAngleLine.Visibility = SceneNodeVisibility.Hidden;
+    }
+
+
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateLabel("Drag surfaces:", isHeader: true);
+
+        ui.CreateCheckBox("Plane N: (0,0,1); P: (0,0,-200)", _isPlaneDragSurface, isChecked => { _isPlaneDragSurface = isChecked; UpdateDragSurfaces(); });
+        ui.CreateCheckBox("Bottom gray box", _isBottomBoxDragSurface, isChecked => { _isBottomBoxDragSurface = isChecked; UpdateDragSurfaces(); });
+        ui.CreateCheckBox("Bottom gray sphere", _isBottomSphereDragSurface, isChecked => { _isBottomSphereDragSurface = isChecked; UpdateDragSurfaces(); });
     }
 }
