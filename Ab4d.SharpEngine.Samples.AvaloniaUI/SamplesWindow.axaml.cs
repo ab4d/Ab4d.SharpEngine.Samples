@@ -30,8 +30,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        //private string? _startupPage = "CameraControllers.MouseCameraControllerSample";
-        private string? _startupPage = null;
+        private string? _startupPage = "HitTesting.InputEventsManagerWithSurfaceSample";
+        //private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
@@ -63,7 +63,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                                                   licenseType: "SamplesLicense",
                                                   platforms: "All",
                                                   license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
-
 
             if (Application.Current != null)
                 Application.Current.RequestedThemeVariant = ThemeVariant.Light;
