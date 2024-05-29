@@ -54,7 +54,7 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        _baseBox = new BoxModelNode(centerPosition: new Vector3(0, -5, 50), size: new Vector3(1000, 10, 600), material: StandardMaterials.LightGray, "Box base");
+        _baseBox = new BoxModelNode(centerPosition: new Vector3(0, -5, 25), size: new Vector3(1000, 10, 650), material: StandardMaterials.LightGray, "Box base");
         scene.RootNode.Add(_baseBox);
 
 
@@ -68,7 +68,7 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
                                         heightDirection: new Vector3(0, 1, 0), 
                                         name: "DragPlane")
         {
-            Material = StandardMaterials.Gray.SetOpacity(opacity: 0.4f),
+            Material = StandardMaterials.Gray.SetOpacity(opacity: 0.2f),
         };
 
         _dragPlane.BackMaterial = _dragPlane.Material;
@@ -97,7 +97,7 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         scene.RootNode.Add(_mainDragLine);
 
         // Drag lines are shows in the following order: z, y and x
-        var smallDragLineMaterial = new LineMaterial(Colors.SkyBlue, lineThickness: 1)
+        var smallDragLineMaterial = new LineMaterial(Colors.DeepSkyBlue, lineThickness: 1)
         {
             DepthBias = 0.0005f, // defining DepthBias will show lines on top of 3D models 
         };
