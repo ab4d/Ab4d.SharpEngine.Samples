@@ -1,30 +1,12 @@
-using System.Numerics;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.SceneNodes;
-using Microsoft.UI.Xaml;
-using Ab4d.SharpEngine.Lights;
-using Ab4d.SharpEngine.Transformations;
-using Microsoft.UI;
 using System;
-using Windows.ApplicationModel;
-using Ab4d.Assimp;
-using Ab4d.SharpEngine.Assimp;
+using Ab4d.SharpEngine.Common;
+using Microsoft.UI.Xaml;
 using Ab4d.SharpEngine.WinUI;
-using Microsoft.UI.Windowing;
-using Colors = Microsoft.UI.Colors;
-using Ab4d.SharpEngine.Vulkan;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using TranslateTransform = Ab4d.SharpEngine.Transformations.TranslateTransform;
-using System.Runtime.InteropServices;
-using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
-using Microsoft.UI.Xaml.Input;
-
+using Colors = Microsoft.UI.Colors;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -40,6 +22,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private MouseCameraController? _mouseCameraController;
+        private InputEventsManager _inputEventsManager;
 
         private WinUIProvider _wpfUiProvider;
 
@@ -82,6 +65,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
+
+            _inputEventsManager = new InputEventsManager(MainSceneView);
         }
 
         private void ResetSample()
@@ -107,6 +92,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                 return;
             
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
+            _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
