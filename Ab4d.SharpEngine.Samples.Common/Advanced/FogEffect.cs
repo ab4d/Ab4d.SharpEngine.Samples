@@ -499,6 +499,9 @@ public class FogEffect : Effect
             
             if (!_pipelineLayout.IsNull())
             {
+                // We must not immediately dispose the resources, because they may be currently used if frames are rendered in the background.
+                // To solve that call the DisposeVulkanResourceOnMainThreadAfterFrameRendered that will wait until the current frame is rendered,
+                // or dispose the resources immediately  when no frame is currently being rendered.
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipelineLayout.Handle, typeof(PipelineLayout));
                 _pipelineLayout = PipelineLayout.Null;
             }
@@ -520,7 +523,7 @@ public class FogEffect : Effect
                 if (_standardDescriptorPoolFactory != null)
                 {
                     _standardDescriptorPoolFactoryDisposeToken.Dispose();
-                    _standardDescriptorPoolFactory      = null;
+                    _standardDescriptorPoolFactory = null;
                 }
             }
         }
