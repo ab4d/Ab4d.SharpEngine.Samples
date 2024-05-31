@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
@@ -79,6 +80,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             // Only show "Full Logging" CheckBox when SharpEngine is compiled with full logging
             if (Ab4d.SharpEngine.Utilities.Log.MinUsedLogLevel != LogLevels.Trace)
                 ActionsRootMenuItem.Items.Remove(FullLoggingCheckBox);
+
+            if (!_commonDiagnostics.IsGltfExporterAvailable)
+            {
+                ExportToGltfMenuItem.IsEnabled = false;
+                ToolTip.SetTip(ExportToGltfMenuItem, "Add Ab4d.SharpEngine.glTF.dll to the application's folder to enabled export to glTF");
+                ToolTip.SetShowOnDisabled(ExportToGltfMenuItem, true);
+            }
 
 
             string dumpFolder;
@@ -294,6 +302,35 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             // Start with empty DumpFile 
             System.IO.File.WriteAllText(DumpFileName, dumpText);
             StartProcess(DumpFileName);
+        }
+        
+        private async void ExportToGltfMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!_commonDiagnostics.IsGltfExporterAvailable || SharpEngineSceneView == null)
+                return;
+
+            // Run file selection dialog
+            var topLevel = TopLevel.GetTopLevel(this);
+            Debug.Assert(topLevel != null, nameof(topLevel) + " != null");
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Export Scene to glTF File",
+                SuggestedFileName = "SharpEngineScene.gltf",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("glTF files")
+                    {
+                        Patterns = new[] { "*.gltf", "*.glb" },
+                        MimeTypes = new[] { "model/gltf+json", "model/gltf-binary" }
+                    }
+                }
+            });
+
+            var fileName = file?.TryGetLocalPath();
+            if (fileName == null)
+                return;
+
+            _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
         }
         
         private void DumpCameraDetailsMenuItem_OnClick(object sender, RoutedEventArgs e)

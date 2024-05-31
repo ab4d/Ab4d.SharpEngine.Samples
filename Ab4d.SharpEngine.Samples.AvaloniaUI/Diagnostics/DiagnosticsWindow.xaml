@@ -32,6 +32,7 @@
                 <MenuItem Name="DumpUsedMaterialsMenuItem" Header="Dump used materials" Click="DumpUsedMaterialsMenuItem_OnClick"/>
                 <MenuItem Name="DumpEngineSettingsMenuItem" Header="Dump engine settings" Click="DumpEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
+                <MenuItem Name="ExportToGltfMenuItem" Header="Export Scene to glTF" Click="ExportToGltfMenuItem_OnClick"/>
                 <MenuItem Name="ShowFullSceneDumpMenuItem" Header="Get full scene dump" Click="ShowFullSceneDumpMenuItem_OnClick"/>
 
                 <Separator />
