@@ -20,6 +20,8 @@ public class ModelScalarSample : CommonSample
     private readonly StandardMaterial _commonMaterial;
     private readonly StandardMaterial _selectedMaterial;
 
+    private float _modelMoverRotationAngle;
+
     private ModelNode? _scalingModel;
     private GroupNode? _testModelsGroupNode;
     private PlanarShadowMeshCreator? _planarShadowMeshCreator;
@@ -255,7 +257,13 @@ public class ModelScalarSample : CommonSample
         ui.CreateCheckBox("Show Z axis", _modelScalar!.IsZAxisShown, isChecked => _modelScalar!.IsZAxisShown = isChecked);
         
         ui.AddSeparator();
-
         ui.CreateCheckBox("Show center box", _modelScalar!.IsCenterBoxShown, isChecked => _modelScalar!.IsCenterBoxShown = isChecked);
+
+        ui.AddSeparator();
+        ui.CreateButton("Rotate ModelScalar", () =>
+        {
+            _modelMoverRotationAngle += 30;
+            _modelScalar.SetRotation(0, _modelMoverRotationAngle, 0); // Rotate ModelScalar around Y (up) axis
+        });
     }
 }

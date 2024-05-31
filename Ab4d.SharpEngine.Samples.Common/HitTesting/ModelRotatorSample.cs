@@ -19,6 +19,8 @@ public class ModelRotatorSample : CommonSample
     private readonly StandardMaterial _commonMaterial;
     private readonly StandardMaterial _selectedMaterial;
 
+    private float _modelMoverRotationAngle;
+
     private float _startRotateX;
     private float _startRotateY;
     private float _startRotateZ;
@@ -259,5 +261,12 @@ public class ModelRotatorSample : CommonSample
         ui.CreateCheckBox("Show rotation X axis", _modelRotator!.IsXAxisRotationCircleShown, isChecked => _modelRotator!.IsXAxisRotationCircleShown = isChecked);
         ui.CreateCheckBox("Show rotation Y axis", _modelRotator!.IsYAxisRotationCircleShown, isChecked => _modelRotator!.IsYAxisRotationCircleShown = isChecked);
         ui.CreateCheckBox("Show rotation Z axis", _modelRotator!.IsZAxisRotationCircleShown, isChecked => _modelRotator!.IsZAxisRotationCircleShown = isChecked);
+
+        ui.AddSeparator();
+        ui.CreateButton("Rotate ModelRotator", () =>
+        {
+            _modelMoverRotationAngle += 30;
+            _modelRotator.SetRotation(0, _modelMoverRotationAngle, 0); // Rotate ModelRotator around Y (up) axis
+        });
     }
 }

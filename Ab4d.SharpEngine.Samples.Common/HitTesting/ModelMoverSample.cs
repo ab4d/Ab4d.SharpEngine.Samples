@@ -20,6 +20,8 @@ public class ModelMoverSample : CommonSample
     private readonly StandardMaterial _selectedMaterial;
     private readonly StandardMaterial _invalidPositionMaterial;
 
+    private float _modelMoverRotationAngle;
+
     private SphereModelNode? _movingSphere;
     private Vector3 _startCenterPosition;
     private GroupNode? _testSpheresGroupNode;
@@ -27,6 +29,7 @@ public class ModelMoverSample : CommonSample
     private MeshModelNode? _shadowModel;
 
     private bool _preventCollisions = true;
+    private bool _preventMovingBlowPlane = true;
 
     public ModelMoverSample(ICommonSamplesContext context)
         : base(context)
@@ -128,11 +131,18 @@ public class ModelMoverSample : CommonSample
             var newPosition = _startCenterPosition + args.MoveVector;
 
 
-            // prevent moving sphere below plane with y = 0
-            if (newPosition.Y < 25)
+            // prevent moving sphere below plane (actually because sphere radius is 20, we allow floating 5 units above the plane)
+            if (_preventMovingBlowPlane && newPosition.Y < 25)
             {
-                args.PreventMove = true; // Set PreventMove to true to prevent automatic moving of ModelMover
-                return;
+                newPosition = new Vector3(newPosition.X, 25, newPosition.Z);
+                
+                // We can change the args.MoveVector and in case ModelMover.IsAutomaticallyMoved is true,
+                // the updated MoveVector will be used to move the ModelMover.
+                args.MoveVector = newPosition - _startCenterPosition;
+
+                // Instead of changing the args.MoveVector, we could also prevent moving the ModelMover by setting PreventMove to true:
+                //args.PreventMove = true; // Set PreventMove to true to prevent automatic moving of ModelMover
+                //return;
             }
 
             
@@ -250,7 +260,7 @@ public class ModelMoverSample : CommonSample
         _modelMover?.Dispose(); // This will unsubscribe all pointer / mouse events from InputEventsManager
         base.OnDisposed();
     }
-
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
@@ -258,13 +268,18 @@ public class ModelMoverSample : CommonSample
         ui.CreateCheckBox("Show X axis", _modelMover!.IsXAxisShown, isChecked => _modelMover!.IsXAxisShown = isChecked);
         ui.CreateCheckBox("Show Y axis", _modelMover!.IsYAxisShown, isChecked => _modelMover!.IsYAxisShown = isChecked);
         ui.CreateCheckBox("Show Z axis", _modelMover!.IsZAxisShown, isChecked => _modelMover!.IsZAxisShown = isChecked);
+        
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("Show movable planes", _modelMover!.ShowMovablePlanes, isChecked => _modelMover!.ShowMovablePlanes = isChecked);
+        ui.CreateCheckBox("Prevent moving below plane", _preventMovingBlowPlane, isChecked => _preventMovingBlowPlane = isChecked);
+        ui.CreateCheckBox("Prevent collisions", _preventCollisions, isChecked => _preventCollisions = isChecked);
 
         ui.AddSeparator();
-        
-        ui.CreateCheckBox("Show movable planes", _modelMover!.ShowMovablePlanes, isChecked => _modelMover!.ShowMovablePlanes = isChecked);
-        
-        ui.AddSeparator();
-        
-        ui.CreateCheckBox("Prevent collisions", _preventCollisions, isChecked => _preventCollisions = isChecked);
+        ui.CreateButton("Rotate ModelMover", () =>
+        {
+            _modelMoverRotationAngle += 30;
+            _modelMover.SetRotation(0, _modelMoverRotationAngle, 0); // Rotate ModelMover around Y (up) axis
+        });
     }
 }
