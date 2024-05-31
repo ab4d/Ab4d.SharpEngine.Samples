@@ -30,8 +30,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        private string? _startupPage = "HitTesting.InputEventsManagerWithSurfaceSample";
-        //private string? _startupPage = null;
+        //private string? _startupPage = "HitTesting.ModelRotatorSample";
+        private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
