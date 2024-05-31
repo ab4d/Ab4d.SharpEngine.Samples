@@ -106,7 +106,7 @@ public class ModelScalarSample : CommonSample
         // In this sample we show ModelScalar on top of all other objects.
         // This is done by enabling clearing depth buffer before rendering OverlayRenderingLayer.
         // Also, the objects shown by the ModelScalar need to be put into the OverlayRenderingLayer (setting CustomRenderingLayer below).
-        // See also Advanced/BackgroundAndOverlayRenderingSample for more information.
+        // See also Advanced/BackgroundAndOverlayRenderingSample for more information on how to render 3D objects on top of below other 3D objects.
         if (Scene.OverlayRenderingLayer != null)
             Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = true;
 
@@ -114,6 +114,12 @@ public class ModelScalarSample : CommonSample
         // Note that ModelScalar is not a SceneNode and cannot be added to the RootNote.
         // Instead, the models that are added to the scene are defined in _modelScalar.ModelScalarGroupNode (see below).
         _modelScalar = new ModelScalar(inputEventsManager);
+
+        // To use custom axes, use the following constructor:
+        //_modelScalar = new ModelScalar(inputEventsManager,
+        //                               xAxisVector: new Vector3(1, 0, 0),
+        //                               yAxisVector: new Vector3(0, 1, 0),
+        //                               zAxisVector: new Vector3(0, 0, 1));
         
         // To show ModelScalar on top of other objects, se the CustomRenderingLayer to OverlayRenderingLayer.
         _modelScalar.CustomRenderingLayer = Scene.OverlayRenderingLayer;

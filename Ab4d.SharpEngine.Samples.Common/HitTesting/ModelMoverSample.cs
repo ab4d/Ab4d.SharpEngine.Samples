@@ -102,15 +102,24 @@ public class ModelMoverSample : CommonSample
         // In this sample we show ModelMover on top of all other objects.
         // This is done by enabling clearing depth buffer before rendering OverlayRenderingLayer.
         // Also, the objects shown by the ModelMover need to be put into the OverlayRenderingLayer (setting CustomRenderingLayer below).
-        // See also Advanced/BackgroundAndOverlayRenderingSample for more information.
+        // See also Advanced/BackgroundAndOverlayRenderingSample for more information on how to render 3D objects on top of below other 3D objects.
         if (Scene.OverlayRenderingLayer != null)
             Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = true;
 
-        // Create ModelMover
+        // Create ModelMover by using the default constructor
         // Note that ModelMover is not a SceneNode and cannot be added to the RootNote.
         // Instead, the models that are added to the scene are defined in _modelMover.ModelMoverGroupNode (see below).
         _modelMover = new ModelMover(inputEventsManager);
-        
+
+        // To customize the look of the ModelRotator use the following constructor (here the default values are used):
+        //_modelMover = new ModelMover(inputEventsManager,
+        //                             xAxisVector: new Vector3(1, 0, 0),
+        //                             yAxisVector: new Vector3(0, 1, 0),
+        //                             zAxisVector: new Vector3(0, 0, 1),
+        //                             axisLength: 50, 
+        //                             axisRadius: 2, 
+        //                             axisArrowRadius: 6);
+
         // To show ModelMover on top of other objects, se the CustomRenderingLayer to OverlayRenderingLayer.
         _modelMover.CustomRenderingLayer = Scene.OverlayRenderingLayer;
 
