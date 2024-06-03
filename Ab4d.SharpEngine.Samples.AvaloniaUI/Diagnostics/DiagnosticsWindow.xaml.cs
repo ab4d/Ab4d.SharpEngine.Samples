@@ -84,7 +84,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             if (!_commonDiagnostics.IsGltfExporterAvailable)
             {
                 ExportToGltfMenuItem.IsEnabled = false;
-                ToolTip.SetTip(ExportToGltfMenuItem, "Add Ab4d.SharpEngine.glTF.dll to the application's folder to enabled export to glTF");
+                ToolTip.SetTip(ExportToGltfMenuItem, "Add reference to the Ab4d.SharpEngine.glTF to enabled export to glTF");
                 ToolTip.SetShowOnDisabled(ExportToGltfMenuItem, true);
             }
 
@@ -318,11 +318,16 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
                 SuggestedFileName = "SharpEngineScene.gltf",
                 FileTypeChoices = new[]
                 {
-                    new FilePickerFileType("glTF files")
+                    new FilePickerFileType("glTF file with embedded data and images")
                     {
-                        Patterns = new[] { "*.gltf", "*.glb" },
-                        MimeTypes = new[] { "model/gltf+json", "model/gltf-binary" }
-                    }
+                        Patterns = new[] { "*.gltf" },
+                        MimeTypes = new[] { "model/gltf+json" }
+                    },
+                    new FilePickerFileType("glTF binary file with embedded data and images")
+                    {
+                        Patterns = new[] { "*.glb" },
+                        MimeTypes = new[] { "model/gltf-binary" }
+                    },
                 }
             });
 

@@ -270,6 +270,29 @@ public class CommonDiagnostics
 
         var isGltfExporterAvailable = _gltfExporterType != null;
 
+        // The following code can be used to manually load Ab4d.SharpEngine.glTF.dll
+        // This can be enabled only after the gltf2Loader is embedded into the Ab4d.SharpEngine.glTF so that we do not need gltf2Loader.dll and Newtonsoft.Json.dll
+        //if (!isGltfExporterAvailable)
+        //{
+        //    var gltfAssemblyFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Ab4d.SharpEngine.glTF.dll");
+
+        //    if (System.IO.File.Exists(gltfAssemblyFileName))
+        //    {
+        //        try
+        //        {
+        //            var gltfAssembly = System.Reflection.Assembly.LoadFrom(gltfAssemblyFileName);
+
+        //            _gltfExporterType = gltfAssembly.GetType("Ab4d.SharpEngine.glTF.glTFExporter", throwOnError: false);
+
+        //            isGltfExporterAvailable = _gltfExporterType != null;
+        //        }
+        //        catch
+        //        {
+        //            // pass
+        //        }
+        //    }
+        //}
+
         _isGltfExporterAvailable = isGltfExporterAvailable;
         return isGltfExporterAvailable;
     }
