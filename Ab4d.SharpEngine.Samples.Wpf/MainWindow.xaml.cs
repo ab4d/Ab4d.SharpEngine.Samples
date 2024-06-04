@@ -388,11 +388,17 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 return;
             }
 
-            if (_diagnosticsWindow == null)
+            if (_diagnosticsWindow != null)
             {
-                _diagnosticsWindow = new DiagnosticsWindow();
-                _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
+                if (_diagnosticsWindow.WindowState == WindowState.Minimized)
+                    _diagnosticsWindow.WindowState = WindowState.Normal;
+
+                _diagnosticsWindow.Activate();
+                return;
             }
+
+            _diagnosticsWindow = new DiagnosticsWindow();
+            _diagnosticsWindow.Closing += (sender, args) => _diagnosticsWindow = null;
 
             _diagnosticsWindow.SharpEngineSceneView = sharpEngineSceneView;
 
