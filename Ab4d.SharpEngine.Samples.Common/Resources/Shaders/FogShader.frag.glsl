@@ -91,6 +91,8 @@ void main()
     // This is enabled by setting UseNegativeMaterialIndexForBackFaceMaterial field to true.
 	// The same is done here for FogEffect.
 	// Because of this, we need to use abs when using the materialIndex.
+	// If you do not want to use nagative materialIndex, do not set UseNegativeMaterialIndexForBackFaceMaterial to true
+	// when the FogEffectTechnique is created in FogEffect.
 	int materialIndex = pushConstants.materialIndex;
     int usedMaterialIndex = abs(materialIndex);
 	FogMaterial material = materialsBuffer.materials[usedMaterialIndex];
