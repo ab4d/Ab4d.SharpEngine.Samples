@@ -62,11 +62,13 @@ compile_shader()
 exit_script()
 {
     echo "!!!! FAILED TO COMPILE $IN_FILE_NAME into $OUT_FILE_NAME !!!!"
+    read -p "Press enter to continue"
     exit -1
 }
-
 
 setup_directories
 
 compile_shader "FogShader" "vert" "" ""
 compile_shader "FogShader" "frag" "" ""
+
+read -p "Press enter to continue"

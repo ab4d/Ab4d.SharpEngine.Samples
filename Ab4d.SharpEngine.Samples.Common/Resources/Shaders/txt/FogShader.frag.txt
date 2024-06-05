@@ -59,30 +59,31 @@ layout(location = 2) in vec2 inUV;
 
 void main()
 {
-    int usedMaterialIndex = abs(pushConstants.materialIndex);
+    int materialIndex = pushConstants.materialIndex;
+    int usedMaterialIndex = abs(materialIndex);
     FogMaterial material;
     material.diffuseColor = materialsBuffer.materials[usedMaterialIndex].diffuseColor;
     material.fogStart = materialsBuffer.materials[usedMaterialIndex].fogStart;
     material.fogFullColorStart = materialsBuffer.materials[usedMaterialIndex].fogFullColorStart;
     material.fogColor = materialsBuffer.materials[usedMaterialIndex].fogColor;
-    vec4 diffuseColor = material.diffuseColor;
-    float multiplyNormal = float(sign(pushConstants.materialIndex));
+    float multiplyNormal = float(sign(materialIndex));
     vec3 normal = normalize(inNormalW) * multiplyNormal;
+    vec4 diffuseColor = material.diffuseColor;
     vec3 toEye = normalize(scene.eyePosW - inPosW);
     vec3 finalDiffuseColor = vec3(0.0);
     Light oneLightInfo;
     for (int iDir = 0; iDir < scene.dirLightCount; iDir++)
     {
-        int _102 = iDir + scene.dirLightStart;
-        oneLightInfo.pos = allLightsBuffer.allLights[_102].pos;
-        oneLightInfo.phi = allLightsBuffer.allLights[_102].phi;
-        oneLightInfo.dir = allLightsBuffer.allLights[_102].dir;
-        oneLightInfo.theta = allLightsBuffer.allLights[_102].theta;
-        oneLightInfo.diffuse = allLightsBuffer.allLights[_102].diffuse;
-        oneLightInfo.falloff = allLightsBuffer.allLights[_102].falloff;
-        oneLightInfo.spec = allLightsBuffer.allLights[_102].spec;
-        oneLightInfo.att = allLightsBuffer.allLights[_102].att;
-        oneLightInfo.range = allLightsBuffer.allLights[_102].range;
+        int _103 = iDir + scene.dirLightStart;
+        oneLightInfo.pos = allLightsBuffer.allLights[_103].pos;
+        oneLightInfo.phi = allLightsBuffer.allLights[_103].phi;
+        oneLightInfo.dir = allLightsBuffer.allLights[_103].dir;
+        oneLightInfo.theta = allLightsBuffer.allLights[_103].theta;
+        oneLightInfo.diffuse = allLightsBuffer.allLights[_103].diffuse;
+        oneLightInfo.falloff = allLightsBuffer.allLights[_103].falloff;
+        oneLightInfo.spec = allLightsBuffer.allLights[_103].spec;
+        oneLightInfo.att = allLightsBuffer.allLights[_103].att;
+        oneLightInfo.range = allLightsBuffer.allLights[_103].range;
         vec3 lightVec = -oneLightInfo.dir;
         float diffuseFactor = dot(lightVec, normal);
         if (diffuseFactor > 0.0)

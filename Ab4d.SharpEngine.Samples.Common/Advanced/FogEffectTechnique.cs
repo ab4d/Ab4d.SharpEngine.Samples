@@ -31,6 +31,11 @@ public class FogEffectTechnique : EffectTechnique
     // For ThickLineEffect this is set to ShaderStageGeometryBit | ShaderStageFragmentBit
     public ShaderStageFlags MaterialPushConstantShaderStages = ShaderStageFlags.Fragment;
 
+    // If we want to correctly calculate the lights for back-face materials, we need to multiply normal by -1.
+    // In StandardEffect this is signaled to fragment shader by setting materialIndex to a negative value.
+    // This is enabled by setting UseNegativeMaterialIndexForBackFaceMaterial field to true.
+    public bool UseNegativeMaterialIndexForBackFaceMaterial = false;
+
 
     private int _sceneDescriptorSetBindingIndex = 0;
 

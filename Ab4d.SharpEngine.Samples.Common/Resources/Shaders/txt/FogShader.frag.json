@@ -16,7 +16,7 @@
                 }
             ]
         },
-        "_20" : {
+        "_22" : {
             "name" : "FogMaterial",
             "members" : [
                 {
@@ -37,7 +37,7 @@
                 }
             ]
         },
-        "_23" : {
+        "_25" : {
             "name" : "FogMaterial",
             "members" : [
                 {
@@ -62,12 +62,12 @@
                 }
             ]
         },
-        "_25" : {
+        "_27" : {
             "name" : "FogMaterialsBuffer",
             "members" : [
                 {
                     "name" : "materials",
-                    "type" : "_23",
+                    "type" : "_25",
                     "array" : [
                         0
                     ],
@@ -79,7 +79,7 @@
                 }
             ]
         },
-        "_64" : {
+        "_65" : {
             "name" : "sceneUniformBuffer",
             "members" : [
                 {
@@ -145,7 +145,7 @@
                 }
             ]
         },
-        "_90" : {
+        "_91" : {
             "name" : "Light",
             "members" : [
                 {
@@ -186,7 +186,7 @@
                 }
             ]
         },
-        "_93" : {
+        "_94" : {
             "name" : "Light",
             "members" : [
                 {
@@ -236,12 +236,12 @@
                 }
             ]
         },
-        "_95" : {
+        "_96" : {
             "name" : "AllLightsBuffer",
             "members" : [
                 {
                     "name" : "allLights",
-                    "type" : "_93",
+                    "type" : "_94",
                     "array" : [
                         0
                     ],
@@ -280,7 +280,7 @@
     ],
     "ssbos" : [
         {
-            "type" : "_25",
+            "type" : "_27",
             "name" : "FogMaterialsBuffer",
             "readonly" : true,
             "block_size" : 0,
@@ -288,7 +288,7 @@
             "binding" : 0
         },
         {
-            "type" : "_95",
+            "type" : "_96",
             "name" : "AllLightsBuffer",
             "readonly" : true,
             "block_size" : 0,
@@ -298,7 +298,7 @@
     ],
     "ubos" : [
         {
-            "type" : "_64",
+            "type" : "_65",
             "name" : "sceneUniformBuffer",
             "block_size" : 132,
             "set" : 0,

@@ -86,22 +86,24 @@ void main()
 
 void main() 
 {
-    int usedMaterialIndex = abs(pushConstants.materialIndex);
+    // If we want to correctly calculate the lights for back-face materials, we need to multiply normal by -1.
+    // In StandardEffect this is signaled to fragment shader by setting the materialIndex to a negative value.
+    // This is enabled by setting UseNegativeMaterialIndexForBackFaceMaterial field to true.
+	// The same is done here for FogEffect.
+	// Because of this, we need to use abs when using the materialIndex.
+	int materialIndex = pushConstants.materialIndex;
+    int usedMaterialIndex = abs(materialIndex);
 	FogMaterial material = materialsBuffer.materials[usedMaterialIndex];
 	
-	vec4 diffuseColor = material.diffuseColor;
+		// When pushConstants.materialIndex is negative, we need to multiply normal by minus 1.
+	float multiplyNormal = sign(materialIndex); // sign returns -1 or +1
 
-	//vec4 diffuseColor = vec4(0, 1, 0, 1);
-
-	
-	//// When pushConstants.materialIndex is negative, we need to multiply normal by minus 1.
-	float multiplyNormal = sign(pushConstants.materialIndex);
-	//
-	//// Interpolating normal can unnormalize it, so normalize it; then we multiply by multiplyNormal
+	// Interpolating normal can unnormalize it, so normalize it; then we multiply by multiplyNormal
 	vec3 normal = normalize(inNormalW) * multiplyNormal;
 
-	//vec3 normal = normalize(inNormalW);
-
+	
+	vec4 diffuseColor = material.diffuseColor;
+	
 	vec3 toEye = normalize(scene.eyePosW - inPosW);	
 	
 	vec3 finalDiffuseColor = vec3(0, 0, 0);

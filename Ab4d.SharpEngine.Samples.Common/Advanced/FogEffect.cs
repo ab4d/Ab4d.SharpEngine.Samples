@@ -319,11 +319,12 @@ public class FogEffect : Effect
         {
             _standardTechnique = new FogEffectTechnique(Scene, "FogEffect-StandardTechnique")
             {
-                VertexInputStatePtr       = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
-                ShaderStages              = _pipelineShaderStages,
-                PipelineLayout            = _pipelineLayout,
-                ColorBlendAttachmentState = CommonStatesManager.OpaqueAttachmentState,
-                RasterizationState        = CommonStatesManager.CullCounterClockwise
+                VertexInputStatePtr                         = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
+                ShaderStages                                = _pipelineShaderStages,
+                PipelineLayout                              = _pipelineLayout,
+                ColorBlendAttachmentState                   = CommonStatesManager.OpaqueAttachmentState,
+                RasterizationState                          = CommonStatesManager.CullCounterClockwise,
+                UseNegativeMaterialIndexForBackFaceMaterial = true
             };
 
             _effectTechniques[0] = _standardTechnique; // Also set _standardTechnique as first technique in _effectTechniques
@@ -369,9 +370,10 @@ public class FogEffect : Effect
 
                 effectTechnique = new FogEffectTechnique(this.Scene, "FogEffect-" + techniqueName)
                 {
-                    VertexInputStatePtr       = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
-                    ShaderStages              = _pipelineShaderStages,
-                    PipelineLayout            = _pipelineLayout,
+                    VertexInputStatePtr                         = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
+                    ShaderStages                                = _pipelineShaderStages,
+                    PipelineLayout                              = _pipelineLayout,
+                    UseNegativeMaterialIndexForBackFaceMaterial = true
                 };
 
                 if (hasTransparency)
