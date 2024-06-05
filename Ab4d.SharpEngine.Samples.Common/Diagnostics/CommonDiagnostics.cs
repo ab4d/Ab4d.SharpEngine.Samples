@@ -77,7 +77,6 @@ public class CommonDiagnostics
     private object? _gltfExporter;
 
     private bool? _isGltfExporterAvailable;
-    private MethodInfo? _clearMethodInfo;
     private MethodInfo? _addSceneMethodInfo;
     private MethodInfo? _exportEmbeddedMethodInfo;
     private MethodInfo? _exportBinaryMethodInfo;
@@ -311,13 +310,10 @@ public class CommonDiagnostics
             if (_gltfExporter == null)
                 return false;
 
-            _clearMethodInfo = _gltfExporter.GetType().GetMethod("Clear");
             _addSceneMethodInfo = _gltfExporter.GetType().GetMethod("AddScene");
             _exportEmbeddedMethodInfo = _gltfExporter.GetType().GetMethod("ExportEmbedded", BindingFlags.Instance | BindingFlags.Public, new Type[] { typeof(string)});
             _exportBinaryMethodInfo = _gltfExporter.GetType().GetMethod("ExportBinary", BindingFlags.Instance | BindingFlags.Public, new Type[] { typeof(string)});
         }
-
-        _clearMethodInfo!.Invoke(_gltfExporter, null);
 
         // Call "AddScene(scene)"
         _addSceneMethodInfo!.Invoke(_gltfExporter, new object?[] { scene });
