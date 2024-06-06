@@ -192,7 +192,7 @@ public class SharpEngineLogoAnimation : IDisposable
             if (_hashModel.Parent != null)
                 _hashModel.Parent.Remove(_hashModel);
 
-            _hashModel.Dispose(); // This will also dispose the mesh
+            _hashModel.DisposeWithMeshAndMaterial();
         }
         
         if (!_logoPlaneModel.IsDisposed)
@@ -200,7 +200,7 @@ public class SharpEngineLogoAnimation : IDisposable
             if (_logoPlaneModel.Parent != null)
                 _logoPlaneModel.Parent.Remove(_logoPlaneModel);
 
-            _logoPlaneModel.Dispose(); // This will also dispose the mesh
+            _logoPlaneModel.DisposeWithMaterial();
         }
 
         if (!_logoTextureMaterial.IsDisposed)
