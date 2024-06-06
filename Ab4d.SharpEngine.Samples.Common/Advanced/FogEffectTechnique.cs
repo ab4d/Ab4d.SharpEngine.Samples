@@ -638,4 +638,15 @@ public class FogEffectTechnique : EffectTechnique
         // Because PipelineLayout were not created here, we do not dispose it here (also, PipelineLayout can be shared by multiple Pipelines - see StandardEffect)
         PipelineLayout = PipelineLayout.Null;
     }
+
+    /// <summary>
+    /// Dispose
+    /// </summary>
+    public void Dispose()
+    {
+        // CheckAndDispose method on ComponentBase is usually called from the Dispose method.
+        // It calls Disposing event handler, then Dispose(bool) method and finally Disposed event handler.
+        // It also sets IsDisposing and IsDisposed properties.
+        this.CheckAndDispose(disposing: true);
+    }
 }
