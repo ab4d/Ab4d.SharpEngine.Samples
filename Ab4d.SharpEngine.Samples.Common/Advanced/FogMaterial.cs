@@ -5,7 +5,7 @@ using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
-public class FogMaterial : Material, ITransparentMaterial
+public class FogMaterial : Material, IDiffuseMaterial, ITransparentMaterial
 {
     private Color3 _diffuseColor;
 
@@ -71,6 +71,27 @@ public class FogMaterial : Material, ITransparentMaterial
     {
         get => _hasTransparency;
     }
+
+
+    private bool _isPreMultipliedAlphaColor;
+
+    /// <summary>
+    /// When IsPreMultipliedAlphaColor is true (false by default) and Opacity is less then 1, then the color components of the <see cref="DiffuseColor"/> are already multiplied with alpha value to produce pre-multiplied colors.
+    /// When false, then non-premultiplied color is converted in pre-multiplied color when this is required by the shader. Default value is false.
+    /// </summary>
+    public bool IsPreMultipliedAlphaColor
+    {
+        get => _isPreMultipliedAlphaColor;
+        set
+        {
+            if (_isPreMultipliedAlphaColor == value)
+                return;
+
+            _isPreMultipliedAlphaColor = value;
+            NotifyMaterialBufferChange();
+        }
+    }
+
 
 
     private float _fogStart = 0;

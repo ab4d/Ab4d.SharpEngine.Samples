@@ -455,11 +455,22 @@ public class FogEffect : Effect
         var alpha = fogMaterial.Opacity;
         var blockData = materialDataBlock.MemoryBlock.Data;
 
-        // Convert to pre-multiplied alpha
-        blockData[materialDataIndex].DiffuseColor = new Color4(fogMaterial.DiffuseColor.Red * alpha,
-                                                               fogMaterial.DiffuseColor.Green * alpha,
-                                                               fogMaterial.DiffuseColor.Blue * alpha,
-                                                               alpha);
+        if (fogMaterial.IsPreMultipliedAlphaColor)
+        {
+            // Already in pre-multiplied alpha
+            blockData[materialDataIndex].DiffuseColor = new Color4(fogMaterial.DiffuseColor.Red,
+                                                                   fogMaterial.DiffuseColor.Green,
+                                                                   fogMaterial.DiffuseColor.Blue,
+                                                                   alpha);
+        }
+        else
+        {
+            // Convert to pre-multiplied alpha
+            blockData[materialDataIndex].DiffuseColor = new Color4(fogMaterial.DiffuseColor.Red * alpha,
+                                                                   fogMaterial.DiffuseColor.Green * alpha,
+                                                                   fogMaterial.DiffuseColor.Blue * alpha,
+                                                                   alpha);
+        }
 
         blockData[materialDataIndex].FogStart           = fogMaterial.FogStart;
         blockData[materialDataIndex].FogFullColorStart  = fogMaterial.FogFullColorStart;
