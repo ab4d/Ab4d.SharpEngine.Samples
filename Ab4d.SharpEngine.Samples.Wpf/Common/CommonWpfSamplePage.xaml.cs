@@ -54,10 +54,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
-            // By default enable Vulkan's standard validation and logging of warnings and errors (this may slightly reduce performance)
-            Log.LogLevel = LogLevels.Warn;
-            Log.IsLoggingToDebugOutput = true;
+            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
             MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 
             // To use Vulkan line rasterizer, uncomment the following lines:
             //MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;

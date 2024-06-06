@@ -40,6 +40,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
+            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
+            MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
+            
+
             // Because we are rendering a background Border with a gradient, we can subscribe mouse events to that element.
             // In this case we can slightly improve performance when SharedTexture is by setting the IsHitTestVisible to false.
             // This prevents rendering a transparent background in SharpEngineSceneView control (this is required to enable mouse events on the control when SharedTexture is used).

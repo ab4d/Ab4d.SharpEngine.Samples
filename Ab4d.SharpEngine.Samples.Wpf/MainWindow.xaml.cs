@@ -66,7 +66,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                                                   platforms: "All",
                                                   license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
 
-
             // The following is a sample global exception handler that can be used 
             // to get system info (with details about graphics card and drivers)
             // in case of exception in SharpEngine.
@@ -85,6 +84,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             };
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            
+            // By default, enable logging of warnings and errors.
+            // In case of problems please send the log text with the description of the problem to AB4D company
+            Utilities.Log.LogLevel = LogLevels.Warn;
+            Utilities.Log.IsLoggingToDebugOutput = true;
 
 
             InitializeComponent();

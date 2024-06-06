@@ -30,8 +30,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        //private string? _startupPage = "HitTesting.ModelRotatorSample";
-        private string? _startupPage = null;
+        //private string? _startupPage = "QuickStart.SharpEngineSceneViewInXaml";
+        private string? _startupPage = "Cameras.TargetPositionCameraSample";
+        //private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
@@ -67,9 +68,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (Application.Current != null)
                 Application.Current.RequestedThemeVariant = ThemeVariant.Light;
 
-            // Setup logger
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
+
+            // By default, enable logging of warnings and errors.
+            // In case of problems please send the log text with the description of the problem to AB4D company
+            Utilities.Log.LogLevel = LogLevels.Warn;
+            Utilities.Log.IsLoggingToDebugOutput = true;
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 

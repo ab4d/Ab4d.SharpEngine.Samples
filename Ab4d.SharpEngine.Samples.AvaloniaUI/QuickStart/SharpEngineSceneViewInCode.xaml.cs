@@ -29,11 +29,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
         {
             InitializeComponent();
 
-            // Setup logger
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
-
             // Create SharpEngineSceneView:
             //
             // SharpEngineSceneView is an Avalonia control that can show SharpEngine's SceneView in an Avalonia application.
@@ -65,6 +60,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 #if DEBUG
             // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             _sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message

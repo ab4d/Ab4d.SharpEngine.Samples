@@ -46,15 +46,17 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         {
             InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
 
-            // Setup logger
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
-
             _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
+
+            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
+            MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 

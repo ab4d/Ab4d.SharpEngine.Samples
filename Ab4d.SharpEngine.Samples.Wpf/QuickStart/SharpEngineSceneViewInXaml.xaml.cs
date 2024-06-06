@@ -35,19 +35,18 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
         public SharpEngineSceneViewInXaml()
         {
-            // Setup logger (before calling InitializeComponent so log events from SharpEngineSceneView can be also logged)
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
             InitializeComponent();
-
-
+            
             // This sample shows how to create SharpEngineSceneView in XAML.
             // To see how do create SharpEngineSceneView in code, see the SharpEngineSceneViewInCode sample.
 
 #if DEBUG
             // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message

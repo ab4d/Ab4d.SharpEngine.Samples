@@ -232,6 +232,13 @@ public abstract class CommonSample
 
         IsDisposed = true;
         OnDisposed();
+
+        if (Scene != null)
+            Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 
     protected virtual void OnDisposed()
