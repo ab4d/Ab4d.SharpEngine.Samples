@@ -15,7 +15,7 @@ public class AssimpImporterSample : CommonSample
 {
     public override string Title => "AssimpImporter - import 3D models from almost any file format";
 
-    private string _subtitle = "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).";
+    private string _subtitle = "AssimpImporter uses third-party native Assimp library (https://github.com/assimp/assimp).\nClick on 'Show supported formats' button to see all supported file formats.";
     public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\planetary-gear.FBX";
