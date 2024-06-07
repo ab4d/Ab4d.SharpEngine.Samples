@@ -1,0 +1,1 @@
+Voyager model by NASA (https://nasa3d.arc.nasa.gov/models)
