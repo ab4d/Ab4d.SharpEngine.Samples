@@ -68,8 +68,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (Application.Current != null)
                 Application.Current.RequestedThemeVariant = ThemeVariant.Light;
 
-            EngineRuntimeOptions.DisposeObjectFromFinalizer = EngineRuntimeOptions.WarningActionLevel.LogWarning;
-
 
             // By default, enable logging of warnings and errors.
             // In case of problems please send the log text with the description of the problem to AB4D company
