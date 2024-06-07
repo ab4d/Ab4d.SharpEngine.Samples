@@ -18,7 +18,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
     /// </summary>
     public partial class AvaloniaMultiTouchSample : UserControl
     {
-        private GesturesCameraController? _mouseCameraController;
+        private GesturesCameraController? _gesturesCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
@@ -27,12 +27,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             InitializeComponent();
 
             CreateTestScene();
-            SetupMouseCameraController();
+            SetupPointerCameraController();
 
             this.Unloaded += (sender, args) => MainSceneView.Dispose();
         }
 
-        private void SetupMouseCameraController()
+        private void SetupPointerCameraController()
         {
             _targetPositionCamera = new TargetPositionCamera()
             {
@@ -47,17 +47,17 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             MainSceneView.SceneView.Camera = _targetPositionCamera;
 
             // Create GesturesCameraController that is defined in Common folder
-            _mouseCameraController = new GesturesCameraController(MainSceneView)
+            _gesturesCameraController = new GesturesCameraController(MainSceneView)
             {
                 IsPinchGestureEnabled         = PinchGestureCheckBox.IsChecked ?? false,
                 IsScrollGestureEnabled        = ScrollGestureCheckBox.IsChecked ?? false,
                 RotateCameraWithScrollGesture = RotateWithScrollCheckBox.IsChecked ?? false,
 
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,                                                   // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey,             // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.MousePosition,
-                RotateAroundMousePosition = true
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
+                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                ZoomMode = CameraZoomMode.PointerPosition,
+                RotateAroundPointerPosition = true
             };
         }
 
@@ -88,26 +88,26 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
 
         private void ScrollGestureCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
         {
-            if (_mouseCameraController == null)
+            if (_gesturesCameraController == null)
                 return;
 
-            _mouseCameraController.IsScrollGestureEnabled = ScrollGestureCheckBox.IsChecked ?? false;
+            _gesturesCameraController.IsScrollGestureEnabled = ScrollGestureCheckBox.IsChecked ?? false;
         }
         
         private void PinchGestureCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
         {
-            if (_mouseCameraController == null)
+            if (_gesturesCameraController == null)
                 return;
 
-            _mouseCameraController.IsPinchGestureEnabled = PinchGestureCheckBox.IsChecked ?? false;
+            _gesturesCameraController.IsPinchGestureEnabled = PinchGestureCheckBox.IsChecked ?? false;
         }        
 
         private void RotateWithScrollCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
         {
-            if (_mouseCameraController == null)
+            if (_gesturesCameraController == null)
                 return;
 
-            _mouseCameraController.RotateCameraWithScrollGesture = RotateWithScrollCheckBox.IsChecked ?? false;
+            _gesturesCameraController.RotateCameraWithScrollGesture = RotateWithScrollCheckBox.IsChecked ?? false;
         }
     }
 }

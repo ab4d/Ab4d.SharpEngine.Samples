@@ -14,7 +14,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
         private InputEventsManager _inputEventsManager;
 
         private AvaloniaUIProvider _avaloniaUiProvider;
@@ -101,8 +101,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
-            if (_mouseCameraController != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            if (_pointerCameraController != null)
+                _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             
             // Show MainSceneView - this will also render the scene
             MainSceneView.IsVisible = true;
@@ -119,14 +119,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeCommonSample();
 
-            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
                 // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
-                // we need to set a custom eventsSourceElement when creating the MouseCameraController
-                _mouseCameraController ??= new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
+                // we need to set a custom eventsSourceElement when creating the PointerCameraController
+                _pointerCameraController ??= new PointerCameraController(MainSceneView, eventsSourceElement: RootBorder);
 
                 if (_currentCommonSample != null)
-                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                    _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
         }
 

@@ -263,28 +263,28 @@ namespace Ab4d.StandardPresentation.WpfUI
             }
         }
 
-        public void GetMouseState(out float x, out float y, out MouseButtons pressedButtons)
+        public void GetMouseState(out float x, out float y, out PointerButtons pressedButtons)
         {
             var mousePosition = Mouse.GetPosition(_wpfWindow);
             x = (float)mousePosition.X;
             y = (float)mousePosition.Y;
 
-            pressedButtons = MouseButtons.None;
+            pressedButtons = PointerButtons.None;
 
             if (Mouse.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
-                pressedButtons |= MouseButtons.Left;
+                pressedButtons |= PointerButtons.Left;
 
             if (Mouse.MiddleButton == System.Windows.Input.MouseButtonState.Pressed)
-                pressedButtons |= MouseButtons.Middle;
+                pressedButtons |= PointerButtons.Middle;
 
             if (Mouse.RightButton == System.Windows.Input.MouseButtonState.Pressed)
-                pressedButtons |= MouseButtons.Right;
+                pressedButtons |= PointerButtons.Right;
 
             if (Mouse.XButton1 == System.Windows.Input.MouseButtonState.Pressed)
-                pressedButtons |= MouseButtons.XButton1;
+                pressedButtons |= PointerButtons.XButton1;
 
             if (Mouse.XButton2 == System.Windows.Input.MouseButtonState.Pressed)
-                pressedButtons |= MouseButtons.XButton2;
+                pressedButtons |= PointerButtons.XButton2;
         }
 
         public ulong CreateVulkanSurface(IntPtr vulkanInstance)
@@ -443,20 +443,20 @@ namespace Ab4d.StandardPresentation.WpfUI
             MouseWheel?.Invoke(this, new MouseWheelEventArgs(0, e.Delta));
         }
 
-        private MouseButtons ConvertMouseButton(System.Windows.Input.MouseButton buttons)
+        private PointerButtons ConvertMouseButton(System.Windows.Input.MouseButton buttons)
         {
             switch (buttons)
             {
                 case System.Windows.Input.MouseButton.Left:
-                    return MouseButtons.Left;
+                    return PointerButtons.Left;
                 case System.Windows.Input.MouseButton.Middle:
-                    return MouseButtons.Middle;
+                    return PointerButtons.Middle;
                 case System.Windows.Input.MouseButton.Right:
-                    return MouseButtons.Right;
+                    return PointerButtons.Right;
                 case System.Windows.Input.MouseButton.XButton1:
-                    return MouseButtons.XButton1;
+                    return PointerButtons.XButton1;
                 case System.Windows.Input.MouseButton.XButton2:
-                    return MouseButtons.XButton2;
+                    return PointerButtons.XButton2;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(buttons), buttons, null);
             }

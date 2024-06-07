@@ -54,31 +54,31 @@ public class WpfManualInputEventsSample : ManualInputEventsSample
     {
         // PointerPressed is called not only when the mouse button is pressed, but all the time until the button is pressed
         // But we would only like ot know when the left mouse button is pressed
-        if (isLeftMouseButtonPressed || _subscribedUIElement == null)
+        if (isLeftPointerButtonPressed || _subscribedUIElement == null)
             return;
 
         var currentPoint = e.GetPosition(_subscribedUIElement);
-        isLeftMouseButtonPressed = e.LeftButton == MouseButtonState.Pressed;
+        isLeftPointerButtonPressed = e.LeftButton == MouseButtonState.Pressed;
 
-        if (isLeftMouseButtonPressed)
+        if (isLeftPointerButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
-            ProcessMouseButtonPress(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+            ProcessLeftPointerButtonPressed(pointerPosition);
         }
     }
 
     private void EventsSourceElementOnMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (!isLeftMouseButtonPressed || _subscribedUIElement == null) // is already released
+        if (!isLeftPointerButtonPressed || _subscribedUIElement == null) // is already released
             return;
 
         var currentPoint = e.GetPosition(_subscribedUIElement);
-        isLeftMouseButtonPressed = e.LeftButton == MouseButtonState.Pressed;
+        isLeftPointerButtonPressed = e.LeftButton == MouseButtonState.Pressed;
 
-        if (!isLeftMouseButtonPressed)
+        if (!isLeftPointerButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
-            ProcessMouseButtonRelease(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+            ProcessLeftPointerButtonReleased(pointerPosition);
         }
     }
 
@@ -89,8 +89,8 @@ public class WpfManualInputEventsSample : ManualInputEventsSample
 
         var currentPoint = e.GetPosition(_subscribedUIElement);
         {
-            var mousePosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
-            ProcessMouseMove(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.X, (float)currentPoint.Y);
+            ProcessPointerMoved(pointerPosition);
         }
     }
 
@@ -196,7 +196,7 @@ public class WpfManualInputEventsSample : ManualInputEventsSample
     private void OnMouseDraggingCheckBoxCheckedChanged(object sender, RoutedEventArgs e)
     {
         var checkBox = (CheckBox)sender;
-        isMouseDraggingEnabled = checkBox.IsChecked ?? false;
+        isPointerDraggingEnabled = checkBox.IsChecked ?? false;
     }
 
     private void OnCheckCollisionCheckBoxCheckedChanged(object sender, RoutedEventArgs e)

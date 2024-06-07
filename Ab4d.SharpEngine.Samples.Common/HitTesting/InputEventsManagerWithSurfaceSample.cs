@@ -46,8 +46,8 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
     public InputEventsManagerWithSurfaceSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
 
         ShowCameraAxisPanel = true;
     }

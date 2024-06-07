@@ -27,17 +27,13 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
 
         public IntroductionPage()
         {
-            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
-
             InitializeComponent();
-
+            
             if (SkipInitializingSharpEngine)
             {
                 MainSceneView.PresentationType = PresentationTypes.None;
                 return;
             }
-
             
 
 #if DEBUG

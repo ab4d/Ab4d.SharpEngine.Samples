@@ -38,8 +38,8 @@ public class ModelMoverSample : CommonSample
         _selectedMaterial = StandardMaterials.Orange;
         _invalidPositionMaterial = StandardMaterials.Red;
 
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
 
         ShowCameraAxisPanel = true;
     }
@@ -92,7 +92,7 @@ public class ModelMoverSample : CommonSample
         multiModelNodesEventsSource.PointerClicked += (sender, args) =>
         {
             // start moving object on left click
-            if (args.PressedButtons == MouseButtons.Left)
+            if (args.PressedButtons == PointerButtons.Left)
                 StartMovingObject(args.RayHitResult.HitSceneNode);
         };
 

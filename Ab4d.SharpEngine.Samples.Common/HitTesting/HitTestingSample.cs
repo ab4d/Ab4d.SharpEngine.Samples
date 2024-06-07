@@ -23,7 +23,7 @@ public class HitTestingSample : CommonSample
     private GroupNode? _testObjectsGroup;
     private GroupNode? _wireCrossesGroup;
 
-    private Vector2 _lastMousePosition;
+    private Vector2 _lastPointerPosition;
     
     private GroupNode? _teapotModelNode;
 
@@ -37,8 +37,8 @@ public class HitTestingSample : CommonSample
     public HitTestingSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions= MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions= PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -72,10 +72,10 @@ public class HitTestingSample : CommonSample
 
     private void OnCameraChanged(object? sender, EventArgs args)
     {
-        TestHitObjects(_lastMousePosition);
+        TestHitObjects(_lastPointerPosition);
     }
 
-    private void TestHitObjects(Vector2 mousePosition)
+    private void TestHitObjects(Vector2 pointerPosition)
     {
         if (SceneView == null)
             return;
@@ -86,11 +86,11 @@ public class HitTestingSample : CommonSample
 
         if (_getAllHitObjects)
         {
-            allHitTestResults = SceneView.GetAllHitObjects(mousePosition.X, mousePosition.Y);
+            allHitTestResults = SceneView.GetAllHitObjects(pointerPosition.X, pointerPosition.Y);
         }
         else
         {
-            var closestHitTestResult = SceneView.GetClosestHitObject(mousePosition.X, mousePosition.Y);
+            var closestHitTestResult = SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
             
             if (closestHitTestResult != null)
             {
@@ -196,7 +196,7 @@ public class HitTestingSample : CommonSample
     private void ProcessPointerMove(Vector2 pointerPosition)
     {
         TestHitObjects(pointerPosition);
-        _lastMousePosition = pointerPosition;
+        _lastPointerPosition = pointerPosition;
     }
 
     private void StartStopCameraRotation()

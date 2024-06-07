@@ -34,8 +34,8 @@ public class ModelScalarSample : CommonSample
         _commonMaterial = StandardMaterials.Silver;
         _selectedMaterial = StandardMaterials.Orange;
 
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
 
         ShowCameraAxisPanel = true;
     }
@@ -96,7 +96,7 @@ public class ModelScalarSample : CommonSample
         multiModelNodesEventsSource.PointerClicked += (sender, args) =>
         {
             // start moving object on left click
-            if (args.PressedButtons == MouseButtons.Left)
+            if (args.PressedButtons == PointerButtons.Left)
                 StartScalingObject(args.RayHitResult.HitSceneNode);
         };
 

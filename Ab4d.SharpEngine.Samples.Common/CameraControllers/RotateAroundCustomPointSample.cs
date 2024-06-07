@@ -10,9 +10,9 @@ namespace Ab4d.SharpEngine.Samples.Common.CameraControllers;
 public class RotateAroundCustomPointSample : CommonSample
 {
     public override string Title => "Rotate around a custom point";
-    public override string? Subtitle => "Use left mouse button to rotate the camera around the specified custom 3D position";
+    public override string? Subtitle => "Use left pointer or mouse button to rotate the camera around the specified custom 3D position";
 
-    private ManualMouseCameraController? _mouseCameraController;
+    private ManualPointerCameraController? _pointerCameraController;
     private WireCrossNode? _rotationCenterWireCross;
 
     public RotateAroundCustomPointSample(ICommonSamplesContext context) 
@@ -56,38 +56,38 @@ public class RotateAroundCustomPointSample : CommonSample
             targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
         }
 
-        // The following values will be used when the MouseCameraController is created.
-        // Note that MouseCameraController is platform specific because it needs to handle mouse events.
-        // But processing of the events is done by a common ManualMouseCameraController.
+        // The following values will be used when the PointerCameraController is created.
+        // Note that PointerCameraController is platform specific because it needs to handle pointer or mouse events.
+        // But processing of the events is done by a common ManualPointerCameraController.
 
-        this.RotateAroundMousePosition = false;
+        this.RotateAroundPointerPosition = false;
         this.ZoomMode = CameraZoomMode.ViewCenter;
     }
 
     protected override void OnDisposed()
     {
-        if (_mouseCameraController != null)
+        if (_pointerCameraController != null)
         {
             // Unsubscribe event handlers
-            _mouseCameraController.CameraRotateStarted -= OnCameraRotateStarted;
-            _mouseCameraController.CameraRotateEnded   -= OnCameraRotateEnded;
-            _mouseCameraController =  null;
+            _pointerCameraController.CameraRotateStarted -= OnCameraRotateStarted;
+            _pointerCameraController.CameraRotateEnded   -= OnCameraRotateEnded;
+            _pointerCameraController =  null;
         }
 
         base.OnDisposed();
     }
 
-    public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
     {
-        // Save mouseCameraController so we can change it later
-        _mouseCameraController = mouseCameraController;
+        // Save pointerCameraController so we can change it later
+        _pointerCameraController = pointerCameraController;
 
         // Show rotation center position
-        mouseCameraController.CameraRotateStarted += OnCameraRotateStarted;
-        mouseCameraController.CameraRotateEnded   += OnCameraRotateEnded;
+        pointerCameraController.CameraRotateStarted += OnCameraRotateStarted;
+        pointerCameraController.CameraRotateEnded   += OnCameraRotateEnded;
         
-        // Use standard initialization code for mouseCameraController
-        base.InitializeMouseCameraController(mouseCameraController);
+        // Use standard initialization code for pointerCameraController
+        base.InitializePointerCameraController(pointerCameraController);
     }
 
     private void OnCameraRotateStarted(object? sender, EventArgs args)
@@ -127,46 +127,46 @@ public class RotateAroundCustomPointSample : CommonSample
     private void ChangeCenterPosition(int selectedIndex)
     {
         Vector3? rotationCenterPosition; // RotationCenterPosition is nullable Vector3 type
-        bool rotateAroundMousePosition;
+        bool rotateAroundPointerPosition;
 
         switch (selectedIndex)
         {
             case 0: // "None", 
                 rotationCenterPosition = null;
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
             
             case 1: // "Red box (-40 5 -30)", 
                 rotationCenterPosition = new Vector3(-40, 5, -30);
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
             
             case 2: // "Yellow box (0 5 0)", 
                 rotationCenterPosition = new Vector3(0, 5, 0);
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
             
             case 3: // "Orange box (40 5 30)", 
                 rotationCenterPosition = new Vector3(40, 5, 30);
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
             
             case 4: // "Position under mouse", 
                 rotationCenterPosition = null;
-                rotateAroundMousePosition = true;
+                rotateAroundPointerPosition = true;
                 break;
 
             default:
                 rotationCenterPosition = null;
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
         }
 
         if (targetPositionCamera != null)
             targetPositionCamera.RotationCenterPosition = rotationCenterPosition;
 
-        if (_mouseCameraController != null)
-            _mouseCameraController.RotateAroundMousePosition = rotateAroundMousePosition;
+        if (_pointerCameraController != null)
+            _pointerCameraController.RotateAroundPointerPosition = rotateAroundPointerPosition;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)

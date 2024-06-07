@@ -15,7 +15,7 @@ public abstract class ManualInputEventsSample : CommonSample
     public override string Title => "Manually implemented mouse events and model collision";
     public override string Subtitle => "Use left mouse button to select and drag the boxes.\nUse right mouse button to rotate and move the camera (with CTRL key).";
 
-    private readonly float _dragMouseDistance = 3;
+    private readonly float _dragPointerDistance = 3;
 
     // Define the dragging plane
     private readonly Vector3 _dragPlaneNormal = new Vector3(0, 1, 0);
@@ -27,14 +27,14 @@ public abstract class ManualInputEventsSample : CommonSample
     private StandardMaterial _draggedMaterial = StandardMaterials.Orange;
     private StandardMaterial _collidedMaterial = StandardMaterials.Red;
 
-    protected bool isMouseDraggingEnabled = true;      // This is set in a derived class
+    protected bool isPointerDraggingEnabled = true;    // This is set in a derived class
     protected bool isCollisionDetectionEnabled = true; // This is set in a derived class
     
-    protected bool isLeftMouseButtonPressed;           // This is set in a derived class
+    protected bool isLeftPointerButtonPressed;         // This is set in a derived class
     
-    private Vector2 _pressedMouseLocation;
+    private Vector2 _pressedPointerLocation;
 
-    private bool _isMouseDragging;
+    private bool _isPointerDragging;
     private bool _isCollided;
     private Vector3? _dragStartPosition;
     private Vector3 _startModelOffset;
@@ -50,8 +50,8 @@ public abstract class ManualInputEventsSample : CommonSample
     public ManualInputEventsSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions= MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions= PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     }
 
 
@@ -103,97 +103,97 @@ public abstract class ManualInputEventsSample : CommonSample
         scene.RootNode.Add(_boxesGroupNode);
     }
     
-    #region Mouse events processing
-    protected void ProcessMouseButtonPress(Vector2 mousePosition)
+    #region Pointer events processing
+    protected void ProcessLeftPointerButtonPressed(Vector2 pointerPosition)
     {
-        ShowMessage("Left mouse button pressed");
+        ShowMessage("Left pointer button pressed");
 
         _pressedHitModel = _lastHitModel;
-        _pressedMouseLocation = new Vector2(mousePosition.X, mousePosition.Y);
+        _pressedPointerLocation = new Vector2(pointerPosition.X, pointerPosition.Y);
     }
 
-    protected void ProcessMouseButtonRelease(Vector2 mousePosition)
+    protected void ProcessLeftPointerButtonReleased(Vector2 pointerPosition)
     {
-        ShowMessage("Left mouse button released");
+        ShowMessage("Left pPointer button released");
 
         // Mouse click occurs when the mouse was pressed and released on the same object
-        if (_pressedHitModel != null && _lastHitModel == _pressedHitModel && !_isMouseDragging)
+        if (_pressedHitModel != null && _lastHitModel == _pressedHitModel && !_isPointerDragging)
         {
             ShowMessage($"{_pressedHitModel.Name} CLICKED");
-            OnModelMouseClick(_pressedHitModel, mousePosition);
+            OnModelPointerClick(_pressedHitModel, pointerPosition);
         }
 
-        if (_isMouseDragging && _pressedHitModel != null)
+        if (_isPointerDragging && _pressedHitModel != null)
         {
             ShowMessage($"{_pressedHitModel.Name} DRAGGING ENDED");
-            OnModelEndMouseDrag(_pressedHitModel, mousePosition);
+            OnModelEndPointerDrag(_pressedHitModel, pointerPosition);
 
-            _isMouseDragging = false;
+            _isPointerDragging = false;
         }
 
         _pressedHitModel = null;
     }
 
-    protected void ProcessMouseMove(Vector2 mousePosition)
+    protected void ProcessPointerMoved(Vector2 pointerPosition)
     {
-        ShowMessage($"Mouse moved to {mousePosition.X:F1} {mousePosition.Y:F1}");
+        ShowMessage($"Pointer moved to {pointerPosition.X:F1} {pointerPosition.Y:F1}");
 
-        if (_isMouseDragging)
+        if (_isPointerDragging)
         {
             if (_pressedHitModel != null)
-                OnModelMouseDrag(_pressedHitModel, mousePosition);
+                OnModelPointerDrag(_pressedHitModel, pointerPosition);
 
             return;
         }
 
-        if (isLeftMouseButtonPressed && _pressedHitModel != null)
+        if (isLeftPointerButtonPressed && _pressedHitModel != null)
         {
-            var distance = Vector2.Subtract(mousePosition, _pressedMouseLocation).Length();
+            var distance = Vector2.Subtract(pointerPosition, _pressedPointerLocation).Length();
 
-            if (distance >= _dragMouseDistance && isMouseDraggingEnabled)
+            if (distance >= _dragPointerDistance && isPointerDraggingEnabled)
             {
                 ShowMessage($"{_pressedHitModel.Name} DRAGGING STARTED");
-                OnModelBeginMouseDrag(_pressedHitModel, mousePosition);
+                OnModelBeginPointerDrag(_pressedHitModel, pointerPosition);
 
-                _isMouseDragging = true;
+                _isPointerDragging = true;
                 return;
             }
         }
 
-        var hitModel = GetHitModel(mousePosition);
+        var hitModel = GetHitModel(pointerPosition);
 
         if (hitModel == _lastHitModel)
             return;
 
         if (_lastHitModel != null && _lastHitModel.Material == _selectedMaterial) // do not change _clickedMaterial 
         {
-            ShowMessage($"{_lastHitModel.Name} MOUSE LEAVE");
-            OnModelMouseLeave(_lastHitModel, mousePosition);
+            ShowMessage($"{_lastHitModel.Name} POINTER LEAVE");
+            OnModelPointerLeave(_lastHitModel, pointerPosition);
         }
 
         if (hitModel != null)
         {
-            ShowMessage($"{hitModel.Name} MOUSE ENTER");
-            OnModelMouseEnter(hitModel, mousePosition);
+            ShowMessage($"{hitModel.Name} POINTER ENTER");
+            OnModelPointerEnter(hitModel, pointerPosition);
         }
 
         _lastHitModel = hitModel;
     }
     #endregion
 
-    #region 3D Model mouse events
-    private void OnModelMouseEnter(ModelNode modelNode, Vector2 mousePoint)
+    #region 3D Model pointer events
+    private void OnModelPointerEnter(ModelNode modelNode, Vector2 pointerPosition)
     {
         if (modelNode.Material == _normalMaterial) // do not change _clickedMaterial 
             modelNode.Material = _selectedMaterial;
     }
 
-    private void OnModelMouseLeave(ModelNode modelNode, Vector2 mousePoint)
+    private void OnModelPointerLeave(ModelNode modelNode, Vector2 pointerPosition)
     {
         modelNode.Material = _normalMaterial;
     }
 
-    private void OnModelMouseClick(ModelNode modelNode, Vector2 mousePoint)
+    private void OnModelPointerClick(ModelNode modelNode, Vector2 pointerPosition)
     {
         if (_clickedModels.Contains(modelNode))
         {
@@ -209,12 +209,12 @@ public abstract class ManualInputEventsSample : CommonSample
         }
     }
 
-    private void OnModelBeginMouseDrag(ModelNode modelNode, Vector2 mousePoint)
+    private void OnModelBeginPointerDrag(ModelNode modelNode, Vector2 pointerPosition)
     {
         modelNode.Material = _draggedMaterial;
 
         // Gets the mouse position on the XZ plane - this is a start 3D position for dragging
-        _dragStartPosition = GetPositionOnHorizontalPlane(mousePoint);
+        _dragStartPosition = GetPositionOnHorizontalPlane(pointerPosition);
 
         if (_dragStartPosition != null)
         {
@@ -229,7 +229,7 @@ public abstract class ManualInputEventsSample : CommonSample
         }
     }
 
-    private void OnModelEndMouseDrag(ModelNode modelNode, Vector2 mousePoint)
+    private void OnModelEndPointerDrag(ModelNode modelNode, Vector2 pointerPosition)
     {
         if (_clickedModels.Contains(modelNode))
             modelNode.Material = _clickedMaterial;
@@ -240,13 +240,13 @@ public abstract class ManualInputEventsSample : CommonSample
         _modelTranslateTransform = null;
     }
 
-    private void OnModelMouseDrag(ModelNode modelNode, Vector2 mousePoint)
+    private void OnModelPointerDrag(ModelNode modelNode, Vector2 pointerPosition)
     {
         if (_dragStartPosition == null || _modelTranslateTransform == null)
             return;
 
         // Gets the mouse position on the XZ plane - this is a start 3D position for dragging
-        var currentDragPosition = GetPositionOnHorizontalPlane(mousePoint);
+        var currentDragPosition = GetPositionOnHorizontalPlane(pointerPosition);
 
         if (currentDragPosition != null)
         {
@@ -344,12 +344,12 @@ public abstract class ManualInputEventsSample : CommonSample
     #endregion
 
     #region Helper methods
-    private ModelNode? GetHitModel(Vector2 mousePosition)
+    private ModelNode? GetHitModel(Vector2 pointerPosition)
     {
         if (SceneView == null)
             return null;
 
-        var rayHitTestResult = SceneView.GetClosestHitObject(mousePosition.X, mousePosition.Y);
+        var rayHitTestResult = SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
 
         if (rayHitTestResult == null)
             return null;
@@ -357,12 +357,12 @@ public abstract class ManualInputEventsSample : CommonSample
         return rayHitTestResult.HitSceneNode as ModelNode;
     }
 
-    private Vector3? GetPositionOnHorizontalPlane(Vector2 mousePosition)
+    private Vector3? GetPositionOnHorizontalPlane(Vector2 pointerPosition)
     {
         if (SceneView == null)
             return null;
 
-        var rayFromCamera = SceneView.GetRayFromCamera(mousePosition.X, mousePosition.Y);
+        var rayFromCamera = SceneView.GetRayFromCamera(pointerPosition.X, pointerPosition.Y);
 
         // Get intersection of ray created from mouse position and the horizontal plane (position: 0,0,0; normal: 0,1,0)
         bool hasIntersection = Ab4d.SharpEngine.Utilities.MathUtils.RayPlaneIntersection(rayOrigin: rayFromCamera.Position,

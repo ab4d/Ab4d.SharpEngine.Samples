@@ -39,8 +39,8 @@ public class LineSelectionSample : CommonSample
     public LineSelectionSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     }
 
     protected override void OnCreateScene(Scene scene)

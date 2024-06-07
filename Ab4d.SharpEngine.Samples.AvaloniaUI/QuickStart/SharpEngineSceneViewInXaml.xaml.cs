@@ -28,7 +28,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
     {
         private GroupNode? _groupNode;
         
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
@@ -81,12 +81,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
 
             CreateTestScene();
-            SetupMouseCameraController();
+            SetupPointerCameraController();
             
             this.Unloaded += (sender, args) => MainSceneView.Dispose();
         }
 
-        private void SetupMouseCameraController()
+        private void SetupPointerCameraController()
         {
             _targetPositionCamera = new TargetPositionCamera()
             {
@@ -101,13 +101,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             MainSceneView.SceneView.Camera = _targetPositionCamera;
 
 
-            _mouseCameraController = new MouseCameraController(MainSceneView)
+            _pointerCameraController = new PointerCameraController(MainSceneView)
             {
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,                                                   // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey,             // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.MousePosition,
-                RotateAroundMousePosition = true
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
+                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                ZoomMode = CameraZoomMode.PointerPosition,
+                RotateAroundPointerPosition = true
             };
         }
 

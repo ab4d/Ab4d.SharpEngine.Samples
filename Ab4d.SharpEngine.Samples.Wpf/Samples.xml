@@ -18,8 +18,8 @@
   <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
 
-  <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
-  <Sample Location="CameraControllers/MouseCameraControllerSample.xaml" Title="MouseCameraController"/>
+  <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
+  <Sample Location="CameraControllers/PointerCameraControllerSample.xaml" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
 

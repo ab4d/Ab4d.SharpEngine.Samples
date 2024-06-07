@@ -28,7 +28,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
         private InputEventsManager _inputEventsManager;
 
         private WpfUIProvider _wpfUiProvider;
@@ -126,8 +126,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
-            if (_mouseCameraController != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            if (_pointerCameraController != null)
+                _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
 
             // Show MainSceneView - this will also render the scene
             MainSceneView.Visibility = Visibility.Visible;
@@ -144,12 +144,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
         {
             InitializeCommonSample();
 
-            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
-                _mouseCameraController = new MouseCameraController(MainSceneView);
+                _pointerCameraController = new PointerCameraController(MainSceneView);
 
                 if (_currentCommonSample != null)
-                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                    _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
         }
 

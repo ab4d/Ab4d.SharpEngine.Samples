@@ -22,7 +22,7 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
     public BackgroundAndOverlayRenderingSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateAroundMousePosition = true;
+        RotateAroundPointerPosition = true;
         ShowCameraAxisPanel = true;
     }
 
@@ -66,10 +66,10 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
     }
 
     /// <inheritdoc />
-    public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
     {
         // Show wire-cross that shows the RotationCenterPosition when rotating the camera
-        mouseCameraController.CameraRotateStarted += (sender, args) =>
+        pointerCameraController.CameraRotateStarted += (sender, args) =>
         {
             if (_rotationCenterWireCross != null && targetPositionCamera != null)
             {
@@ -78,13 +78,13 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
             }
         };
 
-        mouseCameraController.CameraRotateEnded += (sender, args) =>
+        pointerCameraController.CameraRotateEnded += (sender, args) =>
         {
             if (_rotationCenterWireCross != null)
                 _rotationCenterWireCross.Visibility = SceneNodeVisibility.Hidden;
         };
 
-        base.InitializeMouseCameraController(mouseCameraController);
+        base.InitializePointerCameraController(pointerCameraController);
     }
 
     private void AddStandardRenderedObjects(Scene scene)

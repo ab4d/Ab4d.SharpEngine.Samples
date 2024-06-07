@@ -325,7 +325,7 @@ namespace Ab4d.StandardPresentation.GlfwUI
         }
 
 
-        public void GetMouseState(out float x, out float y, out MouseButtons pressedButtons)
+        public void GetMouseState(out float x, out float y, out PointerButtons pressedButtons)
         {
             if (_glfwWindow == Window.None)
                 throw new InvalidOperationException("Cannot call GetMouseState before the Show is called");
@@ -336,27 +336,27 @@ namespace Ab4d.StandardPresentation.GlfwUI
             y = (float)yPos;
 
 
-            pressedButtons = MouseButtons.None;
+            pressedButtons = PointerButtons.None;
 
             var buttonState = Glfw.GetMouseButton(_glfwWindow, GLFW.MouseButton.Left);
             if (buttonState == InputState.Press || buttonState == InputState.Repeat)
-                pressedButtons |= MouseButtons.Left;
+                pressedButtons |= PointerButtons.Left;
 
             buttonState = Glfw.GetMouseButton(_glfwWindow, GLFW.MouseButton.Middle);
             if (buttonState == InputState.Press || buttonState == InputState.Repeat)
-                pressedButtons |= MouseButtons.Middle;
+                pressedButtons |= PointerButtons.Middle;
 
             buttonState = Glfw.GetMouseButton(_glfwWindow, GLFW.MouseButton.Right);
             if (buttonState == InputState.Press || buttonState == InputState.Repeat)
-                pressedButtons |= MouseButtons.Right;
+                pressedButtons |= PointerButtons.Right;
 
             buttonState = Glfw.GetMouseButton(_glfwWindow, GLFW.MouseButton.Button4);
             if (buttonState == InputState.Press || buttonState == InputState.Repeat)
-                pressedButtons |= MouseButtons.XButton1;
+                pressedButtons |= PointerButtons.XButton1;
 
             buttonState = Glfw.GetMouseButton(_glfwWindow, GLFW.MouseButton.Button5);
             if (buttonState == InputState.Press || buttonState == InputState.Repeat)
-                pressedButtons |= MouseButtons.XButton2;
+                pressedButtons |= PointerButtons.XButton2;
         }
 
         public ulong CreateVulkanSurface(IntPtr vulkanInstance)
@@ -487,20 +487,20 @@ namespace Ab4d.StandardPresentation.GlfwUI
             MouseWheel?.Invoke(this, new MouseWheelEventArgs((float)dx, (float)dy));
         }
 
-        private MouseButtons ConvertMouseButton(GLFW.MouseButton button)
+        private PointerButtons ConvertMouseButton(GLFW.MouseButton button)
         {
             switch (button)
             {
                 case GLFW.MouseButton.Left:
-                    return MouseButtons.Left;
+                    return PointerButtons.Left;
                 case GLFW.MouseButton.Middle:
-                    return MouseButtons.Middle;
+                    return PointerButtons.Middle;
                 case GLFW.MouseButton.Right:
-                    return MouseButtons.Right;
+                    return PointerButtons.Right;
                 case GLFW.MouseButton.Button4:
-                    return MouseButtons.XButton1;
+                    return PointerButtons.XButton1;
                 case GLFW.MouseButton.Button5:
-                    return MouseButtons.XButton2;
+                    return PointerButtons.XButton2;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(button), button, null);
             }

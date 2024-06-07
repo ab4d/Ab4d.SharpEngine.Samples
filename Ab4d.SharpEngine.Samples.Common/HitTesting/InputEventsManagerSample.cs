@@ -33,10 +33,10 @@ public class InputEventsManagerSample : CommonSample
     public InputEventsManagerSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
-        QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
-        IsMouseWheelZoomEnabled = false; // Disable wheel zoom because here we demonstrate mouse wheel handling and this prevents using wheel two times
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
+        QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
+        IsPointerWheelZoomEnabled = false; // Disable wheel zoom because here we demonstrate mouse wheel handling and this prevents using wheel two times
 
         ShowCameraAxisPanel = true;
     }
@@ -163,7 +163,7 @@ public class InputEventsManagerSample : CommonSample
             modelNodeEventsSource.PointerWheelChanged += (sender, args) =>
             {
                 //ProcessScale(oneBox, args.MouseWheelDelta);  
-                ProcessRotate(onePyramid, args.MouseWheelDelta);  
+                ProcessRotate(onePyramid, args.WheelDelta);  
             };
 
             // Dragging is demonstrated in InputEventsManagerWithSurfaceSample sample
@@ -239,7 +239,7 @@ public class InputEventsManagerSample : CommonSample
         {
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
             {
-                ProcessScale(modelNode, args.MouseWheelDelta);  
+                ProcessScale(modelNode, args.WheelDelta);  
                 //ProcessRotate(modelNode, args.MouseWheelDelta);
             }
         };
@@ -291,7 +291,7 @@ public class InputEventsManagerSample : CommonSample
             if (args.RayHitResult.HitSceneNode is ModelNode modelNode)
             {
                 //ProcessScale(modelNode, args.MouseWheelDelta);  
-                ProcessRotate(modelNode, args.MouseWheelDelta);
+                ProcessRotate(modelNode, args.WheelDelta);
             }
         };
     }

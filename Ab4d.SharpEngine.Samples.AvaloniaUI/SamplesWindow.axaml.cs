@@ -31,7 +31,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
     public partial class SamplesWindow : Window
     {
         //private string? _startupPage = "QuickStart.SharpEngineSceneViewInXaml";
-        private string? _startupPage = "Cameras.TargetPositionCameraSample";
+        private string? _startupPage = "HitTesting.ModelMoverSample";
         //private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
@@ -67,6 +67,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             if (Application.Current != null)
                 Application.Current.RequestedThemeVariant = ThemeVariant.Light;
+
+            EngineRuntimeOptions.DisposeObjectFromFinalizer = EngineRuntimeOptions.WarningActionLevel.LogWarning;
 
 
             // By default, enable logging of warnings and errors.

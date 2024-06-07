@@ -27,9 +27,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
 
         public IntroductionPage()
         {
-            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
-
             InitializeComponent();
 
             // When Control key is pressed or when SkipInitializingSharpEngine is true,

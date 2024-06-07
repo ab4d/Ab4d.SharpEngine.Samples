@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.CameraControllers.MouseCameraControllerSample" >
+             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.CameraControllers.PointerCameraControllerSample" >
   <Grid Name="RootGrid">
     <Border>
       <Border.Background>
@@ -21,7 +21,7 @@
       <ScrollViewer AllowAutoHide="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <TextBlock Margin="5 10 5 0" FontWeight="Bold">RotateCameraConditions:</TextBlock>
-            <TextBlock Margin="5 0 5 0">(default: Left mouse button)</TextBlock>
+            <TextBlock Margin="5 0 5 0">(default: Left pointer button)</TextBlock>
 
             <Grid Margin="5 2 5 0">
               <Grid.ColumnDefinitions>
@@ -36,7 +36,7 @@
                 <RowDefinition Height="Auto"/>
               </Grid.RowDefinitions>
 
-              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Mouse button:"/>
+              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Pointer button:"/>
               <CheckBox Name="LeftButtonCheckBox1" Grid.Column="0" Margin="0 2 0 0" Grid.Row="1" IsChecked="True" IsCheckedChanged="OnRotateCheckBoxChanged">Left</CheckBox>
               <CheckBox Name="MiddleButtonCheckBox1" Grid.Column="0" Margin="0 2 0 0" Grid.Row="2" IsCheckedChanged="OnRotateCheckBoxChanged">Middle</CheckBox>
               <CheckBox Name="RightButtonCheckBox1" Grid.Column="0" Grid.Row="3" Margin="0 2 0 0" IsCheckedChanged="OnRotateCheckBoxChanged">Right</CheckBox>
@@ -48,7 +48,7 @@
             </Grid>
 
             <TextBlock Margin="5 15 5 0" FontWeight="Bold">MoveCameraConditions:</TextBlock>
-            <TextBlock Margin="5 0 5 0">(default: Ctrl + Left mouse button)</TextBlock>
+            <TextBlock Margin="5 0 5 0">(default: Ctrl + Left pointer button)</TextBlock>
 
             <Grid Margin="5 2 5 0">
               <Grid.ColumnDefinitions>
@@ -63,7 +63,7 @@
                 <RowDefinition Height="Auto"/>
               </Grid.RowDefinitions>
 
-              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Mouse button:"/>
+              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Pointer button:"/>
               <CheckBox Name="LeftButtonCheckBox2" Grid.Column="0" Margin="0 2 0 0" Grid.Row="1" IsChecked="True" IsCheckedChanged="OnMoveCheckBoxChanged">Left</CheckBox>
               <CheckBox Name="MiddleButtonCheckBox2" Grid.Column="0" Margin="0 2 0 0" Grid.Row="2" IsCheckedChanged="OnMoveCheckBoxChanged">Middle</CheckBox>
               <CheckBox Name="RightButtonCheckBox2" Grid.Column="0" Grid.Row="3" Margin="0 2 0 0" IsCheckedChanged="OnMoveCheckBoxChanged">Right</CheckBox>
@@ -90,7 +90,7 @@
                 <RowDefinition Height="Auto"/>
               </Grid.RowDefinitions>
 
-              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Mouse button:"/>
+              <TextBlock Grid.Column="0" Grid.Row="0" Margin="0 2 0 0" TextDecorations="Underline" Text="Pointer button:"/>
               <CheckBox Name="LeftButtonCheckBox3" Grid.Column="0" Margin="0 2 0 0" Grid.Row="1" IsChecked="True" IsCheckedChanged="OnQuickZoomCheckBoxChanged">Left</CheckBox>
               <CheckBox Name="MiddleButtonCheckBox3" Grid.Column="0" Margin="0 2 0 0" Grid.Row="2" IsCheckedChanged="OnQuickZoomCheckBoxChanged">Middle</CheckBox>
               <CheckBox Name="RightButtonCheckBox3" Grid.Column="0" Grid.Row="3" Margin="0 2 0 0" IsChecked="True" IsCheckedChanged="OnQuickZoomCheckBoxChanged">Right</CheckBox>
@@ -101,14 +101,14 @@
               <CheckBox Name="AltKeyCheckBox3" Grid.Column="2" Grid.Row="3" Margin="0 2 0 0" IsCheckedChanged="OnQuickZoomCheckBoxChanged">Alt</CheckBox>
             </Grid>
 
-            <CheckBox Name="RotateAroundMousePositionCheckBox" Content="RotateAroundMousePosition" Margin="5 15 0 0" IsChecked="True" IsCheckedChanged="OnRotateAroundMousePositionCheckedChanged" />
+            <CheckBox Name="RotateAroundPointerPositionCheckBox" Content="RotateAroundPointerPosition" Margin="5 15 0 0" IsChecked="True" IsCheckedChanged="OnRotateAroundPointerPositionCheckedChanged" />
 
             <StackPanel Orientation="Horizontal" Margin="5 5 0 0">
               <TextBlock Text="ZoomMode:" VerticalAlignment="Center" />
               <ComboBox Name="ZoomModeComboBox" Width="170" SelectedIndex="2" SelectionChanged="ZoomModeComboBox_OnSelectionChanged">
                 <ComboBoxItem>ViewCenter</ComboBoxItem>
                 <ComboBoxItem>CameraRotationCenterPosition</ComboBoxItem>
-                <ComboBoxItem>MousePosition</ComboBoxItem>
+                <ComboBoxItem>PointerPosition</ComboBoxItem>
               </ComboBox>
               <TextBlock Name="ZoomModeInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />         
             </StackPanel>
@@ -117,22 +117,22 @@
             <CheckBox Name="IsYAxisInvertedCheckBox" Content="IsYAxisInverted" Margin="5" IsChecked="False" IsCheckedChanged="OnIsYAxisInvertedCheckBoxCheckedChanged" />
 
             <StackPanel Orientation="Horizontal" Margin="5 5 0 0">
-              <CheckBox Name="UseMousePositionForMovementSpeedCheckBox" Content="UseMousePositionForMovementSpeed" IsChecked="True" IsCheckedChanged="OnUseMousePositionForMovementSpeedCheckBoxChanged" VerticalAlignment="Center"/>
-              <TextBlock Name="UseMousePositionForMovementSpeedInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
+              <CheckBox Name="UsePointerPositionForMovementSpeedCheckBox" Content="UsePointerPositionForMovementSpeed" IsChecked="True" IsCheckedChanged="OnUsePointerPositionForMovementSpeedCheckBoxChanged" VerticalAlignment="Center"/>
+              <TextBlock Name="UsePointerPositionForMovementSpeedInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
             </StackPanel>
 
-            <CheckBox Name="IsMouseWheelZoomEnabledCheckBox" Content="IsMouseWheelZoomEnabled" Margin="5 5 0 0" IsChecked="True" IsCheckedChanged="OnIsMouseWheelZoomEnabledCheckedChanged" />
+            <CheckBox Name="IsPointerWheelZoomEnabledCheckBox" Content="IsPointerWheelZoomEnabled" Margin="5 5 0 0" IsChecked="True" IsCheckedChanged="OnIsPointerWheelZoomEnabledCheckedChanged" />
 
             <StackPanel Orientation="Horizontal" Margin="5 5 0 0">
-              <TextBlock Text="MouseWheelDistanceChangeFactor:" VerticalAlignment="Center" />
-              <ComboBox Name="MouseWheelDistanceChangeFactorComboBox" Width="50" SelectionChanged="MouseWheelDistanceChangeFactorComboBox_OnSelectionChanged" />
-              <TextBlock Name="MouseWheelDistanceChangeFactorInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
+              <TextBlock Text="PointerWheelDistanceChangeFactor:" VerticalAlignment="Center" />
+              <ComboBox Name="PointerWheelDistanceChangeFactorComboBox" Width="50" SelectionChanged="PointerWheelDistanceChangeFactorComboBox_OnSelectionChanged" />
+              <TextBlock Name="PointerWheelDistanceChangeFactorInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
             </StackPanel>
 
             <StackPanel Margin="5 15 0 0" Orientation="Horizontal">
-              <TextBlock Text="MouseMoveThreshold:" VerticalAlignment="Center" Margin="0 0 3 0"/>
-              <ComboBox Name="MouseMoveThresholdComboBox" Width="60" SelectionChanged="MouseMoveThresholdComboBox_OnSelectionChanged" />
-              <TextBlock Name="MouseMoveThresholdInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
+              <TextBlock Text="PointerMoveThreshold:" VerticalAlignment="Center" Margin="0 0 3 0"/>
+              <ComboBox Name="PointerMoveThresholdComboBox" Width="60" SelectionChanged="PointerMoveThresholdComboBox_OnSelectionChanged" />
+              <TextBlock Name="PointerMoveThresholdInfoControl" Text="(?)" FontWeight="Bold" Foreground="DimGray" Margin="5 0 0 0" VerticalAlignment="Center" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="5 10 0 10">
@@ -150,8 +150,8 @@
     </Border>
 
     <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Margin="10">
-      <TextBlock Text="MouseCameraController" FontSize="20" FontWeight="Bold" Foreground="#444" />
-      <TextBlock Text="MouseCameraController enables rotating, moving and zooming the camera with the mouse or touch." FontSize="14" Margin="0 5 0 0" />
+      <TextBlock Text="PointerCameraController" FontSize="20" FontWeight="Bold" Foreground="#444" />
+      <TextBlock Text="PointerCameraController enables rotating, moving and zooming the camera with the pointer or mouse." FontSize="14" Margin="0 5 0 0" />
     </StackPanel>
   </Grid>
 </UserControl>

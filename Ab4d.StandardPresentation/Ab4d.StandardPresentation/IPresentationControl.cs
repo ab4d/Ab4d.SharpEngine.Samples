@@ -26,7 +26,7 @@ namespace Ab4d.StandardPresentation
         void Show();
         void Close();
         void StartRenderLoop(Action renderCallback);
-        void GetMouseState(out float x, out float y, out MouseButtons pressedButtons);
+        void GetMouseState(out float x, out float y, out PointerButtons pressedButtons);
         ulong CreateVulkanSurface(IntPtr vulkanInstance); // When non zero value is returned then the returned ulong surfaceHandle is used to create the surface (new VkSurfaceKHR(surfaceHandle))
 
         bool IsMouseCaptureSupported { get; }
