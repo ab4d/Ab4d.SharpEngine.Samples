@@ -27,6 +27,8 @@ public class AssimpImporterSample : CommonSample
     private MultiLineNode? _objectLinesNode;
     private GroupNode? _importedModelNodes;
 
+    private EdgeLinesFactory? _edgeLinesFactory;
+
     private string? _importedFileName;
     private bool _isAssimpLoggingEnabled = false;
 
@@ -310,10 +312,14 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
 
         if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
         {
-            var edgeLinePositions = new List<Vector3>();
-            LineUtils.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+            // Reuse the instance of EdgeLinesFactory
+            // This can reuse the lists and array that are internally used by the EdgeLinesFactory
+            // See comments in Lines/EdgeLinesSample.cs for more info about edge lines generation.
 
-            // Because for complex files it may take a long time to calculate edge lines, 
+            _edgeLinesFactory ??= new EdgeLinesFactory();
+            var edgeLinePositions = _edgeLinesFactory.CreateEdgeLines(_importedModelNodes, 15);
+
+            // Because for complex files it may take some time to calculate edge lines, 
             // we can use the following code to save the edge lines so next time we can load the data:
             //if (_importedFileName != null)
             //{
@@ -334,7 +340,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             //            }
             //        }
             //    }
-                
+
             //    // Read edge lines:
             //    using (var stream = File.Open(edgeLinesFileName, FileMode.Open))
             //    {
@@ -349,7 +355,6 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             //        }
             //    }
             //}
-
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;

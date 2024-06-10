@@ -30,6 +30,8 @@ public class GltfImporterExporterSample : CommonSample
     private ICommonSampleUIElement? _exportFileNameTextBox;
     private ICommonSampleUIElement? _exportSuccessfulLabel;
 
+    private EdgeLinesFactory? _edgeLinesFactory;
+
     private bool _isFullLoggingEnabled = false;
 
     private enum ViewTypes
@@ -193,10 +195,13 @@ public class GltfImporterExporterSample : CommonSample
 
         if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
         {
-            var edgeLinePositions = new List<Vector3>();
-            LineUtils.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+            // Reuse the instance of EdgeLinesFactory
+            // This can reuse the lists and array that are internally used by the EdgeLinesFactory
+            // See comments in Lines/EdgeLinesSample.cs for more info about edge lines generation.
+            _edgeLinesFactory = new EdgeLinesFactory();
+            var edgeLinePositions = _edgeLinesFactory.CreateEdgeLines(_importedModelNodes, 15);
 
-            // Because for complex files it may take a long time to calculate edge lines, 
+            // Because for complex files it may take some time to calculate edge lines, 
             // we can use the following code to save the edge lines so next time we can load the data:
             //if (_importedFileName != null)
             //{
@@ -232,7 +237,6 @@ public class GltfImporterExporterSample : CommonSample
             //        }
             //    }
             //}
-
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
