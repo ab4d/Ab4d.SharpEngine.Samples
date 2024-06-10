@@ -22,11 +22,15 @@ public class GltfImporterExporterSample : CommonSample
     private readonly string _initialFileName = "Resources\\Models\\voyager.gltf";
 
     private ICommonSampleUIElement? _textBoxElement;
-    private ICommonSampleUIPanel? _infoPanel;
     private MultiLineNode? _objectLinesNode;
     private GroupNode? _importedModelNodes;
 
-    private bool _isLoggingEnabled = false;
+    private string? _importedFileName;
+    private string? _exportFileName;
+    private ICommonSampleUIElement? _exportFileNameTextBox;
+    private ICommonSampleUIElement? _exportSuccessfulLabel;
+
+    private bool _isFullLoggingEnabled = false;
 
     private enum ViewTypes
     {
@@ -34,8 +38,16 @@ public class GltfImporterExporterSample : CommonSample
         SolidObjectWithEdgeLines = 1,
         SolidObjectWithWireframe = 2
     }
+    
+    private enum ExportType
+    {
+        GltfWithBin = 0,
+        GltfWithEmbeddedData = 1,
+        BinaryGlb = 2
+    }
 
     private ViewTypes _currentViewType = ViewTypes.SolidObjectsOnly;
+    private ExportType _currentExportType = ExportType.BinaryGlb;
 
 
     public GltfImporterExporterSample(ICommonSamplesContext context)
@@ -47,8 +59,8 @@ public class GltfImporterExporterSample : CommonSample
     {
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading = 50;
-            targetPositionCamera.Attitude = 12;
+            targetPositionCamera.Heading = 120;
+            targetPositionCamera.Attitude = -30;
         }
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
@@ -63,6 +75,7 @@ public class GltfImporterExporterSample : CommonSample
             return;
 
         Scene.RootNode.Clear();
+        _importedFileName = null;
 
         string fileExtension = System.IO.Path.GetExtension(fileName);
         if (!fileExtension.Equals(".gltf", StringComparison.OrdinalIgnoreCase) &&
@@ -109,12 +122,10 @@ public class GltfImporterExporterSample : CommonSample
         // We could also create the glTFImporter by using a custom imageReader and by providing a VulkanDevice (this immediately creates the textures):
         //var glTfImporter = new glTFImporter(imageReader: customBitmapIO, gpuDevice: Scene.GpuDevice);
 
-
-        if (_isLoggingEnabled)
-        {
-            glTfImporter.LogInfoMessages = true;
-            glTfImporter.LoggerCallback = (logLevel, message) => System.Diagnostics.Debug.WriteLine($"glTfImporter: {logLevel} {message}");
-        }
+        // Setup logger that will display log messages in Visual Studio's Output window
+        // When "Enable full logging" CheckBox is checked, then we show full logging; otherwise only warnings and errors are shown
+        glTfImporter.LogInfoMessages = _isFullLoggingEnabled;
+        glTfImporter.LoggerCallback = (logLevel, message) => System.Diagnostics.Debug.WriteLine($"glTfImporter: {logLevel} {message}");
 
         try
         {
@@ -162,6 +173,9 @@ public class GltfImporterExporterSample : CommonSample
                 targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
                 targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
             }
+
+            _importedFileName = fileName;
+            UpdateExportFileName();
         }
     }
 
@@ -232,19 +246,85 @@ public class GltfImporterExporterSample : CommonSample
         }
     }
 
-    // To test this method uncomment the code below and the declaration of export button in OnCreateUI
-    //private void ExportScene()
-    //{
-    //    // To preserve the NativeAssimpScene after importing it, set the _assimpImporter.PreserveNativeResourcesAfterImporting to true
-    //    // and do not call _assimpImporter.DisposeNativeAssimpScene()
-    //    if (_assimpImporter == null || _assimpImporter.NativeAssimpScene == null)
-    //        return;
+    private void UpdateExportFileName()
+    {
+        string fileExtension = _currentExportType == ExportType.BinaryGlb ? ".glb" : ".gltf";
 
-    //    string exportedFileExtension = "obj"; // This value should be from assimpExporter.SupportedExportFileExtensions
-    //    string exportedFileName = System.IO.Path.ChangeExtension(_importedFileName, exportedFileExtension)!;
+        if (string.IsNullOrEmpty(_importedFileName))
+            _exportFileName = "Export";
+        else
+            _exportFileName = System.IO.Path.GetFileNameWithoutExtension(_importedFileName);
 
-    //    bool success = _assimpImporter.NativeAssimpScene.ExportScene(exportedFileName, exportedFileExtension);
-    //}
+        _exportFileName += fileExtension;
+
+        _exportFileNameTextBox?.SetText(_exportFileName);
+    }
+
+
+    private void ExportScene()
+    {
+        if (_importedFileName == null || _exportFileName == null || Scene == null)
+            return;
+
+        _exportSuccessfulLabel?.SetIsVisible(false);
+
+        
+        string fullExportFileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_importedFileName)!, _exportFileName);
+
+        // First create an instance of glTFExporter
+        var glTfExporter = new glTFExporter();
+
+        // Then add Scene to the exporter
+        glTfExporter.AddScene(Scene);
+
+        // We could also export only a selected SceneNode (can be a GroupNode)
+        //glTfExporter.AddSceneNode(sceneNode);
+
+        // Setup logger that will display log messages in Visual Studio's Output window
+        // When "Enable full logging" CheckBox is checked, then we show full logging; otherwise only warnings and errors are shown
+        glTfExporter.LogInfoMessages = _isFullLoggingEnabled;
+        glTfExporter.LoggerCallback = (logLevel, message) => System.Diagnostics.Debug.WriteLine($"glTfExporter: {logLevel} {message}");
+
+        try
+        {
+            switch (_currentExportType)
+            {
+                case ExportType.GltfWithBin:
+                    // Export to .gltf file with json format + .bin file with binary format
+                    // When no exportResourceFunc parameter is used, then the .bin file and textures are created in the same folder as the fullExportFileName.
+                    // Use exportResourceFunc parameter to export to some other folder.
+                    glTfExporter.Export(fullExportFileName);
+
+                    // To export to stream use:
+                    //glTfExporter.Export(gltfFileStream, (filename, data) =>
+                    //{
+                    //    // export data with fileName to some custom stream
+                    //});
+                    break;
+
+                case ExportType.GltfWithEmbeddedData:
+                    glTfExporter.ExportEmbedded(fullExportFileName);
+                    
+                    // To export to stream use:
+                    //glTfExporter.ExportEmbedded(gltfFileStream);
+                    break;
+
+                case ExportType.BinaryGlb:
+                    glTfExporter.ExportBinary(fullExportFileName);
+
+                    // To export to stream use:
+                    //glTfExporter.ExportBinary(gltfFileStream);
+                    break;
+            }
+
+            _exportSuccessfulLabel?.SetText("Exported to:\n" + fullExportFileName);
+            _exportSuccessfulLabel?.SetIsVisible(true);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Error exporting:\n" + ex.Message);
+        }
+    }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -258,10 +338,31 @@ public class GltfImporterExporterSample : CommonSample
         }, selectedItemIndex: (int)_currentViewType);
 
         ui.AddSeparator();
-        ui.CreateCheckBox("Importer logging (see VS Output)", _isLoggingEnabled, isChecked => _isLoggingEnabled = isChecked);
+        ui.CreateLabel("Export", isHeader: true);
+        
+        ui.CreateLabel("Export type:");
+        ui.CreateRadioButtons(new string[] { "json gltf + bin", "json gltf with embedded data", "binary glb" }, 
+            (itemIndex, itemText) =>
+            {
+                _currentExportType = (ExportType)itemIndex;
+                UpdateExportFileName();
+            }, 
+            selectedItemIndex: (int)_currentExportType);
 
-        //ui.AddSeparator();
-        //ui.CreateButton("Export scene", ExportScene);
+        ui.AddSeparator();
+        ui.CreateLabel("Export file name:");
+        _exportFileNameTextBox = ui.CreateTextBox(width: 0, initialText: _exportFileName, textChangedAction: (fileName) => _exportFileName = fileName);
+
+        ui.AddSeparator();
+        ui.CreateButton("Export scene", ExportScene);
+
+        ui.AddSeparator();
+        ui.AddSeparator();
+        ui.CreateCheckBox("Enable full logging (see VS Output)", _isFullLoggingEnabled, isChecked => _isFullLoggingEnabled = isChecked);
+
+
+        ui.AddSeparator();
+        _exportSuccessfulLabel = ui.CreateLabel("Exported to:", width: 230).SetColor(Colors.Green).SetIsVisible(false);
 
 
         // Try to register for file drag-and-drop
@@ -282,7 +383,6 @@ public class GltfImporterExporterSample : CommonSample
 
             ui.CreateButton("Load", () =>
             {
-                _infoPanel?.SetIsVisible(false);
                 ImportFile(_textBoxElement.GetText());
             });
 
