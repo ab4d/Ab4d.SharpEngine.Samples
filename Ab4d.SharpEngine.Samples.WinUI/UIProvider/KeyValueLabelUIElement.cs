@@ -65,6 +65,8 @@ public class KeyValueLabelUIElement : WinUIElement
                 FontSize = winUIProvider.FontSize,
             };
 
+            _keyText = keyTextToShow; // Update _keyText so that show text without toot tip
+
             if (toolTip != null)
                 ToolTipService.SetToolTip(_keyValueTextBlock, toolTip);
 
