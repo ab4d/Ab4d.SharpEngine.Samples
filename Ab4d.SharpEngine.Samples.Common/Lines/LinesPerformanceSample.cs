@@ -226,11 +226,8 @@ public class LinesPerformanceSample : CommonSample
                     }
                     else
                     {
-                        lineNode = new MultiLineNode(lineMaterial!)
-                        {
-                            Positions = spiralPositions,
-                            IsLineStrip = sampleLineType == SampleLineTypes.MultiLineLineStrip,
-                        };
+                        bool isLineStrip = sampleLineType == SampleLineTypes.MultiLineLineStrip;
+                        lineNode = new MultiLineNode(spiralPositions, isLineStrip, lineMaterial!);
                     }
                 }
 
