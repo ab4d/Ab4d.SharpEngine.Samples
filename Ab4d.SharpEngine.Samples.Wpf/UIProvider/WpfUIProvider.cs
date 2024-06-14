@@ -186,9 +186,9 @@ public class WpfUIProvider : ICommonSampleUIProvider
         return newElement;
     }
 
-    public ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0, bool showTicks = false, string? keyText = null, double keyTextWidth = 0, Func<float, string>? formatShownValueFunc = null)
+    public ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0D, bool showTicks = false, string? keyText = null, double keyTextWidth = 0D, Func<float, string>? formatShownValueFunc = null, double shownValueWidth = 0)
     {
-        var newElement = new SliderUIElement(this, minValue, maxValue, getValueFunc, setValueAction, width, showTicks, keyText, keyTextWidth, formatShownValueFunc);
+        var newElement = new SliderUIElement(this, minValue, maxValue, getValueFunc, setValueAction, width, showTicks, keyText, keyTextWidth, formatShownValueFunc, shownValueWidth);
         AddToCurrentPanel(newElement);
 
         return newElement;

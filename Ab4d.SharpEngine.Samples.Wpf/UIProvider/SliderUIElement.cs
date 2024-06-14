@@ -29,7 +29,8 @@ public class SliderUIElement : WpfUIElement
                            bool showTicks, 
                            string? keyText, 
                            double keyTextWidth,
-                           Func<float, string>? formatShownValueFunc)
+                           Func<float, string>? formatShownValueFunc,
+                           double shownValueWidth)
         : base(wpfUIProvider)
     {
         _getValueFunc = getValueFunc;
@@ -95,7 +96,11 @@ public class SliderUIElement : WpfUIElement
                     _valueTextBlock.ToolTip = toolTip;
 
                 // To prevent changing the size of _valueTextBlock we get the max possible size
-                _valueTextBlock.Width = MeasureShownValueTextBlock(minValue, maxValue);
+                if (shownValueWidth > 0)
+                    _valueTextBlock.Width = shownValueWidth;
+                else if (shownValueWidth == 0)
+                    _valueTextBlock.Width = MeasureShownValueTextBlock(minValue, maxValue);
+                // else: when less then zero, then do not set the width
 
                 _stackPanel.Children.Add(_valueTextBlock);
             }
@@ -119,6 +124,8 @@ public class SliderUIElement : WpfUIElement
         float newValue = _getValueFunc();
 
         _slider.Value = newValue;
+
+        UpdateShownValue();
     }
 
 
