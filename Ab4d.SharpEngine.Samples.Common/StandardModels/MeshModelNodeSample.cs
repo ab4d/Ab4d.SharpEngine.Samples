@@ -14,9 +14,20 @@ namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 public class MeshModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "MeshModelNode";
-    public override string Subtitle => "MeshModelNode defines a 3D model from Positions, Normals, TextureCoordinates and TriangleIndices.\nNote that the order of triangles is important: Material shows front side; BackMaterial shows back side (red in this sample; see bottom side of the plane).";
+    public override string Subtitle => 
+@"MeshModelNode defines a 3D model from Positions, Normals, TextureCoordinates and TriangleIndices.
 
-    private StandardMesh? _mesh;
+Note that the order of triangles is important:
+The front side of the triangles (oriented in anti-clockwise direction) is shown by the Material property;
+Back side is show by the the BackMaterial property (red in this sample; see bottom side of the plane).
+
+Click on 'Reverse triangles order' to see the effect of changed order.";
+
+    private StandardMesh? _standardMesh;
+    private StandardMesh? _reversedMesh;
+    private MeshModelNode? _meshModelNode;
+    private ICommonSampleUIElement? _triangleIndicesTextBox;
+
 
     public MeshModelNodeSample(ICommonSamplesContext context)
         : base(context)
@@ -55,6 +66,9 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         };
 
         // triangleIndices connect 3 vertices into triangles (each vertex is defined by and index in the vertices array)
+        // Note that order of triangles is important.
+        // The side of the triangle that is oriented in anti-clockwise direction will show the front Material.
+        // The other side will be shown when BackMaterial property is set.
         var triangleIndices = new int[]
         {
             0, 2, 1, // first triangle from positions at indices 0, 2, 1
@@ -69,7 +83,22 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         //Ab4d.SharpEngine.Utilities.MeshUtils.GeneratePlanarTextureCoordinates(vertices, triangleIndices, ...);
         //Ab4d.SharpEngine.Utilities.MeshUtils.GenerateCylindricalTextureCoordinates(vertices, triangleIndices, ...);
 
-        _mesh = new StandardMesh(vertices, triangleIndices, name: "StandardMesh");
+        _standardMesh = new StandardMesh(vertices, triangleIndices, name: "StandardMesh");
+
+
+        // Create a mesh with reversed triangles order
+        
+        var reversedTriangleIndices = new int[triangleIndices.Length];
+        for (int i = 0; i < triangleIndices.Length; i += 3)
+        {
+            reversedTriangleIndices[i] = triangleIndices[i];
+
+            // Swap second and third index in each triangle
+            reversedTriangleIndices[i + 1] = triangleIndices[i + 2];
+            reversedTriangleIndices[i + 2] = triangleIndices[i + 1];
+        }
+
+        _reversedMesh = new StandardMesh(vertices, reversedTriangleIndices, name: "ReversedMesh");
 
 
         // It is also possible to create a GeometryMesh:
@@ -101,10 +130,10 @@ public class MeshModelNodeSample : StandardModelsSampleBase
 
 
 
-        var meshModelNode = new MeshModelNode(_mesh, StandardMaterials.Orange, name: "SampleMeshModel");
-        meshModelNode.BackMaterial = StandardMaterials.Red;
+        _meshModelNode = new MeshModelNode(_standardMesh, StandardMaterials.Orange, name: "SampleMeshModel");
+        _meshModelNode.BackMaterial = StandardMaterials.Red;
 
-        return meshModelNode;
+        return _meshModelNode;
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -117,9 +146,9 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         textBlockFactory.BackgroundColor = Colors.Transparent; // no background
         textBlockFactory.BorderThickness = 0;
 
-        if (_mesh != null)
+        if (_standardMesh != null)
         {
-            var positions = _mesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
+            var positions = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
             if (positions != null)
             {
                 for (var i = 0; i < positions.Length; i++)
@@ -156,6 +185,12 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         }
     }
 
+    protected override void OnCreateLights(Scene scene)
+    {
+        // Increase ambient light to 0.5 (from 0.3) so the back side is better visible
+        scene.SetAmbientLight(intensity: 0.5f);
+    }
+
     protected override void UpdateMaterial()
     {
         if (modelNode == null)
@@ -167,7 +202,7 @@ public class MeshModelNodeSample : StandardModelsSampleBase
 
     protected override void UpdateNormals(StandardMesh? mesh, Transform? modelTransform)
     {
-        if (Scene == null || _mesh == null)
+        if (Scene == null || _standardMesh == null)
             return;
 
         if (normalsLineNode != null)
@@ -179,7 +214,7 @@ public class MeshModelNodeSample : StandardModelsSampleBase
 
         var normalsGroupNode = new GroupNode("NormalsGroup");
 
-        var positions = _mesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
+        var positions = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
         if (positions != null)
         {
             for (int i = 0; i < positions.Length; i++)
@@ -201,14 +236,44 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         normalsLineNode = normalsGroupNode;
     }
 
+    private void ReverseTrianglesOrder()
+    {
+        if (_meshModelNode == null || _standardMesh == null || _reversedMesh == null)
+            return;
+
+        if (_meshModelNode.Mesh == _standardMesh)
+            _meshModelNode.Mesh = _reversedMesh;
+        else
+            _meshModelNode.Mesh = _standardMesh;
+
+        UpdateTriangleIndicesTextBox();
+    }
+
+    private void UpdateTriangleIndicesTextBox()
+    {
+        if (_triangleIndicesTextBox == null || _meshModelNode == null || _meshModelNode.Mesh == null)
+            return;
+
+        var triangleIndices = _meshModelNode.Mesh.GetDataChannelArray<int>(MeshDataChannelTypes.TriangleIndices);
+        if (triangleIndices != null)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < triangleIndices.Length; i += 3)
+                sb.AppendFormat("\r\n{0}, {1}, {2}", triangleIndices[i], triangleIndices[i + 1], triangleIndices[i + 2]);
+
+            _triangleIndicesTextBox.SetText(sb.ToString().Substring(2));
+        }
+    }
+
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
-        if (_mesh == null)
+        if (_standardMesh == null)
             return;
 
         var sb = new StringBuilder();
 
-        var positions = _mesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
+        var positions = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
         if (positions != null)
         {
             for (int i = 0; i < positions.Length; i++)
@@ -218,7 +283,7 @@ public class MeshModelNodeSample : StandardModelsSampleBase
             ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
         }
         
-        var normals = _mesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Normals);
+        var normals = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Normals);
         if (normals != null)
         {
             sb.Clear();
@@ -231,7 +296,7 @@ public class MeshModelNodeSample : StandardModelsSampleBase
             ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
         }
         
-        var textureCoordinates = _mesh.GetDataChannelArray<Vector2>(MeshDataChannelTypes.TextureCoordinates);
+        var textureCoordinates = _standardMesh.GetDataChannelArray<Vector2>(MeshDataChannelTypes.TextureCoordinates);
         if (textureCoordinates != null)
         {
             sb.Clear();
@@ -245,17 +310,12 @@ public class MeshModelNodeSample : StandardModelsSampleBase
         }
         
         
-        var triangleIndices = _mesh.GetDataChannelArray<int>(MeshDataChannelTypes.TriangleIndices);
-        if (triangleIndices != null)
-        {
-            sb.Clear();
+        ui.AddSeparator();
+        ui.CreateLabel("TriangleIndices:");
+        _triangleIndicesTextBox = ui.CreateTextBox(width: 160, height: 0, "");
 
-            for (int i = 0; i < triangleIndices.Length; i += 3)
-                sb.AppendFormat("\r\n{0}, {1}, {2}", triangleIndices[i], triangleIndices[i + 1], triangleIndices[i + 2]);
+        UpdateTriangleIndicesTextBox();
 
-            ui.AddSeparator();
-            ui.CreateLabel("TriangleIndices:");
-            ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
-        }
+        ui.CreateButton("Reverse triangles order", () => ReverseTrianglesOrder());
     }
 }
