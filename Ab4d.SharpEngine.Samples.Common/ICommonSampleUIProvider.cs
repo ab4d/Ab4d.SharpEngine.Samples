@@ -23,7 +23,7 @@ public interface ICommonSampleUIProvider
 
     ICommonSampleUIElement CreateButton(string text, Action clickedAction, double width = 0, bool alignLeft = false);
 
-    ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0, bool showTicks = false, string? keyText = null, double keyTextWidth = 0, Func<float, string>? formatShownValueFunc = null);
+    ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0, bool showTicks = false, string? keyText = null, double keyTextWidth = 0, Func<float, string>? formatShownValueFunc = null, double shownValueWidth = 0);
 
     ICommonSampleUIElement CreateComboBox(string[] items, Action<int, string?> itemChangedAction, int selectedItemIndex, double width = 0, string? keyText = null, double keyTextWidth = 0);
     
