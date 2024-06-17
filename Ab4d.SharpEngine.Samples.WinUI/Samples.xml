@@ -74,6 +74,7 @@
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.BitmapTextSample" Title="Bitmap text"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
