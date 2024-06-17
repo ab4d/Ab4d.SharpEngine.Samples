@@ -12,7 +12,7 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class ExtrudedMeshSample : CommonSample
 {
     public override string Title => "Extruded 3D models";
-    public override string Subtitle => "Extruded 3D models are created by extruding a 2D shape along a 3D vector";
+    public override string Subtitle => "Extruded 3D models are created by extruding a 2D shape along a 3D vector.\nIt is also possible to create extruded models from shapes with holes.";
 
     private enum SampleShapeTypes
     {
@@ -98,10 +98,12 @@ public class ExtrudedMeshSample : CommonSample
 
         
         // Triangulate 2D shape
-        //var triangleIndices = Triangulator.Triangulate(shape2DPositions).ToArray();
 
         Triangulator triangulator = new Triangulator(shape2DPositions, isYAxisUp: isShapeYUp);
         var triangleIndices =  triangulator.CreateTriangleIndices().ToArray();
+
+        // We can also use the static Triangulate, but then we cannot get the value of triangulator.IsClockwise that is used below
+        //var triangleIndices = Triangulator.Triangulate(shape2DPositions).ToArray();
 
 
         // Convert 2D positions to 3D positions (set y to zero)
@@ -118,7 +120,7 @@ public class ExtrudedMeshSample : CommonSample
 
         if (_showIndividualTriangles)
         {
-            // Show each triangle as with its own color
+            // Show each triangle with its own color
             var individualTrianglesNode = CreateIndividualTrianglesNode(shape3DPositions, triangleIndices);
             parentGroupNode.Add(individualTrianglesNode);
         }
@@ -132,7 +134,7 @@ public class ExtrudedMeshSample : CommonSample
             parentGroupNode.Add(triangulatedModelNode);
         }
 
-        // Extruded mesh
+        // Create extruded mesh - extrude the 2D in the extrudeVector direction
         var extrudedMesh = MeshFactory.CreateExtrudedMesh(positions: shape2DPositions,
                                                           isSmooth: false,
                                                           modelOffset: new Vector3(0, -130, 0),
@@ -142,7 +144,6 @@ public class ExtrudedMeshSample : CommonSample
                                                           closeTop: true);
 
         var material = StandardMaterials.Orange;
-
         var extrudedModelNode = new MeshModelNode(extrudedMesh, material);
 
         if (_showSemiTransparentModel)
@@ -157,7 +158,8 @@ public class ExtrudedMeshSample : CommonSample
     private void AddShapeWithHoles(GroupNode parentGroupNode, SampleShapeTypes currentShapeType)
     {
         // Shape with holes is represented by multiple arrays of positions
-        // The holes are identified by the orientation of positions (clockwise or anti-clockwise) that is different from the orientation of positions in the outer polygons. 
+        // The holes are identified by the orientation of positions (clockwise or anti-clockwise) that is different from the orientation of positions in the outer polygons.
+        // The orientation of the outer polygons is defined by the orientation of the first polygon.
         // In this sample the outer polygons are oriented in clockwise direction, holes in anti-clockwise direction
         Vector2[][] multiplePolygons = GetMultiShapePositions(currentShapeType);
 
@@ -169,24 +171,30 @@ public class ExtrudedMeshSample : CommonSample
         for (int i = 1; i < multiplePolygons.Length; i++)
         {
             // When calling AddHole the method checks if the specified positions are oriented in the opposite direction as the outerPolygon.
-            // If not, then the isCorrectOrientation is set to false and we can fix that by reversing the orientation of positions.
+            // If not, then the isCorrectOrientation is set to false and we can fix that by reversing the orientation of positions
+            // (this is needed when multiplePolygons is passed to the MeshFactory.CreateExtrudedMesh;
+            // if we only need triangle indices, then this is not needed because triangulator will internally reverse the order of positions).
             bool isCorrectOrientation = triangulator.AddHole(multiplePolygons[i]);
+
             if (!isCorrectOrientation)
                 ReversePointsOrder(multiplePolygons[i]);
         }
         
-        // After we added the outer polygon and all holes, we can call the Triangulate method.
-        triangulator.Triangulate(out List<Vector2> allPolygonPositions, out List<int> triangleIndicesList);
+        // After we added the outer polygon and all the holes, we can call the Triangulate method.
+        // This returns a list of triangulated positions (the outer polygons and holes are connected into a single polygon)
+        // and a list of triangle indices that defines the triangles that can show the specified polygon and holes.
+        triangulator.Triangulate(out List<Vector2> triangulatedPositions, out List<int> triangleIndicesList);
 
 
         // The same can be achieved by calling the static Triangulator.Triangulate method.
         // But here we need to make sure that the hole polygons are correctly oriented as we cannot switch their order.
-        //Triangulator.Triangulate(multiplePolygons, out List<Vector2> allPolygonPositions, out List<int> triangleIndicesList);
+        // Also, in this case we cannot get the value of triangulator.IsClockwise that is used below.
+        //Triangulator.Triangulate(multiplePolygons, out List<Vector2> triangulatedPositions, out List<int> triangleIndicesList);
 
 
         // Convert 2D positions to 3D positions (set y to zero)
         // See comments in Convert2DTo3D method for more info
-        var shape3DPositions = Convert2DTo3D(allPolygonPositions.ToArray(), Scene, triangulator.IsClockwise);
+        var shape3DPositions = Convert2DTo3D(triangulatedPositions.ToArray(), Scene, triangulator.IsClockwise);
 
 
         for (var i = 0; i < multiplePolygons.Length; i++)
@@ -220,33 +228,25 @@ public class ExtrudedMeshSample : CommonSample
         }
 
         // Extruded mesh
-        //var extrudedMesh = MeshFactory.CreateExtrudedMesh(positions: multiShape2DPositions,
-        //                                                  isSmooth: false,
-        //                                                  modelOffset: new Vector3(0, -130, 0),
-        //                                                  extrudeVector: new Vector3(0, 30, 0),
-        //                                                  closeBottom: true,
-        //                                                  closeTop: true);
 
         // If points in polygon are counter-clockwise oriented we need to flip normals (change order of triangle indices)
         // to make the triangles correctly oriented - so the normals are pointing out of the object
         var flipNormals = !triangulator.IsClockwise;
 
-        var extrudedMesh = MeshFactory.CreateExtrudedMesh(
-            positions: allPolygonPositions.ToArray(),
-            triangleIndices: triangleIndices,
-            allPolygons: multiplePolygons,
-            isSmooth: false,
-            flipNormals: flipNormals,
-            modelOffset: new Vector3(0, -130, 0),
-            extrudeVector: _extrudeVector,
-            shapeYVector: _shapeYVector, // A 3D vector that defines the 3D direction along the 2D shape surface (i.e., the Y axis of the base 2D shape)
-            textureCoordinatesGenerationType: MeshFactory.ExtrudeTextureCoordinatesGenerationType.None,
-            isYAxisUp: false,
-            closeBottom: true,
-            closeTop: true);
+        var extrudedMesh = MeshFactory.CreateExtrudedMesh(triangulatedPositions: triangulatedPositions.ToArray(),
+                                                          triangleIndices: triangleIndices,
+                                                          allPolygons: multiplePolygons,
+                                                          isSmooth: false,
+                                                          flipNormals: flipNormals,
+                                                          modelOffset: new Vector3(0, -130, 0),
+                                                          extrudeVector: _extrudeVector,
+                                                          shapeYVector: _shapeYVector, // A 3D vector that defines the 3D direction along the 2D shape surface (i.e., the Y axis of the base 2D shape)
+                                                          textureCoordinatesGenerationType: MeshFactory.ExtrudeTextureCoordinatesGenerationType.None,
+                                                          isYAxisUp: false,
+                                                          closeBottom: true,
+                                                          closeTop: true);
 
         var material = StandardMaterials.Orange;
-
         var extrudedModelNode = new MeshModelNode(extrudedMesh, material);
 
         if (_showSemiTransparentModel)
@@ -263,7 +263,7 @@ public class ExtrudedMeshSample : CommonSample
     {
         // Convert 2D positions to 3D positions (set y to zero)
 
-        // We are converting 2D XY coordinates to 3D coordinates to XZ plane (by adding y = 0).
+        // We are converting 2D XY coordinates to 3D coordinates that lie on the XZ plane. This is done by adding y = 0.
         // Because in this sample in 2D coordinates the Y axis is pointing down ((0,0) is at top left corner),
         // we can directly copy that to 3D coordinates when we have YUpRightHanded (default) or ZUpLeftHanded coordinate system.
         // If we have YUpLeftHanded or ZUpRightHanded, then Z axis is oriented in the other direction
