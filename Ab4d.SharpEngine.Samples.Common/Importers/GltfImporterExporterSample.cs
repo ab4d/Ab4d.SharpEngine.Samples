@@ -118,8 +118,11 @@ public class GltfImporterExporterSample : CommonSample
 
 
         // Create a new glTFImporter
-        // with default texture loaded (PngBitmapIO) and without GpuDevice (textures will be created when the objects are added to the Scene)
-        var glTfImporter = new glTFImporter();
+        // Using the platforms specific BitmapIO (this.BitmapIO). If this is not provided, then PngBitmapIO is used but this can read only png files.
+        // When passing a GpuDevice to the constructor, then the glTFImporter can immediately create the texture images.
+        // So in case any error appears when reading textures, this is thrown here (and can be caught in the catch below).
+        // If GpuDevice is not provide in the constructor then the textures will be created when the objects are added to the Scene.
+        var glTfImporter = new glTFImporter(this.BitmapIO, Scene.GpuDevice);
 
         // We could also create the glTFImporter by using a custom imageReader and by providing a VulkanDevice (this immediately creates the textures):
         //var glTfImporter = new glTFImporter(imageReader: customBitmapIO, gpuDevice: Scene.GpuDevice);
