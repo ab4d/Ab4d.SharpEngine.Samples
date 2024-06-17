@@ -62,10 +62,6 @@
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
-  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
-  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
-  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
-  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
@@ -74,6 +70,10 @@
   <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
   <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.BitmapTextSample" Title="Bitmap text"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
