@@ -65,6 +65,7 @@
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
   <Sample Location="AdvancedModels.StreamlinesSample" Title="Streamlines"/>
