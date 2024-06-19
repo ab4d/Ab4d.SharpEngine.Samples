@@ -85,7 +85,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             {
                 ExportToGltfMenuItem.IsEnabled = false;
                 ToolTip.SetTip(ExportToGltfMenuItem, "Add reference to the Ab4d.SharpEngine.glTF to enabled export to glTF");
-                ToolTip.SetShowOnDisabled(ExportToGltfMenuItem, true);
+                
+                // The following is available in Avalonia v11.1.0-rc1
+                //ToolTip.SetShowOnDisabled(ExportToGltfMenuItem, true);
             }
 
 
