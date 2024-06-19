@@ -20,6 +20,8 @@ public class ReaderObjSample : CommonSample
     private MultiLineNode? _objectLinesNode;
     private SceneNode? _importedModelNodes;
 
+    private EdgeLinesFactory? _edgeLinesFactory;
+
     private string? _importedFileName;
 
     private enum ViewTypes
@@ -168,8 +170,11 @@ public class ReaderObjSample : CommonSample
 
         if (_currentViewType == ViewTypes.SolidObjectWithEdgeLines)
         {
-            var edgeLinePositions = new List<Vector3>();
-            LineUtils.AddEdgeLinePositions(_importedModelNodes, 15, edgeLinePositions);
+            // Reuse the instance of EdgeLinesFactory
+            // This can reuse the lists and array that are internally used by the EdgeLinesFactory
+            // See comments in Lines/EdgeLinesSample.cs for more info about edge lines generation.
+            _edgeLinesFactory ??= new EdgeLinesFactory();
+            var edgeLinePositions = _edgeLinesFactory.CreateEdgeLines(_importedModelNodes, 15);
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;

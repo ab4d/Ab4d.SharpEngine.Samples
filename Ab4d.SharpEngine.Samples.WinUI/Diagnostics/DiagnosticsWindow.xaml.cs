@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common.Animations;
 using Ab4d.SharpEngine.Samples.Common.Diagnostics;
@@ -86,6 +88,11 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
                 ActionsRootMenuItem.Items.Remove(FullLoggingCheckBox);
             }
 
+            if (!_commonDiagnostics.IsGltfExporterAvailable)
+            {
+                ExportToGltfMenuItem.IsEnabled = false;
+                ToolTipService.SetToolTip(ExportToGltfMenuItem, "Add reference to the Ab4d.SharpEngine.glTF to enabled export to glTF");
+            }
 
             string dumpFolder;
             if (System.IO.Directory.Exists(@"C:\temp"))
@@ -278,6 +285,25 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
         private void DumpSystemInfoMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());
+        }
+        
+        private void ExportToGltfMenuItem_OnTapped(object sender, RoutedEventArgs e)
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+            // TOOD: How to create SaveFileDialog in WinUI?
+
+            string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SharpEngineScene.glb");
+
+            try
+            {
+                _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
+            }
+            catch (Exception ex)
+            {
+                // pass
+            }
         }
         
         private void ShowFullSceneDumpMenuItem_OnTapped(object sender, RoutedEventArgs e)

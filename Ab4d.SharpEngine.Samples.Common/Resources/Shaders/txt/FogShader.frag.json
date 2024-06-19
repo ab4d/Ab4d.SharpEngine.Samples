@@ -1,0 +1,315 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_9" : {
+            "name" : "indexSetup",
+            "members" : [
+                {
+                    "name" : "materialIndex",
+                    "type" : "int",
+                    "offset" : 4
+                }
+            ]
+        },
+        "_22" : {
+            "name" : "FogMaterial",
+            "members" : [
+                {
+                    "name" : "diffuseColor",
+                    "type" : "vec4"
+                },
+                {
+                    "name" : "fogStart",
+                    "type" : "float"
+                },
+                {
+                    "name" : "fogFullColorStart",
+                    "type" : "float"
+                },
+                {
+                    "name" : "fogColor",
+                    "type" : "vec3"
+                }
+            ]
+        },
+        "_25" : {
+            "name" : "FogMaterial",
+            "members" : [
+                {
+                    "name" : "diffuseColor",
+                    "type" : "vec4",
+                    "offset" : 0
+                },
+                {
+                    "name" : "fogStart",
+                    "type" : "float",
+                    "offset" : 16
+                },
+                {
+                    "name" : "fogFullColorStart",
+                    "type" : "float",
+                    "offset" : 20
+                },
+                {
+                    "name" : "fogColor",
+                    "type" : "vec3",
+                    "offset" : 32
+                }
+            ]
+        },
+        "_27" : {
+            "name" : "FogMaterialsBuffer",
+            "members" : [
+                {
+                    "name" : "materials",
+                    "type" : "_25",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 48
+                }
+            ]
+        },
+        "_65" : {
+            "name" : "sceneUniformBuffer",
+            "members" : [
+                {
+                    "name" : "viewProjection",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "eyePosW",
+                    "type" : "vec3",
+                    "offset" : 64
+                },
+                {
+                    "name" : "viewSize",
+                    "type" : "vec2",
+                    "offset" : 80
+                },
+                {
+                    "name" : "dpiScale",
+                    "type" : "float",
+                    "offset" : 88
+                },
+                {
+                    "name" : "superSampling",
+                    "type" : "float",
+                    "offset" : 92
+                },
+                {
+                    "name" : "ambientColor",
+                    "type" : "vec3",
+                    "offset" : 96
+                },
+                {
+                    "name" : "dirLightStart",
+                    "type" : "int",
+                    "offset" : 108
+                },
+                {
+                    "name" : "dirLightCount",
+                    "type" : "int",
+                    "offset" : 112
+                },
+                {
+                    "name" : "pointLightStart",
+                    "type" : "int",
+                    "offset" : 116
+                },
+                {
+                    "name" : "pointLightCount",
+                    "type" : "int",
+                    "offset" : 120
+                },
+                {
+                    "name" : "spotLightStart",
+                    "type" : "int",
+                    "offset" : 124
+                },
+                {
+                    "name" : "spotLightCount",
+                    "type" : "int",
+                    "offset" : 128
+                }
+            ]
+        },
+        "_91" : {
+            "name" : "Light",
+            "members" : [
+                {
+                    "name" : "pos",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "phi",
+                    "type" : "float"
+                },
+                {
+                    "name" : "dir",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "theta",
+                    "type" : "float"
+                },
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "falloff",
+                    "type" : "float"
+                },
+                {
+                    "name" : "spec",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "att",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "range",
+                    "type" : "float"
+                }
+            ]
+        },
+        "_94" : {
+            "name" : "Light",
+            "members" : [
+                {
+                    "name" : "pos",
+                    "type" : "vec3",
+                    "offset" : 0
+                },
+                {
+                    "name" : "phi",
+                    "type" : "float",
+                    "offset" : 12
+                },
+                {
+                    "name" : "dir",
+                    "type" : "vec3",
+                    "offset" : 16
+                },
+                {
+                    "name" : "theta",
+                    "type" : "float",
+                    "offset" : 28
+                },
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3",
+                    "offset" : 32
+                },
+                {
+                    "name" : "falloff",
+                    "type" : "float",
+                    "offset" : 44
+                },
+                {
+                    "name" : "spec",
+                    "type" : "vec3",
+                    "offset" : 48
+                },
+                {
+                    "name" : "att",
+                    "type" : "vec3",
+                    "offset" : 64
+                },
+                {
+                    "name" : "range",
+                    "type" : "float",
+                    "offset" : 76
+                }
+            ]
+        },
+        "_96" : {
+            "name" : "AllLightsBuffer",
+            "members" : [
+                {
+                    "name" : "allLights",
+                    "type" : "_94",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 80
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec3",
+            "name" : "inNormalW",
+            "location" : 1
+        },
+        {
+            "type" : "vec3",
+            "name" : "inPosW",
+            "location" : 0
+        },
+        {
+            "type" : "vec2",
+            "name" : "inUV",
+            "location" : 2
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "ssbos" : [
+        {
+            "type" : "_27",
+            "name" : "FogMaterialsBuffer",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 3,
+            "binding" : 0
+        },
+        {
+            "type" : "_96",
+            "name" : "AllLightsBuffer",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 1,
+            "binding" : 0
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_65",
+            "name" : "sceneUniformBuffer",
+            "block_size" : 132,
+            "set" : 0,
+            "binding" : 0
+        }
+    ],
+    "push_constants" : [
+        {
+            "type" : "_9",
+            "name" : "pushConstants",
+            "push_constant" : true
+        }
+    ]
+}

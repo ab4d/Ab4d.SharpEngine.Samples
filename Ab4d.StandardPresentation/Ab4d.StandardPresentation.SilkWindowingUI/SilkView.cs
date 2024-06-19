@@ -6,7 +6,6 @@ using Ab4d.SharpEngine.Common;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
-using MouseButtons = Ab4d.SharpEngine.Common.MouseButtons;
 
 namespace Ab4d.StandardPresentation.SilkWindowingUI
 {
@@ -18,9 +17,9 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
         private IInputContext _inputContext;
 
         private Vector2 _lastMousePosition;
-        private MouseButtons _lastPressedButtons;
+        private PointerButtons _lastPressedButtons;
 
-        private MouseButtons[] _allMouseButtons = new MouseButtons[] { MouseButtons.Left, MouseButtons.Middle, MouseButtons.Right, MouseButtons.XButton1, MouseButtons.XButton2 };
+        private PointerButtons[] _allMouseButtons = new PointerButtons[] { PointerButtons.Left, PointerButtons.Middle, PointerButtons.Right, PointerButtons.XButton1, PointerButtons.XButton2 };
 
         private string[] _keyNames;
         private Key[] _keyValues;
@@ -168,24 +167,24 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
             }
         }
 
-        private MouseButtons GetPressedButtons(IMouse mouse)
+        private PointerButtons GetPressedButtons(IMouse mouse)
         {
-            MouseButtons pressedButtons = MouseButtons.None;
+            PointerButtons pressedButtons = PointerButtons.None;
 
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Left))
-                pressedButtons |= MouseButtons.Left;
+                pressedButtons |= PointerButtons.Left;
             
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Right))
-                pressedButtons |= MouseButtons.Right;
+                pressedButtons |= PointerButtons.Right;
             
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Middle))
-                pressedButtons |= MouseButtons.Middle; 
+                pressedButtons |= PointerButtons.Middle; 
             
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Button4))
-                pressedButtons |= MouseButtons.XButton1;
+                pressedButtons |= PointerButtons.XButton1;
             
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Button5))
-                pressedButtons |= MouseButtons.XButton2;
+                pressedButtons |= PointerButtons.XButton2;
 
             return pressedButtons;
         }
@@ -211,7 +210,7 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
             _view.Run();
         }
 
-        public void GetMouseState(out float x, out float y, out MouseButtons pressedButtons)
+        public void GetMouseState(out float x, out float y, out PointerButtons pressedButtons)
         {
             x = _lastMousePosition.X;
             y = _lastMousePosition.Y;
@@ -320,12 +319,12 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
             SizeChanged?.Invoke(this, new SizeChangeEventArgs(width, height));
         }
 
-        protected void OnMouseDown(MouseButtons button)
+        protected void OnMouseDown(PointerButtons button)
         {
             MouseDown?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(button));
         }
 
-        protected void OnMouseUp(MouseButtons button)
+        protected void OnMouseUp(PointerButtons button)
         {
             MouseUp?.Invoke(this, new Ab4d.StandardPresentation.MouseButtonEventArgs(button));
         }

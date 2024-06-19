@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
@@ -59,10 +59,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.7" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.60" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6" />
-		<PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
+		<PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
 	</ItemGroup>
 
 
@@ -115,5 +115,9 @@
     <CodesignEntitlements>Platforms/MacCatalyst/Entitlements.Release.plist</CodesignEntitlements>
     <UseHardenedRuntime>true</UseHardenedRuntime>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.60" />
+  </ItemGroup>
 
 </Project>

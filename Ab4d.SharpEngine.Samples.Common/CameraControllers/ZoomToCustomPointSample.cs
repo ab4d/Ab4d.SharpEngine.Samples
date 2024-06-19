@@ -12,7 +12,7 @@ public class ZoomToCustomPointSample : CommonSample
     public override string Title => "Zoom to a custom point";
     public override string? Subtitle => "Use mouse wheel or quick zoom (left and right mouse button) to zoom the camera around the specified custom 3D position";
 
-    private ManualMouseCameraController? _mouseCameraController;
+    private ManualPointerCameraController? _pointerCameraController;
 
     public ZoomToCustomPointSample(ICommonSamplesContext context) 
         : base(context)
@@ -55,29 +55,29 @@ public class ZoomToCustomPointSample : CommonSample
             targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
         }
 
-        // The following values will be used when the MouseCameraController is created.
-        // Note that MouseCameraController is platform specific because it needs to handle mouse events.
-        // But processing of the events is done by a common ManualMouseCameraController.
+        // The following values will be used when the PointerCameraController is created.
+        // Note that PointerCameraController is platform specific because it needs to handle pointer or mouse events.
+        // But processing of the events is done by a common ManualPointerCameraController.
 
-        this.QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
-        this.RotateAroundMousePosition = false;
+        this.QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
+        this.RotateAroundPointerPosition = false;
         this.ZoomMode = CameraZoomMode.CameraRotationCenterPosition;
     }
 
-    public override void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
     {
-        // Save mouseCameraController so we can change it later
-        _mouseCameraController = mouseCameraController;
+        // Save pointerCameraController so we can change it later
+        _pointerCameraController = pointerCameraController;
         
-        // Use standard initialization code for mouseCameraController
-        base.InitializeMouseCameraController(mouseCameraController);
+        // Use standard initialization code for pointerCameraController
+        base.InitializePointerCameraController(pointerCameraController);
     }
     
     private void ChangeCenterPosition(int selectedIndex)
     {
         CameraZoomMode zoomMode;
         Vector3? rotationCenterPosition = null; // RotationCenterPosition is nullable Vector3 type
-        bool rotateAroundMousePosition = false;
+        bool rotateAroundPointerPosition = false;
 
         switch (selectedIndex)
         {
@@ -100,26 +100,26 @@ public class ZoomToCustomPointSample : CommonSample
                 rotationCenterPosition = new Vector3(40, 5, 30);
                 break;
             
-            case 4: // "Position under mouse", 
-                zoomMode = CameraZoomMode.MousePosition;
+            case 4: // "Position under pointer or mouse", 
+                zoomMode = CameraZoomMode.PointerPosition;
                 rotationCenterPosition = null;
-                rotateAroundMousePosition = true;
+                rotateAroundPointerPosition = true;
                 break;
 
             default:
                 zoomMode = CameraZoomMode.ViewCenter;
                 rotationCenterPosition = null;
-                rotateAroundMousePosition = false;
+                rotateAroundPointerPosition = false;
                 break;
         }
 
         if (targetPositionCamera != null)
             targetPositionCamera.RotationCenterPosition = rotationCenterPosition;
 
-        if (_mouseCameraController != null)
+        if (_pointerCameraController != null)
         {
-            _mouseCameraController.ZoomMode = zoomMode;
-            _mouseCameraController.RotateAroundMousePosition = rotateAroundMousePosition;
+            _pointerCameraController.ZoomMode = zoomMode;
+            _pointerCameraController.RotateAroundPointerPosition = rotateAroundPointerPosition;
         }
     }
 
@@ -144,12 +144,12 @@ public class ZoomToCustomPointSample : CommonSample
 
     private void SetupQuickZoom(bool isChecked)
     {
-        if (_mouseCameraController == null)
+        if (_pointerCameraController == null)
             return;
 
         if (isChecked)
-            _mouseCameraController.QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
+            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
         else
-            _mouseCameraController.QuickZoomConditions = MouseAndKeyboardConditions.Disabled;
+            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.Disabled;
     }
 }

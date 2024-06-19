@@ -23,7 +23,7 @@ public class HitTestingSample : CommonSample
     private GroupNode? _testObjectsGroup;
     private GroupNode? _wireCrossesGroup;
 
-    private Vector2 _lastMousePosition;
+    private Vector2 _lastPointerPosition;
     
     private GroupNode? _teapotModelNode;
 
@@ -32,14 +32,13 @@ public class HitTestingSample : CommonSample
     private ICommonSampleUIElement? _startStopCameraButton;
     private ICommonSampleUIElement? _hitPositionsTextBox;
     
-    private List<Vector3> _lastHitPositions = new List<Vector3>();
     private StringBuilder _hitPositionsText = new StringBuilder();
 
     public HitTestingSample(ICommonSamplesContext context)
         : base(context)
     {
-        RotateCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
-        MoveCameraConditions= MouseAndKeyboardConditions.RightMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        MoveCameraConditions= PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -73,56 +72,75 @@ public class HitTestingSample : CommonSample
 
     private void OnCameraChanged(object? sender, EventArgs args)
     {
-        TestHitObjects(_lastMousePosition);
+        TestHitObjects(_lastPointerPosition);
     }
 
-    private void TestHitObjects(Vector2 mousePosition)
+    private void TestHitObjects(Vector2 pointerPosition)
     {
         if (SceneView == null)
             return;
 
-        _lastHitPositions.Clear();
         _hitPositionsText.Clear();
+
+        List<RayHitTestResult>? allHitTestResults;
 
         if (_getAllHitObjects)
         {
-            var allHitTestResults = SceneView.GetAllHitObjects(mousePosition.X, mousePosition.Y);
-
-            foreach (var hitTestResult in allHitTestResults)
-                _lastHitPositions.Add(hitTestResult.HitPosition);
+            allHitTestResults = SceneView.GetAllHitObjects(pointerPosition.X, pointerPosition.Y);
         }
         else
         {
-            var closestHitTestResult = SceneView.GetClosestHitObject(mousePosition.X, mousePosition.Y);
+            var closestHitTestResult = SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
             
             if (closestHitTestResult != null)
-                _lastHitPositions.Add(closestHitTestResult.HitPosition);
+            {
+                allHitTestResults = new List<RayHitTestResult>()
+                {
+                    closestHitTestResult
+                };
+            }
+            else
+            {
+                allHitTestResults = null;
+            }
         }
 
         if (_hitPositionsTextBox != null)
         {
-            if (_lastHitPositions.Count == 0)
+            if (allHitTestResults == null || allHitTestResults.Count == 0)
             {
                 _hitPositionsText.Append("No hit");
             }
-            else if (_lastHitPositions.Count == 1)
+            else if (allHitTestResults.Count == 1)
             {
+                var hitPosition = allHitTestResults[0].HitPosition;
+
                 _hitPositionsText.AppendLine("Hit position:");
-                _hitPositionsText.AppendLine($"{_lastHitPositions[0].X:F0} {_lastHitPositions[0].Y:F0} {_lastHitPositions[0].Z:F0}");
+                _hitPositionsText.AppendLine($"{hitPosition.X:F0} {hitPosition.Y:F0} {hitPosition.Z:F0}");
+                
+                AddWireCross(hitPosition);
             }
             else
             {
-                _hitPositionsText.AppendLine("Hit positions:");
+                _hitPositionsText.AppendLine("All hit positions:");
 
-                foreach (var hitPosition in _lastHitPositions)
-                    _hitPositionsText.AppendLine($"{hitPosition.X:F0} {hitPosition.Y:F0} {hitPosition.Z:F0}");
+                foreach (var hitResult in allHitTestResults)
+                {
+                    var hitPosition = hitResult.HitPosition;
+
+                    _hitPositionsText.Append($"{hitPosition.X:F0} {hitPosition.Y:F0} {hitPosition.Z:F0}");
+
+                    if (hitResult.IsBackFacing)
+                        _hitPositionsText.Append(" (back face)");
+
+                    _hitPositionsText.AppendLine();
+
+                    AddWireCross(hitPosition);
+                }
             }
 
             _hitPositionsTextBox.SetText(_hitPositionsText.ToString());
         }
-
-        foreach (var hitPosition in _lastHitPositions)
-            AddWireCross(hitPosition);
     }
 
     private void AddWireCross(Vector3 position)
@@ -178,7 +196,7 @@ public class HitTestingSample : CommonSample
     private void ProcessPointerMove(Vector2 pointerPosition)
     {
         TestHitObjects(pointerPosition);
-        _lastMousePosition = pointerPosition;
+        _lastPointerPosition = pointerPosition;
     }
 
     private void StartStopCameraRotation()

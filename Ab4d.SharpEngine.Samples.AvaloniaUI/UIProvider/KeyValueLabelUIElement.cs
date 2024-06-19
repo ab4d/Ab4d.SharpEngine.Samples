@@ -66,6 +66,8 @@ public class KeyValueLabelUIElement : AvaloniaUIElement
                 FontSize = avaloniaUIProvider.FontSize,
             };
 
+            _keyText = keyTextToShow; // Update _keyText so that show text without toot tip
+
             if (toolTip != null)
                 ToolTip.SetTip(_keyValueTextBlock, toolTip);
 

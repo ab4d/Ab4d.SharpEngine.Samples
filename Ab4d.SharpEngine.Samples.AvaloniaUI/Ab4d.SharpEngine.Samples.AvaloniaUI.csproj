@@ -4,7 +4,7 @@
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.8740</Version>
+    <Version>2.0.8936-rc1</Version>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
@@ -14,13 +14,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.7" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.7" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.7" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="1.0.8740" />
+    <PackageReference Include="Avalonia" Version="11.0.11" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.11" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.11" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="2.0.8936-rc1" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="1.1.8776" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8936-rc1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
@@ -28,9 +28,7 @@
 
   <ItemGroup>
     <AvaloniaXaml Include="Advanced\AvaloniaMultiTouchSample.xaml" />
-    <AvaloniaXaml Include="CameraControllers\MouseCameraControllerSample.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </AvaloniaXaml>
+    <AvaloniaXaml Include="CameraControllers\PointerCameraControllerSample.xaml" />
     <AvaloniaXaml Include="Common\MessageBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -71,6 +69,7 @@
   <ItemGroup>
     <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
+    <None Remove="CameraControllers\PointerCameraControllerSample.xaml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
     <None Remove="Diagnostics\LogMessagesWindow.xaml" />    
     <None Remove="Samples.xml" />

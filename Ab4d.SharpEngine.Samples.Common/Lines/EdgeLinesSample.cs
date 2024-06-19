@@ -1,11 +1,50 @@
 ﻿using Ab4d.SharpEngine.Common;
 using System.Numerics;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lines;
+
+
+// SharpEngine can generate edge lines from meshes.
+// This is done by calculating angles between all triangles and when an angle is bigger than
+// a specified EdgeStartAngle then a line is generated.
+//
+// The recommended way to generate the edge lines is to create an instance of EdgeLinesFactory
+// and then call:
+// - CreateEdgeLines: returns a List<Vector3> with positions for edge lines
+// - AddEdgeLines: adds edge lines to an existing List<Vector3> (can be used to reuse an instance of List<Vector3>)
+// - CreateEdgeLineIndices: returns a List<int> that defines the position indices for edge lines (each line has two indexes that define 2 positions from the positions collection).
+//
+// When calculating edge lines for multiple scene nodes, it is recommended to reuse the instance of EdgeLinesFactory.
+// This way the internal lists and arrays are reused.
+//
+// EdgeLinesFactory provides a few properties that can be adjusted to improve the performance of the edge line generated
+// when the mesh is nicely defined. For example is it possible to prevent removing duplicate positions or
+// handle edge cases (when some edges are partially covered by some other edges).
+// Disabling those features may significantly improve the performance of edge generation,
+// but in some meshes it can provide invalid results.
+// See online help for more info: https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Utilities_EdgeLinesFactory.htm
+// 
+// To calculate edge lines, it is also possible to use static methods on LineUtils: CreateEdgeLinesForEachSceneNode, AddEdgeLinePositions, ClearEdgeLineIndices.
+//
+// When the edge lines are generated, the edge line indices are stored into the mesh's EdgeLineIndices channel. This can be read by:
+// mesh.GetDataChannel<List<int>>(MeshDataChannelTypes.EdgeLineIndices)
+//
+// To clear the stored edge lines indices call:
+// mesh.RemoveDataChannel(MeshDataChannelTypes.EdgeLineIndices)
+// or
+// LineUtils.ClearEdgeLineIndices(sceneNode)
+//
+// 
+// NOTE:
+// When transformation of a SceneNode is changed, then all the generated edge lines need to be regenerated.
+// Because in this case the edge lines indices do not need to be changed, the process of regeneration
+// is very fast because only the edge positions need to be transformed by new transformation.
+// To regenerate the edge lines call CreateEdgeLines or AddEdgeLines.
 
 public class EdgeLinesSample : CommonSample
 {
@@ -79,33 +118,19 @@ public class EdgeLinesSample : CommonSample
         else
             _edgeLinePositions.Clear();
 
-        // Add edge lines positions to the _edgeLinePositions list.
-        //
-        // We will add edge lines from all child scene nodes to the same list.
-        // If we know that some parts may be changed, it is good to have their edge lines
-        // in a separate list so we will only need to update that when the object is changed (this is not done here).
-        //
-        // Behind the scenes, the AddEdgeLinePositions will ensure that the edge lines indices
-        // are generated and stored to the mesh's EdgeLineIndices channel.
-        // Generation of edge line indices is done by calling the ClearEdgeLineIndices method (this can be also done manually).
-        // This can be quite slow because the mesh needs to be analyzed to find sibling triangles.
-        // After the EdgeLineIndices are generated, then the AddEdgeLinePositions just adds the positions
-        // (that are transformed by the SceneNode's transformation) to the _edgeLinePositions list.
-        // 
-        // So after changing the transformation of any object in the _rootSceneNode, the AddEdgeLinePositions
-        // needs to be called again. This is quite fast operation because it only reads the positions,
-        // transforms them and adds them to list.
-        LineUtils.AddEdgeLinePositions(_rootSceneNode, _edgeStartAngle, _edgeLinePositions);
+
+
+        // Add edge lines to the _edgeLinePositions
+        // See comments at the beginning of this file for more info.
+
+        var edgeLinesFactory = new EdgeLinesFactory();
+        edgeLinesFactory.AddEdgeLines(_rootSceneNode, _edgeStartAngle, _edgeLinePositions);
+
 
         // Create a new MultiLineNode that will show the edge lines
         var multiLineNode = new MultiLineNode(_edgeLinePositions.ToArray(), isLineStrip: false, _lineMaterial);
 
         _linesRootNode.Add(multiLineNode);
-
-
-        // We could also call CreateEdgeLinesForEachSceneNode
-        // This would add MultiLineNode for each SceneNode with edges
-        //EdgeLinesFactory.CreateEdgeLinesForEachSceneNode(_rootSceneNode, _edgeStartAngle, _lineMaterial, _linesRootNode);
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)

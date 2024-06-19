@@ -1,30 +1,12 @@
-using System.Numerics;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.SceneNodes;
-using Microsoft.UI.Xaml;
-using Ab4d.SharpEngine.Lights;
-using Ab4d.SharpEngine.Transformations;
-using Microsoft.UI;
 using System;
-using Windows.ApplicationModel;
-using Ab4d.Assimp;
-using Ab4d.SharpEngine.Assimp;
+using Ab4d.SharpEngine.Common;
+using Microsoft.UI.Xaml;
 using Ab4d.SharpEngine.WinUI;
-using Microsoft.UI.Windowing;
-using Colors = Microsoft.UI.Colors;
-using Ab4d.SharpEngine.Vulkan;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using TranslateTransform = Ab4d.SharpEngine.Transformations.TranslateTransform;
-using System.Runtime.InteropServices;
-using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
-using Microsoft.UI.Xaml.Input;
-
+using Colors = Microsoft.UI.Colors;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,7 +21,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
+        private InputEventsManager _inputEventsManager;
 
         private WinUIProvider _wpfUiProvider;
 
@@ -63,15 +46,17 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         {
             InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
 
-            // Setup logger
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
-
             _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
+
+            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
+            MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
@@ -82,6 +67,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
+
+            _inputEventsManager = new InputEventsManager(MainSceneView);
         }
 
         private void ResetSample()
@@ -107,6 +94,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                 return;
             
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
+            _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
@@ -116,8 +104,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
-            if (_mouseCameraController != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            if (_pointerCameraController != null)
+                _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
 
             // Show MainSceneView - this will also render the scene
             MainSceneView.Visibility = Visibility.Visible;
@@ -134,12 +122,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
         {
             InitializeCommonSample();
 
-            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
-                _mouseCameraController = new MouseCameraController(MainSceneView);
+                _pointerCameraController = new PointerCameraController(MainSceneView);
 
                 if (_currentCommonSample != null)
-                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                    _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
 
             _isLoaded = true;

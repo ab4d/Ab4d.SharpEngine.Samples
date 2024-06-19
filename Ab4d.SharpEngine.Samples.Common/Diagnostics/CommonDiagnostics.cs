@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
@@ -71,6 +72,15 @@ public class CommonDiagnostics
     public Action? OnSceneRenderedAction;
     public Action<string>? ShowMessageBoxAction;
 
+
+    private Type? _gltfExporterType;
+    private object? _gltfExporter;
+
+    private bool? _isGltfExporterAvailable;
+    private MethodInfo? _addSceneMethodInfo;
+    private MethodInfo? _exportEmbeddedMethodInfo;
+    private MethodInfo? _exportBinaryMethodInfo;
+    public bool IsGltfExporterAvailable => _isGltfExporterAvailable ?? CheckGltfExporter();
 
     public CommonDiagnostics(IBitmapIO bitmapIO)
     {
@@ -252,6 +262,69 @@ public class CommonDiagnostics
         UpdateStatistics();
 
         OnSceneRenderedAction?.Invoke();
+    }
+
+    private bool CheckGltfExporter()
+    {
+        _gltfExporterType = Type.GetType("Ab4d.SharpEngine.glTF.glTFExporter, Ab4d.SharpEngine.glTF", throwOnError: false);
+
+        var isGltfExporterAvailable = _gltfExporterType != null;
+
+        // The following code can be used to manually load Ab4d.SharpEngine.glTF.dll
+        // This can be enabled only after the gltf2Loader is embedded into the Ab4d.SharpEngine.glTF so that we do not need gltf2Loader.dll and Newtonsoft.Json.dll
+        //if (!isGltfExporterAvailable)
+        //{
+        //    var gltfAssemblyFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Ab4d.SharpEngine.glTF.dll");
+
+        //    if (System.IO.File.Exists(gltfAssemblyFileName))
+        //    {
+        //        try
+        //        {
+        //            var gltfAssembly = System.Reflection.Assembly.LoadFrom(gltfAssemblyFileName);
+
+        //            _gltfExporterType = gltfAssembly.GetType("Ab4d.SharpEngine.glTF.glTFExporter", throwOnError: false);
+
+        //            isGltfExporterAvailable = _gltfExporterType != null;
+        //        }
+        //        catch
+        //        {
+        //            // pass
+        //        }
+        //    }
+        //}
+
+        _isGltfExporterAvailable = isGltfExporterAvailable;
+        return isGltfExporterAvailable;
+    }
+
+    public bool ExportScene(Scene scene, SceneView sceneView, string fileName) // sceneView is not yet used, but may be used in the future to export the camera
+    {
+        if (_gltfExporterType == null)
+            return false;
+
+        // Use Reflection to call 
+        if (_gltfExporter == null)
+        {
+            _gltfExporter = Activator.CreateInstance(_gltfExporterType);
+
+            if (_gltfExporter == null)
+                return false;
+
+            _addSceneMethodInfo = _gltfExporter.GetType().GetMethod("AddScene");
+            _exportEmbeddedMethodInfo = _gltfExporter.GetType().GetMethod("ExportEmbedded", BindingFlags.Instance | BindingFlags.Public, new Type[] { typeof(string)});
+            _exportBinaryMethodInfo = _gltfExporter.GetType().GetMethod("ExportBinary", BindingFlags.Instance | BindingFlags.Public, new Type[] { typeof(string)});
+        }
+
+        // Call "AddScene(scene)"
+        _addSceneMethodInfo!.Invoke(_gltfExporter, new object?[] { scene });
+
+        // Call "ExportEmbedded(fileName)"
+        if (fileName.EndsWith("glb", StringComparison.OrdinalIgnoreCase))
+            _exportBinaryMethodInfo!.Invoke(_gltfExporter, new object?[] { fileName });
+        else
+            _exportEmbeddedMethodInfo!.Invoke(_gltfExporter, new object?[] { fileName });
+
+        return true;
     }
 
     private void UpdateStatistics()

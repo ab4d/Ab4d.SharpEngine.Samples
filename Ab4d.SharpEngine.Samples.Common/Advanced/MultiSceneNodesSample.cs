@@ -729,7 +729,7 @@ public class MultiSceneNodesSample : CommonSample
         string fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
 
         //var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
-        if (scene.GpuDevice != null && scene.GpuDevice.DefaultBitmapIO != null)
+        if (scene.GpuDevice != null)
         {
             var blackBitmapFont = CreateBitmapFont(fontFileName, scene.GpuDevice.DefaultBitmapIO);
 
@@ -764,7 +764,7 @@ public class MultiSceneNodesSample : CommonSample
 
         var blackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
 
-        if (blackWithOutlineBitmapFont != null && scene.GpuDevice != null && scene.GpuDevice.DefaultBitmapIO != null)
+        if (blackWithOutlineBitmapFont != null && scene.GpuDevice != null)
         {
             var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(scene, blackWithOutlineBitmapFont, scene.GpuDevice.DefaultBitmapIO)
             {

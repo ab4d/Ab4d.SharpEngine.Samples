@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Reflection.PortableExecutable;
-using System.Windows;
-using System.Windows.Input;
-using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common;
@@ -14,7 +10,6 @@ using Ab4d.Vulkan;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 
@@ -185,9 +180,9 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         return newElement;
     }
 
-    public ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0, bool showTicks = false, string? keyText = null, double keyTextWidth = 0, Func<float, string>? formatShownValueFunc = null)
+    public ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0D, bool showTicks = false, string? keyText = null, double keyTextWidth = 0D, Func<float, string>? formatShownValueFunc = null, double shownValueWidth = 0)
     {
-        var newElement = new SliderUIElement(this, minValue, maxValue, getValueFunc, setValueAction, width, showTicks, keyText, keyTextWidth, formatShownValueFunc);
+        var newElement = new SliderUIElement(this, minValue, maxValue, getValueFunc, setValueAction, width, showTicks, keyText, keyTextWidth, formatShownValueFunc, shownValueWidth);
         AddToCurrentPanel(newElement);
 
         return newElement;

@@ -8,7 +8,7 @@ using SKCanvasView = SkiaSharp.Views.Maui.Controls.SKCanvasView;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
 
-public class MauiCameraController : ManualMouseCameraController
+public class MauiCameraController : ManualPointerCameraController
 {
     private SKCanvasView _skCanvasView;
 
@@ -58,8 +58,8 @@ public class MauiCameraController : ManualMouseCameraController
         _skCanvasView = skCanvasView;
 
         // Set defaults:
-        RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed;
-        MoveCameraConditions   = MouseAndKeyboardConditions.RightMouseButtonPressed;
+        RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed;
+        MoveCameraConditions   = PointerAndKeyboardConditions.RightPointerButtonPressed;
 
 
         // In windows use PlatformInputHelper to get mouse buttons and keyboard modifiers state
@@ -159,9 +159,9 @@ public class MauiCameraController : ManualMouseCameraController
         if (SceneView == null)
             return;
 
-        // We only use Pan gesture when rotation or movement is bound to left mouse button
-        if (RotateCameraConditions == MouseAndKeyboardConditions.LeftMouseButtonPressed ||
-            MoveCameraConditions == MouseAndKeyboardConditions.LeftMouseButtonPressed)
+        // We only use Pan gesture when rotation or movement is bound to left pointer button
+        if (RotateCameraConditions == PointerAndKeyboardConditions.LeftPointerButtonPressed ||
+            MoveCameraConditions == PointerAndKeyboardConditions.LeftPointerButtonPressed)
         {
             // We need to multiply TotalX and TotalY with dpi scale
             float dx = (float)e.TotalX * _dpiScale;
@@ -170,19 +170,19 @@ public class MauiCameraController : ManualMouseCameraController
             // The ProcessXYZ methods below require an actual screen position of the mouse
             // We do not get that here but we have only offset of the pan from the start position.
             // Therefore we always assume that the pan has started at the start of the view
-            var mousePosition = new Vector2((float)(SceneView.Width * 0.5f + dx), (float)(SceneView.Height * 0.5f + dy));
+            var pointerPosition = new Vector2((float)(SceneView.Width * 0.5f + dx), (float)(SceneView.Height * 0.5f + dy));
 
             if (e.StatusType == GestureStatus.Started)
             {
-                base.ProcessMouseDown(mousePosition, MouseButtons.Left, KeyboardModifiers.None);
+                base.ProcessPointerPressed(pointerPosition, PointerButtons.Left, KeyboardModifiers.None);
             }
             else if (e.StatusType == GestureStatus.Running)
             {
-                base.ProcessMouseMove(mousePosition, MouseButtons.Left, KeyboardModifiers.None);
+                base.ProcessPointerMoved(pointerPosition, PointerButtons.Left, KeyboardModifiers.None);
             }
             else if (e.StatusType == GestureStatus.Completed || e.StatusType == GestureStatus.Canceled)
             {
-                base.ProcessMouseUp(MouseButtons.None, KeyboardModifiers.None);
+                base.ProcessPointerReleased(PointerButtons.None, KeyboardModifiers.None);
             }
         }
     }
@@ -194,7 +194,7 @@ public class MauiCameraController : ManualMouseCameraController
         // ScaleOrigin is relative (from 0 to 1) so it does not need to be multiplied by dpi scale
         var originPosition = new Vector2((float)(SceneView!.Width * e.ScaleOrigin.X), (float)(SceneView.Height * e.ScaleOrigin.Y));
 
-        if (ZoomMode == CameraZoomMode.MousePosition &&
+        if (ZoomMode == CameraZoomMode.PointerPosition &&
             e.Status == GestureStatus.Started && 
             SceneView != null && SceneView.IsInitialized)
         {
@@ -246,12 +246,12 @@ public class MauiCameraController : ManualMouseCameraController
 
         var actionType = e.ActionType;
 
-        var mousePosition = new Vector2(e.Location.X, e.Location.Y);
+        var pointerPosition = new Vector2(e.Location.X, e.Location.Y);
         
         // Uncomment the following line to see the data that is passed to Touch event:
         //System.Diagnostics.Debug.WriteLine($"Touch: {actionType} at {mousePosition}, MouseButton: {e.MouseButton}");
 
-        MouseButtons pressedMouseButtons;
+        PointerButtons pressedPointerButtons;
         KeyboardModifiers keyboardModifiers;
 
         // Update _pressedMouseButtons
@@ -278,9 +278,9 @@ public class MauiCameraController : ManualMouseCameraController
         //    _pressedMouseButtons = ConvertToMouseButtons(e.MouseButton); // This seems to contain the currently pressed event
         //}
 
-        if (_platformInputHelper != null && _platformInputHelper.IsCurrentMouseButtonAvailable)
+        if (_platformInputHelper != null && _platformInputHelper.IsCurrentPointerButtonAvailable)
         {
-            pressedMouseButtons = _platformInputHelper.GetCurrentMouseButtons();
+            pressedPointerButtons = _platformInputHelper.GetCurrentPointerButtons();
 
             if (_platformInputHelper.IsCurrentKeyboardModifierAvailable)
                 keyboardModifiers = _platformInputHelper.GetCurrentKeyboardModifiers();
@@ -290,40 +290,40 @@ public class MauiCameraController : ManualMouseCameraController
         else
         {
             // The following code is the most reliable based on testing
-            pressedMouseButtons = ConvertToMouseButtons(e.MouseButton);
+            pressedPointerButtons = ConvertToPointerButtons(e.MouseButton);
             keyboardModifiers = KeyboardModifiers.None;
         }
 
         if (actionType == SKTouchAction.Pressed)
         {
             // Start rotate
-            isHandled = base.ProcessMouseDown(mousePosition, pressedMouseButtons, keyboardModifiers);
+            isHandled = base.ProcessPointerPressed(pointerPosition, pressedPointerButtons, keyboardModifiers);
         }
         else if (actionType == SKTouchAction.Released)
         {
             // End rotate
-            isHandled = base.ProcessMouseUp(MouseButtons.None, keyboardModifiers);
+            isHandled = base.ProcessPointerReleased(PointerButtons.None, keyboardModifiers);
         }
         else if (actionType == SKTouchAction.Moved)
         {
             // Rotate / move
-            isHandled = base.ProcessMouseMove(mousePosition, pressedMouseButtons, keyboardModifiers);
+            isHandled = base.ProcessPointerMoved(pointerPosition, pressedPointerButtons, keyboardModifiers);
         }
 
 
         if (actionType == SKTouchAction.WheelChanged)
         {
-            isHandled = base.ProcessMouseWheel(mousePosition, e.WheelDelta);
+            isHandled = base.ProcessPointerWheelChanged(pointerPosition, e.WheelDelta);
         }
 
         e.Handled = isHandled;
     }
 
-    private MouseButtons ConvertToMouseButtons(SKMouseButton skMouseButton) => skMouseButton switch
+    private PointerButtons ConvertToPointerButtons(SKMouseButton skMouseButton) => skMouseButton switch
     {
-        SKMouseButton.Left   => MouseButtons.Left,
-        SKMouseButton.Middle => MouseButtons.Middle,
-        SKMouseButton.Right  => MouseButtons.Right,
-        _                    => MouseButtons.None
+        SKMouseButton.Left   => PointerButtons.Left,
+        SKMouseButton.Middle => PointerButtons.Middle,
+        SKMouseButton.Right  => PointerButtons.Right,
+        _                    => PointerButtons.None
     };
 }

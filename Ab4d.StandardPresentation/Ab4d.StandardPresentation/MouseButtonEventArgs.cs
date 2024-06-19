@@ -9,9 +9,9 @@ namespace Ab4d.StandardPresentation
     {
         /// <summary>Gets the button associated with the event.</summary>
         /// <returns>The button which was pressed.</returns>
-        public MouseButtons ChangedButton { get; }
+        public PointerButtons ChangedButton { get; }
 
-        public MouseButtonEventArgs(MouseButtons changedButton, long timeStamp = 0) 
+        public MouseButtonEventArgs(PointerButtons changedButton, long timeStamp = 0) 
             : base(timeStamp)
         { 
             ChangedButton = changedButton;

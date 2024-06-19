@@ -71,7 +71,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
 
         private IPresentationControl _presentationControl;
 
-        private ManualMouseCameraController? _mouseCameraController;
+        private ManualPointerCameraController? pointerCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
@@ -522,20 +522,20 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             }
 
 
-            _mouseCameraController = new ManualMouseCameraController(_sceneView)
+            pointerCameraController = new ManualPointerCameraController(_sceneView)
             {
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey,
-                ZoomMode = CameraZoomMode.MousePosition,
-                RotateAroundMousePosition = true
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
+                ZoomMode = CameraZoomMode.PointerPosition,
+                RotateAroundPointerPosition = true
             };
 
             // Setup mouse capture when supported by the platform
             // This enables getting mouse events after pressing mouse button event when the mouse leaves the window area
             if (_presentationControl.IsMouseCaptureSupported)
             {
-                _mouseCameraController.CaptureMouseAction = () => _presentationControl.CaptureMouse();
-                _mouseCameraController.ReleaseMouseCaptureAction = () => _presentationControl.ReleaseMouseCapture();
+                pointerCameraController.CapturePointerAction = () => _presentationControl.CaptureMouse();
+                pointerCameraController.ReleasePointerCaptureAction = () => _presentationControl.ReleaseMouseCapture();
             }
         }
 
@@ -638,46 +638,46 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
 
         private void OnMouseMove(object sender, Ab4d.StandardPresentation.MouseMoveEventArgs e)
         {
-            if (_mouseCameraController != null)
+            if (pointerCameraController != null)
             {
                 var keyboardModifiers = _presentationControl.GetKeyboardModifiers();
-                _presentationControl.GetMouseState(out float x, out float y, out var pressedMouseButtons);
+                _presentationControl.GetMouseState(out float x, out float y, out var pressedPointerButtons);
 
                 // Note that we need to convert from MouseButton enum that is defined in Ab4d.StandardPresentation to MouseCameraController.MouseButtons (both enums use the same values so we can convert them directly); the same is done for keyboardModifiers.
-                _mouseCameraController.ProcessMouseMove(new Vector2(x, y), pressedMouseButtons, keyboardModifiers);
+                pointerCameraController.ProcessPointerMoved(new Vector2(x, y), pressedPointerButtons, keyboardModifiers);
             }            
         }
 
         private void OnMouseUp(object sender, Ab4d.StandardPresentation.MouseButtonEventArgs e)
         {
-            if (_mouseCameraController != null)
+            if (pointerCameraController != null)
             {
                 var keyboardModifiers = _presentationControl.GetKeyboardModifiers();
                 _presentationControl.GetMouseState(out _, out _, out var pressedMouseButtons);
 
                 // Note that we need to convert from MouseButton enum that is defined in Ab4d.StandardPresentation to MouseCameraController.MouseButtons (both enums use the same values so we can convert them directly); the same is done for keyboardModifiers.
-                _mouseCameraController.ProcessMouseUp(pressedMouseButtons, keyboardModifiers);
+                pointerCameraController.ProcessPointerReleased(pressedMouseButtons, keyboardModifiers);
             }
         }
 
         private void OnMouseDown(object sender, Ab4d.StandardPresentation.MouseButtonEventArgs e)
         {
-            if (_mouseCameraController != null)
+            if (pointerCameraController != null)
             {
                 var keyboardModifiers = _presentationControl.GetKeyboardModifiers();
                 _presentationControl.GetMouseState(out float x, out float y, out var pressedMouseButtons);
 
                 // Note that we need to convert from MouseButton enum that is defined in Ab4d.StandardPresentation to MouseCameraController.MouseButtons (both enums use the same values so we can convert them directly); the same is done for keyboardModifiers.
-                _mouseCameraController.ProcessMouseDown(new Vector2(x, y), pressedMouseButtons, keyboardModifiers);
+                pointerCameraController.ProcessPointerPressed(new Vector2(x, y), pressedMouseButtons, keyboardModifiers);
             }
         }
 
         private void OnMouseWheel(object sender, Ab4d.StandardPresentation.MouseWheelEventArgs e)
         {
-            if (_mouseCameraController != null)
+            if (pointerCameraController != null)
             {
                 _presentationControl.GetMouseState(out float x, out float y, out var pressedMouseButtons);
-                _mouseCameraController.ProcessMouseWheel(new Vector2(x, y), e.DeltaY);
+                pointerCameraController.ProcessPointerWheelChanged(new Vector2(x, y), e.DeltaY);
             }
         }
 

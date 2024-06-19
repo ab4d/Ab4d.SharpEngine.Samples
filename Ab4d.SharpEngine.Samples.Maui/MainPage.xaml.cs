@@ -66,15 +66,15 @@ public partial class MainPage : ContentPage
         // See comments in the MauiCameraController.cs
         _mauiCameraController = new MauiCameraController(_sharpEngineSceneView)
         {
-            RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,
-            ZoomMode = CameraZoomMode.MousePosition,
+            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            ZoomMode = CameraZoomMode.PointerPosition,
         };
 
         // On Windows set camera move condition to left mouse button + Control key; on other platforms use both left and right mouse buttons
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            _mauiCameraController.MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
+            _mauiCameraController.MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
         else
-            _mauiCameraController.MoveCameraConditions = MouseAndKeyboardConditions.RightMouseButtonPressed;
+            _mauiCameraController.MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
     }
 
     private bool SetupPlatform(EngineCreateOptions engineCreateOptions)

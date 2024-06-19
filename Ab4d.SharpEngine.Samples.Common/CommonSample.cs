@@ -31,16 +31,19 @@ public abstract class CommonSample
     public Scene? Scene { get; private set; }
     public SceneView? SceneView { get; private set; }
 
+    public ManualInputEventsManager? InputEventsManager { get; private set; }
+
     public abstract string Title { get; }
     public virtual string? Subtitle { get; }
 
     public bool IsDisposed { get; private set; }
 
-    public MouseAndKeyboardConditions RotateCameraConditions { get; set; } = MouseAndKeyboardConditions.LeftMouseButtonPressed;
-    public MouseAndKeyboardConditions MoveCameraConditions { get; set; } = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey;
-    public MouseAndKeyboardConditions QuickZoomConditions { get; set; } = MouseAndKeyboardConditions.Disabled;
-    public bool RotateAroundMousePosition { get; set; }
+    public PointerAndKeyboardConditions RotateCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed;
+    public PointerAndKeyboardConditions MoveCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
+    public PointerAndKeyboardConditions QuickZoomConditions { get; set; } = PointerAndKeyboardConditions.Disabled;
+    public bool RotateAroundPointerPosition { get; set; }
     public CameraZoomMode ZoomMode { get; set; } = CameraZoomMode.CameraRotationCenterPosition;
+    public bool IsPointerWheelZoomEnabled { get; set; } = true;
 
     private bool _showCameraAxisPanel;
 
@@ -109,6 +112,12 @@ public abstract class CommonSample
         OnSceneViewInitialized(sceneView);
     }
 
+    public void InitializeInputEventsManager(ManualInputEventsManager inputEventsManager)
+    {
+        InputEventsManager = inputEventsManager;
+        OnInputEventsManagerInitialized(inputEventsManager);
+    }
+
     public virtual CameraAxisPanel CreateCameraAxisPanel(ICamera camera)
     {
         if (SceneView == null)
@@ -128,6 +137,14 @@ public abstract class CommonSample
     }
 
     protected abstract void OnCreateScene(Scene scene);
+
+    /// <summary>
+    /// OnInputEventsManagerInitialized can be overridden to initialize the InputEventsManager.
+    /// </summary>
+    /// <param name="inputEventsManager">ManualInputEventsManager</param>
+    protected virtual void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
+    {
+    }
 
     protected virtual void OnCreateLights(Scene scene)
     {
@@ -158,13 +175,14 @@ public abstract class CommonSample
         return defaultTargetPositionCamera;
     }
 
-    public virtual void InitializeMouseCameraController(ManualMouseCameraController mouseCameraController)
+    public virtual void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
     {
-        mouseCameraController.RotateCameraConditions    = this.RotateCameraConditions;
-        mouseCameraController.MoveCameraConditions      = this.MoveCameraConditions;
-        mouseCameraController.QuickZoomConditions       = this.QuickZoomConditions;
-        mouseCameraController.RotateAroundMousePosition = this.RotateAroundMousePosition;
-        mouseCameraController.ZoomMode                  = this.ZoomMode;
+        pointerCameraController.RotateCameraConditions      = this.RotateCameraConditions;
+        pointerCameraController.MoveCameraConditions        = this.MoveCameraConditions;
+        pointerCameraController.QuickZoomConditions         = this.QuickZoomConditions;
+        pointerCameraController.RotateAroundPointerPosition = this.RotateAroundPointerPosition;
+        pointerCameraController.ZoomMode                    = this.ZoomMode;
+        pointerCameraController.IsPointerWheelZoomEnabled   = this.IsPointerWheelZoomEnabled;
     }
 
     public void CreateUI(ICommonSampleUIProvider uiProvider)
@@ -214,6 +232,13 @@ public abstract class CommonSample
 
         IsDisposed = true;
         OnDisposed();
+
+        if (Scene != null)
+            Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 
     protected virtual void OnDisposed()

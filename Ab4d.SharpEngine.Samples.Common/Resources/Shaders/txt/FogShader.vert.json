@@ -1,0 +1,173 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "vert"
+        }
+    ],
+    "types" : {
+        "_12" : {
+            "name" : "modelMatricesBuffer",
+            "members" : [
+                {
+                    "name" : "world",
+                    "type" : "mat4",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 64,
+                    "matrix_stride" : 16
+                }
+            ]
+        },
+        "_17" : {
+            "name" : "indexSetup",
+            "members" : [
+                {
+                    "name" : "matrixIndex",
+                    "type" : "int",
+                    "offset" : 0
+                }
+            ]
+        },
+        "_39" : {
+            "name" : "gl_PerVertex",
+            "members" : [
+                {
+                    "name" : "gl_Position",
+                    "type" : "vec4"
+                }
+            ]
+        },
+        "_43" : {
+            "name" : "sceneUniformBuffer",
+            "members" : [
+                {
+                    "name" : "viewProjection",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "eyePosW",
+                    "type" : "vec3",
+                    "offset" : 64
+                },
+                {
+                    "name" : "viewSize",
+                    "type" : "vec2",
+                    "offset" : 80
+                },
+                {
+                    "name" : "dpiScale",
+                    "type" : "float",
+                    "offset" : 88
+                },
+                {
+                    "name" : "superSampling",
+                    "type" : "float",
+                    "offset" : 92
+                },
+                {
+                    "name" : "ambientColor",
+                    "type" : "vec3",
+                    "offset" : 96
+                },
+                {
+                    "name" : "dirLightStart",
+                    "type" : "int",
+                    "offset" : 108
+                },
+                {
+                    "name" : "dirLightCount",
+                    "type" : "int",
+                    "offset" : 112
+                },
+                {
+                    "name" : "pointLightStart",
+                    "type" : "int",
+                    "offset" : 116
+                },
+                {
+                    "name" : "pointLightCount",
+                    "type" : "int",
+                    "offset" : 120
+                },
+                {
+                    "name" : "spotLightStart",
+                    "type" : "int",
+                    "offset" : 124
+                },
+                {
+                    "name" : "spotLightCount",
+                    "type" : "int",
+                    "offset" : 128
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec3",
+            "name" : "inPosition",
+            "location" : 0
+        },
+        {
+            "type" : "vec3",
+            "name" : "inNormal",
+            "location" : 1
+        },
+        {
+            "type" : "vec2",
+            "name" : "inUV",
+            "location" : 2
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec3",
+            "name" : "outWorldPos",
+            "location" : 0
+        },
+        {
+            "type" : "vec3",
+            "name" : "outNormal",
+            "location" : 1
+        },
+        {
+            "type" : "vec2",
+            "name" : "outUV",
+            "location" : 2
+        }
+    ],
+    "ssbos" : [
+        {
+            "type" : "_12",
+            "name" : "modelMatricesBuffer",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 2,
+            "binding" : 0
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_43",
+            "name" : "sceneUniformBuffer",
+            "block_size" : 132,
+            "set" : 0,
+            "binding" : 0
+        }
+    ],
+    "push_constants" : [
+        {
+            "type" : "_17",
+            "name" : "pushConstants",
+            "push_constant" : true
+        }
+    ]
+}

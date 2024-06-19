@@ -26,16 +26,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
     public partial class SharpEngineSceneViewInCode : Page
     {
         private readonly SharpEngineSceneView _sharpEngineSceneView;
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
 
         public SharpEngineSceneViewInCode()
         {
             InitializeComponent();
-
-            // Setup logger
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
 
             // Create SharpEngineSceneView:
             //
@@ -76,6 +71,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 #if DEBUG
             // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             _sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message
@@ -118,7 +117,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             CreateTestScene();
             CreateLights();
-            SetupMouseCameraController();
+            SetupPointerCameraController();
 
             // Add SharpEngineSceneView to the WPF controls tree
             SceneViewBorder.Child = _sharpEngineSceneView;
@@ -129,7 +128,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             };
         }
 
-        private void SetupMouseCameraController()
+        private void SetupPointerCameraController()
         {
             // Define the camera
             var camera = new TargetPositionCamera()
@@ -144,16 +143,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             _sharpEngineSceneView.SceneView.Camera = camera;
 
 
-            // MouseCameraController use mouse to control the camera
+            // PointerCameraController use pointer or mouse to control the camera
 
-            //_mouseCameraController = new MouseCameraController(_sharpEngineSceneView.SceneView, SceneViewBorder) // We could also create MouseCameraController by SceneView and custom EventSourceElement
-            _mouseCameraController = new MouseCameraController(_sharpEngineSceneView)
+            //_pointerCameraController = new PointerCameraController(_sharpEngineSceneView.SceneView, SceneViewBorder) // We could also create PointerCameraController by SceneView and custom EventSourceElement
+            _pointerCameraController = new PointerCameraController(_sharpEngineSceneView)
             {
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,                                                   // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey,             // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed, // quick zoom is disabled by default
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
+                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
 
-                RotateAroundMousePosition = false,
+                RotateAroundPointerPosition = false,
                 ZoomMode = CameraZoomMode.ViewCenter,
             };
         }

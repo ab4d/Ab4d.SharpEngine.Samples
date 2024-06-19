@@ -144,7 +144,7 @@ namespace Ab4d.StandardPresentation.WinFormsUI
             _isRenderLoopStarted = true;
         }
 
-        public void GetMouseState(out float x, out float y, out Ab4d.SharpEngine.Common.MouseButtons pressedButtons)
+        public void GetMouseState(out float x, out float y, out Ab4d.SharpEngine.Common.PointerButtons pressedButtons)
         {
             var mousePosition = Cursor.Position;
 
@@ -240,24 +240,24 @@ namespace Ab4d.StandardPresentation.WinFormsUI
             MouseWheel?.Invoke(this, new MouseWheelEventArgs(0, e.Delta));
         }
 
-        private Ab4d.SharpEngine.Common.MouseButtons ConvertMouseButton(System.Windows.Forms.MouseButtons buttons)
+        private Ab4d.SharpEngine.Common.PointerButtons ConvertMouseButton(System.Windows.Forms.MouseButtons buttons)
         {
-            var pressedButtons = Ab4d.SharpEngine.Common.MouseButtons.None;
+            var pressedButtons = Ab4d.SharpEngine.Common.PointerButtons.None;
 
             if ((buttons & MouseButtons.Left) != 0)
-                pressedButtons |= Ab4d.SharpEngine.Common.MouseButtons.Left;
+                pressedButtons |= Ab4d.SharpEngine.Common.PointerButtons.Left;
 
             if ((buttons & MouseButtons.Middle) != 0)
-                pressedButtons |= Ab4d.SharpEngine.Common.MouseButtons.Middle;
+                pressedButtons |= Ab4d.SharpEngine.Common.PointerButtons.Middle;
 
             if ((buttons & MouseButtons.Right) != 0)
-                pressedButtons |= Ab4d.SharpEngine.Common.MouseButtons.Right;
+                pressedButtons |= Ab4d.SharpEngine.Common.PointerButtons.Right;
 
             if ((buttons & MouseButtons.XButton1) != 0)
-                pressedButtons |= Ab4d.SharpEngine.Common.MouseButtons.XButton1;
+                pressedButtons |= Ab4d.SharpEngine.Common.PointerButtons.XButton1;
 
             if ((buttons & MouseButtons.XButton2) != 0)
-                pressedButtons |= Ab4d.SharpEngine.Common.MouseButtons.XButton2;
+                pressedButtons |= Ab4d.SharpEngine.Common.PointerButtons.XButton2;
 
             return pressedButtons;
         }

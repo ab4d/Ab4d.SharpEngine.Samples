@@ -11,7 +11,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Colors = Ab4d.SharpEngine.Common.Colors;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.HitTesting;
 
@@ -62,33 +61,33 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
 
     private void EventsSourceElementOnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // PointerPressed is called not only when the mouse button is pressed, but all the time until the button is pressed
-        // But we would only like ot know when the left mouse button is pressed
-        if (isLeftMouseButtonPressed || _subscribedElement == null)
+        // PointerPressed is called not only when the pointer button is pressed, but all the time until the button is pressed
+        // But we would only like to know when the left pointer button is pressed
+        if (isLeftPointerButtonPressed || _subscribedElement == null)
             return;
 
         var currentPoint = e.GetCurrentPoint(_subscribedElement);
-        isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
+        isLeftPointerButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
 
-        if (isLeftMouseButtonPressed)
+        if (isLeftPointerButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
-            ProcessMouseButtonPress(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            ProcessLeftPointerButtonPressed(pointerPosition);
         }
     }
 
     private void EventsSourceElementOnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (!isLeftMouseButtonPressed || _subscribedElement == null) // is already released
+        if (!isLeftPointerButtonPressed || _subscribedElement == null) // is already released
             return;
 
         var currentPoint = e.GetCurrentPoint(_subscribedElement);
-        isLeftMouseButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
+        isLeftPointerButtonPressed = currentPoint.Properties.IsLeftButtonPressed;
 
-        if (!isLeftMouseButtonPressed)
+        if (!isLeftPointerButtonPressed)
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
-            ProcessMouseButtonRelease(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            ProcessLeftPointerButtonReleased(pointerPosition);
         }
     }
 
@@ -99,8 +98,8 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
 
         var currentPoint = e.GetCurrentPoint(_subscribedElement);
         {
-            var mousePosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
-            ProcessMouseMove(mousePosition);
+            var pointerPosition = new Vector2((float)currentPoint.Position.X, (float)currentPoint.Position.Y);
+            ProcessPointerMoved(pointerPosition);
         }
     }
 
@@ -204,7 +203,7 @@ public class AvaloniaManualInputEventsSample : ManualInputEventsSample
     private void OnMouseDraggingCheckBoxCheckedChanged(object? sender, RoutedEventArgs e)
     {
         if (sender is CheckBox checkBox) 
-            isMouseDraggingEnabled = checkBox.IsChecked ?? false;
+            isPointerDraggingEnabled = checkBox.IsChecked ?? false;
     }
 
     private void OnCheckCollisionCheckBoxCheckedChanged(object? sender, RoutedEventArgs e)

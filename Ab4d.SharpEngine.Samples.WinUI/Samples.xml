@@ -17,17 +17,23 @@
   <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
 
-  <Sample Location="Titles.MouseCameraControllerTitle.md" IsTitle="True" Title="MouseCameraController"/>
-  <Sample Location="CameraControllers.MouseCameraControllerSample" Title="MouseCameraController"/>
+  <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
+  <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
   
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
   <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.WinUIManualInputEventsSample" Title="Manual Input events"/>
+  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
@@ -56,24 +62,27 @@
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
-  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
-  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
-  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
-  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
   <Sample Location="AdvancedModels.StreamlinesSample" Title="Streamlines"/>
   <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
   <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.BitmapTextSample" Title="Bitmap text"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
   <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
+  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter"/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
@@ -98,5 +107,7 @@
 
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
   <Sample Location="Advanced.MultiSceneNodesSample" Title="Multi SceneNodes" />
+  <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
+  <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />  
 
 </Samples>

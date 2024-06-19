@@ -82,9 +82,7 @@ namespace AndroidApp1
             {
                 changeColorButton.Click += delegate (object? sender, EventArgs args)
                 {
-                    _sceneView?.NotifyChange(SceneViewDirtyFlags.ViewSizeChanged);
-                    _sceneView?.Render(true, true);
-                    //ChangeBoxColor();
+                    ChangeBoxColor();
                 };
             }
             

@@ -14,7 +14,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
+        private InputEventsManager _inputEventsManager;
 
         private AvaloniaUIProvider _avaloniaUiProvider;
 
@@ -39,6 +40,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
+            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
+            MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
+            
+
             // Because we are rendering a background Border with a gradient, we can subscribe mouse events to that element.
             // In this case we can slightly improve performance when SharedTexture is by setting the IsHitTestVisible to false.
             // This prevents rendering a transparent background in SharpEngineSceneView control (this is required to enable mouse events on the control when SharedTexture is used).
@@ -53,6 +62,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
+
+
+            _inputEventsManager = new InputEventsManager(MainSceneView, RootBorder);
         }
 
         private void ResetSample()
@@ -79,6 +91,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             _currentCommonSample.InitializeScene(MainSceneView.Scene);
             _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
+            _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
@@ -88,8 +101,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
-            if (_mouseCameraController != null)
-                _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+            if (_pointerCameraController != null)
+                _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             
             // Show MainSceneView - this will also render the scene
             MainSceneView.IsVisible = true;
@@ -106,14 +119,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
         {
             InitializeCommonSample();
 
-            if (_mouseCameraController == null) // if _mouseCameraController is not null, then InitializeMouseCameraController was already called from InitializeCommonSample
+            if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
                 // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
-                // we need to set a custom eventsSourceElement when creating the MouseCameraController
-                _mouseCameraController ??= new MouseCameraController(MainSceneView, eventsSourceElement: RootBorder);
+                // we need to set a custom eventsSourceElement when creating the PointerCameraController
+                _pointerCameraController ??= new PointerCameraController(MainSceneView, eventsSourceElement: RootBorder);
 
                 if (_currentCommonSample != null)
-                    _currentCommonSample.InitializeMouseCameraController(_mouseCameraController);
+                    _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
         }
 

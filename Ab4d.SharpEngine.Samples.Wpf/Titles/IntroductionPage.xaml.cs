@@ -27,15 +27,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
 
         public IntroductionPage()
         {
-            // Setup logger (before calling InitializeComponent so log events from SharpEngineSceneView can be also logged)
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            if (!SkipInitializingSharpEngine)
-                LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
             InitializeComponent();
 
             // When Control key is pressed or when SkipInitializingSharpEngine is true,
-            // then no Ab3d.SharpEngine objects are created - only WPF objects are created.
+            // then no Ab4d.SharpEngine objects are created - only WPF objects are created.
             if (SkipInitializingSharpEngine || Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 MainSceneView.PresentationType = PresentationTypes.None;

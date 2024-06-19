@@ -73,7 +73,7 @@ namespace AndroidDemo
 
         private IInputContext? _inputContext;
         private ScaleGestureDetector? _scaleGestureDetector;
-        private ManualMouseCameraController? _mouseCameraController;
+        private ManualPointerCameraController? _pointerCameraController;
         private MyScaleListener? _myScaleListener;
         private AndroidBitmapIO? _androidBitmapIO;
 
@@ -123,8 +123,8 @@ namespace AndroidDemo
             // If you want to use SDK, then call this in OnCreate method above:
             RequestedOrientation = ScreenOrientation.Locked; // Prevent rotating the screen
             
-            Silk.NET.Windowing.Window.PrioritizeSdl();
-            //Silk.NET.Windowing.Window.PrioritizeGlfw();
+            //Silk.NET.Windowing.Window.PrioritizeSdl();
+            Silk.NET.Windowing.Window.PrioritizeGlfw();
 
 
             var options = ViewOptions.DefaultVulkan;
@@ -300,16 +300,16 @@ namespace AndroidDemo
 
 
             // Currently RotateCameraConditions and MoveCameraConditions are set by using mouse events - this will be improved in the future and touch events will be used
-            _mouseCameraController = new ManualMouseCameraController(_sceneView)
+            _pointerCameraController = new ManualPointerCameraController(_sceneView)
             {
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed,
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed,
                 ZoomMode = CameraZoomMode.ViewCenter,
                 //RotateAroundMousePosition = true
             };
 
             if (_myScaleListener != null)
-                _myScaleListener.SetMouseCameraController(_mouseCameraController);
+                _myScaleListener.SetMouseCameraController(_pointerCameraController);
         }
 
         private void CreateAllObjectsTestScene()
@@ -393,23 +393,23 @@ namespace AndroidDemo
 
             Log.Trace?.Write($"TouchEvent: Action: {e.Action}; pos: {xPos} {yPos}; PointerCount: {e.PointerCount}");
 
-            if (_mouseCameraController != null)
+            if (_pointerCameraController != null)
             {
-                MouseButtons simulatedMouseButtons;
+                PointerButtons simulatedPointerButtons;
 
                 if (e.PointerCount == 1)
-                    simulatedMouseButtons = MouseButtons.Left;
+                    simulatedPointerButtons = PointerButtons.Left;
                 else if (e.PointerCount == 2)
-                    simulatedMouseButtons = MouseButtons.Left | MouseButtons.Right;
+                    simulatedPointerButtons = PointerButtons.Left | PointerButtons.Right;
                 else
-                    simulatedMouseButtons = MouseButtons.None;
+                    simulatedPointerButtons = PointerButtons.None;
 
                 if (e.Action == MotionEventActions.Down ||
                     e.Action == MotionEventActions.Pointer1Down ||
                     e.Action == MotionEventActions.Pointer2Down)
                 {
                     // Start rotate
-                    _mouseCameraController.ProcessMouseDown(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+                    _pointerCameraController.ProcessPointerPressed(new Vector2(xPos, yPos), simulatedPointerButtons, KeyboardModifiers.None);
                 }
                 else if (e.Action == MotionEventActions.Up ||
                          e.Action == MotionEventActions.Pointer1Up ||
@@ -421,24 +421,24 @@ namespace AndroidDemo
                     if (e.PointerCount == 2)
                     {
                         if (e.Action == MotionEventActions.Pointer1Up)
-                            simulatedMouseButtons = MouseButtons.Right; // 1st is up so only right remains
+                            simulatedPointerButtons = PointerButtons.Right; // 1st is up so only right remains
                         else if (e.Action == MotionEventActions.Pointer1Up)
-                            simulatedMouseButtons = MouseButtons.Left; // 2nd is up so only left remains
+                            simulatedPointerButtons = PointerButtons.Left; // 2nd is up so only left remains
                         else
-                            simulatedMouseButtons = MouseButtons.None;
+                            simulatedPointerButtons = PointerButtons.None;
                     }
                     else
                     {
-                        simulatedMouseButtons = MouseButtons.None;
+                        simulatedPointerButtons = PointerButtons.None;
                     }
 
-                    _mouseCameraController.ProcessMouseUp(simulatedMouseButtons, KeyboardModifiers.None);
+                    _pointerCameraController.ProcessPointerReleased(simulatedPointerButtons, KeyboardModifiers.None);
                 }
                 else if (e.Action == MotionEventActions.Move)
                 {
                     // Rotate / move
 
-                    _mouseCameraController.ProcessMouseMove(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+                    _pointerCameraController.ProcessPointerMoved(new Vector2(xPos, yPos), simulatedPointerButtons, KeyboardModifiers.None);
                 }
             }
         }

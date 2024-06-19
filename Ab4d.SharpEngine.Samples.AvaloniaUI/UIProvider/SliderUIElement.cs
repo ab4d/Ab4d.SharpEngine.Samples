@@ -32,7 +32,8 @@ public class SliderUIElement : AvaloniaUIElement
                            bool showTicks,
                            string? keyText,
                            double keyTextWidth,
-                           Func<float, string>? formatShownValueFunc)
+                           Func<float, string>? formatShownValueFunc,
+                           double shownValueWidth)
         : base(avaloniaUIProvider)
     {
         _getValueFunc = getValueFunc;
@@ -101,7 +102,11 @@ public class SliderUIElement : AvaloniaUIElement
                 };
 
                 // To prevent changing the size of _valueTextBlock we get the max possible size
-                _valueTextBlock.Width = MeasureShownValueTextBlock(minValue, maxValue);
+                if (shownValueWidth > 0)
+                    _valueTextBlock.Width = shownValueWidth;
+                else if (shownValueWidth == 0)
+                    _valueTextBlock.Width = MeasureShownValueTextBlock(minValue, maxValue);
+                // else: when less then zero, then do not set the width
 
                 _stackPanel.Children.Add(_valueTextBlock);
             }
@@ -125,6 +130,8 @@ public class SliderUIElement : AvaloniaUIElement
         float newValue = _getValueFunc();
 
         _slider.Value = newValue;
+
+        UpdateShownValue();
     }
 
 

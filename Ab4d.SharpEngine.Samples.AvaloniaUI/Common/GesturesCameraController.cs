@@ -9,10 +9,11 @@ using Avalonia.Input;
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 
 /// <summary>
-/// GesturesCameraController extends the standard MouseCameraController is processes Avalonia's mouse events for SharpEngine.
+/// GesturesCameraController extends the standard PointerCameraController.
+/// It processes Avalonia's mouse events for SharpEngine.
 /// This class adds support for Scroll and Pinch gestures.
 /// </summary>
-public class GesturesCameraController : MouseCameraController
+public class GesturesCameraController : PointerCameraController
 {
     public bool IsPinchGestureEnabled { get; set; } = true;
 
@@ -38,13 +39,13 @@ public class GesturesCameraController : MouseCameraController
             return;
 
 
-        float mouseDx = (float)-args.Delta.X;
-        float mouseDy = (float)-args.Delta.Y;
+        float pointerDx = (float)-args.Delta.X;
+        float pointerDy = (float)-args.Delta.Y;
 
         if (RotateCameraWithScrollGesture)
-            RotateCamera(mouseDx, mouseDy);
+            RotateCamera(pointerDx, pointerDy);
         else
-            MoveCamera(mouseDx, mouseDy);
+            MoveCamera(pointerDx, pointerDy);
         
         args.Handled = true;
 
@@ -58,7 +59,7 @@ public class GesturesCameraController : MouseCameraController
         if (!IsScrollGestureEnabled || !ReferenceEquals(target, this.SharpEngineSceneView))
             return;
 
-        EndMouseProcessing(); // This is required to prevent invalid camera rotation after next touch (this will not be needed anymore in the next version)
+        EndPointerProcessing(); // This is required to prevent invalid camera rotation after next touch (this will not be needed anymore in the next version)
 
         args.Handled = true;
 
@@ -72,28 +73,28 @@ public class GesturesCameraController : MouseCameraController
         if (!IsPinchGestureEnabled || !ReferenceEquals(target, this.SharpEngineSceneView))
             return;
 
-        var mousePosition = new Vector2((float)args.ScaleOrigin.X, (float)args.ScaleOrigin.Y);
+        var pointerPosition = new Vector2((float)args.ScaleOrigin.X, (float)args.ScaleOrigin.Y);
         var scale = (float)args.Scale;
 
 
         bool resetRotationCenterPosition = false;
         Vector3? savedRotationCenterPosition = null;
 
-        // If ZoomMode is set to MousePosition and we have started a new zooming (there is more then 1 seconds from last zoom event),
+        // If ZoomMode is set to PointerPosition and we have started a new zooming (there is more then 1 seconds from last zoom event),
         // then we use hit testing to get new Camera's RotationCenterPosition
-        if (this.ZoomMode == CameraZoomMode.MousePosition)
+        if (this.ZoomMode == CameraZoomMode.PointerPosition)
         {
             // Save RotationCenterPosition so it can be reset at the end of this method
             savedRotationCenterPosition = GetCameraRotationCenterPosition();
             resetRotationCenterPosition = true;
 
-            if (lastZoomMousePosition != mousePosition)
+            if (lastZoomPointerPosition != pointerPosition)
             {
-                bool isSupportedCamera = UpdateRotationCenterPosition(mousePosition, calculatePositionWhenNoObjectIsHit: true);
+                bool isSupportedCamera = UpdateRotationCenterPosition(pointerPosition, calculatePositionWhenNoObjectIsHit: true);
                 if (!isSupportedCamera)
-                    throw new NotSupportedException("MousePosition ZoomMode can be used only when MouseCameraController is controlling TargetPositionCamera or FreeCamera.");
+                    throw new NotSupportedException("PointerPosition ZoomMode can be used only when PointerCameraController is controlling TargetPositionCamera or FreeCamera.");
 
-                lastZoomMousePosition            = mousePosition;
+                lastZoomPointerPosition            = pointerPosition;
                 _lastPinchRotationCenterPosition = GetCameraRotationCenterPosition();
             }
             else
@@ -126,7 +127,7 @@ public class GesturesCameraController : MouseCameraController
             return;
 
         _previousPinchScale = 1;
-        lastZoomMousePosition = new Vector2(float.NaN, float.NaN);
+        lastZoomPointerPosition = new Vector2(float.NaN, float.NaN);
         
         args.Handled = true;
 

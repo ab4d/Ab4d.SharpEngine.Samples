@@ -28,7 +28,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
     {
         private GroupNode? _groupNode;
         
-        private MouseCameraController? _mouseCameraController;
+        private PointerCameraController? _pointerCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
@@ -37,12 +37,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
         public SharpEngineSceneViewInXaml()
         {
-            // Setup logger (before calling InitializeComponent so log events from SharpEngineSceneView can be also logged)
-            // Set enableFullLogging to true in case of problems and then please send the log text with the description of the problem to AB4D company
-            LogHelper.SetupSharpEngineLogger(enableFullLogging: false);
-
             InitializeComponent();
-
 
             // This sample shows how to create SharpEngineSceneView in XAML.
             // To see how do create SharpEngineSceneView in code, see the SharpEngineSceneViewInCode sample.
@@ -55,6 +50,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 #if DEBUG
             // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message
@@ -82,12 +81,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
 
             CreateTestScene();
-            SetupMouseCameraController();
-
+            SetupPointerCameraController();
+            
             this.Unloaded += (sender, args) => MainSceneView.Dispose();
         }
 
-        private void SetupMouseCameraController()
+        private void SetupPointerCameraController()
         {
             _targetPositionCamera = new TargetPositionCamera()
             {
@@ -102,13 +101,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             MainSceneView.SceneView.Camera = _targetPositionCamera;
 
 
-            _mouseCameraController = new MouseCameraController(MainSceneView)
+            _pointerCameraController = new PointerCameraController(MainSceneView)
             {
-                RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed,                                                   // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.ControlKey,             // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.MousePosition,
-                RotateAroundMousePosition = true
+                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
+                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
+                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                ZoomMode = CameraZoomMode.PointerPosition,
+                RotateAroundPointerPosition = true
             };
         }
 
@@ -139,6 +138,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                     PositionType = PositionTypes.Bottom,
                     Size = new Vector3(30, 20, 50),
                     Material = new StandardMaterial(new Color3(1f, i * 0.0625f + 0.5f, i * 0.125f)), // orange to white
+                    UseSharedBoxMesh = false
                 };
 
                 _groupNode.Add(boxModelNode);

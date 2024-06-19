@@ -47,7 +47,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
     /// To change <strong>text color</strong> (set Run.Foreground property) insert "\#RRGGBB" where RRGGBB is color is hex value. To reset the Foreground property to null, use "\#_".
     /// </para>
     /// <para>
-    /// To add <strong>hyperlink</strong> insert "\@" that is followed by anchor text, then add ':' character and then url address. Complete with '|' character into the text - for example: "click here \@Ab3d.PowerToys:https://www.ab4d.com/PowerToys.aspx| to learn more"
+    /// To add <strong>hyperlink</strong> insert "\@" that is followed by anchor text, then add ':' character and then url address. Complete with '|' character into the text - for example: "click here \@Ab4d.SharpEngine:https://www.ab4d.com/SharpEngine.aspx| to learn more"
     /// </para>
     /// </remarks>
     [ContentProperty("ContentText")]

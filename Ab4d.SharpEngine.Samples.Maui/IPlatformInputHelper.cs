@@ -4,9 +4,9 @@ namespace Ab4d.SharpEngine.Samples.Maui;
 
 public interface IPlatformInputHelper
 {
-    bool IsCurrentMouseButtonAvailable { get; }
+    bool IsCurrentPointerButtonAvailable { get; }
     bool IsCurrentKeyboardModifierAvailable { get; }
 
-    MouseButtons GetCurrentMouseButtons();
+    PointerButtons GetCurrentPointerButtons();
     KeyboardModifiers GetCurrentKeyboardModifiers();
 }

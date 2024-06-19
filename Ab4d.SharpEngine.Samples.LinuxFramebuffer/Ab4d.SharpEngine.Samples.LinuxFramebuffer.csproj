@@ -5,16 +5,16 @@
         <RootNamespace>Ab4d.SharpEngine.Samples.LinuxFramebuffer</RootNamespace>    
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
-        <Version>1.0.8740</Version>
+        <Version>2.0.8936-rc1</Version>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
-      <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+      <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     </ItemGroup>
 
