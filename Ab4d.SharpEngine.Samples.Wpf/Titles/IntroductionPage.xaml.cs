@@ -30,7 +30,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
             InitializeComponent();
 
             // When Control key is pressed or when SkipInitializingSharpEngine is true,
-            // then no Ab3d.SharpEngine objects are created - only WPF objects are created.
+            // then no Ab4d.SharpEngine objects are created - only WPF objects are created.
             if (SkipInitializingSharpEngine || Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
                 MainSceneView.PresentationType = PresentationTypes.None;

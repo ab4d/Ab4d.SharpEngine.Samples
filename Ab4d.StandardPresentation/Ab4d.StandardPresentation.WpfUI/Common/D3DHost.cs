@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.StandardPresentation.WpfUI.Common
@@ -12,9 +13,9 @@ namespace Ab4d.StandardPresentation.WpfUI.Common
     // http://blogs.msdn.com/b/dwayneneed/archive/2013/02/26/mitigating-airspace-issues-in-wpf-applications.aspx
 
     /// <summary>
-    /// D3DHost is a control that is used to show the 3D scene with when the <see cref="Ab4d.SharpEngine.Common.PresentationTypes.DirectXOverlay"/> is used for the <see cref="Ab3d.DirectX.Controls.DXView.PresentationType"/> property.
+    /// D3DHost is a control that is used to show the 3D scene with when the <see cref="PresentationTypes.OverlayTexture"/> is used for the PresentationType property.
     /// The control is derived from System.Windows.Interop.HwndHost and provides a windows handle based area that can be used to display the 3D scene with using the DirectX SwapChain.
-    /// The area occupied with D3DHost cannot be used by any other WPF element (this is possible when using <see cref="Ab3d.DirectX.Controls.DXImage"/> control.
+    /// The area occupied with D3DHost cannot be used by any other WPF element.
     /// </summary>
     internal class D3DHost : HwndHost
     {
