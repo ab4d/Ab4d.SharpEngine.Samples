@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -77,6 +78,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             if (Ab4d.SharpEngine.Utilities.Log.MinUsedLogLevel != LogLevels.Trace)
                 ActionsRootMenuItem.Items.Remove(FullLoggingCheckBox);
 
+            if (!_commonDiagnostics.IsGltfExporterAvailable)
+            {
+                ExportToGltfMenuItem.IsEnabled = false;
+                ExportToGltfMenuItem.ToolTip = "Add reference to the Ab4d.SharpEngine.glTF to enabled export to glTF";
+                ToolTipService.SetShowOnDisabled(ExportToGltfMenuItem, true);
+            }
 
             string dumpFolder;
             if (System.IO.Directory.Exists(@"C:\temp"))
@@ -281,6 +288,39 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());
         }
         
+        private async void ExportToGltfMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (!_commonDiagnostics.IsGltfExporterAvailable || SharpEngineSceneView == null)
+                return;
+
+
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.AddExtension = false;
+            saveFileDialog.CheckFileExists = false;
+            saveFileDialog.CheckPathExists = true;
+            saveFileDialog.OverwritePrompt = false;
+            saveFileDialog.ValidateNames = false;
+
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            saveFileDialog.FileName = "SharpEngineScene.gltf";
+            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.Filter = "glTF file with embedded data and images (.gltf)|*.gltf|glTF binary file with embedded data and images (.glb)|*.glb";
+            saveFileDialog.Title = "Export Scene to glTF File";
+
+            if (saveFileDialog.ShowDialog() ?? false)
+            {
+                try
+                {
+                    _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, saveFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving gltf file:\r\n" + ex.Message);
+                }
+            }
+        }
+
         private void ShowFullSceneDumpMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (SharpEngineSceneView == null)
