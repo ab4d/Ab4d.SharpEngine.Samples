@@ -8,7 +8,7 @@ using AndroidApp1;
 
 namespace AndroidApp1;
 
-public class AndroidCameraController : ManualMouseCameraController
+public class AndroidCameraController : ManualPointerCameraController
 {
     private Activity _activity;
     private CustomScaleListener _myScaleListener;
@@ -23,14 +23,14 @@ public class AndroidCameraController : ManualMouseCameraController
         _uiThread = System.Threading.Thread.CurrentThread;
         
         // Set default rotate (single touch) and move (two finger touch) events:
-        RotateCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed;
-        MoveCameraConditions = MouseAndKeyboardConditions.LeftMouseButtonPressed | MouseAndKeyboardConditions.RightMouseButtonPressed;
+        RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed;
+        MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
 
         // See: https://developer.android.com/training/gestures/scale#java
         _myScaleListener = new CustomScaleListener();
         _scaleGestureDetector = new ScaleGestureDetector(androidContext, _myScaleListener);
 
-        _myScaleListener.SetMouseCameraController(this);
+        _myScaleListener.SetPointerCameraController(this);
     }
 
     public bool ProcessTouchEvent(MotionEvent? e)
@@ -69,21 +69,21 @@ public class AndroidCameraController : ManualMouseCameraController
         float xPos = e.GetX();
         float yPos = e.GetY();
 
-        MouseButtons simulatedMouseButtons;
+        PointerButtons simulatedPointerButtons;
 
         if (e.PointerCount == 1)
-            simulatedMouseButtons = MouseButtons.Left;
+            simulatedPointerButtons = PointerButtons.Left;
         else if (e.PointerCount == 2)
-            simulatedMouseButtons = MouseButtons.Left | MouseButtons.Right;
+            simulatedPointerButtons = PointerButtons.Left | PointerButtons.Right;
         else
-            simulatedMouseButtons = MouseButtons.None;
+            simulatedPointerButtons = PointerButtons.None;
 
         if (e.Action == MotionEventActions.Down ||
             e.Action == MotionEventActions.Pointer1Down ||
             e.Action == MotionEventActions.Pointer2Down)
         {
             // Start rotate
-            isHandled = base.ProcessMouseDown(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+            isHandled = base.ProcessPointerPressed(new Vector2(xPos, yPos), simulatedPointerButtons, KeyboardModifiers.None);
         }
         else if (e.Action == MotionEventActions.Up ||
                  e.Action == MotionEventActions.Pointer1Up ||
@@ -95,24 +95,24 @@ public class AndroidCameraController : ManualMouseCameraController
             if (e.PointerCount == 2)
             {
                 if (e.Action == MotionEventActions.Pointer1Up)
-                    simulatedMouseButtons = MouseButtons.Right; // 1st is up so only right remains
+                    simulatedPointerButtons = PointerButtons.Right; // 1st is up so only right remains
                 else if (e.Action == MotionEventActions.Pointer1Up)
-                    simulatedMouseButtons = MouseButtons.Left;  // 2nd is up so only left remains
+                    simulatedPointerButtons = PointerButtons.Left;  // 2nd is up so only left remains
                 else
-                    simulatedMouseButtons = MouseButtons.None;
+                    simulatedPointerButtons = PointerButtons.None;
             }
             else
             {
-                simulatedMouseButtons = MouseButtons.None;
+                simulatedPointerButtons = PointerButtons.None;
             }
 
-            isHandled = base.ProcessMouseUp(simulatedMouseButtons, KeyboardModifiers.None);
+            isHandled = base.ProcessPointerReleased(simulatedPointerButtons, KeyboardModifiers.None);
         }
         else if (e.Action == MotionEventActions.Move)
         {
             // Rotate / move
 
-            isHandled = base.ProcessMouseMove(new Vector2(xPos, yPos), simulatedMouseButtons, KeyboardModifiers.None);
+            isHandled = base.ProcessPointerMoved(new Vector2(xPos, yPos), simulatedPointerButtons, KeyboardModifiers.None);
         }
         else
         {
