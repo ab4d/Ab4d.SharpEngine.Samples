@@ -1,6 +1,8 @@
 ﻿# 3D model importers
 
-Ab3d.SharpEngine includes a **ReaderObj** that can be used to import 3D models from obj files. Obj file is a very common and simple text based file format that usually comes with a separate mtl file that defines materials. Note that the obj file cannot store object hierarchies.
+Ab4d.SharpEngine includes a **ReaderObj** that can be used to import 3D models from obj files. Obj file is a very common and simple text based file format that usually comes with a separate mtl file that defines materials. Note that the obj file cannot store object hierarchies.
+
+The **Ab4d.SharpEngine.glTF library** (available as a separate NuGet package) can read 3D objects from glTF files. glTF is a standard file format for three-dimensional scenes and models and is defined by the KhronosGroup. The file format uses one of two possible file extensions: .gltf or .glb. Both .gltf and .glb files may reference external binary and texture resources. Alternatively, both formats may be self-contained by directly embedding binary data buffers. The Ab4d.SharpEngine.glTF library provides a **glTFImporter** and **glTFExporter** classes that can import or export existing 3D scene. It is also possible to export any 3D scene from the Diagnostics window by clicking on **"Export Scene to glTF"**.
 
 To read 3D models from many other file formats, use the **Assimp importer**. Assimp (Open Asset Import Library) is an open source library that can read many file formats with 3D objects. It is compiled into a native library. Therefore the Ab4d.SharpEngine.Assimp library is required to use Assimp importer.
 
