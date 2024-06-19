@@ -11,7 +11,7 @@ namespace Ab4d.SharpEngine.Samples.Maui;
 
 public class PlatformInputHelper : IPlatformInputHelper
 {
-    public bool IsCurrentMouseButtonAvailable => true;
+    public bool IsCurrentPointerButtonAvailable => true;
     public bool IsCurrentKeyboardModifierAvailable => true;
 
     public PlatformInputHelper()
@@ -20,30 +20,30 @@ public class PlatformInputHelper : IPlatformInputHelper
             throw new InvalidOperationException("PlatformInputHelper for Windows can be only used on Windows OS");
     }
 
-    public MouseButtons GetCurrentMouseButtons()
+    public PointerButtons GetCurrentPointerButtons()
     {
-        var mouseButtons = MouseButtons.None;
+        var pointerButtons = PointerButtons.None;
 
         // GetKeyState usage: https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeystate
 
         //System.Diagnostics.Debug.WriteLine($"VK_LBUTTON: {GetKeyState(VirtualKeyStates.VK_LBUTTON):X}; VK_RBUTTON: {GetKeyState(VirtualKeyStates.VK_RBUTTON):X}; VK_CONTROL: {GetKeyState(VirtualKeyStates.VK_CONTROL):X}");
 
         if (GetKeyState(VirtualKeyStates.VK_LBUTTON) >= 128)
-            mouseButtons |= MouseButtons.Left;
+            pointerButtons |= PointerButtons.Left;
         
         if (GetKeyState(VirtualKeyStates.VK_MBUTTON) >= 128)
-            mouseButtons |= MouseButtons.Middle;
+            pointerButtons |= PointerButtons.Middle;
         
         if (GetKeyState(VirtualKeyStates.VK_RBUTTON) >= 128)
-            mouseButtons |= MouseButtons.Right;
+            pointerButtons |= PointerButtons.Right;
         
         if (GetKeyState(VirtualKeyStates.VK_XBUTTON1) >= 128)
-            mouseButtons |= MouseButtons.XButton1;
+            pointerButtons |= PointerButtons.XButton1;
         
         if (GetKeyState(VirtualKeyStates.VK_XBUTTON2) >= 128)
-            mouseButtons |= MouseButtons.XButton2;
+            pointerButtons |= PointerButtons.XButton2;
 
-        return mouseButtons;
+        return pointerButtons;
     }
 
     public KeyboardModifiers GetCurrentKeyboardModifiers()
