@@ -61,7 +61,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 public class CustomFogEffectSample : CommonSample
 {
     public override string Title => "Custom fog effect ";
-    public override string Subtitle => "This sample shows how to create a custom effect with custom vertex and fragment shaders.";
+    public override string Subtitle => "This sample shows how to create a custom effect with custom vertex and fragment shaders.\nFogEffect and FogMaterial source code is in the Advanced folder. Shaders source code is in the Resources/Shaders folder.";
     
     
     private float _fogStart = 260;
