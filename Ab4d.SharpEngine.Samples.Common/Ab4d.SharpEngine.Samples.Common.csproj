@@ -4,18 +4,22 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>  
     <TargetFramework>net6.0</TargetFramework>
-    <Version>1.0.8740</Version>
+    <Version>2.0.8936-rc1</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks> <!--This is required for FogEffect -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="1.0.8740" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="1.1.8776" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8936-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.0.8936-rc1" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Shaders\spv\FogShader.frag.spv" />
+    <None Remove="Resources\Shaders\spv\FogShader.vert.spv" />
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
     <None Remove="StandardModels\OtherStandardModelsTitle.md" />
     <None Remove="Titles\AdvancedModelsTitle.md" />
@@ -28,6 +32,7 @@
     <None Remove="Titles\LinesTitle.md" />
     <None Remove="Titles\MaterialsTitle.md" />
     <None Remove="Titles\MouseCameraControllerTitle.md" />
+    <None Remove="Titles\PointerCameraControllerTitle.md" />
     <None Remove="Titles\StandardModelsTitle.md" />
   </ItemGroup>
 
@@ -38,16 +43,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Shaders\spv\FogShader.frag.spv" />
+    <EmbeddedResource Include="Resources\Shaders\spv\FogShader.vert.spv" />
     <EmbeddedResource Include="Titles\AdvancedTitle.md" />   
     <EmbeddedResource Include="Titles\AnimationsTitle.md" />
     <EmbeddedResource Include="Titles\LightsTitle.md" />
     <EmbeddedResource Include="Titles\MaterialsTitle.md" />
-    <EmbeddedResource Include="Titles\MouseCameraControllerTitle.md" />
     <EmbeddedResource Include="Titles\LinesTitle.md" />
     <EmbeddedResource Include="Titles\ImportersTitle.md" />
     <EmbeddedResource Include="Titles\CamerasTitle.md" />
     <EmbeddedResource Include="Titles\AdvancedModelsTitle.md" />
     <EmbeddedResource Include="Titles\HitTesting.md" />
+    <EmbeddedResource Include="Titles\PointerCameraControllerTitle.md" />
     <EmbeddedResource Include="Titles\StandardModelsTitle.md" />
   </ItemGroup>
 

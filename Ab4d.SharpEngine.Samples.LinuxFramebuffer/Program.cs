@@ -275,7 +275,7 @@ class Program
         var engineCreateOptions = new EngineCreateOptions(
             applicationName: "LinuxFramebufferDemo",
             enableStandardValidation: false);
-        var vulkanInstance = new VulkanInstance(engineCreateOptions);
+        var vulkanInstance = VulkanInstance.Create(engineCreateOptions);
         _logger?.LogInformation("Vulkan instance created. API version: {version}", vulkanInstance.ApiVersion);
 
         /* Select Vulkan device */
@@ -298,11 +298,11 @@ class Program
 
         _logger?.LogInformation("Selected device #{index}: {name}", _vulkanDeviceIndex, vulkanInstance.AllPhysicalDeviceDetails[_vulkanDeviceIndex].DeviceName);
 
-        _vulkanDevice = new VulkanDevice(
+        _vulkanDevice = VulkanDevice.Create(
             vulkanInstance,
             vulkanInstance.AllPhysicalDeviceDetails[_vulkanDeviceIndex],
-            SurfaceKHR.Null,
-            vulkanInstance.CreateOptions);
+            vulkanInstance.CreateOptions,
+            SurfaceKHR.Null);
     }
 
     private void SetupTestSceneAndView()
