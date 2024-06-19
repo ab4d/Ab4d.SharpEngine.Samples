@@ -288,7 +288,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             ShowInfoText(_commonDiagnostics.GetSystemInfoDumpString());
         }
         
-        private async void ExportToGltfMenuItem_OnClick(object sender, RoutedEventArgs e)
+        private void ExportToGltfMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             if (!_commonDiagnostics.IsGltfExporterAvailable || SharpEngineSceneView == null)
                 return;
