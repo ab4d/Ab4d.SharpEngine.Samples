@@ -17,6 +17,7 @@ The following features are supported by the current version:
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - ReaderObj to read 3D models from obj files
+- Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
 
 
