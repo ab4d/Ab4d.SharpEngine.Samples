@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Samples>
+
+  <Sample Location="Titles.IntroductionUserControl" IsTitle="True" Title="Ab4d.SharpEngine Introduction"/>
+  <Sample IsSeparator="True" />
+
+  <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
+  <Sample Location="QuickStart.SharpEngineSceneViewControl" Title="SharpEngineSceneView Control" />
+
+  <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
+  <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
+  <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
+  <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
+  <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+  <Sample Location="Cameras.WinFormsPoint3DTo2DSample" Title="Point3DTo2D"/>
+  <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
+  <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
+
+  <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
+  <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
+  <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
+  <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
+  
+  <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
+  <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
+  <Sample Location="HitTesting.WinFormsManualInputEventsSample" Title="Manual Input events"/>
+  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
+  <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
+  <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+
+  <!-- HitTestingWithIdBitmapSample sample does not work because it flickers when ID bitmap is rendered.
+       This will be fixed in v2.1 -->
+  <!--  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/> -->
+  
+  <Sample IsSeparator="True" />
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
+
+  <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
+  <Sample Location="Lights.LightsSample" Title="Lights"/>
+
+  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
+  <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
+  <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
+
+  <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
+  <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
+  <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
+  <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
+  <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
+  <Sample Location="StandardModels.ConeModelNodeSample" Title="ConeModelNode"/>
+  <Sample Location="StandardModels.PyramidModelNodeSample" Title="PyramidModelNode"/>
+  <Sample Location="StandardModels.TrapezoidModelNodeSample" Title="TrapezoidModelNode"/>
+  <Sample Location="StandardModels.ArrowModelNodeSample" Title="ArrowModelNode"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="StandardModels.TransformationsSample" Title="Transformations"/>
+  <Sample Location="StandardModels.PositionAndScaleSample" Title="Position and scale"/>
+  
+  <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
+  <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
+  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
+  <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
+  <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
+  <Sample Location="AdvancedModels.StreamlinesSample" Title="Streamlines"/>
+  <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
+  <Sample Location="AdvancedModels.ExtrudedMeshSample" Title="Extruded mesh"/>
+  <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
+  <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.BitmapTextSample" Title="Bitmap text"/>
+  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
+
+  <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
+  <Sample Location="Importers.ReaderObjSample" Title="ReaderObj"/>
+  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter"/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
+
+  <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
+  <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
+  <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
+  <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
+  <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
+  <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
+  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
+  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+  <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
+  
+  <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
+  <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
+  <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
+  <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
+  <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
+  <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
+  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
+  <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
+
+  <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
+  <Sample Location="Advanced.MultiSceneNodesSample" Title="Multi SceneNodes" />
+  <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
+  <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
+  <Sample Location="Titles.RenderFormSample.md" Title="RenderFormSample"/>
+</Samples>
