@@ -66,7 +66,7 @@ namespace Ab4d.SharpEngine.PrivateSamples.WinForms
 
             // Get window icon from SamplesForm
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SamplesForm));
-            _renderForm.Icon = (Icon)resources.GetObject("$this.Icon");
+            _renderForm.Icon = (Icon?)resources.GetObject("$this.Icon");
 
 
             _renderForm.GpuDeviceCreationFailed += (sender, args) =>

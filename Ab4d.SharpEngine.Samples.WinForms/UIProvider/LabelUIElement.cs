@@ -79,7 +79,7 @@ public class LabelUIElement : WinFormsUIElement
     {
         _styleString = style;
 
-        Font font;
+        Font? font;
         if (style.Contains("italic"))
         {
             font = winFormsUIProvider.ItalicFont;
