@@ -300,7 +300,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             {
                 _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
             }
-            catch (Exception ex)
+            catch
             {
                 // pass
             }
