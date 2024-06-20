@@ -26,9 +26,9 @@ The following features are supported by the current version:
   - WPF full composition support with SharpEngineSceneView control (Ab4d.SharpEngine.Wpf library)
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - WinUI 3 support with SharpEngineSceneView control (Ab4d.SharpEngine.WinUI library)
+  - WinForms support with SharpEngineSceneView control (Ab4d.SharpEngine.WinForms library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Linux)
   - MAUI
-  - WinForms support
   
 **Linux** (including Raspberry PI 4):
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
@@ -58,6 +58,7 @@ Online help:
 - The core Ab4d.SharpEngine library has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.Wpf has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.WinUI has NO EXTERNAL dependencies.
+- The Ab4d.SharpEngine.WinForms has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.AvaloniaUI library requires Avalonia library.
 
 
@@ -104,6 +105,12 @@ The following Visual Studio solutions are available:
   The SharpEngineSceneView provides an WinUI control that is very easy to be used and can 
   compose the 3D scene with the WinUI UI objects (for example showing buttons on top of 3D scene).
 
+- **Ab4d.SharpEngine.Samples.WinForms**
+  This solution provides the samples for WinForms and can run only on Windows.
+  The samples also use Ab4d.SharpEngine.WinForms library that provides SharpEngineSceneView Control for WinForms.
+  The SharpEngineSceneView provides a WinForms Control that is very easy to be used and can 
+  compose the 3D scene with other UI Controls (for example showing buttons on top of 3D scene).
+  
 - **Ab4d.SharpEngine.Samples.CrossPlatform**
   This sample uses third-party Silk.Net library that provides support for SDL and GLFW.
   SDL and GLFW are used to get platform-independent way to create windows and views.
@@ -140,7 +147,7 @@ The main two objects in SharpEngine are:
   It also defines the Lights collection.
 - SceneView object is used to show the objects that are defined by the Scene object. SceneView also defines the Camera and provides the size of the view.
 
-When using WPF, Avalonia or WinUI, then Scene and SceneView are created by the SharpEngineSceneView control.
+When using WPF, Avalonia, WinUI or WinForms, then Scene and SceneView are created by the SharpEngineSceneView control.
 
 3D objects are defined in the SceneNodes namespace, for example BoxModelNode, SphereModelNode, LineNode, MeshModelNode, etc.
 
@@ -156,7 +163,7 @@ To read 3D models from other file formats, use AssimpImporter.
 
 Ab4d.SharpEngine is built on the same concepts as the Ab3d.PowerToys and Ab3d.DXEngine libraries. So users of those two libraries should feel very familiar. But there are some main differences:
 
-For WPF, WinUI and Avalonia there is a special library ([Ab4d.SharpEngine.Wpf](https://www.nuget.org/packages/Ab4d.SharpEngine.Wpf), [Ab4d.SharpEngine.WinUI](https://www.nuget.org/packages/Ab4d.SharpEngine.WinUI), [Ab4d.SharpEngine.AvaloniaUI](https://www.nuget.org/packages/Ab4d.SharpEngine.AvaloniaUI)) that defines the `SharpEngineSceneView` class. This class hides the differences between those platforms under the hood and provides the same API for all platforms. The class also initializes the engine by creating the `VulkanDevice`. The main two properties that  `SharpEngineSceneView` provides are `Scene` and `SceneView`. The `Scene` is used to define the scene by adding the SceneNodes to the `Scene.RootNode` (similar as Viewport3D.Children in WPF) and adding lights to `Scene.Lights` collection. The `SceneView` defines the view of the scene and provides a camera that is set to the `SceneView.Camera` property. When working with `SharpEngineSceneView`, then **100% of the code** to show 3D graphics **can be the same for  WPF, WinUI and Avalonia**. Other platforms and UI frameworks require some special setup code that is different for each platform. But from there on, the code is the same regardless of the platform. See samples for more info.
+For WPF, Avalonia, WinUI and WinForms there is a special library ([Ab4d.SharpEngine.Wpf](https://www.nuget.org/packages/Ab4d.SharpEngine.Wpf), [Ab4d.SharpEngine.AvaloniaUI](https://www.nuget.org/packages/Ab4d.SharpEngine.AvaloniaUI), [Ab4d.SharpEngine.WinUI](https://www.nuget.org/packages/Ab4d.SharpEngine.WinUI), [Ab4d.SharpEngine.WinForms](https://www.nuget.org/packages/Ab4d.SharpEngine.WinForms)) that defines the `SharpEngineSceneView` class. This class hides the differences between those platforms under the hood and provides the same API for all platforms. The class also initializes the engine by creating the `VulkanDevice`. The main two properties that  `SharpEngineSceneView` provides are `Scene` and `SceneView`. The `Scene` is used to define the scene by adding the SceneNodes to the `Scene.RootNode` (similar as Viewport3D.Children in WPF) and adding lights to `Scene.Lights` collection. The `SceneView` defines the view of the scene and provides a camera that is set to the `SceneView.Camera` property. When working with `SharpEngineSceneView`, then **100% of the code** to show 3D graphics **can be the same for WPF, Avalonia, WinUI and WinForms**. Other platforms and UI frameworks require some special setup code that is different for each platform. But from there on, the code is the same regardless of the platform. See samples for more info.
 
 Some other differences:
 
