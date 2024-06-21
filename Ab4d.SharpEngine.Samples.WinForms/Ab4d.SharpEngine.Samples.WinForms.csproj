@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.WinForms</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.WinForms</RootNamespace>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>

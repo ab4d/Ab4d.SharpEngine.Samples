@@ -9,7 +9,7 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.PrivateSamples.WinForms.Properties;
+using Ab4d.SharpEngine.Samples.WinForms.Properties;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
@@ -17,7 +17,7 @@ using Ab4d.SharpEngine.WinForms;
 
 // This Forms shows how to use Ab4d.SharpEngine to render to the whole Form (Window) at the maximum speed (as many frames per second as possible).
 
-namespace Ab4d.SharpEngine.PrivateSamples.WinForms
+namespace Ab4d.SharpEngine.Samples.WinForms
 {
     public class RenderFormSample : IDisposable
     {

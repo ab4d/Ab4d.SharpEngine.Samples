@@ -16,7 +16,7 @@ using Ab4d.SharpEngine.Samples.WinForms.Common;
 using Ab4d.SharpEngine.WinForms;
 using Microsoft.Web.WebView2.WinForms;
 
-namespace Ab4d.SharpEngine.PrivateSamples.WinForms
+namespace Ab4d.SharpEngine.Samples.WinForms
 {
     public partial class SamplesForm : Form
     {

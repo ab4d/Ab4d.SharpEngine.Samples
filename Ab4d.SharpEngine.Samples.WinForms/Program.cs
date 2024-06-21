@@ -1,4 +1,4 @@
-namespace Ab4d.SharpEngine.PrivateSamples.WinForms
+namespace Ab4d.SharpEngine.Samples.WinForms
 {
     internal static class Program
     {
