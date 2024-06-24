@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Android.Generic</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Android.Generic</RootNamespace>  
     <TargetFramework>net8.0-android</TargetFramework>
-    <Version>2.0.8936-rc1</Version>
+    <Version>2.0.8941-rc2</Version>
     <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion>  <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features does not work so it is recommended to use Vulkan 1.1 -->
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8941-rc2" />
     <PackageReference Include="Silk.NET.Input.Sdl" Version="2.21.0" />
     <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.21.0" />
     <PackageReference Include="SkiaSharp" Version="3.0.0-preview.3.1" />

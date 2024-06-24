@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8936-rc1" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="2.0.8936-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8941-rc2" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="2.0.8941-rc2" />
     <PackageReference Include="Avalonia" Version="11.0.11" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.11" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.11" />
