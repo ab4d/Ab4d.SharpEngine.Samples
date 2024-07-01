@@ -4,6 +4,7 @@ using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
 
@@ -21,6 +22,8 @@ public class ModelMoverSample : CommonSample
     private readonly StandardMaterial _invalidPositionMaterial;
 
     private float _modelMoverRotationAngle;
+
+    private StandardTransform? _modelMoverCustomTransform;
 
     private SphereModelNode? _movingSphere;
     private Vector3 _startCenterPosition;
@@ -110,7 +113,7 @@ public class ModelMoverSample : CommonSample
         // Note that ModelMover is not a SceneNode and cannot be added to the RootNote.
         // Instead, the models that are added to the scene are defined in _modelMover.ModelMoverGroupNode (see below).
         _modelMover = new ModelMover(inputEventsManager);
-
+        
         // To customize the look of the ModelRotator use the following constructor (here the default values are used):
         //_modelMover = new ModelMover(inputEventsManager,
         //                             xAxisVector: new Vector3(1, 0, 0),
@@ -122,6 +125,12 @@ public class ModelMoverSample : CommonSample
 
         // To show ModelMover on top of other objects, se the CustomRenderingLayer to OverlayRenderingLayer.
         _modelMover.CustomRenderingLayer = Scene.OverlayRenderingLayer;
+
+        // By default, the IsAutomaticallyMoved property is set to true.
+        // It automatically updates the Position of the ModelMover when it is moved.
+        // If we want to have a custom transformation for the ModelMover, then set that to false
+        // (see handling of the "Use custom transform" button click at the end of this file).
+        //_modelMover.IsAutomaticallyMoved = true;
 
         // Handle ModelMoveStarted and ModelMoved
         _modelMover.ModelMoveStarted += (sender, args) =>
@@ -167,6 +176,11 @@ public class ModelMoverSample : CommonSample
 
             _movingSphere.Material = _selectedMaterial;
             _movingSphere.CenterPosition = newPosition;
+
+            // If we are using custom transformation, update its translation
+            if (_modelMoverCustomTransform != null)
+                _modelMoverCustomTransform.SetTranslate(newPosition);
+            // else - we do not need to do anything because by default the IsAutomaticallyMoved is set to true
 
 
             if (_planarShadowMeshCreator != null && _shadowModel != null)
@@ -218,7 +232,12 @@ public class ModelMoverSample : CommonSample
 
         _movingSphere = newMovingSphere;
 
-        _modelMover.Position = newMovingSphere.GetCenterPosition();
+        // If we are using custom transformation, update its translation
+        if (_modelMoverCustomTransform != null)
+            _modelMoverCustomTransform.SetTranslate(newMovingSphere.GetCenterPosition());
+        else
+            _modelMover.Position = newMovingSphere.GetCenterPosition();
+
         _modelMover.IsEnabled = true;
     }
     
@@ -288,7 +307,33 @@ public class ModelMoverSample : CommonSample
         ui.CreateButton("Rotate ModelMover", () =>
         {
             _modelMoverRotationAngle += 30;
-            _modelMover.SetRotation(0, _modelMoverRotationAngle, 0); // Rotate ModelMover around Y (up) axis
+
+            // To rotate the ModelMover, we need to call SetRotation (this is required to provide correct directions of the arrows for pointer dragging)
+            // Here we rotate ModelMover around Y (up) axis
+            _modelMover.SetRotation(0, _modelMoverRotationAngle, 0);
+
+            // When we use a custom transform, we also need to set rotation there
+            if (_modelMoverCustomTransform != null)
+                _modelMoverCustomTransform.RotateY = _modelMoverRotationAngle;
+        });
+        
+        ui.CreateButton("Use custom transform", () =>
+        {
+            if (_modelMoverCustomTransform != null)
+                return; // Custom transform is already used
+
+            // Use StandardTransform as a custom transformation in this sample
+            _modelMoverCustomTransform = new StandardTransform();
+            _modelMoverCustomTransform.SetTranslate(_modelMover.Position);
+            _modelMoverCustomTransform.SetScale(1.5f); // set uniform scale to 1.5
+            _modelMoverCustomTransform.RotateY = _modelMoverRotationAngle;
+
+            // Prevent automatic moving of ModelMover and ...
+            _modelMover.IsAutomaticallyMoved = false;
+
+            // ... and set our custom transform on the ModelGroup that shows ModelRotator.
+            // This replaces an internal transformation that is used by default for ModelMoverGroupNode.Transform.
+            _modelMover.ModelMoverGroupNode.Transform = _modelMoverCustomTransform;
         });
     }
 }
