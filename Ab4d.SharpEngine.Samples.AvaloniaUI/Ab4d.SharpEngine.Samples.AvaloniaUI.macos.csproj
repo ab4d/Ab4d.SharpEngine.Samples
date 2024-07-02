@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaXaml Include="CameraControllers\MouseCameraControllerSample.xaml">
+    <AvaloniaXaml Include="CameraControllers\PointerCameraControllerSample.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="Common\MessageBox.xaml">
@@ -74,7 +74,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
+    <None Remove="CameraControllers\PointerCameraControllerSample.xaml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
     <None Remove="Diagnostics\LogMessagesWindow.xaml" />
     <None Remove="Samples.xml" />
