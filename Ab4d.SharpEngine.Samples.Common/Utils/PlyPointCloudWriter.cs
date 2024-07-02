@@ -6,7 +6,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils
 {
     public static class PlyPointCloudWriter
     {
-        public static void ExportPointCloud(string fileName, Vector3[] positions, Color4[] positionColors, bool isBinaryFileFormat)
+        public static void ExportPointCloud(string fileName, Vector3[]? positions, Color4[]? positionColors, bool isBinaryFileFormat)
         {
             if (positions == null || positions.Length == 0) 
                 return;
@@ -50,7 +50,9 @@ end_header
 
                             if (hasColors)
                             {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                                 var oneColor = positionColors[i];
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
                                 int red = (int)(oneColor.Red * 255);
                                 int green = (int)(oneColor.Green * 255);
                                 int blue = (int)(oneColor.Blue * 255);
@@ -77,7 +79,10 @@ end_header
 
                             if (hasColors)
                             {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                                 var oneColor = positionColors[i];
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
                                 int red = (int)(oneColor.Red * 255);
                                 int green = (int)(oneColor.Green * 255);
                                 int blue = (int)(oneColor.Blue * 255);

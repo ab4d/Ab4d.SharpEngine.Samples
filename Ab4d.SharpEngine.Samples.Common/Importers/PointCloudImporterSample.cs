@@ -146,7 +146,7 @@ public class PointCloudImporterSample : CommonSample
     // It can also read position colors that are written after z value: color is written as red, green and blue separated by tab ('\t').
     // Note that the code below is from the performance and memory usage not optimal because it uses File.ReadAllLines.
     // This requires reading the whole file and storing it into memory. It would be better to use stream reader and read line by line.
-    private Vector3[] LoadXyzFile(string fileName, out Color4[] positionColors)
+    private Vector3[] LoadXyzFile(string fileName, out Color4[]? positionColors)
     {
         var fileLines = System.IO.File.ReadAllLines(fileName);
 
