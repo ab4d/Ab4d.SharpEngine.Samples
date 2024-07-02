@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaXaml Include="Advanced\AvaloniaMultiTouchSample.xaml" />
     <AvaloniaXaml Include="CameraControllers\PointerCameraControllerSample.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
