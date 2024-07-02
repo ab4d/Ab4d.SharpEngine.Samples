@@ -12,6 +12,8 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class PixelsRenderingSample : CommonSample
 {
     public override string Title => "Rendering 3D positions as pixels";
+    
+    public override string Subtitle => "See also 'Importers / Point-cloud importer' sample";
 
     private float _pixelSize = 2;
 
