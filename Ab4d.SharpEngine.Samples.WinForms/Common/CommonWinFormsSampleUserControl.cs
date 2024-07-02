@@ -160,9 +160,9 @@ public class CommonWinFormsSampleUserControl : UserControl
 
         if (_currentCommonSample == null)
             return;
-        
-        _currentCommonSample.InitializeScene(MainSceneView.Scene);
-        _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
+
+        _currentCommonSample.InitializeSharpEngineView(MainSceneView);
+
         _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
         // Prevent updating the control while recreating sample controls
