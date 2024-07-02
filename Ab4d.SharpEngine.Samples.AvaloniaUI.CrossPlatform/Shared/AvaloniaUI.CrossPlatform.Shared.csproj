@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Shared</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Shared</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>

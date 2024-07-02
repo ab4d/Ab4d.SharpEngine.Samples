@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android</RootNamespace>  
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-android</TargetFramework>
     <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
@@ -23,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.csproj" />
+    <ProjectReference Include="..\Shared\AvaloniaUI.CrossPlatform.Shared.csproj" />
   </ItemGroup>
 </Project>

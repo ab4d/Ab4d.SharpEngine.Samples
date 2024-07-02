@@ -99,6 +99,7 @@ The following Visual Studio solutions are available:
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
   Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
   See also "Building for macOS and iOS" section for more information on how to compile for isOS.
+  Note that folder and file names in this solution have been shortened to prevent problems with max path size on Windows (260 chars).
   
 - **Ab4d.SharpEngine.Samples.WinUI**
   This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
@@ -234,11 +235,14 @@ The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
 
 ## Troubleshooting
 
+If you get build errors on Windows (for example 'project.assets.json' not found) than maybe the total path length is larger than max path (260 chars). Move the samples solution to a folder with a shorter path and try compiling again.
+
+
 Known issues:
+
 - Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
 
 - When using SharedTexture in a WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error. Set SharpEngineSceneView.PresentationType to WriteableBitmap as a workaround.
-
 
 
 To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/

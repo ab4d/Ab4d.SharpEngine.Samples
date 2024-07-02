@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</RootNamespace>  
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-ios</TargetFramework>
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
@@ -15,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.csproj" />
+    <ProjectReference Include="..\Shared\AvaloniaUI.CrossPlatform.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
