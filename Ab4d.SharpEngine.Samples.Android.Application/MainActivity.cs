@@ -132,6 +132,9 @@ namespace AndroidApp1
         // This happens on app startup or when the app was resumed from background
         private void OnSurfaceCreated(IntPtr windowPtr)
         {
+            // Create VulkanSurface provider that will create the surface pointer when the VulkanInstance will be available
+            var vulkanSurface = new AndroidVulkanSurfaceProvider(windowPtr);
+
             // If app was resumed from background, then the Vulkan device and Scene were preserved
             if (_vulkanDevice == null)
             {
@@ -157,7 +160,7 @@ namespace AndroidApp1
                 // It is also possible not to specify surface when creating VulkanDevice and do that only when creating SceneView.
                 try
                 {
-                    _vulkanDevice = VulkanDevice.Create(engineCreateOptions);
+                    _vulkanDevice = VulkanDevice.Create(vulkanSurface, engineCreateOptions);
                 }
                 catch (SharpEngineException ex)
                 {
@@ -193,8 +196,6 @@ namespace AndroidApp1
             }
 
 
-            // Create VulkanSurface provider that will create the surface pointer when the VulkanInstance will be available
-            var vulkanSurface = new AndroidVulkanSurfaceProvider(windowPtr);
 
             // Initialize GPU resources after we have a valid surface
             _sceneView.Initialize(_vulkanDevice, vulkanSurface);
