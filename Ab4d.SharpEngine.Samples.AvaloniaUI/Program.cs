@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Vulkan;
 using System;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
@@ -21,20 +20,21 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 // With Avalonia v11.1+ it is possible to use Vulkan backend - in this case uncomment the following code
-                //.With(new Win32PlatformOptions
-                //{
-                //    RenderingMode = new[]
-                //    {
-                //        Win32RenderingMode.Vulkan
-                //    }
-                //})
-                //.With(new VulkanOptions()
-                //{
-                //    VulkanInstanceCreationOptions = new VulkanInstanceCreationOptions()
-                //    {
-                //        UseDebug = true
-                //    }
-                //})
+                // This requires Ab4d.SharpEngine.AvaloniaUI RC1 that depends on Avalonia v11.1 (the official version depends on Avalonia v11.0)
+    //            .With(new Win32PlatformOptions
+    //            {
+    //                RenderingMode = new[]
+    //                {
+    //                    Win32RenderingMode.Vulkan
+    //                }
+    //            })
+    //            .With(new Avalonia.Vulkan.VulkanOptions()
+    //            {
+    //                VulkanInstanceCreationOptions = new Avalonia.Vulkan.VulkanInstanceCreationOptions()
+    //                {
+    //                    UseDebug = true
+    //                }
+    //            })
                 .LogToTrace();
     }
 }
