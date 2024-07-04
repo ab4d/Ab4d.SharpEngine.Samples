@@ -64,6 +64,7 @@
     <Folder Include="Resources\HeightMaps\" />
     <Folder Include="Resources\Models\" />
     <Folder Include="Resources\Textures\" />
+    <Folder Include="Resources\PointClouds\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +98,7 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
   </ItemGroup>
 
 </Project>

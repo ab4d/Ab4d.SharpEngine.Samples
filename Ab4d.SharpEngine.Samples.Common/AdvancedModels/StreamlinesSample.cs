@@ -44,7 +44,7 @@ public class StreamlinesSample : CommonSample
 
 
         // Sample data was created by using ParaView application and exporting the streamlines into csv file.
-        string sampleDataFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Streamlines.csv");
+        string sampleDataFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/streamlines.csv");
         sampleDataFileName = FileUtils.FixDirectorySeparator(sampleDataFileName);
 
         ReadStreamlinesData(scene, sampleDataFileName);

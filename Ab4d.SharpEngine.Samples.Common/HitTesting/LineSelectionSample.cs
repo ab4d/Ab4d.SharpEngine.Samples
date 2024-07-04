@@ -556,7 +556,7 @@ public class LineSelectionSample : CommonSample
                 _maxSelectionDistance = newValue;
                 _maxSelectionDistanceLabel.UpdateValue();
             },
-            200);
+            210);
 
 
         ui.AddSeparator();

@@ -149,7 +149,8 @@ public class BitmapTextSample : CommonSample
     private void CollectAvailableBitmapFonts()
     {
         string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\");
-
+        fontPath = FileUtils.FixDirectorySeparator(fontPath);
+        
         var allFontFiles = System.IO.Directory.GetFiles(fontPath, "*.fnt");
 
         _fontFiles = new List<string>(allFontFiles.Length + 1);

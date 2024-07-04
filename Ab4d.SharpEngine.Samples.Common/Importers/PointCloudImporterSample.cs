@@ -111,6 +111,8 @@ public class PointCloudImporterSample : CommonSample
     {
         Vector3[]? positions;
         
+        fileName = FileUtils.FixDirectorySeparator(fileName);
+        
         var fileExtension = System.IO.Path.GetExtension(fileName);
         bool swapYZCoordinates = _isZAxisUp;
 
