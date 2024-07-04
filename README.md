@@ -277,7 +277,7 @@ Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false;
 
 ## Change log
 
-**v2.0.8936-rc1** (2024-06-19):
+**v2.0.8951** (2024-07-04):
 
 Major new features:
 - Added PixelsNode, PixelMaterial and PixelEffect which can be used to render 3D pixels and point-clouds.

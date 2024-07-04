@@ -4,17 +4,17 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>  
     <TargetFramework>net8.0</TargetFramework>
-    <Version>2.0.8941-rc2</Version>
+    <Version>2.0.8951</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks> <!--This is required for FogEffect -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8941-rc2" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8951" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8941-rc2" />
-    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.0.8941-rc2" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8951" />
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.0.8951" />
   </ItemGroup>
 
   <ItemGroup>
