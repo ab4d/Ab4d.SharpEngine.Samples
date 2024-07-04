@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>2.0.8951</Version>
+    <Nullable>enable</Nullable>
+    <PackageIcon>sharp-engine-logo.ico</PackageIcon>
+    <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
+    <DefineConstants>VULKAN_BAKCEND</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.0-rc2" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.0-rc2" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.1.0-rc2" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8951" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="2.0.8953-rc1" />
+    <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8951" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaXaml Include="Advanced\AvaloniaMultiTouchSample.xaml" />
+    <AvaloniaXaml Include="CameraControllers\PointerCameraControllerSample.xaml" />
+    <AvaloniaXaml Include="Common\MessageBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="Common\CommonTitleUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+    <AvaloniaXaml Include="Diagnostics\DiagnosticsWindow.xaml" />
+    <AvaloniaXaml Include="Diagnostics\LogMessagesWindow.xaml" />    
+    <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
+    <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
+    <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaXaml>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="TestVulkanInteropWindow.axaml.cs">
+      <DependentUpon>TestVulkanInteropWindow.axaml</DependentUpon>
+    </Compile> 
+    <Compile Update="SamplesWindow.axaml.cs">
+      <DependentUpon>SamplesWindow.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Titles\QuickStartTitle.md" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Resources\BitmapFonts\" />
+    <Folder Include="Resources\HeightMaps\" />
+    <Folder Include="Resources\Models\" />
+    <Folder Include="Resources\Textures\" />
+    <Folder Include="Resources\PointClouds\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
+    <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
+    <None Remove="CameraControllers\PointerCameraControllerSample.xaml" />
+    <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
+    <None Remove="Diagnostics\LogMessagesWindow.xaml" />    
+    <None Remove="Samples.xml" />
+    <None Remove="Titles\IntroductionPage.xaml" />
+    <None Remove="Titles\QuickStartTitle.md" />
+    <Content Include="Samples.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
+  </ItemGroup>
+
+</Project>
