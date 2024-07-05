@@ -1,9 +1,8 @@
-﻿using System.Numerics;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Effects;
-using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.Common.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -62,8 +61,8 @@ public class CustomFogEffectSample : CommonSample
 {
     public override string Title => "Custom fog effect ";
     public override string Subtitle => "This sample shows how to create a custom effect with custom vertex and fragment shaders.\nFogEffect and FogMaterial source code is in the Advanced folder. Shaders source code is in the Resources/Shaders folder.";
-    
-    
+
+
     private float _fogStart = 260;
     private float _fogDistance = 150;
     private Color3 _fogColor = Color3.White;
@@ -111,11 +110,11 @@ public class CustomFogEffectSample : CommonSample
             FogFullColorStart = _fogStart + _fogDistance,
             FogColor          = _fogColor
         };
-        
+
         _allFogMaterials.Add(bottomFogMaterial);
         _allFogMaterials.Add(sphereFogMaterial);
 
-        
+
         var bottomBoxNode = new BoxModelNode(new Vector3(0, -2, 0), new Vector3(200, 4, 100), "BottomBox")
         {
             UseSharedBoxMesh = false, // this will generate the mesh with position and size defined here (and not use a 1x1x1 box mesh that is than transformed to final size - this does not work when using vertex shader with fixed matrices)
@@ -157,11 +156,11 @@ public class CustomFogEffectSample : CommonSample
     {
         foreach (var fogMaterial in _allFogMaterials)
         {
-            fogMaterial.FogStart          = _fogStart;
+            fogMaterial.FogStart = _fogStart;
             fogMaterial.FogFullColorStart = _fogStart + _fogDistance;
         }
     }
-    
+
     private void ChangeFogColor(string? colorText)
     {
         if (!Color3.TryParse(colorText, out _fogColor))
@@ -181,36 +180,36 @@ public class CustomFogEffectSample : CommonSample
 
         ui.CreateSlider(
             minValue: 0,
-            maxValue: 500, 
-            getValueFunc: () => _fogStart, 
+            maxValue: 500,
+            getValueFunc: () => _fogStart,
             setValueAction: newValue =>
             {
                 _fogStart = newValue;
                 UpdateFogMaterial();
-            }, 
-            width: 100, 
-            keyText: "Fog start:", 
-            formatShownValueFunc: sliderValue => $"{sliderValue:F0}", 
+            },
+            width: 100,
+            keyText: "Fog start:",
+            formatShownValueFunc: sliderValue => $"{sliderValue:F0}",
             keyTextWidth: 80);
-        
+
         ui.CreateSlider(
-            minValue: 0, 
-            maxValue: 500, 
-            getValueFunc: () => _fogDistance, 
+            minValue: 0,
+            maxValue: 500,
+            getValueFunc: () => _fogDistance,
             setValueAction: newValue =>
             {
                 _fogDistance = newValue;
                 UpdateFogMaterial();
-            }, 
-            width: 100, 
-            keyText: "Fog distance:", 
-            formatShownValueFunc: sliderValue => $"{sliderValue:F0}", 
+            },
+            width: 100,
+            keyText: "Fog distance:",
+            formatShownValueFunc: sliderValue => $"{sliderValue:F0}",
             keyTextWidth: 80);
 
         ui.AddSeparator();
 
-        ui.CreateComboBox(new string[] { "White", "LightCyan", "Black" }, 
-            (itemIndex, itemText) => ChangeFogColor(itemText), 
+        ui.CreateComboBox(new string[] { "White", "LightCyan", "Black" },
+            (itemIndex, itemText) => ChangeFogColor(itemText),
             selectedItemIndex: 0,
             width: 100,
             keyText: "Fog color:",

@@ -1,15 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.Common.Materials;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
-namespace Ab4d.SharpEngine.Samples.Common.Advanced;
+namespace Ab4d.SharpEngine.Samples.Common.Effects;
 
 public class FogEffect : Effect
 {
@@ -34,7 +35,7 @@ public class FogEffect : Effect
 
 
     // See Resources/Shaders/txt/FogShader.frag.json to see the FieldOffset values
-    [StructLayout(LayoutKind.Explicit, Size = FogMaterialUniformBuffer.SizeInBytes)]
+    [StructLayout(LayoutKind.Explicit, Size = SizeInBytes)]
     internal struct FogMaterialUniformBuffer
     {
         [FieldOffset(0)]
@@ -62,7 +63,7 @@ public class FogEffect : Effect
     // This way the effect can be disposed only by the constructor of the effect and
     // not by any user of the effect (there is no public Dispose method).
 
-    private FogEffect(Scene scene, string? name) 
+    private FogEffect(Scene scene, string? name)
         : base(scene, name)
     {
 
@@ -74,7 +75,7 @@ public class FogEffect : Effect
 
         if (scene.GpuDevice == null || scene.EffectsManager == null)
             throw new InvalidOperationException("Scene is not yet initialized (Scene was not created with VulkanDevice or Initialized method was not yet called)");
-        
+
         return scene.EffectsManager.GetDefault<FogEffect>();
     }
 
@@ -93,7 +94,7 @@ public class FogEffect : Effect
 
     private void DisposeAction()
     {
-        this.CheckAndDispose(disposing: true);
+        CheckAndDispose(disposing: true);
     }
 
 
@@ -130,7 +131,7 @@ public class FogEffect : Effect
 
         int poolCapacity = Math.Max(16, 8 * Scene.SwapChainImagesCount); // Make pool size multiple of swapChainImagesCount because we will allocate in chunks of swapChainImagesCount (this also prevents error that is described in VulkanDescriptorSetFactory.CreateDescriptorSets)
         (_standardDescriptorPoolFactory, _standardDescriptorPoolFactoryDisposeToken) = VulkanDescriptorSetFactory.Create(gpuDevice, DescriptorType.StorageBuffer, fogMaterialsDescriptorSetLayout, poolCapacity, name: "FogEffect-DescriptorPool");
-        
+
 
         (_materialsDataBlockPool, _materialsDataBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>.Create(Scene, FogMaterialUniformBuffer.SizeInBytes, Scene.SwapChainImagesCount, "MaterialMemoryBlocks");
 
@@ -160,7 +161,7 @@ public class FogEffect : Effect
         Log.Trace?.Write(LogArea, Id, "Initialize material id: {0} (name: {1})", material.Id, material.Name ?? "");
 
         if (!material.IsInitialized)
-            material.InitializeSceneResources(this.Scene);
+            material.InitializeSceneResources(Scene);
 
         // First set MaterialBlockIndex and MaterialIndex
         EnsureMaterialsDataBlockPool();
@@ -173,7 +174,7 @@ public class FogEffect : Effect
         //Debug.Assert(dataIndex != 0, "materialDataIndex should not be zero because this prevents rendering backsided materials");
 
         SetMaterialBlock(material, dataBlockIndex, dataIndex);
-            
+
         // Now update data
         UpdateMaterialData(fogMaterial);
     }
@@ -198,7 +199,7 @@ public class FogEffect : Effect
 
         //    EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
         //    var materialsData = _materialsDataBlockPool.GetMemoryBlockOrDefault(material.MaterialBlockIndex, material.MaterialIndex);
-            
+
         //    if (materialIndex >= 0 && materialsData != null) 
         //    {
         //        // Free memory block in main thread and when the current frame is rendered
@@ -241,7 +242,7 @@ public class FogEffect : Effect
 
         if (effectTechnique != null && effectTechnique.Pipeline.IsNull())
             effectTechnique.CreatePipeline(renderingContext, PipelineCreateFlags.AllowDerivatives, effectTechnique.Name);
-        
+
         renderingItem.EffectTechnique = effectTechnique;
 
 
@@ -258,7 +259,7 @@ public class FogEffect : Effect
             descriptorSets = materialDataBlock.DescriptorSets;
         else
             descriptorSets = null;
-            
+
         renderingItem.MaterialDescriptorSets = descriptorSets;
 
 
@@ -271,7 +272,7 @@ public class FogEffect : Effect
         uint stateSortValue;
         unchecked
         {
-            stateSortValue = (uint)(this.Id << 8);
+            stateSortValue = (uint)(Id << 8);
         }
 
         if (isFrontCounterClockwise) // is back material
@@ -312,7 +313,7 @@ public class FogEffect : Effect
 
     private void EnsureStandardTechniqueWithPipeline(RenderingContext renderingContext)
     {
-        if ((_standardTechnique != null && !_standardTechnique.Pipeline.IsNull()) || _vertexBufferDescription == null)
+        if (_standardTechnique != null && !_standardTechnique.Pipeline.IsNull() || _vertexBufferDescription == null)
             return; // Exist early if _standardTechnique is already created
 
         if (_standardTechnique == null)
@@ -353,7 +354,7 @@ public class FogEffect : Effect
 
         techniqueIndex = GetEffectTechniqueIndex(hasTransparency, isFrontCounterClockwise);
         var effectTechnique = _effectTechniques[techniqueIndex];
-        
+
         if (effectTechnique == null)
         {
             if (techniqueIndex == 0)
@@ -368,7 +369,7 @@ public class FogEffect : Effect
 
                 Log.Trace?.Write(LogArea, Id, "Creating EffectTechnique: FogEffect-{0} (index: {1})", techniqueName, techniqueIndex);
 
-                effectTechnique = new FogEffectTechnique(this.Scene, "FogEffect-" + techniqueName)
+                effectTechnique = new FogEffectTechnique(Scene, "FogEffect-" + techniqueName)
                 {
                     VertexInputStatePtr                         = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
                     ShaderStages                                = _pipelineShaderStages,
@@ -379,11 +380,11 @@ public class FogEffect : Effect
                 if (hasTransparency)
                 {
                     //if (isPreMultipliedAlpha)
-                        effectTechnique.ColorBlendAttachmentState = CommonStatesManager.PremultipliedAlphaBlendAttachmentState;
+                    effectTechnique.ColorBlendAttachmentState = CommonStatesManager.PremultipliedAlphaBlendAttachmentState;
                     //else
                     //    effectTechnique.ColorBlendAttachmentState = CommonStatesManager.NonPremultipliedAlphaBlendAttachmentState;
                 }
-                
+
                 if (isFrontCounterClockwise)
                     effectTechnique.RasterizationState = CommonStatesManager.CullClockwise;
 
@@ -509,7 +510,7 @@ public class FogEffect : Effect
 
                 _pipelineShaderStages = null;
             }
-            
+
             if (!_pipelineLayout.IsNull())
             {
                 // We must not immediately dispose the resources, because they may be currently used if frames are rendered in the background.

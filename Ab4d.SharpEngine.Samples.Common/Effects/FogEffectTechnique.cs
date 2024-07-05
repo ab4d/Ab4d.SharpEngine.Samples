@@ -6,7 +6,7 @@ using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using System.Runtime.CompilerServices;
 
-namespace Ab4d.SharpEngine.Samples.Common.Advanced;
+namespace Ab4d.SharpEngine.Samples.Common.Effects;
 
 public class FogEffectTechnique : EffectTechnique
 {
@@ -26,7 +26,7 @@ public class FogEffectTechnique : EffectTechnique
 
     public Pipeline Pipeline { get; private set; }
 
-        public ShaderStageFlags MatrixPushConstantShaderStages = ShaderStageFlags.Vertex;
+    public ShaderStageFlags MatrixPushConstantShaderStages = ShaderStageFlags.Vertex;
 
     // For ThickLineEffect this is set to ShaderStageGeometryBit | ShaderStageFragmentBit
     public ShaderStageFlags MaterialPushConstantShaderStages = ShaderStageFlags.Fragment;
@@ -71,8 +71,8 @@ public class FogEffectTechnique : EffectTechnique
             _allLightsDescriptorSetBindingIndex = value;
         }
     }
-    
-    
+
+
     private int _matricesDescriptorSetBindingIndex = 2;
 
     /// <summary>
@@ -89,8 +89,8 @@ public class FogEffectTechnique : EffectTechnique
             _matricesDescriptorSetBindingIndex = value;
         }
     }
-    
-    
+
+
     private int _materialDescriptorSetBindingIndex = 3;
 
     /// <summary>
@@ -209,7 +209,7 @@ public class FogEffectTechnique : EffectTechnique
         if (!IsInitialized)
             InitializeDeviceResources(); // This will also check if Scene is initialized
 
-        var vulkanDevice = this.Scene.GpuDevice;
+        var vulkanDevice = Scene.GpuDevice;
 
         if (vulkanDevice == null)
             throw new SharpEngineException("Scene.GpuDevice not initialized in CreatePipeline");
@@ -359,7 +359,7 @@ public class FogEffectTechnique : EffectTechnique
             pipeline.SetName(vulkanDevice, pipelineName);
         }
 
-        this.Pipeline = pipeline;
+        Pipeline = pipeline;
 
         return pipeline;
     }
@@ -369,14 +369,14 @@ public class FogEffectTechnique : EffectTechnique
     /// </summary>
     public override void ResetPipeline()
     {
-        if (this.Scene.GpuDevice == null)
+        if (Scene.GpuDevice == null)
             return;
 
         var pipeline = Pipeline;
         if (!pipeline.IsNull())
         {
             // The pipeline may still be used so we need to dispose it after rendering is complete
-            this.Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(pipeline.Handle, typeof(Pipeline));
+            Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(pipeline.Handle, typeof(Pipeline));
 
             Pipeline = Pipeline.Null;
         }
@@ -404,7 +404,7 @@ public class FogEffectTechnique : EffectTechnique
                 //Log.Warn?.Write(LogArea, Id, $"Skipping rendering RenderingItem '{renderingItem.ToString()}' because its StandardEffectTechnique.Pipeline is null.");
                 return;
             }
-            
+
             if (PipelineLayout.IsNull())
             {
                 //Log.Warn?.Write(LogArea, Id, $"Skipping rendering RenderingItem '{renderingItem.ToString()}' because its StandardEffectTechnique.PipelineLayout is null.");
@@ -422,7 +422,7 @@ public class FogEffectTechnique : EffectTechnique
         // This is used in ThickLineEffect (see GeometryShaderLineRasterizer.ApplyRenderingItemMaterial method)
         // We also need to bind again when a standard PipelineLayout is used after non-standard one
         bool isNonStandardPipelineLayout = renderingItemFlags.HasFlag(RenderingItemFlags.NonStandardPipelineLayout);
-            
+
         if (isPipelineChanged || isNonStandardPipelineLayout != renderingContext.IsNonStandardPipelineLayout)
         {
             for (var i = 0; i < currentBoundDescriptorSets.Length; i++)
@@ -456,7 +456,7 @@ public class FogEffectTechnique : EffectTechnique
         {
             //if (!renderingItemFlags.HasFlag(RenderingItemFlags.NoVertexBuffer))
             //    Log.Warn?.Write(LogArea, Id, $"Skipping rendering RenderingItem '{renderingItem.ToString()}' because its VertexBuffer is null. If this is intended, then set the NoVertexBuffer to RenderingItem.Flags.");
-            
+
             return;
         }
 
@@ -514,7 +514,7 @@ public class FogEffectTechnique : EffectTechnique
             descriptorSet = descriptorSets[swapChainImageIndex];
             if (descriptorSet != currentBoundDescriptorSets[2])
             {
-                vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pipelineLayout, firstSet: (uint)_matricesDescriptorSetBindingIndex, descriptorSetCount: 1, pDescriptorSets: (DescriptorSet*)&descriptorSet, dynamicOffsetCount: 0, pDynamicOffsets: null);
+                vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pipelineLayout, firstSet: (uint)_matricesDescriptorSetBindingIndex, descriptorSetCount: 1, pDescriptorSets: &descriptorSet, dynamicOffsetCount: 0, pDynamicOffsets: null);
 
                 currentBoundDescriptorSets[_matricesDescriptorSetBindingIndex] = descriptorSet;
                 descriptorSetChangesCount++;
@@ -536,7 +536,7 @@ public class FogEffectTechnique : EffectTechnique
             {
                 //if (!renderingItemFlags.HasFlag(RenderingItemFlags.NoMatricesDescriptorSets))
                 //    Log.Warn?.Write(LogArea, Id, $"Skipping rendering RenderingItem '{renderingItem.ToString()}' because its MatricesDescriptorSets is null. If this is intended, then set the NoMatricesDescriptorSets to RenderingItem.Flags.");
-             
+
                 return;
             }
 
@@ -557,7 +557,7 @@ public class FogEffectTechnique : EffectTechnique
             descriptorSet = descriptorSets[swapChainImageIndex];
             if (descriptorSet != currentBoundDescriptorSets[3])
             {
-                vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pipelineLayout, firstSet: (uint)_materialDescriptorSetBindingIndex, descriptorSetCount: 1, pDescriptorSets: (DescriptorSet*)&descriptorSet, dynamicOffsetCount: 0, pDynamicOffsets: null);
+                vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pipelineLayout, firstSet: (uint)_materialDescriptorSetBindingIndex, descriptorSetCount: 1, pDescriptorSets: &descriptorSet, dynamicOffsetCount: 0, pDynamicOffsets: null);
 
                 currentBoundDescriptorSets[_materialDescriptorSetBindingIndex] = descriptorSet;
                 descriptorSetChangesCount++;
@@ -599,7 +599,7 @@ public class FogEffectTechnique : EffectTechnique
             }
         }
 
-        
+
         var vertexCount = renderingItem.VertexCount;
         var indexCount = renderingItem.IndexCount;
         var instanceCount = renderingItem.InstanceCount;

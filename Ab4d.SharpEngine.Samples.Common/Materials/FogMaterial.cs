@@ -1,9 +1,10 @@
-﻿using System.Text;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.Common.Effects;
 using Ab4d.SharpEngine.Vulkan;
+using System.Text;
 
-namespace Ab4d.SharpEngine.Samples.Common.Advanced;
+namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
 public class FogMaterial : Material, IDiffuseMaterial, ITransparentMaterial
 {
@@ -149,7 +150,7 @@ public class FogMaterial : Material, IDiffuseMaterial, ITransparentMaterial
     /// Constructor
     /// </summary>
     /// <param name="name">optional name</param>
-    public FogMaterial(string? name = null) 
+    public FogMaterial(string? name = null)
         : base(name)
     {
 
@@ -168,8 +169,8 @@ public class FogMaterial : Material, IDiffuseMaterial, ITransparentMaterial
     /// <inheritdoc />
     public override void GetDetailsText(StringBuilder sb, bool showDirtyFlags = true, bool showVersion = true, bool showGpuHandles = false)
     {
-        if (!string.IsNullOrEmpty(this.Name))
-            sb.AppendFormat("FogMaterial ({0}) '{1}'", Id, this.Name);
+        if (!string.IsNullOrEmpty(Name))
+            sb.AppendFormat("FogMaterial ({0}) '{1}'", Id, Name);
         else
             sb.AppendFormat("FogMaterial ({0})", Id);
 
