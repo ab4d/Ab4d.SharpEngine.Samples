@@ -24,20 +24,21 @@ The following features are supported by the current version:
 ### Platforms and UI frameworks:
 
 **Windows:**
-  - WPF full composition support with SharpEngineSceneView control (Ab4d.SharpEngine.Wpf library)
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
+  - WPF full composition support with SharpEngineSceneView control (Ab4d.SharpEngine.Wpf library)
   - WinUI 3 support with SharpEngineSceneView control (Ab4d.SharpEngine.WinUI library)
   - WinForms support with SharpEngineSceneView control (Ab4d.SharpEngine.WinForms library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Linux)
   - MAUI
   
-**Linux** (including Raspberry PI 4):
+**Linux** (including Raspberry PI 4 and similar devices):
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
   - Off-screen rendering combined with Linux framebuffer display (FbDev or DRM/KMS).
   - See ["Vulkan on Raspberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Raspberry Pi 4 with an external monitor.
   
 **Android:**
+  - Using AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library).
   - Using SurfaceView in C# Android Application
   - Using SDL (using third-party Silk.Net library)
   - MAUI
@@ -47,6 +48,7 @@ The following features are supported by the current version:
   - Using MAUI - requires MoltenVK library - see Building for macOS and iOS below.
    
 **iOS:**
+  - AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library). Requires MoltenVK library - see Building for macOS and iOS below.
   - Using MAUI - requires .Net 8 and MoltenVK library - see "Building for macOS and iOS" below.
 
 
