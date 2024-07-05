@@ -61,6 +61,7 @@ Online help:
 - The Ab4d.SharpEngine.WinUI has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.WinForms has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.AvaloniaUI library requires Avalonia library.
+- The Ab4d.SharpEngine.glTF library requires glTF2Loader library (this will be internalized in the future).
 
 
 ### System requirements to run the samples:
@@ -79,63 +80,73 @@ Online help:
 
 The following Visual Studio solutions are available:
 
-- **Ab4d.SharpEngine.Samples.Wpf**
-  This solution provides the samples for WPF and can run only on Windows.
-  The samples also use Ab4d.SharpEngine.Wpf library that provides SharpEngineSceneView control for WPF.
-  The SharpEngineSceneView provides a WPF control that is very easy to be used and can 
-  compose the 3D scene with the WPF objects (for example showing buttons on top of 3D scene).
-
-- **Ab4d.SharpEngine.Samples.AvaloniaUI**
+- **Ab4d.SharpEngine.Samples.AvaloniaUI**\
   This sample uses Avalonia UI (https://avaloniaui.net/) that provides WPF-like object model to 
   build UI controls and can run on Windows, Linux and macOS.
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
-  The SharpEngineSceneView provides an Avalonia control that is very easy to be used and can 
+  The SharpEngineSceneView provides an Avalonia control that is very easy to use and can 
   compose the 3D scene with the Avalonia UI objects (for example showing buttons on top of 3D scene).
-  The sample can be started on Windows, Linux and on macOS (use special macos solution).
+  The sample can be started on Windows, Linux and on macOS (use a special macOS solution).
   See also "Building for macOS and iOS" section for more information on how to compile for macOS.
 
-- **Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform**
+- **Ab4d.SharpEngine.Samples.AvaloniaUI.VulkanBackend**\
+  This sample uses Avalonia UI which uses Vulkan as a backend, so the whole application is using Vulkan API
+  (the UI controls are also rendered by Vulkan instead of DirectX or OpenGL as by default).
+  Vulkan backend is setup in the Program.cs file.
+  This provides the best integration of 2D UI and 3D graphics.
+  This requires Avalonia v11.1 which is currently in release candidate version (2024-07-05).
+  Because of this, the project is using Ab4d.SharpEngine.Samples.AvaloniaUI v2.0.8953-rc1 version.
+  When the Avalonia version will be released, a new Ab4d.SharpEngine.Samples.AvaloniaUI library will also be released.
+  This sample can run only on Windows.
+
+- **Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform**\
   This sample shows how to create an Avalonia app that can run on Windows, Android and iOS.
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
   Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
   See also "Building for macOS and iOS" section for more information on how to compile for isOS.
   Note that folder and file names in this solution have been shortened to prevent problems with max path size on Windows (260 chars).
+
+- **Ab4d.SharpEngine.Samples.Wpf**\
+  This solution provides the samples for WPF and can run only on Windows.
+  The samples also use Ab4d.SharpEngine.Wpf library that provides SharpEngineSceneView control for WPF.
+  The SharpEngineSceneView provides a WPF control that is very easy to use and can 
+  compose the 3D scene with the WPF objects (for example showing buttons on top of 3D scene).
   
-- **Ab4d.SharpEngine.Samples.WinUI**
+- **Ab4d.SharpEngine.Samples.WinUI**\
   This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
   This sample uses Ab4d.SharpEngine.WinUI library that provides SharpEngineSceneView control.
   The SharpEngineSceneView provides an WinUI control that is very easy to be used and can 
   compose the 3D scene with the WinUI UI objects (for example showing buttons on top of 3D scene).
 
-- **Ab4d.SharpEngine.Samples.WinForms**
+- **Ab4d.SharpEngine.Samples.WinForms**\
   This solution provides the samples for WinForms and can run only on Windows.
   The samples also use Ab4d.SharpEngine.WinForms library that provides SharpEngineSceneView Control for WinForms.
   The SharpEngineSceneView provides a WinForms Control that is very easy to be used and can 
   compose the 3D scene with other UI Controls (for example showing buttons on top of 3D scene).
   
-- **Ab4d.SharpEngine.Samples.CrossPlatform**
+- **Ab4d.SharpEngine.Samples.CrossPlatform**\
   This sample uses third-party Silk.Net library that provides support for SDL and GLFW.
   SDL and GLFW are used to get platform-independent way to create windows and views.
   The 3D scene here is shown in the whole window area.
   Because of this project can work on Windows and Linux.
   
-- **Ab4d.SharpEngine.Samples.Android.Generic**
+- **Ab4d.SharpEngine.Samples.Android.Generic**\
   This solution is similar to Ab4d.SharpEngine.Samples.CrossPlatform because it also uses Silk.Net library.
   To work on Android the code to initialize SharpEngine and define the 3D scene can be the same
   as for other platforms, but there needs to be some special startup code to create the Android Activity.
   The 3D scene here is shown on the whole view area.
 
-- **Ab4d.SharpEngine.Samples.Android.Application**
-  This solution uses a Xamarin-based Android.Application project template for .Net 6.
+- **Ab4d.SharpEngine.Samples.Android.Application**\
+  This solution uses an Android.Application project template for .Net 6.
   The 3D scene is shown on the part of the view that is defined by SurfaceView.
 
-- **Ab4d.SharpEngine.Samples.Maui**
+- **Ab4d.SharpEngine.Samples.Maui**\
   This solution uses a NET Maui and can work on Windows, Android, macOS and iOS.
   Compiling for Windows, Android and macOS requires .Net 8.
   Because Vulkan is not natively supported on macOS and iOS, the MoltenVK library is required to translate the Vulkan calls to Molten API calls.
   See "Building for macOS and iOS" section for more information on how to compile for macOS and iOS.
 
-- **Ab4d.SharpEngine.Samples.LinuxFramebuffer**
+- **Ab4d.SharpEngine.Samples.LinuxFramebuffer**\
   This solution uses SharpEngine with off-screen Vulkan renderer, and displays
   the rendered frames on Linux framebuffer display (FbDev or DRM/KMS). See
   [the example's README](Ab4d.SharpEngine.Samples.LinuxFramebuffer/README.md)
@@ -323,9 +334,10 @@ Breaking changes:
 
 ## Plans for later versions
 
+- Support for Uno platform
 - Supersampling
-- Add support for PhysicallyBasedRendering effect
-- Multi-threaded rendering
+- PhysicallyBasedRendering effect
+- Multi-threaded rendering and background resource creation
 - Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
 - Shadows
 - Python binding and samples
