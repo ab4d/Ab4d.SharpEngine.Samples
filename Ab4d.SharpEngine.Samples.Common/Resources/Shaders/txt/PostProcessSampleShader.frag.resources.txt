@@ -12,6 +12,7 @@ subpass inputs
 inputs
 =============
 
+ ID 020 : inUV (Location : 0)
 =============
 
 outputs
@@ -23,6 +24,7 @@ outputs
 textures
 =============
 
+ ID 016 : inTexture (Set : 0) (Binding : 0)
 =============
 
 separate images

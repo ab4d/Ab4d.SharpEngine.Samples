@@ -1,21 +1,15 @@
 #version 450
 #pragma shader_stage(vertex)
 
-layout(set = 0, binding = 0) uniform Scene {
-    mat4 viewProjection;
-} scene;
+layout(location = 0) out vec2 outUV;
 
-layout(set = 1, binding = 0) readonly buffer Matrices {
-    mat4 world[];
-} matrices;
-
-layout(push_constant) uniform PushConstants {
-    int matrixIndex;
-} pushConstants;
-
-layout(location = 0) in vec3 inPosition;
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 void main()
 {
-    gl_Position = (scene.viewProjection * matrices.world[pushConstants.matrixIndex]) * vec4(inPosition, 1.0);
+	outUV = vec2((gl_VertexIndex << 1) & 2, gl_VertexIndex & 2);
+	gl_Position = vec4(outUV * 2.0 - 1.0, 0.0, 1.0);
 }

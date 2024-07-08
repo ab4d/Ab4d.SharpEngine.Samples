@@ -5,11 +5,26 @@
             "mode" : "frag"
         }
     ],
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "inUV",
+            "location" : 0
+        }
+    ],
     "outputs" : [
         {
             "type" : "vec4",
             "name" : "outColor",
             "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "inTexture",
+            "set" : 0,
+            "binding" : 0
         }
     ]
 }
