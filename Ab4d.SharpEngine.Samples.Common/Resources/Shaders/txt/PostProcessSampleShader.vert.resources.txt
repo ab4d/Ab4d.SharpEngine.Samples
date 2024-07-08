@@ -1,0 +1,108 @@
+Entry points:
+  main (vertex)
+
+Execution modes:
+
+subpass inputs
+=============
+
+=============
+
+inputs
+=============
+
+ ID 038 : inPosition (Location : 0)
+=============
+
+outputs
+=============
+
+=============
+
+textures
+=============
+
+=============
+
+separate images
+=============
+
+=============
+
+separate samplers
+=============
+
+=============
+
+images
+=============
+
+=============
+
+ssbos
+=============
+
+ ID 026 : Matrices (Set : 1) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 64 bytes)
+=============
+
+ubos
+=============
+
+ ID 019 : Scene (Set : 0) (Binding : 0) (BlockSize : 64 bytes)
+=============
+
+push
+=============
+
+ ID 029 : pushConstants
+=============
+
+counters
+=============
+
+=============
+
+acceleration structures
+=============
+
+=============
+
+record buffers
+=============
+
+=============
+
+builtin inputs
+=============
+
+=============
+
+builtin outputs
+=============
+
+Builtin Position (float4) (active: yes).
+Builtin PointSize (float) (active: no).
+Builtin ClipDistance (float[1]) (active: no).
+Builtin CullDistance (float[1]) (active: no).
+=============
+
+Active members in buffer: pushConstants
+==================
+
+Member #  0 (matrixIndex): Offset:    0, Range:    4
+==================
+
+Specialization constants
+==================
+
+==================
+
+Capabilities
+============
+Capability: 1
+============
+
+Extensions
+============
+============
+

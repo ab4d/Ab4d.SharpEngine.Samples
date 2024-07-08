@@ -1,0 +1,96 @@
+Entry points:
+  main (fragment)
+
+Execution modes:
+  OriginUpperLeft
+
+subpass inputs
+=============
+
+=============
+
+inputs
+=============
+
+=============
+
+outputs
+=============
+
+ ID 009 : outColor (Location : 0)
+=============
+
+textures
+=============
+
+=============
+
+separate images
+=============
+
+=============
+
+separate samplers
+=============
+
+=============
+
+images
+=============
+
+=============
+
+ssbos
+=============
+
+=============
+
+ubos
+=============
+
+=============
+
+push
+=============
+
+=============
+
+counters
+=============
+
+=============
+
+acceleration structures
+=============
+
+=============
+
+record buffers
+=============
+
+=============
+
+builtin inputs
+=============
+
+=============
+
+builtin outputs
+=============
+
+=============
+
+Specialization constants
+==================
+
+==================
+
+Capabilities
+============
+Capability: 1
+============
+
+Extensions
+============
+============
+

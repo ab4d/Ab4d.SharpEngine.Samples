@@ -1,0 +1,24 @@
+#version 450
+
+layout(set = 0, binding = 0, std140) uniform Scene
+{
+    mat4 viewProjection;
+} scene;
+
+layout(set = 1, binding = 0, std430) readonly buffer Matrices
+{
+    mat4 world[];
+} matrices;
+
+layout(push_constant, std430) uniform PushConstants
+{
+    int matrixIndex;
+} pushConstants;
+
+layout(location = 0) in vec3 inPosition;
+
+void main()
+{
+    gl_Position = (scene.viewProjection * matrices.world[pushConstants.matrixIndex]) * vec4(inPosition, 1.0);
+}
+

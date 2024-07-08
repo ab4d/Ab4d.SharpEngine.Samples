@@ -18,8 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Shaders\spv\FogShader.frag.spv" />
-    <None Remove="Resources\Shaders\spv\FogShader.vert.spv" />
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
     <None Remove="StandardModels\OtherStandardModelsTitle.md" />
     <None Remove="Titles\AdvancedModelsTitle.md" />
@@ -43,8 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Shaders\spv\FogShader.frag.spv" />
-    <EmbeddedResource Include="Resources\Shaders\spv\FogShader.vert.spv" />
     <EmbeddedResource Include="Titles\AdvancedTitle.md" />   
     <EmbeddedResource Include="Titles\AnimationsTitle.md" />
     <EmbeddedResource Include="Titles\LightsTitle.md" />
@@ -60,7 +56,7 @@
 
   <ItemGroup>
     <Folder Include="Importers\" />
-    <Folder Include="Materials\" />
+    <Folder Include="Resources\Shaders\spv\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,4 +92,12 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Makes sure a rebuild happens if the shaders change -->
+    <UpToDateCheckInput Include="Resources\Shaders\spv\*" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Shaders\spv\*" />
+  </ItemGroup>
 </Project>

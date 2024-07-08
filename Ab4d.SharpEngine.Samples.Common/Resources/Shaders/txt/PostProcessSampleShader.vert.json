@@ -1,0 +1,115 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "vert"
+        }
+    ],
+    "types" : {
+        "_11" : {
+            "name" : "gl_PerVertex",
+            "members" : [
+                {
+                    "name" : "gl_Position",
+                    "type" : "vec4"
+                },
+                {
+                    "name" : "gl_PointSize",
+                    "type" : "float"
+                },
+                {
+                    "name" : "gl_ClipDistance",
+                    "type" : "float",
+                    "array" : [
+                        1
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ]
+                },
+                {
+                    "name" : "gl_CullDistance",
+                    "type" : "float",
+                    "array" : [
+                        1
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ]
+                }
+            ]
+        },
+        "_17" : {
+            "name" : "Scene",
+            "members" : [
+                {
+                    "name" : "viewProjection",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                }
+            ]
+        },
+        "_24" : {
+            "name" : "Matrices",
+            "members" : [
+                {
+                    "name" : "world",
+                    "type" : "mat4",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 64,
+                    "matrix_stride" : 16
+                }
+            ]
+        },
+        "_27" : {
+            "name" : "PushConstants",
+            "members" : [
+                {
+                    "name" : "matrixIndex",
+                    "type" : "int",
+                    "offset" : 0
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec3",
+            "name" : "inPosition",
+            "location" : 0
+        }
+    ],
+    "ssbos" : [
+        {
+            "type" : "_24",
+            "name" : "Matrices",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 1,
+            "binding" : 0
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_17",
+            "name" : "Scene",
+            "block_size" : 64,
+            "set" : 0,
+            "binding" : 0
+        }
+    ],
+    "push_constants" : [
+        {
+            "type" : "_27",
+            "name" : "pushConstants",
+            "push_constant" : true
+        }
+    ]
+}
