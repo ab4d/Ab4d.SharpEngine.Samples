@@ -20,7 +20,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 // With Avalonia v11.1+ it is possible to use Vulkan backend - in this case uncomment the following code
-                // This requires Ab4d.SharpEngine.AvaloniaUI v2.0.8952-rc1 that depends on Avalonia v11.1.rc2
+                // This requires Ab4d.SharpEngine.AvaloniaUI v2.0.8957-rc1 that depends on Avalonia v11.1.rc2
                 // When an official version of Avalonia v11.1 will be released, then an official Ab4d.SharpEngine.AvaloniaUI will be also released.
 #if VULKAN_BAKCEND
                 .With(new Win32PlatformOptions

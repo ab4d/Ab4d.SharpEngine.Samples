@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8951" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
   </ItemGroup>
 
 </Project>
