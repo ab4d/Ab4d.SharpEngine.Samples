@@ -47,6 +47,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Views
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
 
+            MainSceneView.GpuDeviceCreated += (sender, args) =>
+            {
+                var sharpEngineVersion = MainSceneView.GetType().Assembly.GetName().Version ?? new Version(0, 0, 0);
+                InfoText.Text = $"Using Ab4d.SharpEngine v{sharpEngineVersion.Major}.{sharpEngineVersion.Minor}.{sharpEngineVersion.Revision} on {args.GpuDevice.GpuName} GPU";
+            };
+
             CreateTestScene();
             SetupMouseCameraController();
 

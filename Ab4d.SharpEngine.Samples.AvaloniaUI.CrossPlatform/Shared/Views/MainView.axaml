@@ -39,6 +39,7 @@
 
       <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
           <TextBlock Text="Ab4d.SharpEngine in a cross-platform Avalonia app" FontSize="20" FontWeight="Bold" Foreground="#444" Margin="5" TextWrapping="Wrap"/>
+          <TextBlock Name="InfoText" Margin="5 0" TextWrapping="Wrap"/>
       </StackPanel>
     </Grid>
 </UserControl>
