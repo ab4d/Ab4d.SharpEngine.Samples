@@ -3,6 +3,7 @@ using Ab4d.SharpEngine.RenderingSteps;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
+using System.Runtime.CompilerServices;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -36,12 +37,6 @@ sealed class PostProcessRenderingStep : RenderingStep
     //readonly Sampler _sampler;
 
     readonly DescriptorSet[] _samplerDescriptorSets;
-    //readonly VulkanDescriptorSetFactory _samplerDescriptorSetFactory;
-    //readonly DisposeToken _samplerDescriptorSetFactoryDisposeToken;
-    //readonly GpuDynamicMemoryBlockPool<DescriptorImageInfo> _samplerMemoryBlockPool;
-    //readonly DisposeToken _samplerMemoryBlockPoolDisposeToken;
-    //readonly int _samplerMemoryBlockIndex;
-    //readonly int _samplerMemoryIndex;
 
     readonly PipelineLayout _pipelineLayout;
     readonly PipelineShaderStageCreateInfo[] _shaderStageCreateInfo;
@@ -56,7 +51,7 @@ sealed class PostProcessRenderingStep : RenderingStep
     static readonly PipelineInputAssemblyStateCreateInfo _inputAssemblyStateCreateInfo = CommonStatesManager.TriangleListInputAssemblyState;
     static readonly PipelineColorBlendAttachmentState _colorBlendAttachmentState = CommonStatesManager.OpaqueAttachmentState;
 
-    VertexBufferDescription? _vertexBufferDescription;
+    readonly VertexBufferDescription _vertexBufferDescription;
 
     Pipeline _pipeline;
 
@@ -81,16 +76,16 @@ sealed class PostProcessRenderingStep : RenderingStep
         // descriptor sets
 
         var descriptorSetLayouts = new DescriptorSetLayout[] {
-            gpuDevice.CreateDescriptorSetLayout(DescriptorType.Sampler, ShaderStageFlags.Fragment)
+            gpuDevice.CreateDescriptorSetLayout(DescriptorType.CombinedImageSampler, ShaderStageFlags.Fragment)
         };
 
         var swapChainImagesCount = sceneView.SwapChainImagesCount;
-        var samplerDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.Sampler, swapChainImagesCount);
+        var samplerDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.CombinedImageSampler, swapChainImagesCount);
         _samplerDescriptorSets = gpuDevice.CreateDescriptorSets(descriptorSetLayouts[0], samplerDescriptorPool, swapChainImagesCount);
 
         //(_samplerDescriptorSetFactory, _samplerDescriptorSetFactoryDisposeToken) = VulkanDescriptorSetFactory.Create(
         //    gpuDevice,
-        //    DescriptorType.Sampler,
+        //    DescriptorType.CombinedImageSampler,
         //    descriptorSetLayouts[0],
         //    Math.Max(16, 8 * scene.SwapChainImagesCount));
         //(_samplerMemoryBlockPool, _samplerMemoryBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<DescriptorImageInfo>.Create(
@@ -126,9 +121,6 @@ sealed class PostProcessRenderingStep : RenderingStep
         PipelineCreateFlags flags,
         string? name)
     {
-        if (_vertexBufferDescription is null)
-            throw new Exception("PostProcessEffectTechnique must be initialized before calling " + nameof(_createPipeline));
-
         // Vulkan by default uses right coordinate system with y axis down (?!). To enable y axis up, we need to define negative height.
         var viewport = height < 0 ?
             new Viewport(0, -height, width, height, 0, 1) :
@@ -216,8 +208,7 @@ sealed class PostProcessRenderingStep : RenderingStep
 
         Pipeline pipeline;
         var gpuDevice = SceneView.GpuDevice!;
-        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo, null, &pipeline)
-            .LogAndCheckResult(_logArea, "vkCreateGraphicsPipeline for " + Name);
+        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo, null, &pipeline);
         if (name is not null)
             pipeline.SetName(gpuDevice, name);
 
@@ -225,14 +216,14 @@ sealed class PostProcessRenderingStep : RenderingStep
         return pipeline;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     protected override unsafe bool OnRun(RenderingContext renderingContext)
     {
         var descriptorSetChangesCount = 0;
 
         var gpuDevice = renderingContext.GpuDevice;
         var vk = gpuDevice.Vk;
-        renderingContext.BeginRecordingCommandBuffer();
-        var cmdBuf = renderingContext.CurrentCommandBuffer;
+        var cmdBuf = gpuDevice.BeginGraphicsCommands();
 
         // ensure the pipeline exists
 
@@ -252,29 +243,82 @@ sealed class PostProcessRenderingStep : RenderingStep
         var boundDescriptorSets = renderingContext.CurrentBoundDescriptorSets;
         var swapChainImageIndex = renderingContext.CurrentSwapChainImageIndex;
 
-        //var samplerDescriptorSets = _samplerMemoryBlockPool
-        //    .GetMemoryBlockOrDefault(_samplerMemoryBlockIndex, _samplerMemoryIndex)
-        //    ?.DescriptorSets;
-        //if (samplerDescriptorSets is not null)
-        //{
         var samplerDescriptorSet = _samplerDescriptorSets[swapChainImageIndex];
-        var imageInfo = new DescriptorImageInfo
+
+        // note to Andrej:
+        // instead of more images here
+        // it'd be great if we could just set ImageUsage on the swap chain to allow the sampler to see it
+        //var imageCreateInfo = new ImageCreateInfo
+        //{
+        //    ArrayLayers = 1,
+        //    Extent = new((int)renderingContext.Width, (int)renderingContext.Height, 1),
+        //    Format = renderingContext.SwapChain.SurfaceFormat.Format,
+        //    ImageType = ImageType.ImageType2D,
+        //    MipLevels = 1,
+        //    Tiling = ImageTiling.Optimal,
+        //    InitialLayout = ImageLayout.Undefined,
+        //    Usage = ImageUsageFlags.TransferDst | ImageUsageFlags.Sampled,
+        //    Samples = SampleCountFlags.SampleCount1,
+        //    SharingMode = SharingMode.Exclusive,
+        //    SType = StructureType.ImageCreateInfo,
+        //};
+        ////gpuDevice.CreateSwapChainImages()
+        //Image image;
+        //vk.CreateImage(gpuDevice.Device, &imageCreateInfo, null, &image);
+        //MemoryRequirements imageMemoryRequirements;
+        //vk.GetImageMemoryRequirements(gpuDevice.Device, image, &imageMemoryRequirements);
+        //var imageMemoryAllocateInfo = new MemoryAllocateInfo
+        //{
+        //    AllocationSize = imageMemoryRequirements.Size,
+        //    MemoryTypeIndex = (uint)gpuDevice.PhysicalDeviceDetails.FindMemoryType(imageMemoryRequirements.MemoryTypeBits, MemoryPropertyFlags.DeviceLocal),
+        //    SType = StructureType.MemoryAllocateInfo,
+        //};
+        //DeviceMemory imageMemory;
+        //vk.AllocateMemory(gpuDevice.Device, &imageMemoryAllocateInfo, null, &imageMemory);
+        //vk.BindImageMemory(gpuDevice.Device, image, imageMemory, 0);
+        //renderingContext.SwapChain.CopyToImage(swapChainImageIndex, image);
+
+        var imageViewSubresourceRange = new ImageSubresourceRange
+        {
+            AspectMask = ImageAspectFlags.Color,
+            BaseMipLevel = 0,
+            LevelCount = 1,
+            BaseArrayLayer = 0,
+            LayerCount = 1,
+        };
+        var imageViewCreateInfo = new ImageViewCreateInfo
+        {
+            Components = new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, ComponentSwizzle.A),
+            Format = renderingContext.SwapChain.SurfaceFormat.Format,
+            // not sure where to get the image from
+            Image = renderingContext.StagingGpuImage.Image,
+            //Image = _saveOutputRenderingStep.Images[swapChainImageIndex],
+            //Image = image,
+            //Image = renderingContext.CurrentSwapChainImage,
+            SType = StructureType.ImageViewCreateInfo,
+            SubresourceRange = imageViewSubresourceRange,
+            ViewType = ImageViewType.ImageViewType2D,
+        };
+        ImageView imageView;
+        vk.CreateImageView(gpuDevice.Device, &imageViewCreateInfo, null, &imageView);
+        var descriptorImageInfo = new DescriptorImageInfo
         {
             ImageLayout = ImageLayout.ReadOnlyOptimal,
-            ImageView = renderingContext.CurrentSwapChainImageView,
+            ImageView = imageView,
+            //ImageView = renderingContext.CurrentSwapChainImageView,
             Sampler = gpuDevice.SamplerFactory.MirrorSampler.Sampler,
         };
-        var write = new WriteDescriptorSet
+        var writeDescriptorSet = new WriteDescriptorSet
         {
-            DescriptorType = DescriptorType.Sampler,
+            DescriptorType = DescriptorType.CombinedImageSampler,
             DstArrayElement = 0,
             DescriptorCount = 1,
             DstBinding = _samplerDescriptorSetIndex,
             DstSet = samplerDescriptorSet,
-            PImageInfo = &imageInfo,
+            PImageInfo = &descriptorImageInfo,
             SType = StructureType.WriteDescriptorSet,
         };
-        vk.UpdateDescriptorSets(gpuDevice.Device, 1, &write, 0, null);
+        vk.UpdateDescriptorSets(gpuDevice.Device, 1, &writeDescriptorSet, 0, null);
 
         // bind descriptor sets
 
@@ -284,11 +328,14 @@ sealed class PostProcessRenderingStep : RenderingStep
             boundDescriptorSets[_samplerDescriptorSetIndex] = samplerDescriptorSet;
             descriptorSetChangesCount++;
         }
-        //}
 
         // bind the pipeline
 
         vk.CmdBindPipeline(cmdBuf, PipelineBindPoint.Graphics, _pipeline);
+
+        // ende
+
+        gpuDevice.EndGraphicsCommands();
 
         return true;
     }

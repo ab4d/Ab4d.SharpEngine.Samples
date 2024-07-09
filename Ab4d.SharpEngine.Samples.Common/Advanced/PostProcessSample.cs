@@ -30,10 +30,8 @@ public class PostProcessSample : CommonSample
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         // todo:
-        // fix error in PostProcessRenderingStep (You must call vkBeginCommandBuffer() before this call to vkCmdBindDescriptorSets...)
-        // pass in the proper sampler and image view (PostProcessRenderingStep l.264,265)
-        // write the shaders
-        // how to prevent previous render pass from presenting to screen?
+        // pass in the proper sampler and image view (PostProcessRenderingStep l.293)
+        // dispose things and free memory where possible in PostProcessRenderingStep
 
         var beginRenderPassRenderingStep = new BeginRenderPassRenderingStep(sceneView, "PostProcessSample-BeginRenderingPass");
         var postProcessRenderingStep = new PostProcessRenderingStep("PostProcessSampleShader.vert.spv", "PostProcessSampleShader.frag.spv", sceneView);
@@ -42,25 +40,6 @@ public class PostProcessSample : CommonSample
             beginRenderPassRenderingStep,
             postProcessRenderingStep,
             completeRenderingStep);
-
-        sceneView.DefaultRenderObjectsRenderingStep.AfterRunningStep += (o, e) =>
-        {
-
-        };
-        sceneView.DefaultCompleteRenderingStep.AfterRunningStep += (o, e) =>
-        {
-
-        };
-        beginRenderPassRenderingStep.BeforeRunningStep += (o, e) =>
-        {
-        };
-        beginRenderPassRenderingStep.AfterRunningStep += (o, e) =>
-        {
-        };
-        postProcessRenderingStep.AfterRunningStep += (o, e) =>
-        {
-
-        };
 
         base.OnSceneViewInitialized(sceneView);
     }
