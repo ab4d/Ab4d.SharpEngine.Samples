@@ -121,17 +121,14 @@ public abstract class StandardModelsSampleBase : CommonSample
             return;
 
 
-        var normalLinePositions = LineUtils.GetNormalLinePositions(mesh, normalsLength);
+        var normalLinePositions = LineUtils.GetNormalLinePositions(mesh, normalsLength, modelTransform);
 
         if (normalLinePositions == null)
             return;
 
         var lineMaterial = new LineMaterial(Colors.Orange, normalsLineThickness);
 
-        normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, lineMaterial, "NormalLines")
-        {
-            Transform = modelTransform,
-        };
+        normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, lineMaterial, "NormalLines");
 
         Scene.RootNode.Add(normalsLineNode);
     }
