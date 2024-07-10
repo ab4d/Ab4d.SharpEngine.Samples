@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="v2.0.8956" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
   </ItemGroup>
 
   <ItemGroup>
