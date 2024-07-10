@@ -55,15 +55,6 @@
     <EmbeddedResource Include="Titles\QuickStartTitle.md" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <Folder Include="Resources\BitmapFonts\" />
-    <Folder Include="Resources\HeightMaps\" />
-    <Folder Include="Resources\Models\" />
-    <Folder Include="Resources\Textures\" />
-    <Folder Include="Resources\PointClouds\" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />

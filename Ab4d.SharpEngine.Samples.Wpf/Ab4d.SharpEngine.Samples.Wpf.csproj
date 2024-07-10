@@ -53,15 +53,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Cameras\" />
-    <Folder Include="Resources\BitmapFonts\" />
-    <Folder Include="Resources\HeightMaps\" />
-    <Folder Include="Resources\Models\" />
-    <Folder Include="Resources\Textures\" />
-    <Folder Include="Resources\PointClouds\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Samples.xml" />
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
