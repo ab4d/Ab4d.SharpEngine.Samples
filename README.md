@@ -63,7 +63,7 @@ Online help:
 - The Ab4d.SharpEngine.WinUI has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.WinForms has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.AvaloniaUI library requires Avalonia library.
-- The Ab4d.SharpEngine.glTF library requires glTF2Loader library (this will be internalized in the future).
+- The Ab4d.SharpEngine.glTF.
 
 
 ### System requirements to run the samples:
@@ -75,6 +75,23 @@ Online help:
 - Visual Studio 2022 on Windows (VS 2019 does not support .Net 6)
 - Rider from JetBrains on Windows, Linux and macOS
 - Visual Studio Code on Windows, Linux and macOS
+
+
+### Notice:
+Ab4d.SharpEngine.glTF library use source code from glTF2Loader with PR from ZingBallyhoo (https://github.com/KhronosGroup/glTF-CSharp-Loader/pull/51).
+glTF2Loader library is publushed under the following MIT license:
+
+This license is for the C# reference loader, not the rest of the repository.
+
+Copyright (c) 2015, Matthew and Xueru McMullan All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
