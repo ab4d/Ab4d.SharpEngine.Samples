@@ -77,6 +77,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
 
+
+#if VULKAN_BAKCEND
+            // When using Vulkan backend, then the whole application uses Vulkan (also to render Avalonia UI).
+            // This requires Avalonia v11.1+ and Ab4d.SharpEngine.AvaloniaUI v2.0.8990 or newer.
+            this.Title += " using Vulkan backend";
+#endif
+
+
             DisableDiagnosticsButton();
 
             AvaloniaSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
