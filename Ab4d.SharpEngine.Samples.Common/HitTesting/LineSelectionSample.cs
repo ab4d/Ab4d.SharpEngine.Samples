@@ -343,13 +343,6 @@ public class LineSelectionSample : CommonSample
 
         if (_selectedLineSelectorData.Count > 0)
         {
-            // We need mouse ray from the mouse position to get the closest position on the line
-            var mouseRay = SceneView.GetRayFromCamera(_lastMousePosition.X, _lastMousePosition.Y);
-
-            if (!mouseRay.IsValid)
-                return;
-
-
             float closestDistance = float.MaxValue;
 
             if (_orderByDistance && targetPositionCamera != null)
@@ -360,7 +353,12 @@ public class LineSelectionSample : CommonSample
 
                 foreach (var oneLineSelectorData in _selectedLineSelectorData)
                 {
-                    var oneClosestPositionOnLine = oneLineSelectorData.GetClosestPositionOnLine(mouseRay.Position, mouseRay.Direction);
+                    var oneClosestPositionOnLine = oneLineSelectorData.GetClosestPositionOnLine(_lastMousePosition);
+
+                    // If we had mouseRay, we could also call the following overload:
+                    // The ray could be calculated by:
+                    // var mouseRay = SceneView.GetRayFromCamera(_lastMousePosition.X, _lastMousePosition.Y);
+                    //var oneClosestPositionOnLine = oneLineSelectorData.GetClosestPositionOnLine(mouseRay.Position, mouseRay.Direction);
 
                     if (float.IsNaN(oneClosestPositionOnLine.X)) // if we cannot calculate the closest position, then NaN is returned
                         continue;
@@ -389,7 +387,7 @@ public class LineSelectionSample : CommonSample
                 }
 
                 if (closestLineSelector != null)
-                    closestPositionOnLine = closestLineSelector.GetClosestPositionOnLine(mouseRay.Position, mouseRay.Direction);
+                    closestPositionOnLine = closestLineSelector.GetClosestPositionOnLine(_lastMousePosition);
             }
         }
 
