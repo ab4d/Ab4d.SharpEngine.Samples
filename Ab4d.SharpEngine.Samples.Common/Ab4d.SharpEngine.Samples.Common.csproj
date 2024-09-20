@@ -14,7 +14,7 @@
     <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
     <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.1.9028-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.0.8960" />
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.1.9028-beta1" />
   </ItemGroup>
 
   <ItemGroup>
