@@ -62,7 +62,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.60" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
-		<PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
+		<PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
 	</ItemGroup>
 
 
