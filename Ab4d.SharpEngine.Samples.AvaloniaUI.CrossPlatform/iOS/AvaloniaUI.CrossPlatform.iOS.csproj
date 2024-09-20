@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</RootNamespace>  
@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.iOS" Version="11.1.0" />
+    <PackageReference Include="Avalonia.iOS" Version="11.1.3" />
   </ItemGroup>
 
   <ItemGroup>
