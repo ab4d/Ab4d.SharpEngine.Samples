@@ -16,9 +16,12 @@ public class SliceModelsSample : CommonSample
 
     private GroupNode? _importedModel;
     private StandardMaterial _redBackMaterial;
-
-    private SceneNode? _frontSceneNode;
-    private SceneNode? _backSceneNode;
+    
+    private GroupNode? _frontGroupNode;
+    private GroupNode? _backGroupNode;
+    
+    private TranslateTransform? _frontGroupTranslateTransform;
+    private TranslateTransform? _backGroupTranslateTransform;
 
     private Plane[] _allPlanes;
 
@@ -27,16 +30,21 @@ public class SliceModelsSample : CommonSample
     private float _slicePositionPercent = 70;
     private float _planeRotationAngle = 0;
 
+    private EdgeLinesFactory? _edgeLinesFactory;
+    private MultiLineNode? _frontEdgeLinesNode;
+    private MultiLineNode? _backEdgeLinesNode;
+
     private bool _showFront = true;
     private bool _showBack = true;
-    
+    private bool _showEdgeLines = true;
+
 
     public SliceModelsSample(ICommonSamplesContext context)
         : base(context)
     {
-        _redBackMaterial = StandardMaterials.Red;
+        _redBackMaterial = StandardMaterials.Red; // Use a single instance for back material
 
-        // Plane is created with defining plane's normal vector (first 3 numbers) and an offset d (forth number):
+        // Plane is created by defining plane's normal vector (first 3 numbers) and an offset d (forth number):
         _allPlanes = new Plane[]
         {
             new Plane(1, 0, 0, 0),
@@ -49,6 +57,34 @@ public class SliceModelsSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
+        // We add additional front and back GroupNodes that will provide separation from the front and back models.
+        // Here we only create TranslateTransform objects. The actual transformation is set in UpdateSlicedModel method.
+        _frontGroupNode = new GroupNode("FrontGroup");
+        _frontGroupTranslateTransform = new TranslateTransform();
+        _frontGroupNode.Transform = _frontGroupTranslateTransform;
+        scene.RootNode.Add(_frontGroupNode);
+
+        _backGroupNode = new GroupNode("BackGroup");
+        _backGroupTranslateTransform = new TranslateTransform();
+        _backGroupNode.Transform = _backGroupTranslateTransform;
+        scene.RootNode.Add(_backGroupNode);
+
+
+        // Create MultiLineNodes that will show edge lines
+        var edgeLineMaterial = new LineMaterial(Colors.Black)
+        {
+            LineThickness = 1,
+            DepthBias = 0.005f // rise the lines above the 3D object
+        };
+
+        _frontEdgeLinesNode = new MultiLineNode(isLineStrip: false, edgeLineMaterial);
+        scene.RootNode.Add(_frontEdgeLinesNode);
+
+        _backEdgeLinesNode = new MultiLineNode(isLineStrip: false, edgeLineMaterial);
+        scene.RootNode.Add(_backEdgeLinesNode);
+
+
+
         // Read model from obj file
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
 
@@ -104,24 +140,9 @@ public class SliceModelsSample : CommonSample
         //_importedModel.Add(box3);
 
 
-        // Test on sphere model
-
-        //var sphere = new SphereModelNode()
-        //{
-        //    Radius = 100,
-        //    Material = StandardMaterials.Blue,
-        //    //UseSharedSphereMesh = false
-        //};
-
-        //_importedModel = new GroupNode("RootGroup");
-        //_importedModel.Add(sphere);
-
 
         if (_importedModel == null)
             return;
-
-        scene.RootNode.Add(_importedModel);
-
 
         if (_importedModel.WorldBoundingBox.IsUndefined)
             _importedModel.Update();
@@ -145,12 +166,6 @@ public class SliceModelsSample : CommonSample
     {
         if (_importedModel == null || Scene == null)
             return;
-
-        Scene.RootNode.Clear();
-
-        //// Define the Plane that will be used to slice the model
-        //var modelWidth = _importedModel.WorldBoundingBox.SizeX;
-        //var actualSlicePosition = modelWidth * _slicePositionPercent / 100 - modelWidth / 2 + _importedModel.WorldBoundingBox.GetCenterPosition().X;
 
 
         // Get slice plane
@@ -177,7 +192,7 @@ public class SliceModelsSample : CommonSample
         // ModelUtils.SliceSceneNode slices the _importedModel by the plane.
         // It returns frontSceneNodes and backSceneNodes.
         // We can also call SliceGroupNode or SliceModelNode.
-        (_frontSceneNode, _backSceneNode) = ModelUtils.SliceSceneNode(plane, _importedModel, parentTransform: null); // we can also remove the parentTransform parameter because its default value is null
+        var(frontSceneNode, backSceneNode) = ModelUtils.SliceSceneNode(plane, _importedModel, parentTransform: null); // we can also remove the parentTransform parameter because its default value is null
 
         // To slice a mesh, use:
         //(var frontMesh, var backMesh) = MeshUtils.SliceMesh(plane, mesh, parentTransform);
@@ -187,44 +202,77 @@ public class SliceModelsSample : CommonSample
         float slicedModelsSeparation = modelSizeInNormalDirection * 0.1f;
 
         // Set back material to red so we will easily see the inner parts of the model
-        if (_frontSceneNode != null)
+        if (frontSceneNode != null && _frontGroupNode != null && _frontGroupTranslateTransform != null)
         {
             // Change back material to red, so we can more easily see inside the model
-            Utilities.ModelUtils.ChangeBackMaterial(_frontSceneNode, _redBackMaterial);
+            Utilities.ModelUtils.ChangeBackMaterial(frontSceneNode, _redBackMaterial);
 
             // Create a new GroupNode because we need to apply separation transformation (and we do not want to overwrite any existing transform).
             // We could also use Ab4d.SharpEngine.Utilities.TransformationUtils.CombineTransformations, but creating a new GroupNode is cleaner.
             
-            var frontGroupNode = new GroupNode("SeparatedFrontGroup");
-            frontGroupNode.Transform = new TranslateTransform(plane.Normal.X * slicedModelsSeparation, plane.Normal.Y * slicedModelsSeparation, plane.Normal.Z * slicedModelsSeparation);
+            _frontGroupNode.Clear();
+            _frontGroupNode.Add(frontSceneNode);
 
-            frontGroupNode.Add(_frontSceneNode);
-
-            Scene.RootNode.Add(frontGroupNode);
+            // Move front model for the 10% of the object size in the direction of plane's normal
+            _frontGroupTranslateTransform.SetTranslate(plane.Normal.X * slicedModelsSeparation, plane.Normal.Y * slicedModelsSeparation, plane.Normal.Z * slicedModelsSeparation);
         }
 
-        if (_backSceneNode != null)
+        if (backSceneNode != null && _backGroupNode != null && _backGroupTranslateTransform != null)
         {
-            Utilities.ModelUtils.ChangeBackMaterial(_backSceneNode, _redBackMaterial);
+            Utilities.ModelUtils.ChangeBackMaterial(backSceneNode, _redBackMaterial);
             
-            var backGroupNode = new GroupNode("SeparatedBackGroup");
-            backGroupNode.Transform = new TranslateTransform(plane.Normal.X * -slicedModelsSeparation, plane.Normal.Y * -slicedModelsSeparation, plane.Normal.Z * -slicedModelsSeparation);
+            _backGroupNode.Clear();
+            _backGroupNode.Add(backSceneNode);
 
-            backGroupNode.Add(_backSceneNode);
-
-            Scene.RootNode.Add(backGroupNode);
+            // Move front model for the 10% of the object size in the opposite direction of plane's normal
+            _backGroupTranslateTransform.SetTranslate(plane.Normal.X * -slicedModelsSeparation, plane.Normal.Y * -slicedModelsSeparation, plane.Normal.Z * -slicedModelsSeparation);
         }
 
-        UpdateFronAndBackVisibility();
+        UpdateEdgeLines();
+
+        UpdateVisibility();
     }
 
-    private void UpdateFronAndBackVisibility()
+    private void UpdateEdgeLines()
     {
-        if (_frontSceneNode != null)
-            _frontSceneNode.Visibility = _showFront ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+        if (Scene == null || !_showEdgeLines) // No need to update edge lines when they are not visible
+            return;
 
-        if (_backSceneNode != null)
-            _backSceneNode.Visibility = _showBack ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+        _edgeLinesFactory ??= new EdgeLinesFactory(); // Reuse the EdgeLinesFactory object. This reuses the internal collections.
+
+        if (_frontGroupNode != null && _frontEdgeLinesNode != null)
+        {
+            // Generate edge lines from the _frontGroupNode
+            var edgeLines = _edgeLinesFactory.CreateEdgeLines(_frontGroupNode, edgeStartAngleInDegrees: 25);
+            
+            // And update the line positions in the MultiLineNode
+            _frontEdgeLinesNode.Positions = edgeLines.ToArray();
+            //_frontEdgeLinesNode.Transform = _frontGroupNode.Transform; // _frontGroupNode is already transformed; but if we would create edge lines from frontSceneNode, then we would need to apply the transformation from _frontGroupNode
+        }
+
+        if (_backGroupNode != null && _backEdgeLinesNode != null)
+        {
+            // Generate edge lines from the _backGroupNode
+            var edgeLines = _edgeLinesFactory.CreateEdgeLines(_backGroupNode, edgeStartAngleInDegrees: 25);
+            
+            // And update the line positions in the MultiLineNode
+            _backEdgeLinesNode.Positions = edgeLines.ToArray();
+        }
+    }
+    
+    private void UpdateVisibility()
+    {
+        if (_frontGroupNode != null)
+            _frontGroupNode.Visibility = _showFront ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+
+        if (_backGroupNode != null)
+            _backGroupNode.Visibility = _showBack ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+
+        if (_frontEdgeLinesNode != null)
+            _frontEdgeLinesNode.Visibility = _showEdgeLines ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+
+        if (_backEdgeLinesNode != null)
+            _backEdgeLinesNode.Visibility = _showEdgeLines ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
@@ -279,13 +327,23 @@ public class SliceModelsSample : CommonSample
         ui.CreateCheckBox("Show front", _showFront, isChecked =>
         {
             _showFront = isChecked;
-            UpdateFronAndBackVisibility();
+            UpdateVisibility();
         });
         
         ui.CreateCheckBox("Show back", _showBack, isChecked =>
         {
             _showBack = isChecked;
-            UpdateFronAndBackVisibility();
+            UpdateVisibility();
+        });
+
+        ui.CreateCheckBox("Show edge lines", _showEdgeLines, isChecked =>
+        {
+            _showEdgeLines = isChecked;
+
+            if (isChecked)
+                UpdateEdgeLines(); // Regenerate edge lines
+
+            UpdateVisibility();
         });
     }
 }
