@@ -64,6 +64,9 @@
     <None Remove="Samples.xml" />
     <None Remove="Titles\IntroductionPage.xaml" />
     <None Remove="Titles\QuickStartTitle.md" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\CadImporter-for-SharpEngine.png" Link="Resources\CadImporter-for-SharpEngine.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

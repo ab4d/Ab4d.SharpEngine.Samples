@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
@@ -18,13 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\CadImporter-for-SharpEngine.png" />
     <None Remove="Resources\Shaders\spv\FogShader.frag.spv" />
     <None Remove="Resources\Shaders\spv\FogShader.vert.spv" />
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
     <None Remove="StandardModels\OtherStandardModelsTitle.md" />
     <None Remove="Titles\AdvancedModelsTitle.md" />
     <None Remove="Titles\AdvancedTitle.md" />   
-    <None Remove="Titles\AnimationsTitle.md" />
+    <None Remove="Titles\AnimationsTitle.md" />   
+    <None Remove="Titles\CadImporterInfo.md" />
     <None Remove="Titles\CamerasTitle.md" />
     <None Remove="Titles\HitTesting.md" />
     <None Remove="Titles\ImportersTitle.md" />
@@ -37,6 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\CadImporter-for-SharpEngine.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Textures\sharp-engine-logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -55,11 +60,11 @@
     <EmbeddedResource Include="Titles\AdvancedModelsTitle.md" />
     <EmbeddedResource Include="Titles\HitTesting.md" />
     <EmbeddedResource Include="Titles\PointerCameraControllerTitle.md" />
+    <EmbeddedResource Include="Importers\CadImporterInfo.md" />
     <EmbeddedResource Include="Titles\StandardModelsTitle.md" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Importers\" />
     <Folder Include="Materials\" />
   </ItemGroup>
 
