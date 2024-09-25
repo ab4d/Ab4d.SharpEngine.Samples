@@ -98,6 +98,7 @@
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
   <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+  <Sample Location="Lines.SpecialLineRenderingSample" Title="Special line rendering"/>
   <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
