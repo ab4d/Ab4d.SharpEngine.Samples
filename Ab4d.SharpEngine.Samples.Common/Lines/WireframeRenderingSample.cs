@@ -168,11 +168,7 @@ public class WireframeRenderingSample : CommonSample
 
 
                         // Add wireframe positions for the current SceneNode's Mesh to the linePositions
-
-                        // NOTE:
-                        // In SharpEngine v1.1 it will be possible to call AddWireframeLinePositions and pass WorldMatrix as parameter without the need to convert that to MatrixTransform.
-                        var matrixTransform = new MatrixTransform(transformMatrix);
-                        LineUtils.AddWireframeLinePositions(linePositions, mesh, _removeDuplicateLines, matrixTransform, _distinctLinesHashSet);
+                        LineUtils.AddWireframeLinePositions(linePositions, mesh, transformMatrix, _removeDuplicateLines, _distinctLinesHashSet);
                     }
                 }
             });
