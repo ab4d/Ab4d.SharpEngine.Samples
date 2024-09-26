@@ -31,7 +31,10 @@ public class SpecialLineRenderingSample : CommonSample
         // To render lines that are always visible (when in front of objects and when behind objects),
         // use always visible lines. Those lines are added to the Scene.OverlayRenderingLayer (OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering also needs to be set to true).
         // See ChangeLinesVisibility method below and Advanced/BackgroundAndOverlayRenderingSample sample for more info.
-
+        //
+        // TO SUMMARIZE:
+        // If you want to use different styles for visible and hidden lines then use two LineMaterials (one with IsHiddenLine set to true).
+        // If you want to use the same line style for lines that are visible in fron of the objects and behind them, then use OverlayRenderingLayer.
         _standardLineMaterial = new LineMaterial(Colors.Yellow, lineThickness: 5);
         
         _standardPolyLineMaterial = new PolyLineMaterial(Colors.Yellow, lineThickness: 5);
@@ -58,10 +61,6 @@ public class SpecialLineRenderingSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-
-        scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangular;
-
-
         var greenBoxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -2.5f, -10), size: new Vector3(100, 4, 180), material: StandardMaterials.Green);
         scene.RootNode.Add(greenBoxModelNode);
 
@@ -204,7 +203,14 @@ public class SpecialLineRenderingSample : CommonSample
 
             if (Scene != null && Scene.OverlayRenderingLayer != null)
             {
-                // This is done by first clearing the depth-buffer before rendering objects in OverlayRenderingLayer...
+                // To render lines that are always visible, we need to put them to the OverlayRenderingLayer.
+                // Before objects from this layer are rendered, the depth buffer is cleared so no previously rendered object will obscure the lines.
+                //
+                // To do this on ModelNodes or LineNodes, you can use the CustomRenderingLayer property.
+                // On GroupNode, you need to call ModelUtils.SetCustomRenderingLayer method to change CustomRenderingLayer property on all child nodes.
+
+                // Before SharpEngine v2.1 we also need to manually set OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering to true.
+                // This will clear the depth-buffer before rendering objects in OverlayRenderingLayer.
                 Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = true;
 
                 if (showAlwaysVisibleLines)
