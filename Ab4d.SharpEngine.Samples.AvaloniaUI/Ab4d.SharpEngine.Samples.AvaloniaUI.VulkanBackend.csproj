@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
-    <DefineConstants>VULKAN_BAKCEND</DefineConstants>
+    <DefineConstants>VULKAN_BACKEND</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

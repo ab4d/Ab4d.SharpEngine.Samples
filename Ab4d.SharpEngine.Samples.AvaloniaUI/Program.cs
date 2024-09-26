@@ -21,7 +21,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 .UsePlatformDetect()
                 // With Avalonia v11.1+ it is possible to use Vulkan backend - in this case the whole application uses Vulkan (also to render Avalonia UI).
                 // This requires Ab4d.SharpEngine.AvaloniaUI v2.0.8990 that depends on Avalonia v11.1.0
-#if VULKAN_BAKCEND
+#if VULKAN_BACKEND
                 .With(new Win32PlatformOptions
                 {
                     RenderingMode = new[]
