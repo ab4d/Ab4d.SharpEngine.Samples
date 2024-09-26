@@ -267,13 +267,9 @@ The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
 
 If you get build errors on Windows (for example 'project.assets.json' not found) than maybe the total path length is larger than max path (260 chars). Move the samples solution to a folder with a shorter path and try compiling again.
 
+The latest version of branches that start with "version/" may not compile with the latest published NuGet package and require the latest development version of the engine. If you need a feature from that branch, you can contact support to get the pre-release version.
 
-Known issues:
-
-- Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
-
-- When using SharedTexture in a WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error. Set SharpEngineSceneView.PresentationType to WriteableBitmap as a workaround.
-
+Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
 
 To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/
 When Vulkan validation is installed and enabled by the SharpEngine (EnableStandardValidation is set to true when creating the engine),
