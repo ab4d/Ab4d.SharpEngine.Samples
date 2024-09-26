@@ -22,11 +22,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 //    + easy to control which objects are rendered (but cannot to control individual line positions)
 //    - worse performance because of more draw calls - each object is rendered with its own draw call even if line color is the same; no duplicate lines removal
 
-//// The following will be available with v1.1:
-//// 3) Creating a new RenderObjectsRenderingStep that will use wireframe rendering technique to render all objects
-////    + no additional line positions arrays and MeshModelNodes are required
-////    - worse performance because of more draw calls - each object is rendered with its own draw call even if line color is the same; no duplicate lines removal
-////    - harder to filter which objects are rendered (this required to use FilterObjectsFunction)
+// 3) Creating a new RenderObjectsRenderingStep that will use WireframeRenderingEffectTechnique (set to OverrideEffectTechnique) to render all objects
+//    + no additional line positions arrays and MeshModelNodes are required
+//    - worse performance because of more draw calls - each object is rendered with its own draw call even if line color is the same; no duplicate lines removal
+//    - harder to filter which objects are rendered (this required to use FilterObjectsFunction)
 
 public class WireframeRenderingSample : CommonSample
 {
@@ -38,7 +37,7 @@ public class WireframeRenderingSample : CommonSample
     {
         CreateWireframePositions = 0, 
         UseLineMaterial = 1,
-        //WireframeRenderingStep = 2 // This will be available in v1.1
+        WireframeRenderingStep = 2
     }
     
     private WireframeRenderingTechniques _wireframeRenderingTechnique = WireframeRenderingTechniques.CreateWireframePositions;
@@ -69,18 +68,18 @@ public class WireframeRenderingSample : CommonSample
 
         RecreateWireframe();
         
-        if (targetPositionCamera != null)
-            targetPositionCamera.StartRotation(20, 0);
+        //if (targetPositionCamera != null)
+        //    targetPositionCamera.StartRotation(20, 0);
 
         base.OnSceneViewInitialized(sceneView);
     }
 
-    //protected override void OnDisposed()
-    //{
-    //    RemoveWireframeRenderingStep();
+    protected override void OnDisposed()
+    {
+        RemoveWireframeRenderingStep();
 
-    //    base.OnDisposed();
-    //}
+        base.OnDisposed();
+    }
 
     private void RecreateWireframe()
     {
@@ -97,10 +96,9 @@ public class WireframeRenderingSample : CommonSample
                 CreateSceneNodesWithLineMaterial();
                 break;
 
-            // The following will be available with v1.1:
-            //case WireframeRenderingTechniques.WireframeRenderingStep:
-            //    CreateWireframeRenderingStep();
-            //    break;
+            case WireframeRenderingTechniques.WireframeRenderingStep:
+                CreateWireframeRenderingStep();
+                break;
 
             default:
                 throw new ArgumentOutOfRangeException();
@@ -236,39 +234,35 @@ public class WireframeRenderingSample : CommonSample
             });
     }
 
-    //// The following will be available with v1.1:
-    //private void CreateWireframeRenderingStep()
-    //{
-    //    if (Scene == null || SceneView == null || _testSceneNode == null || SceneView.DefaultRenderObjectsRenderingStep == null)
-    //        return;
+    private void CreateWireframeRenderingStep()
+    {
+        if (Scene == null || SceneView == null || _testSceneNode == null || SceneView.DefaultRenderObjectsRenderingStep == null)
+            return;
 
-    //    Scene.RootNode.Clear();
-    //    Scene.RootNode.Add(_testSceneNode);
+        var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(Scene, "CustomWireframeRenderingEffectTechnique")
+        {
+            UseLineColorFromDiffuseColor = !_useSingleColorLines,
 
-    //    var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(Scene, "CustomWireframeRenderingEffectTechnique")
-    //    {
-    //        UseLineColorFromDiffuseColor = !_useSingleColorLines,
+            LineColor = Color4.Black,
+            LineThickness = _lineThickness,
 
-    //        LineColor = Color4.Black,
-    //        LineThickness = _lineThickness,
+            // Use default values:
+            DepthBias = 0,
+            LinePattern = 0,
+            LinePatternScale = 1,
+            LinePatternOffset = 0,
+        };
 
-    //        // Use default values:
-    //        DepthBias = 0,
-    //        LinePattern = 0,
-    //        LinePatternScale = 1,
-    //        LinePatternOffset = 0,
-    //    };
+        SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
+    }
 
-    //    SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
-    //}
+    private void RemoveWireframeRenderingStep()
+    {
+        if (SceneView == null || SceneView.DefaultRenderObjectsRenderingStep == null)
+            return;
 
-    //private void RemoveWireframeRenderingStep()
-    //{
-    //    if (SceneView == null || SceneView.DefaultRenderObjectsRenderingStep == null)
-    //        return;
-
-    //    SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = null;
-    //}
+        SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = null;
+    }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -276,18 +270,19 @@ public class WireframeRenderingSample : CommonSample
 
         ui.CreateLabel("Wireframe rendering technique:", isHeader: true);
 
-        ui.CreateComboBox(new string[] {"Create wireframe positions", "Use LineMaterial", "WireframeRenderingStep"}, 
+        ui.CreateRadioButtons(new string[] { "Create wireframe positions", "Use LineMaterial", "WireframeRenderingStep"}, 
             (selectedIndex, selectedText) =>
             {
-                //if (_wireframeRenderingTechnique == WireframeRenderingTechniques.WireframeRenderingStep)
-                //    RemoveWireframeRenderingStep();
+                if (_wireframeRenderingTechnique == WireframeRenderingTechniques.WireframeRenderingStep)
+                    RemoveWireframeRenderingStep();
 
                 _wireframeRenderingTechnique = (WireframeRenderingTechniques)selectedIndex;
                 RecreateWireframe();
             },
-            selectedItemIndex: 2);
+            selectedItemIndex: 0);
         
                 
+        ui.AddSeparator();
         ui.AddSeparator();
         
         var lineThicknessOptions = new float[] { 0.2f, 0.5f, 1, 2, 3 };
