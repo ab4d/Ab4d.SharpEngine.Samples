@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Ab4d;
 using Ab4d.SharpEngine.Common;
 using GLFW;
-using Microsoft.Win32.SafeHandles;
-using SizeChangeEventArgs = Ab4d.StandardPresentation.SizeChangeEventArgs;
 
 namespace Ab4d.StandardPresentation.GlfwUI
 {
