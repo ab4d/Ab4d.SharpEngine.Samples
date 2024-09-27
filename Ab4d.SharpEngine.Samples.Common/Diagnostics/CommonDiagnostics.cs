@@ -519,7 +519,7 @@ PrepareRenderTime: {6:0.00} ms
                 if (oneValue is string stringValue)
                     oneValueText = stringValue;
                 else if (oneValue is float || oneValue is double)
-                    oneValueText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00} ms", oneValue);
+                    oneValueText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.00}{1}", oneValue, keyValuePair.Key.Contains("Time", StringComparison.OrdinalIgnoreCase) ? " ms" :"");
                 else
                     oneValueText = oneValue.ToString()!;
 
@@ -579,15 +579,6 @@ PipelineChangesCount: {8:#,##0}",
         }
 
         _renderingStatisticStringBuilder.AppendFormat("\r\n\r\nSceneViewDirtyFlags: {0}\r\nSceneDirtyFlags: {1}", _lastSceneViewDirtyFlags, _lastSceneDirtyFlags);
-
-
-        if (renderingStatistics.Other.Count > 0)
-        {
-            _renderingStatisticStringBuilder.AppendLine().AppendLine();
-
-            foreach (var keyValuePair in renderingStatistics.Other)
-                _renderingStatisticStringBuilder.AppendFormat("{0}: {1}\r\n", keyValuePair.Key, keyValuePair.Value);
-        }
 
         return _renderingStatisticStringBuilder.ToString();
     }
