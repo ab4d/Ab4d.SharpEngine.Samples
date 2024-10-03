@@ -100,14 +100,25 @@ namespace AndroidApp1
         }
     }
 
-	internal static class NativeMethods
+	internal static partial class NativeMethods
 	{
 		const string AndroidRuntimeLibrary = "android";
 
+#if NET7_0_OR_GREATER
+		// Using LibraryImport instead of DllImport. This uses compiler time source code generator and allows AOT.
+		// See https://learn.microsoft.com/en-us/dotnet/standard/native-interop/pinvoke-source-generation
+
+		[LibraryImport(AndroidRuntimeLibrary)]
+		internal static partial IntPtr ANativeWindow_fromSurface(IntPtr jniEnv, IntPtr handle);
+
+		[LibraryImport(AndroidRuntimeLibrary)]
+		internal static partial void ANativeWindow_release(IntPtr window);
+#else
 		[DllImport (AndroidRuntimeLibrary)]
 		internal static extern IntPtr ANativeWindow_fromSurface (IntPtr jniEnv, IntPtr handle);
 
 		[DllImport (AndroidRuntimeLibrary)]
-		internal static extern void ANativeWindow_release (IntPtr window);
+        internal static extern void ANativeWindow_release (IntPtr window);
+#endif
 	}
 }
