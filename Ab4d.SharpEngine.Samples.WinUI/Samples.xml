@@ -30,6 +30,7 @@
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
+  <Sample Location="HitTesting.WinUIRectangularSelectionSample" Title="Rectangular selection"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
   <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>

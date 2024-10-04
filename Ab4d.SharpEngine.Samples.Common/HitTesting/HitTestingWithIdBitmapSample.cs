@@ -35,7 +35,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
     // Set this to 0, to render ID bitmap on each frame change
     private const double UpdateIdBitmapDelayMs = 250; 
 
-    private const int IdToColorMultiplier = 1; // If you want to see the ID Bitmap with bigger color differences, change this value to 8 or similar
+    private static int _idToColorMultiplier = 1; // If you want to see the ID Bitmap with bigger color differences, change this value to 8 or similar
 
 
     private Dictionary<ModelNode, Material>? _sceneNodeOriginalMaterials;
@@ -159,7 +159,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
                 _lastPixelColor = _rawRenderedBitmap.GetColor(idBitmapX, idBitmapY);
 
                 // Covert color to Object ID (index in the _idBitmapModelNodes)
-                _lastObjectId = GetObjectId(_lastPixelColor, _rawRenderedBitmap.Format);
+                _lastObjectId = GetObjectIdFromColor(_lastPixelColor, _rawRenderedBitmap.Format);
 
                 if (_idBitmapModelNodes != null && _lastObjectId >= 0 && _lastObjectId < _idBitmapModelNodes.Count)
                 {
@@ -187,6 +187,9 @@ public class HitTestingWithIdBitmapSample : CommonSample
         _objectIdLabel?.UpdateValue();
         _objectNameLabel?.UpdateValue();
     }
+
+    #region Render bitmap ID
+    // This code is the same as in RectangularSelectionSample.cs
 
     private void RenderIdBitmap()
     {
@@ -236,7 +239,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
         _pngBitmapIO ??= new PngBitmapIO();
 
-        string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AvaloniaSharpEngineScene.png");
+        string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SharpEngineBitmapId.png");
         _pngBitmapIO.SaveBitmap(_rawRenderedBitmap, fileName);
 
         System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
@@ -284,7 +287,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
             if (childSceneNode is ModelNode childModelNode)
             {
-                Color4 colorId = GetObjectIdColor4(objectId);
+                Color4 colorId = GetColorFromObjectId(objectId);
 
                 // Create SolidColorMaterial so the color is not changed based on lights
                 var colorIdMaterial = new SolidColorMaterial(colorId);
@@ -312,7 +315,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
             {
                 _lineNodesOriginalLineColors.Add(lineNode, lineNode.LineColor);
 
-                Color4 colorId = GetObjectIdColor4(objectId);
+                Color4 colorId = GetColorFromObjectId(objectId);
                 lineNode.LineColor = colorId;
 
                 _idBitmapModelNodes.Add(lineNode);
@@ -349,14 +352,13 @@ public class HitTestingWithIdBitmapSample : CommonSample
         _lineNodesOriginalLineColors.Clear();
     }
 
-
-    private static Color4 GetObjectIdColor4(int objectIndex)
+    public static Color4 GetColorFromObjectId(int objectIndex)
     {
 #if DEBUG
         // This is not for production code but just for this sample,
         // where you can increase the IdToColorMultiplier value (for example to 8),
         // to see the ID Bitmap with bigger color differences.
-        objectIndex *= IdToColorMultiplier;
+        objectIndex *= _idToColorMultiplier;
 #endif
 
         // Encode objectIndex into red, green and blue colors components (max written index is 16.777.215)
@@ -369,7 +371,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
         return new Color4(red, green, blue, 1);
     }
 
-    public static int GetObjectId(uint idColor, Format idBitmapFormat)
+    public static int GetObjectIdFromColor(uint idColor, Format idBitmapFormat)
     {
         if (idColor == 0)
             return -1; // no object
@@ -391,14 +393,15 @@ public class HitTestingWithIdBitmapSample : CommonSample
             return -1; // unknown format
         }
 
-
 #if DEBUG
         // See comment in GetObjectIdColor4
-        objectIndex /= IdToColorMultiplier;
+        objectIndex /= _idToColorMultiplier;
 #endif
 
         return objectIndex;
     }
+
+#endregion
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -422,7 +425,11 @@ public class HitTestingWithIdBitmapSample : CommonSample
         {
             RenderIdBitmap();
             SaveIdBitmap();
-        }, width: 185);
+        }, width: 190);
+
+        ui.CreateCheckBox("Increase color difference (?):When checked the indexes in the ID bitmap are multiplied by 8 so that it is easier to see the different colors for different objects.",
+            isInitiallyChecked: false,
+            isChecked => _idToColorMultiplier = isChecked ? 8 : 1);
         
         // Subscribe to mouse (pointer) moved
         ui.RegisterPointerMoved(ProcessPointerMove);
