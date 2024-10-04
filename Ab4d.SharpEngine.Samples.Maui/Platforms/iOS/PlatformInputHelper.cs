@@ -1,13 +1,14 @@
 ﻿using Ab4d.SharpEngine.Common;
+using System;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
 
 public class PlatformInputHelper : IPlatformInputHelper
 {
-    public bool IsCurrentMouseButtonAvailable => false;
+    public bool IsCurrentPointerButtonAvailable => false;
     public bool IsCurrentKeyboardModifierAvailable => false;
 
-    public MouseButtons GetCurrentMouseButtons()
+    public PointerButtons GetCurrentPointerButtons()
     {
         throw new NotSupportedException();
     }
