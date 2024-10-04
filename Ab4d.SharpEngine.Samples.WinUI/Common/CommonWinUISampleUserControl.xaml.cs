@@ -58,6 +58,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
 
+            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
+
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
             // In case when VulkanDevice cannot be created, show an error message

@@ -46,6 +46,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
+
+            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
             
 
             // Because we are rendering a background Border with a gradient, we can subscribe mouse events to that element.
