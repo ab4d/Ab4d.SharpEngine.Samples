@@ -93,6 +93,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             // Remove all lights (new sample will set setup their own lights)
             MainSceneView.Scene.Lights.Clear();
 
+            // Remove any registered event sources or drag surfaces
+            _inputEventsManager.ResetEventSources();
+            _inputEventsManager.RemoveAllDragSurfaces();
+
             // Call DisposeAllChildren on RootNode.
             // Here we will also dispose all meshes and materials with textures (textures that are cached by the Scene or GpuDevice are not disposed).
             // We also set runSceneCleanup to true so the Scene.Cleanup method is also called to release free empty memory blocks.
