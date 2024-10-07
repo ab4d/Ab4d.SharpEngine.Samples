@@ -20,8 +20,10 @@
     <ProjectReference Include="..\Shared\AvaloniaUI.CrossPlatform.Shared.csproj" />
   </ItemGroup>
 
+  <!-- iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
+  <!-- When starting iOS simulator, use the dylib from ios-arm64_x86_64-simulator folder -->
   <ItemGroup>
-    <Content Include="../../lib/MoltenVK/iOS/libMoltenVK.dylib">
+    <Content Include="../../lib/MoltenVK/ios-arm64/libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
