@@ -91,6 +91,7 @@
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.LineCapsSample" Title="Lines with caps"/>
   <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
