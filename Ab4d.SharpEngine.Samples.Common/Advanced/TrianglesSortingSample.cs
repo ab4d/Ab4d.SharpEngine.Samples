@@ -80,13 +80,27 @@ public class TrianglesSortingSample : CommonSample
         if (_meshTrianglesSorter == null)
             _meshTrianglesSorter = new MeshTrianglesSorter(_meshToSort.Vertices!, _meshToSort.TriangleIndices!);
 
-        // SortTrianglesByCameraDistance method will sort triangles (update IndexBuffer in the _wpfGeometryModel3DNode1.DXMesh)
-        // so that the triangles that are farther away from the camera will be rendered first.
-
+        // SortTrianglesByCameraDistance method will sort triangles so that the triangles that are farther away from the camera will be rendered first.
+        // The triangles are defined by Vertices and TriangleIndices that were set in the constructor.
+        // The method returns an array of integers that represents a sorted triangle indices array.
+        // Note that this array is reused and the same instance is returned after each call to SortByCameraDistance.
         var sortedTriangleIndices = _meshTrianglesSorter.SortByCameraDistance(cameraPosition, checkIfAlreadySorted: true, out bool isSorted);
 
-        _meshToSort.TriangleIndices = sortedTriangleIndices;
-        _meshToSort.UpdateMesh(_meshToSort.BoundingBox); // sort preserves bounding box
+        if (_meshToSort.TriangleIndices != sortedTriangleIndices)
+        {
+            // After first sort, change the TriangleIndices to the sorted array.
+            // This will also call RecreateIndexBuffer.
+            _meshToSort.TriangleIndices = sortedTriangleIndices; 
+        }
+        else if (_meshToSort.Scene != null && _meshToSort.Scene.GpuDevice != null)
+        {
+            // When the TriangleIndices is already set to the sortedTriangleIndices,
+            // then we need to manually recreate the used IndexBuffer.
+            _meshToSort.RecreateIndexBuffer();
+
+            // We could also call UpdateMesh, but this would also recreate the vertex buffer. But this is not needed.
+            //_meshToSort.UpdateMesh();
+        }
 
         if (isSorted) // If the camera is not changed enough then the triangles order may not be changed
         {
@@ -130,7 +144,7 @@ public class TrianglesSortingSample : CommonSample
 
         
         _meshToSort = mesh1;
-        _meshTrianglesSorter = null;
+        _meshTrianglesSorter = null; // Set _meshTrianglesSorter to null so we will create a new instance on next sort
 
         SortTriangles();
     }
