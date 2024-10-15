@@ -21,7 +21,7 @@ public class TrianglesSortingSample : CommonSample
     private int _sortCount;
 
     private ICommonSampleUIElement? _sortButton;
-    private ICommonSampleUIElement _sortedCountLabel;
+    private ICommonSampleUIElement? _sortedCountLabel;
 
     public TrianglesSortingSample(ICommonSamplesContext context)
         : base(context)
@@ -125,7 +125,7 @@ public class TrianglesSortingSample : CommonSample
         
         Scene.RootNode.Clear();
 
-        var material = StandardMaterials.DimGray.SetOpacity(0.5f);
+        var material = StandardMaterials.Silver.SetOpacity(0.5f);
 
         var meshModelNode1 = new MeshModelNode(mesh1, material);
         meshModelNode1.BackMaterial = material;
@@ -167,7 +167,7 @@ public class TrianglesSortingSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateComboBox(new string[] { "Torus", "Teapot", "Dragon" }, (selectedIndex, selectedText) => ShowModel(selectedIndex), selectedItemIndex: 0);
+        ui.CreateComboBox(new string[] { "Torus Knot", "Teapot", "Dragon" }, (selectedIndex, selectedText) => ShowModel(selectedIndex), selectedItemIndex: 0);
 
         ui.AddSeparator();
 
