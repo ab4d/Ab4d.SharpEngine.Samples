@@ -22,11 +22,7 @@ public class FogEffectTechnique : EffectTechnique
 
     public List<DynamicState> AdditionalDynamicStates { get; set; }
 
-    public PipelineLayout PipelineLayout;
-
-    public Pipeline Pipeline { get; private set; }
-
-        public ShaderStageFlags MatrixPushConstantShaderStages = ShaderStageFlags.Vertex;
+    public ShaderStageFlags MatrixPushConstantShaderStages = ShaderStageFlags.Vertex;
 
     // For ThickLineEffect this is set to ShaderStageGeometryBit | ShaderStageFragmentBit
     public ShaderStageFlags MaterialPushConstantShaderStages = ShaderStageFlags.Fragment;
