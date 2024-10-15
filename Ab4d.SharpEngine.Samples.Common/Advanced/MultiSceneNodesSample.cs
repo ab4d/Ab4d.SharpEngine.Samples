@@ -378,8 +378,16 @@ public class MultiSceneNodesSample : CommonSample
         // VertexColorMaterial with transparency
         //
         var transparentPositionColors = positionColors.ToArray();
+        float alpha = 0.3f;
         for (int i = 0; i < positionsCount; i++)
-            transparentPositionColors[i].Alpha = 0.3f;
+        {
+            // When using transparent colors in VertexColorMaterial, we need to convert them to alpha pre-multiplied values.
+            // This is done by multiplying all the color components by alpha value:
+            transparentPositionColors[i] = new Color4(transparentPositionColors[i].Red * alpha, 
+                                                      transparentPositionColors[i].Green * alpha, 
+                                                      transparentPositionColors[i].Blue * alpha, 
+                                                      alpha);
+        }
 
         var vertexColorMaterial2 = new VertexColorMaterial(transparentPositionColors, "VertexColorMaterial-transparent");
 
