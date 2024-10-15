@@ -26,7 +26,11 @@ public class LineCapsSample : CommonSample
 
     private bool _showMultiLines = true;
     private bool _showPolyLines = true;
-    
+    private bool _showLineArc = false;
+
+    private List<ICommonSampleUIElement> _globalSettingControls = new();
+    private ICommonSampleUIElement? _showGlobalSettingsButton;
+
     public LineCapsSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -38,10 +42,10 @@ public class LineCapsSample : CommonSample
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.TargetPosition = new Vector3(-50, -15, 0);
+            targetPositionCamera.TargetPosition = new Vector3(-50, 15, 0);
             targetPositionCamera.Heading = 17;
             targetPositionCamera.Attitude = -16;
-            targetPositionCamera.Distance = 1100;
+            targetPositionCamera.Distance = 1050;
         }
     }
 
@@ -152,9 +156,28 @@ public class LineCapsSample : CommonSample
 
             if (_showPolyLines)
             {
+                Vector3[] polyLinePositions;
+                if (_showLineArc)
+                {
+                    // Get positions that define a line arc
+                    polyLinePositions = EllipseLineNode.GetArc3DPoints(centerPosition: new Vector3(15, 15, 0), 
+                                                                       normalDirection: new Vector3(0, 0, 1), 
+                                                                       zeroAngleDirection: new Vector3(1, 0, 0), 
+                                                                       xRadius: 15, 
+                                                                       yRadius: 15, 
+                                                                       startAngle: 30, 
+                                                                       endAngle: 300, 
+                                                                       segments: 30);
+                }
+                else
+                {
+                    // Same positions as for multi-line
+                    polyLinePositions = _multiLinePositions;
+                }
+
                 var polyLineVisual3D = new PolyLineNode()
                 {
-                    Positions = _multiLinePositions.Select(p => position + p + offset).ToArray(),
+                    Positions = polyLinePositions.Select(p => position + p + offset).ToArray(),
                     LineColor = Colors.Green,
                     LineThickness = _selectedLineThickness,
                     StartLineCap = lineCapValue,
@@ -206,6 +229,12 @@ public class LineCapsSample : CommonSample
             _showMultiLines = isChecked;
             CreateSampleLines();
         });
+        
+        ui.CreateCheckBox("Show line arc for poly-lines", isInitiallyChecked: _showLineArc, isChecked =>
+        {
+            _showLineArc = isChecked;
+            CreateSampleLines();
+        });
 
         var lineThicknesses = new float[] { 0.5f, 0.8f, 1, 2, 3, 5, 10 };
         ui.CreateComboBox(
@@ -217,12 +246,22 @@ public class LineCapsSample : CommonSample
             }, 
             selectedItemIndex: 3, keyText: "LineThickness:");
 
-        //ui.AddSeparator();
+        ui.AddSeparator();
 
-        ui.CreateLabel("Global arrow settings:", isHeader: true);
+        ui.CreateButton("Randomize line caps", () => RandomizeLineCaps());
+
+        _showGlobalSettingsButton = ui.CreateButton("Show global arrow settings", () =>
+        {
+            _showGlobalSettingsButton?.SetIsVisible(false);
+            foreach (var oneControl in _globalSettingControls)
+                oneControl.SetIsVisible(true);
+        });
+
+
+        _globalSettingControls.Add(ui.CreateLabel("Global arrow settings:", isHeader: true).SetIsVisible(false));
 
         var arrowAngles = new float[] { 10, 15, 30, 45 };
-        ui.CreateComboBox(
+        _globalSettingControls.Add(ui.CreateComboBox(
             arrowAngles.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray(), 
             (selectedIndex, selectedText) =>
             {
@@ -234,28 +273,93 @@ public class LineCapsSample : CommonSample
             }, 
             selectedItemIndex: 1, 
             width: 60,
-            keyText: "Arrow angle: (?):Specifies the angle of the standard Arrow line cap.\nThe angle of other arrows will be adjusted accordingly.",
-            keyTextWidth: 130);
+            keyText: 
+@"Arrow angle: (?):Specifies the angle of the standard Arrow line cap.
+The angle of other arrows will be adjusted accordingly.",
+            keyTextWidth: 180).SetIsVisible(false));
         
         var maxArrowLengths = new float[] { 0.1f, 0.25f, 0.33f, 0.4f, 0.5f };
-        ui.CreateComboBox(
+        _globalSettingControls.Add(ui.CreateComboBox(
             maxArrowLengths.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray(), 
             (selectedIndex, selectedText) =>
             {
-                // Update the static MaxLineArrowLength static field in LineNode.
-                // MaxLineArrowLength specifies the maximum arrow length set as fraction of the line length - e.g. 0.333 means that the maximum arrow length will be 1 / 3 (=0.333) of the line length.
-                // If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength, the arrow is shortened (the arrow angle is increased).
-                // Default value is 0.333 (1 / 3 of the line's length)
                 LineNode.MaxLineArrowLength = maxArrowLengths[selectedIndex];
                 CreateSampleLines();
+
+                // This set the global MinLineStripArrowLength for all lines.
+                // To use different value of MinLineStripArrowLength for only a few lines, 
+                // call the SetMinLineArrowLength method.
+                // For example:
+                //var lineNode = new LineNode(/* all parameters */);
+                //lineNode.SetMaxLineArrowLength(4);
             }, 
             selectedItemIndex: 2, 
             width: 60,
-            keyText: "Max arrow length: (?):Specifies the maximum arrow length set as fraction of the line length.\nFor example: 0.2 means that the maximum arrow length will be 1 / 5 (=0.2) of the line length.\nIf the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength,\nthe arrow is shortened (the arrow angle is increased).",
-            keyTextWidth: 130);
+            keyText: 
+@"Max arrow length: (?):Specifies the maximum arrow length set as fraction of the line length.
+For example: 0.2 means that the maximum arrow length will be 1/5 (=0.2) of the line length.
+If the line is short so that the arrow length exceeds the amount defined by MaxLineArrowLength,
+the arrow is shortened (the arrow angle is increased).
 
-        ui.AddSeparator();
+To set a custom MaxLineArrowLength for a LineNode or derived class, call its SetMaxLineArrowLength method.",
+            keyTextWidth: 180).SetIsVisible(false));
+        
+        
+        var minArrowLengths = new float[] { 0, 1, 2, 3, 4, 6, 10 };
+        
+        _globalSettingControls.Add(ui.CreateComboBox(
+            minArrowLengths.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray(), 
+            (selectedIndex, selectedText) =>
+            {
+                LineNode.MinLineStripArrowLength = minArrowLengths[selectedIndex];
+                CreateSampleLines();
 
-        ui.CreateButton("Randomize line caps", () => RandomizeLineCaps());
+                // This set the global MinLineStripArrowLength for all lines.
+                // To use different value of MinLineStripArrowLength for only a few lines, 
+                // call the SetMinLineArrowLength method.
+                // For example:
+                //var polyLineNode = new PolyLineNode(/* all parameters */);
+                //polyLineNode.SetMinLineArrowLength(4);
+            }, 
+            selectedItemIndex: 2, 
+            width: 60,
+            keyText: 
+@"MinLineStripArrowLength: (?):Specifies the minimum arrow length set as a multiplier of the line thickness.
+For example 2 means that the line arrow will not be shorter than 2 times the line arrow.
+This can be used for line arcs and curves where the line segments are very short.
+This is applied after the MaxLineArrowLength property and only for poly-lines and connected lines (IsLineStrip is true).
+Default value is 2 that always shows the arrow size at least 2 line thicknesses long for connected lines.
+This prevents hiding the line arrow for line arcs where individual line segments are very short.
+
+To set a custom MinLineArrowLength for a LineNode or a derived class, call its SetMinLineArrowLength method.",
+            keyTextWidth: 180).SetIsVisible(false));
+        
+        _globalSettingControls.Add(ui.CreateComboBox(
+            minArrowLengths.Select(t => t.ToString(CultureInfo.InvariantCulture)).ToArray(), 
+            (selectedIndex, selectedText) =>
+            {
+                LineNode.MinLineListArrowLength = minArrowLengths[selectedIndex];
+                CreateSampleLines();
+
+                // This set the global MinLineStripArrowLength for all lines.
+                // To use different value of MinLineStripArrowLength for only a few lines, 
+                // call the SetMinLineArrowLength method.
+                // For example:
+                //var multiLineNode = new MultiLineNode(/* all parameters */);
+                //multiLineNode.SetMinLineArrowLength(4);
+            }, 
+            selectedItemIndex: 0, 
+            width: 60,
+            keyText: 
+@"MinLineListArrowLength: (?):This is the same as MinLineStripArrowLength but is used only for individual lines and disconnected lines (IsLineStrip is false)
+Default value is 0 that does not limit how small the arrow can be (it will disappear when the line is very short).
+
+To see the effect of this value, change it to a bigger value (for example 4)
+and then rotate the camera to view the lines from above.
+This will reduce the length of the lines on the screen,
+but the size of the arrow will be at least 4 times the line thickness.
+
+To set a custom MinLineArrowLength for a LineNode or a derived class, call its SetMinLineArrowLength method.",
+            keyTextWidth: 180).SetIsVisible(false));
     }
 }
