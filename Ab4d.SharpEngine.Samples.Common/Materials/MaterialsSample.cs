@@ -209,7 +209,7 @@ public class MaterialsSample : CommonSample
         //
 
         // The easiest option to render VertexColor material is to set an array of Color3 or Color4 data
-        // to the mesh's VertexColors data channel. See SetSphereVertexColorData or SetBoxVertexColorData methods below.
+        // to the mesh's VertexColors data channel. See GetSphereVertexColorData or GetBoxVertexColorData methods below.
         //
         // Another option is to set the PositionColors array in the VertexColorMaterial object.
         // This will also overwrite the data in the VertexColors data channel.
@@ -224,6 +224,12 @@ public class MaterialsSample : CommonSample
         //
         //var positionColors = GetSphereVertexColors(_sphereMesh, sphereRadius);
         //var vertexColorMaterial = new VertexColorMaterial(positionColors, "SphereVertexColorMaterial");
+
+        // When using transparent colors (alpha < 1) for VertexColorMaterial,
+        // we need to convert the colors to alpha pre-multiplied values.
+        // This is done by multiplying all the color components by alpha value, for example:
+        // float alpha = 0.3f;
+        // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
 
         var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial");
 
@@ -308,6 +314,12 @@ public class MaterialsSample : CommonSample
 
             // Set Color this position
             positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
+
+            // When using transparent colors (alpha < 1) for VertexColorMaterial,
+            // we need to convert the colors to alpha pre-multiplied values.
+            // This is done by multiplying all the color components by alpha value, for example:
+            // float alpha = 0.3f;
+            // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
         }
 
         return positionColors;
@@ -334,6 +346,12 @@ public class MaterialsSample : CommonSample
 
             // Set Color this position
             positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
+
+            // When using transparent colors (alpha < 1) for VertexColorMaterial,
+            // we need to convert the colors to alpha pre-multiplied values.
+            // This is done by multiplying all the color components by alpha value, for example:
+            // float alpha = 0.3f;
+            // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
         }
 
         return positionColors;
