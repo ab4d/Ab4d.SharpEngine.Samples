@@ -38,6 +38,11 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+	
+		<!-- Workaround for problem with SkiaSharp.Views.Maui.Controls with new Windows SDK that is installed with Viusal Studio v17.11.5 -->
+		<!-- See: https://github.com/mono/SkiaSharp/issues/2999 -->
+		<WindowsSdkPackageVersion>10.0.19041.34</WindowsSdkPackageVersion>		
+	
 	</PropertyGroup>
 
 	<ItemGroup>
