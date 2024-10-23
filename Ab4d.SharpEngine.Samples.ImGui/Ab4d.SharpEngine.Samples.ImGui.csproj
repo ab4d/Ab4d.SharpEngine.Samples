@@ -11,6 +11,7 @@
     <ItemGroup>
       <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
       <PackageReference Include="ImGui.NET" Version="1.91.0.1" />
+      <PackageReference Include="Silk.NET.Input" Version="2.21.0" />
+      <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.21.0" />
     </ItemGroup>
-
 </Project>
