@@ -23,6 +23,11 @@ internal class Program
     private static SceneView? _sceneView;
     private static ManualPointerCameraController? _pointerCameraController;
 
+    private static ImGuiRenderer? _imGuiRenderer;
+
+    private static bool ShowDemoWindow = true;
+    private static bool ShowOtherWindow = true;
+
     private static void Main(string[] args)
     {
         var options = WindowOptions.DefaultVulkan;
@@ -112,6 +117,24 @@ internal class Program
             RotateAroundPointerPosition = false,
             ZoomMode = CameraZoomMode.PointerPosition,
         };
+
+        // Add ImGui renderer to the scene view
+        _imGuiRenderer = new ImGuiRenderer(_sceneView, () =>
+        {
+            if (ShowOtherWindow)
+            {
+                ImGuiNET.ImGui.Begin("Another window", ref ShowOtherWindow);
+                ImGuiNET.ImGui.Text("Some text");
+                ImGuiNET.ImGui.End();
+            }
+
+            if (ShowDemoWindow)
+            {
+                ImGuiNET.ImGui.ShowDemoWindow(ref ShowDemoWindow);
+            }
+
+            return true; // Always update
+        });
     }
 
     static void OnRender(double obj)
