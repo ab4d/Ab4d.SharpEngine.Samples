@@ -78,16 +78,27 @@ internal class Program
             SetupImGui();
         };
 
+        // ReSharper disable once AccessToDisposedClosure
         _window.Render += (_) => { _sceneView?.Render(); };
 
+        // ReSharper disable once AccessToDisposedClosure
         _window.FramebufferResize += (_) => { _sceneView?.Resize(renderNextFrameAfterResize: true); };
 
         _window.Initialize();
 
         Silk.NET.Windowing.WindowExtensions.Run(_window);
 
-        // TODO: clean up everything
+        // Cleanup
         _window.Dispose();
+
+        _sceneView?.Dispose();
+        _sceneView = null;
+
+        _scene?.Dispose();
+        _imGuiRenderingStep?.Dispose();
+
+        _vulkanSurfaceProvider?.Dispose();
+        _vulkanDevice?.Dispose();
 
         ImGuiNET.ImGui.DestroyContext(_imGuiCtx);
     }
