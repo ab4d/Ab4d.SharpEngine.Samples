@@ -16,10 +16,12 @@ namespace Ab4d.SharpEngine.Samples.ImGui;
 
 internal class Program
 {
+    // Silk
     private static IWindow? _window;
     private static IKeyboard? _keyboard;
     private static IMouse? _mouse;
 
+    // SharpEngine
     private static VulkanDevice? _vulkanDevice;
     private static VulkanSurfaceProvider? _vulkanSurfaceProvider;
 
@@ -27,10 +29,16 @@ internal class Program
     private static SceneView? _sceneView;
     private static ManualPointerCameraController? _pointerCameraController;
 
-    private static ImGuiRenderer? _imGuiRenderer;
+    private static ImGuiRenderingStep? _imGuiRenderingStep;
 
-    private static bool ShowDemoWindow = true;
-    private static bool ShowOtherWindow = true;
+    // ImGui
+    private static nint _imGuiCtx;
+    private static ImGuiNET.ImGuiIOPtr _imGuiIo;
+    
+    private static DateTime _previousFrameTime;
+
+    private static bool _showDemoWindow = true;
+    private static bool _showOtherWindow = true;
 
     private static void Main(string[] args)
     {
@@ -40,6 +48,15 @@ internal class Program
             licenseType: "SamplesLicense",
             platforms: "All",
             license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
+
+        // Create ImGui context
+        _imGuiCtx = ImGuiNET.ImGui.CreateContext();
+
+        _imGuiIo = ImGuiNET.ImGui.GetIO();
+        _imGuiIo.BackendFlags |= ImGuiNET.ImGuiBackendFlags.RendererHasVtxOffset;
+        _imGuiIo.ConfigFlags |= ImGuiNET.ImGuiConfigFlags.NavEnableKeyboard |
+                                ImGuiNET.ImGuiConfigFlags.DockingEnable;
+        _imGuiIo.Fonts.Flags |= ImGuiNET.ImFontAtlasFlags.NoBakedLines;
 
         // Create window using Silk; setup is performed once window is created/loaded.
         var options = WindowOptions.DefaultVulkan;
@@ -53,31 +70,14 @@ internal class Program
             SetupInput();
             SetupSharpEngine();
             CreateScene();
-
-            // Add ImGui renderer to the scene view
-            Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
-            _imGuiRenderer = new ImGuiRenderer(_sceneView, () =>
-            {
-                if (ShowOtherWindow)
-                {
-                    ImGuiNET.ImGui.Begin("Another window", ref ShowOtherWindow);
-                    ImGuiNET.ImGui.Text("Some text");
-                    ImGuiNET.ImGui.End();
-                }
-
-                if (ShowDemoWindow)
-                {
-                    ImGuiNET.ImGui.ShowDemoWindow(ref ShowDemoWindow);
-                }
-
-                return true; // Always update
-            });
+            SetupImGui();
         };
 
         _window.Render += (double obj) =>
         {
             _sceneView?.Render();
         };
+
         _window.FramebufferResize += (Vector2D<int> size) =>
         {
             _sceneView?.Resize(renderNextFrameAfterResize: true);
@@ -87,7 +87,10 @@ internal class Program
 
         _window.Run();
 
+        // TODO: clean up everything
         _window.Dispose();
+
+        ImGuiNET.ImGui.DestroyContext(_imGuiCtx);
     }
 
     private static void SetupInput()
@@ -180,6 +183,66 @@ internal class Program
             RotateAroundPointerPosition = false,
             ZoomMode = CameraZoomMode.PointerPosition,
         };
+    }
+
+    private static void SetupImGui()
+    {
+        Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
+        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width, _sceneView.Height);
+        _imGuiIo.DeltaTime = 0;
+
+        _previousFrameTime = DateTime.Now;
+
+        // We need to call GetTexDataAsRGBA32 before first call to ImGui.NewFrame.
+        // The data is also retrieved by ImGuiRenderingStep implementation; here, we only need to initialize it.
+        _imGuiIo.Fonts.GetTexDataAsRGBA32(out IntPtr _, out _, out _, out _);
+        _imGuiIo.Fonts.SetTexID(1); // NOTE: font texture ID is also explicitly set by ImGuiRenderingStep implementation.
+
+        // Create and register custom rendering step
+        _imGuiRenderingStep = new ImGuiRenderingStep(_sceneView, _imGuiIo, "ImGuiRenderingStep");
+        Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null, "_sceneView.DefaultRenderObjectsRenderingStep != null");
+        _sceneView.RenderingSteps.AddAfter(_sceneView.DefaultRenderObjectsRenderingStep, _imGuiRenderingStep);
+
+        // This allows UI to be animated
+        _sceneView.SceneUpdating += (object? sender, EventArgs args) =>
+        {
+            UpdateImgUiInterface();
+        };
+    }
+
+    private static void UpdateImgUiInterface ()
+    {
+        var shouldUpdate = true; // This can be set to false when we know the UI has not changed
+
+        // Update time delta between calls
+        var now = DateTime.Now;
+        _imGuiIo.DeltaTime = (float)(now - _previousFrameTime).TotalSeconds;
+        _previousFrameTime = now;
+
+        // Keep display size up to date
+        Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
+        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width, _sceneView.Height);
+
+        // Begin frame
+        ImGuiNET.ImGui.NewFrame();
+
+        if (_showOtherWindow)
+        {
+            ImGuiNET.ImGui.Begin("Another window", ref _showOtherWindow);
+            ImGuiNET.ImGui.Text("Some text");
+            ImGuiNET.ImGui.End();
+        }
+
+        if (_showDemoWindow)
+        {
+            ImGuiNET.ImGui.ShowDemoWindow(ref _showDemoWindow);
+        }
+
+        ImGuiNET.ImGui.EndFrame();
+        ImGuiNET.ImGui.Render();
+
+        if (shouldUpdate)
+            _sceneView.NotifyChange(SceneViewDirtyFlags.SpritesChanged);
     }
 
     #region Input
