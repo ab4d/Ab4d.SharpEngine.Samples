@@ -17,8 +17,12 @@ namespace Ab4d.SharpEngine.Samples.ImGui;
 internal class Program
 {
     private static IWindow? _window;
+    private static IKeyboard? _keyboard;
+    private static IMouse? _mouse;
 
     private static VulkanDevice? _vulkanDevice;
+    private static VulkanSurfaceProvider? _vulkanSurfaceProvider;
+
     private static Scene? _scene;
     private static SceneView? _sceneView;
     private static ManualPointerCameraController? _pointerCameraController;
@@ -33,6 +37,7 @@ internal class Program
         var options = WindowOptions.DefaultVulkan;
         options.Size = new Vector2D<int>(800, 600);
         options.Title = "Silk.NET + SharpEngine + ImGui";
+
         _window = Window.Create(options);
 
         _window.Load += OnLoad;
@@ -49,18 +54,29 @@ internal class Program
     }
     static unsafe void OnLoad()
     {
-        // Create renderer
-        Console.WriteLine("OnLoad!");
-        
-        // Set-up input context on all available keyboards.
+        // Register input events on fist available keyboard and mouse
+        Debug.Assert(_window != null, nameof(_window) + " != null");
         var input = _window.CreateInput();
-        foreach (var keyboard in input.Keyboards)
+        var keyboards = input.Keyboards;
+        if (keyboards.Count > 0)
         {
-            keyboard.KeyDown += OnKeyboardKeyDown;
+            _keyboard = keyboards[0];
+            _keyboard.KeyDown += OnKeyboardKeyDown;
+            _keyboard.KeyUp += OnKeyboardKeyUp;
         }
 
-        // Set up SharpEngine and its scene
-        var _vulkanSurfaceProvider = new CustomVulkanSurfaceProvider(instance =>
+        var mice = input.Mice;
+        if (mice.Count > 0)
+        {
+            _mouse = mice[0];
+            _mouse.MouseDown += OnMouseButtonDown;
+            _mouse.MouseUp += OnMouseButtonUp;
+            _mouse.MouseMove += OnMouseMove;
+            _mouse.Scroll += OnMouseScroll;
+        }
+
+        // Set up SharpEngine
+        _vulkanSurfaceProvider = new CustomVulkanSurfaceProvider(instance =>
             {
                 Debug.Assert(_window.VkSurface != null, "_window.VkSurface != null");
                 var vkNonDispatchableHandle = _window.VkSurface.Create(new VkHandle(instance.Handle), (byte*)null);
@@ -137,35 +153,93 @@ internal class Program
         });
     }
 
-    static void OnRender(double obj)
+    private static void OnRender(double obj)
     {
-        Console.WriteLine("OnRender!");
         if (_scene != null && _sceneView != null)
             _sceneView.Render();
     }
 
-    static void OnUpdate(double obj)
+    private static void OnUpdate(double obj)
     {
-        Console.WriteLine("OnUpdate!");
     }
 
-    static void OnFramebufferResize(Vector2D<int> newSize)
+    private static void OnFramebufferResize(Vector2D<int> newSize)
     {
-        Console.WriteLine("OnFramebufferResize!");
-        if (_sceneView != null)
-            _sceneView.Resize(renderNextFrameAfterResize: true);
+        _sceneView?.Resize(renderNextFrameAfterResize: true);
     }
 
-    static void OnClose()
+    private static void OnClose()
     {
-        Console.WriteLine("OnClose!");
+    }
+
+    #region Input
+
+    private static void OnKeyboardKeyUp(IKeyboard keyboard, Key key, int keyCode)
+    {
     }
 
     private static void OnKeyboardKeyDown(IKeyboard keyboard, Key key, int keyCode)
     {
-        if (key == Key.Escape)
-        {
-            _window!.Close();
-        }
+        // Pressing ESC key exits the application
+        if (key == Key.Escape && _window != null)
+            _window.Close();
     }
+
+    private static void OnMouseMove(IMouse mouse, Vector2 position)
+    {
+        _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), KeyboardModifiers.None);
+    }
+
+    private static void OnMouseButtonDown(IMouse mouse, MouseButton button)
+    {
+        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButton(button), GetKeyboardModifiers());
+    }
+
+    private static void OnMouseButtonUp(IMouse mouse, MouseButton button)
+    {
+        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButton(button), GetKeyboardModifiers());
+    }
+
+    private static void OnMouseScroll(IMouse mouse, ScrollWheel wheel)
+    {
+        _pointerCameraController?.ProcessPointerWheelChanged(mouse.Position, wheel.Y);
+    }
+
+
+    private static KeyboardModifiers GetKeyboardModifiers()
+    {
+        if (_keyboard == null)
+            return KeyboardModifiers.None;
+
+        return ((_keyboard.IsKeyPressed(Key.ShiftLeft) || _keyboard.IsKeyPressed(Key.ShiftRight))  ? KeyboardModifiers.ShiftKey : 0) |
+               ((_keyboard.IsKeyPressed(Key.ControlLeft) || _keyboard.IsKeyPressed(Key.ControlRight))  ? KeyboardModifiers.ControlKey : 0) |
+               ((_keyboard.IsKeyPressed(Key.AltLeft) || _keyboard.IsKeyPressed(Key.AltRight))  ? KeyboardModifiers.AltKey : 0) |
+               ((_keyboard.IsKeyPressed(Key.SuperLeft) || _keyboard.IsKeyPressed(Key.ShiftRight))  ? KeyboardModifiers.SuperKey : 0);
+    }
+
+    private static PointerButtons GetPressedMouseButtons()
+    {
+        if (_mouse == null)
+            return PointerButtons.None;
+        return (_mouse.IsButtonPressed(MouseButton.Left) ? PointerButtons.Left : 0) |
+               (_mouse.IsButtonPressed(MouseButton.Middle) ? PointerButtons.Middle : 0) |
+               (_mouse.IsButtonPressed(MouseButton.Right) ? PointerButtons.Right : 0) |
+               (_mouse.IsButtonPressed(MouseButton.Button4) ? PointerButtons.XButton1 : 0) |
+               (_mouse.IsButtonPressed(MouseButton.Button5) ? PointerButtons.XButton2 : 0);
+    }
+
+    private static PointerButtons MapMouseButton(MouseButton button)
+    {
+        return button switch
+        {
+            MouseButton.Left => PointerButtons.Left,
+            MouseButton.Right => PointerButtons.Right,
+            MouseButton.Middle => PointerButtons.Middle,
+            MouseButton.Button4 => PointerButtons.XButton1,
+            MouseButton.Button5 => PointerButtons.XButton2,
+            _ => PointerButtons.None
+        };
+    }
+
+    #endregion
 }
