@@ -114,6 +114,7 @@ internal class Program
             _keyboard = keyboards[0];
             _keyboard.KeyDown += OnKeyboardKeyDown;
             _keyboard.KeyUp += OnKeyboardKeyUp;
+            _keyboard.KeyChar += OnKeyboardKeyChar;
         }
 
         var mice = input.Mice;
@@ -275,6 +276,11 @@ internal class Program
     {
         if (MapKeyImGui(key, out var mappedKey))
             _imGuiIo.AddKeyEvent(mappedKey, false);
+    }
+
+    private static void OnKeyboardKeyChar(Silk.NET.Input.IKeyboard keyboard, char c)
+    {
+        _imGuiIo.AddInputCharacter(c);
     }
 
     private static void OnMouseMove(Silk.NET.Input.IMouse mouse, Vector2 position)
