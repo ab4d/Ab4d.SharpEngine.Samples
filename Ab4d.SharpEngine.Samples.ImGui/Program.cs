@@ -18,7 +18,7 @@ internal class Program
     private static Silk.NET.Input.IMouse? _mouse;
 
     // SharpEngine
-    private static bool _vulkanValidation = false;
+    private static bool _vulkanValidation;
 
     private static VulkanDevice? _vulkanDevice;
     private static VulkanSurfaceProvider? _vulkanSurfaceProvider;
