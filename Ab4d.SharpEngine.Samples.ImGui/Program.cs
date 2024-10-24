@@ -248,6 +248,9 @@ internal class Program
 
     private static void OnKeyboardKeyDown(IKeyboard keyboard, Key key, int keyCode)
     {
+        if (_imGuiIo.WantCaptureKeyboard)
+            return;
+
         // Pressing ESC key exits the application
         if (key == Key.Escape && _window != null)
             _window.Close();
@@ -255,21 +258,38 @@ internal class Program
 
     private static void OnMouseMove(IMouse mouse, Vector2 position)
     {
+        _imGuiIo.AddMousePosEvent(mouse.Position.X, mouse.Position.Y);
+
+        if (_imGuiIo.WantCaptureMouse)
+            return;
+
         _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), KeyboardModifiers.None);
     }
 
     private static void OnMouseButtonDown(IMouse mouse, MouseButton button)
     {
-        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButton(button), GetKeyboardModifiers());
+        _imGuiIo.AddMouseButtonEvent(MapMouseButtonImGui(button), true);
+        if (_imGuiIo.WantCaptureMouse)
+            return;
+
+        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButtonToSharpEngine(button), GetKeyboardModifiers());
     }
 
     private static void OnMouseButtonUp(IMouse mouse, MouseButton button)
     {
-        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButton(button), GetKeyboardModifiers());
+        _imGuiIo.AddMouseButtonEvent(MapMouseButtonImGui(button), false);
+        if (_imGuiIo.WantCaptureMouse)
+            return;
+
+        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButtonToSharpEngine(button), GetKeyboardModifiers());
     }
 
     private static void OnMouseScroll(IMouse mouse, ScrollWheel wheel)
     {
+        _imGuiIo.AddMouseWheelEvent(0f, wheel.Y);
+        if (_imGuiIo.WantCaptureMouse)
+            return;
+
         _pointerCameraController?.ProcessPointerWheelChanged(mouse.Position, wheel.Y);
     }
 
@@ -296,7 +316,7 @@ internal class Program
                (_mouse.IsButtonPressed(MouseButton.Button5) ? PointerButtons.XButton2 : 0);
     }
 
-    private static PointerButtons MapMouseButton(MouseButton button)
+    private static PointerButtons MapMouseButtonToSharpEngine(MouseButton button)
     {
         return button switch
         {
@@ -306,6 +326,19 @@ internal class Program
             MouseButton.Button4 => PointerButtons.XButton1,
             MouseButton.Button5 => PointerButtons.XButton2,
             _ => PointerButtons.None
+        };
+    }
+
+    private static int MapMouseButtonImGui(MouseButton button)
+    {
+        return button switch
+        {
+            MouseButton.Left => 0,
+            MouseButton.Right => 1,
+            MouseButton.Middle => 2,
+            MouseButton.Button4 => 3,
+            MouseButton.Button5 => 4,
+            _ => -1
         };
     }
 
