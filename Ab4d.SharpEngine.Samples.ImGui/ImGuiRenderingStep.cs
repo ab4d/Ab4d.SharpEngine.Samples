@@ -176,7 +176,7 @@ public class ImGuiRenderingStep : RenderingStep
 
             _indexBuffer?.Dispose();
             _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices, BufferUsageFlags.IndexBuffer,
-                isDeviceLocal: true, name: $"ImGuiIndexBuffer");
+                isDeviceLocal: false, name: $"ImGuiIndexBuffer");  // isDeviceLocal: true seems to corrupt data.
         }
 
         var verticesChanged = true;
@@ -193,7 +193,7 @@ public class ImGuiRenderingStep : RenderingStep
 
             _vertexBuffer?.Dispose();
             _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices, BufferUsageFlags.VertexBuffer,
-                isDeviceLocal: true, name: $"ImGuiVertexBuffer");
+                isDeviceLocal: false, name: $"ImGuiVertexBuffer");  // isDeviceLocal: true seems to corrupt data.
         }
 
         // Bind pipeline
