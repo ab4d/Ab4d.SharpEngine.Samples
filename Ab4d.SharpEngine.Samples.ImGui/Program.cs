@@ -73,15 +73,9 @@ internal class Program
             SetupImGui();
         };
 
-        _window.Render += (double obj) =>
-        {
-            _sceneView?.Render();
-        };
+        _window.Render += (double obj) => { _sceneView?.Render(); };
 
-        _window.FramebufferResize += (Vector2D<int> size) =>
-        {
-            _sceneView?.Resize(renderNextFrameAfterResize: true);
-        };
+        _window.FramebufferResize += (Vector2D<int> size) => { _sceneView?.Resize(renderNextFrameAfterResize: true); };
 
         _window.Initialize();
 
@@ -129,10 +123,11 @@ internal class Program
             },
             addDefaultSurfaceExtensions: true);
 
-        var engineCreateOptions = new EngineCreateOptions(applicationName: "SharpEngine.Samples.ImGui", enableStandardValidation: true)
-        {
-            EnableSurfaceSupport = true,
-        };
+        var engineCreateOptions =
+            new EngineCreateOptions(applicationName: "SharpEngine.Samples.ImGui", enableStandardValidation: true)
+            {
+                EnableSurfaceSupport = true,
+            };
 
         _vulkanDevice = VulkanDevice.Create(defaultSurfaceProvider: _vulkanSurfaceProvider, engineCreateOptions);
     }
@@ -162,7 +157,7 @@ internal class Program
         _sceneView.BackgroundColor = Color4.White;
         Debug.Assert(_vulkanSurfaceProvider != null, nameof(_vulkanSurfaceProvider) + " != null");
         _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX: 1.0f, dpiScaleY: 1.0f);
-        
+
         // Camera
         _sceneView.Camera = new TargetPositionCamera()
         {
@@ -177,8 +172,10 @@ internal class Program
         _pointerCameraController = new ManualPointerCameraController(_sceneView)
         {
             RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
-            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
-            QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed,
+            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed |
+                                   PointerAndKeyboardConditions.ControlKey,
+            QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed |
+                                  PointerAndKeyboardConditions.RightPointerButtonPressed,
 
             RotateAroundPointerPosition = false,
             ZoomMode = CameraZoomMode.PointerPosition,
@@ -195,17 +192,15 @@ internal class Program
 
         // Create and register custom rendering step
         _imGuiRenderingStep = new ImGuiRenderingStep(_sceneView, _imGuiCtx, "ImGuiRenderingStep");
-        Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null, "_sceneView.DefaultRenderObjectsRenderingStep != null");
+        Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null,
+            "_sceneView.DefaultRenderObjectsRenderingStep != null");
         _sceneView.RenderingSteps.AddAfter(_sceneView.DefaultRenderObjectsRenderingStep, _imGuiRenderingStep);
 
         // This allows UI to be animated
-        _sceneView.SceneUpdating += (object? sender, EventArgs args) =>
-        {
-            UpdateImgUiInterface();
-        };
+        _sceneView.SceneUpdating += (object? sender, EventArgs args) => { UpdateImgUiInterface(); };
     }
 
-    private static void UpdateImgUiInterface ()
+    private static void UpdateImgUiInterface()
     {
         var shouldUpdate = true; // This can be set to false when we know the UI has not changed
 
@@ -242,18 +237,23 @@ internal class Program
 
     #region Input
 
-    private static void OnKeyboardKeyUp(IKeyboard keyboard, Key key, int keyCode)
-    {
-    }
-
     private static void OnKeyboardKeyDown(IKeyboard keyboard, Key key, int keyCode)
     {
+        if (MapKeyImGui(key, out var mappedKey))
+            _imGuiIo.AddKeyEvent(mappedKey, true);
+
         if (_imGuiIo.WantCaptureKeyboard)
             return;
 
         // Pressing ESC key exits the application
         if (key == Key.Escape && _window != null)
             _window.Close();
+    }
+
+    private static void OnKeyboardKeyUp(IKeyboard keyboard, Key key, int keyCode)
+    {
+        if (MapKeyImGui(key, out var mappedKey))
+            _imGuiIo.AddKeyEvent(mappedKey, false);
     }
 
     private static void OnMouseMove(IMouse mouse, Vector2 position)
@@ -268,20 +268,26 @@ internal class Program
 
     private static void OnMouseButtonDown(IMouse mouse, MouseButton button)
     {
-        _imGuiIo.AddMouseButtonEvent(MapMouseButtonImGui(button), true);
+        if (MapMouseButtonImGui(button, out var mappedButton))
+            _imGuiIo.AddMouseButtonEvent(mappedButton, true);
+
         if (_imGuiIo.WantCaptureMouse)
             return;
 
-        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButtonToSharpEngine(button), GetKeyboardModifiers());
+        if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
     }
 
     private static void OnMouseButtonUp(IMouse mouse, MouseButton button)
     {
-        _imGuiIo.AddMouseButtonEvent(MapMouseButtonImGui(button), false);
+        if (MapMouseButtonImGui(button, out var mappedButton))
+            _imGuiIo.AddMouseButtonEvent(mappedButton, false);
+
         if (_imGuiIo.WantCaptureMouse)
             return;
 
-        _pointerCameraController?.ProcessPointerPressed(mouse.Position, MapMouseButtonToSharpEngine(button), GetKeyboardModifiers());
+        if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
     }
 
     private static void OnMouseScroll(IMouse mouse, ScrollWheel wheel)
@@ -299,10 +305,14 @@ internal class Program
         if (_keyboard == null)
             return KeyboardModifiers.None;
 
-        return ((_keyboard.IsKeyPressed(Key.ShiftLeft) || _keyboard.IsKeyPressed(Key.ShiftRight))  ? KeyboardModifiers.ShiftKey : 0) |
-               ((_keyboard.IsKeyPressed(Key.ControlLeft) || _keyboard.IsKeyPressed(Key.ControlRight))  ? KeyboardModifiers.ControlKey : 0) |
-               ((_keyboard.IsKeyPressed(Key.AltLeft) || _keyboard.IsKeyPressed(Key.AltRight))  ? KeyboardModifiers.AltKey : 0) |
-               ((_keyboard.IsKeyPressed(Key.SuperLeft) || _keyboard.IsKeyPressed(Key.ShiftRight))  ? KeyboardModifiers.SuperKey : 0);
+        return (_keyboard.IsKeyPressed(Key.ShiftLeft) ? KeyboardModifiers.ShiftKey : 0) |
+               (_keyboard.IsKeyPressed(Key.ShiftRight) ? KeyboardModifiers.ShiftKey : 0) |
+               (_keyboard.IsKeyPressed(Key.ControlLeft) ? KeyboardModifiers.ControlKey : 0) |
+               (_keyboard.IsKeyPressed(Key.ControlRight) ? KeyboardModifiers.ControlKey : 0) |
+               (_keyboard.IsKeyPressed(Key.AltLeft) ? KeyboardModifiers.AltKey : 0) |
+               (_keyboard.IsKeyPressed(Key.AltRight) ? KeyboardModifiers.AltKey : 0) |
+               (_keyboard.IsKeyPressed(Key.SuperLeft) ? KeyboardModifiers.SuperKey : 0) |
+               (_keyboard.IsKeyPressed(Key.SuperRight) ? KeyboardModifiers.SuperKey : 0);
     }
 
     private static PointerButtons GetPressedMouseButtons()
@@ -316,9 +326,9 @@ internal class Program
                (_mouse.IsButtonPressed(MouseButton.Button5) ? PointerButtons.XButton2 : 0);
     }
 
-    private static PointerButtons MapMouseButtonToSharpEngine(MouseButton button)
+    private static bool MapMouseButtonToSharpEngine(MouseButton button, out PointerButtons result)
     {
-        return button switch
+        result = button switch
         {
             MouseButton.Left => PointerButtons.Left,
             MouseButton.Right => PointerButtons.Right,
@@ -327,11 +337,12 @@ internal class Program
             MouseButton.Button5 => PointerButtons.XButton2,
             _ => PointerButtons.None
         };
+        return result != PointerButtons.None;
     }
 
-    private static int MapMouseButtonImGui(MouseButton button)
+    private static bool MapMouseButtonImGui(MouseButton button, out int result)
     {
-        return button switch
+        result = button switch
         {
             MouseButton.Left => 0,
             MouseButton.Right => 1,
@@ -340,6 +351,69 @@ internal class Program
             MouseButton.Button5 => 4,
             _ => -1
         };
+        return result != -1;
+    }
+
+    private static bool MapKeyImGui(Key key, out ImGuiNET.ImGuiKey result)
+    {
+        ImGuiNET.ImGuiKey KeyToImGuiKeyShortcut(Key keyToConvert, Key startKey1, ImGuiNET.ImGuiKey startKey2)
+        {
+            var changeFromStart1 = (int)keyToConvert - (int)startKey1;
+            return startKey2 + changeFromStart1;
+        }
+
+        result = key switch
+        {
+            >= Key.F1 and <= Key.F24 => KeyToImGuiKeyShortcut(key, Key.F1, ImGuiNET.ImGuiKey.F1),
+            >= Key.Keypad0 and <= Key.Keypad9 => KeyToImGuiKeyShortcut(key, Key.Keypad0, ImGuiNET.ImGuiKey.Keypad0),
+            >= Key.A and <= Key.Z => KeyToImGuiKeyShortcut(key, Key.A, ImGuiNET.ImGuiKey.A),
+            >= Key.Number0 and <= Key.Number9 => KeyToImGuiKeyShortcut(key, Key.Number0, ImGuiNET.ImGuiKey._0),
+            Key.ShiftLeft or Key.ShiftRight => ImGuiNET.ImGuiKey.ModShift,
+            Key.ControlLeft or Key.ControlRight => ImGuiNET.ImGuiKey.ModCtrl,
+            Key.AltLeft or Key.AltRight => ImGuiNET.ImGuiKey.ModAlt,
+            Key.SuperLeft or Key.SuperRight => ImGuiNET.ImGuiKey.ModSuper,
+            Key.Menu => ImGuiNET.ImGuiKey.Menu,
+            Key.Up => ImGuiNET.ImGuiKey.UpArrow,
+            Key.Down => ImGuiNET.ImGuiKey.DownArrow,
+            Key.Left => ImGuiNET.ImGuiKey.LeftArrow,
+            Key.Right => ImGuiNET.ImGuiKey.RightArrow,
+            Key.Enter => ImGuiNET.ImGuiKey.Enter,
+            Key.Escape => ImGuiNET.ImGuiKey.Escape,
+            Key.Space => ImGuiNET.ImGuiKey.Space,
+            Key.Tab => ImGuiNET.ImGuiKey.Tab,
+            Key.Backspace => ImGuiNET.ImGuiKey.Backspace,
+            Key.Insert => ImGuiNET.ImGuiKey.Insert,
+            Key.Delete => ImGuiNET.ImGuiKey.Delete,
+            Key.PageUp => ImGuiNET.ImGuiKey.PageUp,
+            Key.PageDown => ImGuiNET.ImGuiKey.PageDown,
+            Key.Home => ImGuiNET.ImGuiKey.Home,
+            Key.End => ImGuiNET.ImGuiKey.End,
+            Key.CapsLock => ImGuiNET.ImGuiKey.CapsLock,
+            Key.ScrollLock => ImGuiNET.ImGuiKey.ScrollLock,
+            Key.PrintScreen => ImGuiNET.ImGuiKey.PrintScreen,
+            Key.Pause => ImGuiNET.ImGuiKey.Pause,
+            Key.NumLock => ImGuiNET.ImGuiKey.NumLock,
+            Key.KeypadDivide => ImGuiNET.ImGuiKey.KeypadDivide,
+            Key.KeypadMultiply => ImGuiNET.ImGuiKey.KeypadMultiply,
+            Key.KeypadSubtract => ImGuiNET.ImGuiKey.KeypadSubtract,
+            Key.KeypadAdd => ImGuiNET.ImGuiKey.KeypadAdd,
+            Key.KeypadDecimal => ImGuiNET.ImGuiKey.KeypadDecimal,
+            Key.KeypadEnter => ImGuiNET.ImGuiKey.KeypadEnter,
+            Key.GraveAccent => ImGuiNET.ImGuiKey.GraveAccent,
+            Key.Minus => ImGuiNET.ImGuiKey.Minus,
+            Key.Equal => ImGuiNET.ImGuiKey.Equal,
+            Key.LeftBracket => ImGuiNET.ImGuiKey.LeftBracket,
+            Key.RightBracket => ImGuiNET.ImGuiKey.RightBracket,
+            Key.Semicolon => ImGuiNET.ImGuiKey.Semicolon,
+            Key.Apostrophe => ImGuiNET.ImGuiKey.Apostrophe,
+            Key.Comma => ImGuiNET.ImGuiKey.Comma,
+            Key.Period => ImGuiNET.ImGuiKey.Period,
+            Key.Slash => ImGuiNET.ImGuiKey.Slash,
+            Key.BackSlash => ImGuiNET.ImGuiKey.Backslash,
+            _ => ImGuiNET.ImGuiKey.None
+        };
+
+        return result != ImGuiNET.ImGuiKey.None;
     }
 
     #endregion
