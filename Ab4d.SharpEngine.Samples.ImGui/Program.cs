@@ -230,6 +230,10 @@ internal class Program
 
         if (shouldUpdate)
             _sceneView.NotifyChange(SceneViewDirtyFlags.SpritesChanged);
+
+        // If all ImGui windows were closed, exit the application
+        if (!_showDemoWindow && !_showOtherWindow)
+            _window?.Close();
     }
 
     #region Input
