@@ -34,7 +34,7 @@ internal class Program
     // ImGui
     private static nint _imGuiCtx;
     private static ImGuiNET.ImGuiIOPtr _imGuiIo;
-    
+
     private static DateTime _previousFrameTime;
 
     private static bool _showDemoWindow = true;
@@ -193,13 +193,8 @@ internal class Program
 
         _previousFrameTime = DateTime.Now;
 
-        // We need to call GetTexDataAsRGBA32 before first call to ImGui.NewFrame.
-        // The data is also retrieved by ImGuiRenderingStep implementation; here, we only need to initialize it.
-        _imGuiIo.Fonts.GetTexDataAsRGBA32(out IntPtr _, out _, out _, out _);
-        _imGuiIo.Fonts.SetTexID(1); // NOTE: font texture ID is also explicitly set by ImGuiRenderingStep implementation.
-
         // Create and register custom rendering step
-        _imGuiRenderingStep = new ImGuiRenderingStep(_sceneView, _imGuiIo, "ImGuiRenderingStep");
+        _imGuiRenderingStep = new ImGuiRenderingStep(_sceneView, _imGuiCtx, "ImGuiRenderingStep");
         Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null, "_sceneView.DefaultRenderObjectsRenderingStep != null");
         _sceneView.RenderingSteps.AddAfter(_sceneView.DefaultRenderObjectsRenderingStep, _imGuiRenderingStep);
 

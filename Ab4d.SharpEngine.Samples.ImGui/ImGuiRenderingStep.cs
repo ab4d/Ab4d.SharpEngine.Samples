@@ -11,8 +11,8 @@ namespace Ab4d.SharpEngine.Samples.ImGui;
 public class ImGuiRenderingStep : RenderingStep
 {
     // Data for font texture
-    private const IntPtr FontTextureId = 1; // ID we want ImGui to use to mark its font texture
-    private RawImageData? _fontTextureData;
+    private readonly RawImageData _fontTextureData;
+    private const IntPtr FontTextureId = 1; // ID we want ImGui to use for the font texture
 
     private GpuImage? _fontTextureImage;
     private DescriptorSetLayout _fontTextureDescriptorSetLayout;
@@ -21,7 +21,9 @@ public class ImGuiRenderingStep : RenderingStep
 
     private Vector2 _lastDisplaySize;
 
-    private ImGuiNET.ImGuiIOPtr _io;
+    private nint _imGuiCtx;
+    private ImGuiNET.ImGuiIOPtr _imGuiIo;
+
     private GpuBuffer[]? _matricesBuffers;
     private DescriptorSetLayout _matricesDescriptorSetLayout;
     private DescriptorPool _matricesDescriptorPool;
@@ -45,11 +47,26 @@ public class ImGuiRenderingStep : RenderingStep
     private Pipeline _pipeline;
 
     /// <inheritdoc />
-    public ImGuiRenderingStep(SceneView sceneView, ImGuiNET.ImGuiIOPtr imGuiIo, string? name,
-        string? description = null)
+    public ImGuiRenderingStep(SceneView sceneView, nint imGuiCtx, string? name, string? description = null)
         : base(sceneView, name, description)
     {
-        _io = imGuiIo;
+        _imGuiCtx = imGuiCtx;
+
+        ImGuiNET.ImGui.SetCurrentContext(_imGuiCtx); // Ensure context is active
+        _imGuiIo = ImGuiNET.ImGui.GetIO();
+
+        // Get data for font texture
+        _imGuiIo.Fonts.GetTexDataAsRGBA32(out IntPtr textureDataPtr, out var textureWidth, out var textureHeight, out var textureBytesPerPixel);
+        _imGuiIo.Fonts.SetTexID(FontTextureId);
+
+        var textureData = new byte[textureWidth * textureHeight * textureBytesPerPixel];
+        System.Runtime.InteropServices.Marshal.Copy(textureDataPtr, textureData, 0, textureData.Length);
+
+        _fontTextureData = new RawImageData(textureWidth, textureHeight, textureWidth * textureBytesPerPixel, Format.R8G8B8A8Unorm, textureData, checkTransparency: false)
+        {
+            HasTransparentPixels = true,
+            IsPreMultipliedAlpha = false,
+        };
     }
 
     /// <inheritdoc />
@@ -81,6 +98,7 @@ public class ImGuiRenderingStep : RenderingStep
         var vk = renderingContext.GpuDevice.Vk;
 
         // Fetch ImGui data
+        ImGuiNET.ImGui.SetCurrentContext(_imGuiCtx);
         var drawData = ImGuiNET.ImGui.GetDrawData();
 
         // Nothing to render. This might happen on first draw with UI that contains only windows that were not explicitly
@@ -92,12 +110,12 @@ public class ImGuiRenderingStep : RenderingStep
 
         // Check if display size changed
         // Create/update orthographic projection matrix. The matrix can be (re)computed on viewport changes.
-        if (_lastDisplaySize != _io.DisplaySize)
+        if (_lastDisplaySize != _imGuiIo.DisplaySize)
         {
             _mvpMatrix = Matrix4x4.CreateOrthographicOffCenter(
                 0f,
-                _io.DisplaySize.X,
-                _io.DisplaySize.Y,
+                _imGuiIo.DisplaySize.X,
+                _imGuiIo.DisplaySize.Y,
                 0.0f,
                 -1.0f,
                 1.0f);
@@ -105,7 +123,7 @@ public class ImGuiRenderingStep : RenderingStep
             // Mark all GpuBuffers that store MVP (_matricesBuffers) as dirty - this will update them by calling WriteToBuffer (see below)
             MarkMatrixBufferDirty();
 
-            _lastDisplaySize = _io.DisplaySize;
+            _lastDisplaySize = _imGuiIo.DisplaySize;
         }
 
         // If GpuBuffer for the current frame is marked as dirty, then update it
@@ -494,26 +512,7 @@ public class ImGuiRenderingStep : RenderingStep
     private unsafe void InitializeFontTextureResources(RenderingContext renderingContext)
     {
         var gpuDevice = renderingContext.GpuDevice;
-        int swapChainImagesCount = renderingContext.SwapChainImagesCount;
-
-        // Get texture data and create GpuImage
-        if (_fontTextureData == null)
-        {
-            // Get data for font texture
-            _io.Fonts.GetTexDataAsRGBA32(out IntPtr textureDataPtr, out var textureWidth, out var textureHeight,
-                out var textureBytesPerPixel);
-            _io.Fonts.SetTexID(FontTextureId);
-
-            var textureData = new byte[textureWidth * textureHeight * textureBytesPerPixel];
-            System.Runtime.InteropServices.Marshal.Copy(textureDataPtr, textureData, 0, textureData.Length);
-
-            _fontTextureData = new RawImageData(textureWidth, textureHeight, textureWidth * textureBytesPerPixel,
-                Format.R8G8B8A8Unorm, textureData, checkTransparency: false)
-            {
-                HasTransparentPixels = true,
-                IsPreMultipliedAlpha = false,
-            };
-        }
+        var swapChainImagesCount = renderingContext.SwapChainImagesCount;
 
         // NOTE: we need to store reference to created GpuImage, otherwise it will end up garbage-collected.
         _fontTextureImage = new GpuImage(gpuDevice, _fontTextureData, true, null);
@@ -660,8 +659,9 @@ public class ImGuiRenderingStep : RenderingStep
             }
 
 
-            // NOTE: we do not own the ImGui I/O structure (ImGuiNET.ImGuiIOPtr), so just reset the pointer to it.
-            _io = IntPtr.Zero;
+            // NOTE: we do not own the ImGui context nor its I/O structure; so just reset the pointers.
+            _imGuiIo = IntPtr.Zero;
+            _imGuiCtx = 0;
         }
 
         base.Dispose(disposing);
