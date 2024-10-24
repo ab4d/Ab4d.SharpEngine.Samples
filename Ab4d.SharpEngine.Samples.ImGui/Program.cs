@@ -7,19 +7,15 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
-using Silk.NET.Core.Native;
-using Silk.NET.Input;
-using Silk.NET.Maths;
-using Silk.NET.Windowing;
 
 namespace Ab4d.SharpEngine.Samples.ImGui;
 
 internal class Program
 {
     // Silk
-    private static IWindow? _window;
-    private static IKeyboard? _keyboard;
-    private static IMouse? _mouse;
+    private static Silk.NET.Windowing.IWindow? _window;
+    private static Silk.NET.Input.IKeyboard? _keyboard;
+    private static Silk.NET.Input.IMouse? _mouse;
 
     // SharpEngine
     private static VulkanDevice? _vulkanDevice;
@@ -40,11 +36,11 @@ internal class Program
     private static bool _showDemoWindow = true;
     private static bool _showOtherWindow = true;
 
-    private static void Main(string[] args)
+    private static void Main()
     {
         // Ab4d.SharpEngine Samples License can be used only for Ab4d.SharpEngine samples.
         // To use Ab4d.SharpEngine in your project, get a license from ab4d.com/trial or ab4d.com/purchase
-        Ab4d.SharpEngine.Licensing.SetLicense(licenseOwner: "AB4D",
+        Licensing.SetLicense(licenseOwner: "AB4D",
             licenseType: "SamplesLicense",
             platforms: "All",
             license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
@@ -59,11 +55,11 @@ internal class Program
         _imGuiIo.Fonts.Flags |= ImGuiNET.ImFontAtlasFlags.NoBakedLines;
 
         // Create window using Silk; setup is performed once window is created/loaded.
-        var options = WindowOptions.DefaultVulkan;
-        options.Size = new Vector2D<int>(800, 600);
+        var options = Silk.NET.Windowing.WindowOptions.DefaultVulkan;
+        options.Size = new Silk.NET.Maths.Vector2D<int>(800, 600);
         options.Title = "Silk.NET + SharpEngine + ImGui";
 
-        _window = Window.Create(options);
+        _window = Silk.NET.Windowing.Window.Create(options);
 
         _window.Load += () =>
         {
@@ -73,13 +69,13 @@ internal class Program
             SetupImGui();
         };
 
-        _window.Render += (double obj) => { _sceneView?.Render(); };
+        _window.Render += (_) => { _sceneView?.Render(); };
 
-        _window.FramebufferResize += (Vector2D<int> size) => { _sceneView?.Resize(renderNextFrameAfterResize: true); };
+        _window.FramebufferResize += (_) => { _sceneView?.Resize(renderNextFrameAfterResize: true); };
 
         _window.Initialize();
 
-        _window.Run();
+        Silk.NET.Windowing.WindowExtensions.Run(_window);
 
         // TODO: clean up everything
         _window.Dispose();
@@ -91,7 +87,7 @@ internal class Program
     {
         // Register input events on fist available keyboard and mouse
         Debug.Assert(_window != null, nameof(_window) + " != null");
-        var input = _window.CreateInput();
+        var input = Silk.NET.Input.InputWindowExtensions.CreateInput(_window);
         var keyboards = input.Keyboards;
         if (keyboards.Count > 0)
         {
@@ -118,7 +114,8 @@ internal class Program
             {
                 Debug.Assert(_window != null, nameof(_window) + " != null");
                 Debug.Assert(_window.VkSurface != null, "_window.VkSurface != null");
-                var surfaceHandle = _window.VkSurface.Create(new VkHandle(instance.Handle), (byte*)null);
+                var surfaceHandle =
+                    _window.VkSurface.Create(new Silk.NET.Core.Native.VkHandle(instance.Handle), (byte*)null);
                 return new SurfaceKHR(surfaceHandle.Handle);
             },
             addDefaultSurfaceExtensions: true);
@@ -197,7 +194,7 @@ internal class Program
         _sceneView.RenderingSteps.AddAfter(_sceneView.DefaultRenderObjectsRenderingStep, _imGuiRenderingStep);
 
         // This allows UI to be animated
-        _sceneView.SceneUpdating += (object? sender, EventArgs args) => { UpdateImgUiInterface(); };
+        _sceneView.SceneUpdating += (_, _) => { UpdateImgUiInterface(); };
     }
 
     private static void UpdateImgUiInterface()
@@ -237,7 +234,7 @@ internal class Program
 
     #region Input
 
-    private static void OnKeyboardKeyDown(IKeyboard keyboard, Key key, int keyCode)
+    private static void OnKeyboardKeyDown(Silk.NET.Input.IKeyboard keyboard, Silk.NET.Input.Key key, int keyCode)
     {
         if (MapKeyImGui(key, out var mappedKey))
             _imGuiIo.AddKeyEvent(mappedKey, true);
@@ -246,17 +243,17 @@ internal class Program
             return;
 
         // Pressing ESC key exits the application
-        if (key == Key.Escape && _window != null)
+        if (key == Silk.NET.Input.Key.Escape && _window != null)
             _window.Close();
     }
 
-    private static void OnKeyboardKeyUp(IKeyboard keyboard, Key key, int keyCode)
+    private static void OnKeyboardKeyUp(Silk.NET.Input.IKeyboard keyboard, Silk.NET.Input.Key key, int keyCode)
     {
         if (MapKeyImGui(key, out var mappedKey))
             _imGuiIo.AddKeyEvent(mappedKey, false);
     }
 
-    private static void OnMouseMove(IMouse mouse, Vector2 position)
+    private static void OnMouseMove(Silk.NET.Input.IMouse mouse, Vector2 position)
     {
         _imGuiIo.AddMousePosEvent(mouse.Position.X, mouse.Position.Y);
 
@@ -266,7 +263,7 @@ internal class Program
         _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), KeyboardModifiers.None);
     }
 
-    private static void OnMouseButtonDown(IMouse mouse, MouseButton button)
+    private static void OnMouseButtonDown(Silk.NET.Input.IMouse mouse, Silk.NET.Input.MouseButton button)
     {
         if (MapMouseButtonImGui(button, out var mappedButton))
             _imGuiIo.AddMouseButtonEvent(mappedButton, true);
@@ -275,10 +272,11 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine,
+                GetKeyboardModifiers());
     }
 
-    private static void OnMouseButtonUp(IMouse mouse, MouseButton button)
+    private static void OnMouseButtonUp(Silk.NET.Input.IMouse mouse, Silk.NET.Input.MouseButton button)
     {
         if (MapMouseButtonImGui(button, out var mappedButton))
             _imGuiIo.AddMouseButtonEvent(mappedButton, false);
@@ -287,10 +285,11 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine,
+                GetKeyboardModifiers());
     }
 
-    private static void OnMouseScroll(IMouse mouse, ScrollWheel wheel)
+    private static void OnMouseScroll(Silk.NET.Input.IMouse mouse, Silk.NET.Input.ScrollWheel wheel)
     {
         _imGuiIo.AddMouseWheelEvent(0f, wheel.Y);
         if (_imGuiIo.WantCaptureMouse)
@@ -305,58 +304,59 @@ internal class Program
         if (_keyboard == null)
             return KeyboardModifiers.None;
 
-        return (_keyboard.IsKeyPressed(Key.ShiftLeft) ? KeyboardModifiers.ShiftKey : 0) |
-               (_keyboard.IsKeyPressed(Key.ShiftRight) ? KeyboardModifiers.ShiftKey : 0) |
-               (_keyboard.IsKeyPressed(Key.ControlLeft) ? KeyboardModifiers.ControlKey : 0) |
-               (_keyboard.IsKeyPressed(Key.ControlRight) ? KeyboardModifiers.ControlKey : 0) |
-               (_keyboard.IsKeyPressed(Key.AltLeft) ? KeyboardModifiers.AltKey : 0) |
-               (_keyboard.IsKeyPressed(Key.AltRight) ? KeyboardModifiers.AltKey : 0) |
-               (_keyboard.IsKeyPressed(Key.SuperLeft) ? KeyboardModifiers.SuperKey : 0) |
-               (_keyboard.IsKeyPressed(Key.SuperRight) ? KeyboardModifiers.SuperKey : 0);
+        return (_keyboard.IsKeyPressed(Silk.NET.Input.Key.ShiftLeft) ? KeyboardModifiers.ShiftKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.ShiftRight) ? KeyboardModifiers.ShiftKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.ControlLeft) ? KeyboardModifiers.ControlKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.ControlRight) ? KeyboardModifiers.ControlKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.AltLeft) ? KeyboardModifiers.AltKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.AltRight) ? KeyboardModifiers.AltKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.SuperLeft) ? KeyboardModifiers.SuperKey : 0) |
+               (_keyboard.IsKeyPressed(Silk.NET.Input.Key.SuperRight) ? KeyboardModifiers.SuperKey : 0);
     }
 
     private static PointerButtons GetPressedMouseButtons()
     {
         if (_mouse == null)
             return PointerButtons.None;
-        return (_mouse.IsButtonPressed(MouseButton.Left) ? PointerButtons.Left : 0) |
-               (_mouse.IsButtonPressed(MouseButton.Middle) ? PointerButtons.Middle : 0) |
-               (_mouse.IsButtonPressed(MouseButton.Right) ? PointerButtons.Right : 0) |
-               (_mouse.IsButtonPressed(MouseButton.Button4) ? PointerButtons.XButton1 : 0) |
-               (_mouse.IsButtonPressed(MouseButton.Button5) ? PointerButtons.XButton2 : 0);
+        return (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Left) ? PointerButtons.Left : 0) |
+               (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Middle) ? PointerButtons.Middle : 0) |
+               (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Right) ? PointerButtons.Right : 0) |
+               (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Button4) ? PointerButtons.XButton1 : 0) |
+               (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Button5) ? PointerButtons.XButton2 : 0);
     }
 
-    private static bool MapMouseButtonToSharpEngine(MouseButton button, out PointerButtons result)
+    private static bool MapMouseButtonToSharpEngine(Silk.NET.Input.MouseButton button, out PointerButtons result)
     {
         result = button switch
         {
-            MouseButton.Left => PointerButtons.Left,
-            MouseButton.Right => PointerButtons.Right,
-            MouseButton.Middle => PointerButtons.Middle,
-            MouseButton.Button4 => PointerButtons.XButton1,
-            MouseButton.Button5 => PointerButtons.XButton2,
+            Silk.NET.Input.MouseButton.Left => PointerButtons.Left,
+            Silk.NET.Input.MouseButton.Right => PointerButtons.Right,
+            Silk.NET.Input.MouseButton.Middle => PointerButtons.Middle,
+            Silk.NET.Input.MouseButton.Button4 => PointerButtons.XButton1,
+            Silk.NET.Input.MouseButton.Button5 => PointerButtons.XButton2,
             _ => PointerButtons.None
         };
         return result != PointerButtons.None;
     }
 
-    private static bool MapMouseButtonImGui(MouseButton button, out int result)
+    private static bool MapMouseButtonImGui(Silk.NET.Input.MouseButton button, out int result)
     {
         result = button switch
         {
-            MouseButton.Left => 0,
-            MouseButton.Right => 1,
-            MouseButton.Middle => 2,
-            MouseButton.Button4 => 3,
-            MouseButton.Button5 => 4,
+            Silk.NET.Input.MouseButton.Left => 0,
+            Silk.NET.Input.MouseButton.Right => 1,
+            Silk.NET.Input.MouseButton.Middle => 2,
+            Silk.NET.Input.MouseButton.Button4 => 3,
+            Silk.NET.Input.MouseButton.Button5 => 4,
             _ => -1
         };
         return result != -1;
     }
 
-    private static bool MapKeyImGui(Key key, out ImGuiNET.ImGuiKey result)
+    private static bool MapKeyImGui(Silk.NET.Input.Key key, out ImGuiNET.ImGuiKey result)
     {
-        ImGuiNET.ImGuiKey KeyToImGuiKeyShortcut(Key keyToConvert, Key startKey1, ImGuiNET.ImGuiKey startKey2)
+        ImGuiNET.ImGuiKey KeyToImGuiKeyShortcut(Silk.NET.Input.Key keyToConvert, Silk.NET.Input.Key startKey1,
+            ImGuiNET.ImGuiKey startKey2)
         {
             var changeFromStart1 = (int)keyToConvert - (int)startKey1;
             return startKey2 + changeFromStart1;
@@ -364,52 +364,52 @@ internal class Program
 
         result = key switch
         {
-            >= Key.F1 and <= Key.F24 => KeyToImGuiKeyShortcut(key, Key.F1, ImGuiNET.ImGuiKey.F1),
-            >= Key.Keypad0 and <= Key.Keypad9 => KeyToImGuiKeyShortcut(key, Key.Keypad0, ImGuiNET.ImGuiKey.Keypad0),
-            >= Key.A and <= Key.Z => KeyToImGuiKeyShortcut(key, Key.A, ImGuiNET.ImGuiKey.A),
-            >= Key.Number0 and <= Key.Number9 => KeyToImGuiKeyShortcut(key, Key.Number0, ImGuiNET.ImGuiKey._0),
-            Key.ShiftLeft or Key.ShiftRight => ImGuiNET.ImGuiKey.ModShift,
-            Key.ControlLeft or Key.ControlRight => ImGuiNET.ImGuiKey.ModCtrl,
-            Key.AltLeft or Key.AltRight => ImGuiNET.ImGuiKey.ModAlt,
-            Key.SuperLeft or Key.SuperRight => ImGuiNET.ImGuiKey.ModSuper,
-            Key.Menu => ImGuiNET.ImGuiKey.Menu,
-            Key.Up => ImGuiNET.ImGuiKey.UpArrow,
-            Key.Down => ImGuiNET.ImGuiKey.DownArrow,
-            Key.Left => ImGuiNET.ImGuiKey.LeftArrow,
-            Key.Right => ImGuiNET.ImGuiKey.RightArrow,
-            Key.Enter => ImGuiNET.ImGuiKey.Enter,
-            Key.Escape => ImGuiNET.ImGuiKey.Escape,
-            Key.Space => ImGuiNET.ImGuiKey.Space,
-            Key.Tab => ImGuiNET.ImGuiKey.Tab,
-            Key.Backspace => ImGuiNET.ImGuiKey.Backspace,
-            Key.Insert => ImGuiNET.ImGuiKey.Insert,
-            Key.Delete => ImGuiNET.ImGuiKey.Delete,
-            Key.PageUp => ImGuiNET.ImGuiKey.PageUp,
-            Key.PageDown => ImGuiNET.ImGuiKey.PageDown,
-            Key.Home => ImGuiNET.ImGuiKey.Home,
-            Key.End => ImGuiNET.ImGuiKey.End,
-            Key.CapsLock => ImGuiNET.ImGuiKey.CapsLock,
-            Key.ScrollLock => ImGuiNET.ImGuiKey.ScrollLock,
-            Key.PrintScreen => ImGuiNET.ImGuiKey.PrintScreen,
-            Key.Pause => ImGuiNET.ImGuiKey.Pause,
-            Key.NumLock => ImGuiNET.ImGuiKey.NumLock,
-            Key.KeypadDivide => ImGuiNET.ImGuiKey.KeypadDivide,
-            Key.KeypadMultiply => ImGuiNET.ImGuiKey.KeypadMultiply,
-            Key.KeypadSubtract => ImGuiNET.ImGuiKey.KeypadSubtract,
-            Key.KeypadAdd => ImGuiNET.ImGuiKey.KeypadAdd,
-            Key.KeypadDecimal => ImGuiNET.ImGuiKey.KeypadDecimal,
-            Key.KeypadEnter => ImGuiNET.ImGuiKey.KeypadEnter,
-            Key.GraveAccent => ImGuiNET.ImGuiKey.GraveAccent,
-            Key.Minus => ImGuiNET.ImGuiKey.Minus,
-            Key.Equal => ImGuiNET.ImGuiKey.Equal,
-            Key.LeftBracket => ImGuiNET.ImGuiKey.LeftBracket,
-            Key.RightBracket => ImGuiNET.ImGuiKey.RightBracket,
-            Key.Semicolon => ImGuiNET.ImGuiKey.Semicolon,
-            Key.Apostrophe => ImGuiNET.ImGuiKey.Apostrophe,
-            Key.Comma => ImGuiNET.ImGuiKey.Comma,
-            Key.Period => ImGuiNET.ImGuiKey.Period,
-            Key.Slash => ImGuiNET.ImGuiKey.Slash,
-            Key.BackSlash => ImGuiNET.ImGuiKey.Backslash,
+            >= Silk.NET.Input.Key.F1 and <= Silk.NET.Input.Key.F24 => KeyToImGuiKeyShortcut(key, Silk.NET.Input.Key.F1, ImGuiNET.ImGuiKey.F1),
+            >= Silk.NET.Input.Key.Keypad0 and <= Silk.NET.Input.Key.Keypad9 => KeyToImGuiKeyShortcut(key, Silk.NET.Input.Key.Keypad0, ImGuiNET.ImGuiKey.Keypad0),
+            >= Silk.NET.Input.Key.A and <= Silk.NET.Input.Key.Z => KeyToImGuiKeyShortcut(key, Silk.NET.Input.Key.A, ImGuiNET.ImGuiKey.A),
+            >= Silk.NET.Input.Key.Number0 and <= Silk.NET.Input.Key.Number9 => KeyToImGuiKeyShortcut(key, Silk.NET.Input.Key.Number0, ImGuiNET.ImGuiKey._0),
+            Silk.NET.Input.Key.ShiftLeft or Silk.NET.Input.Key.ShiftRight => ImGuiNET.ImGuiKey.ModShift,
+            Silk.NET.Input.Key.ControlLeft or Silk.NET.Input.Key.ControlRight => ImGuiNET.ImGuiKey.ModCtrl,
+            Silk.NET.Input.Key.AltLeft or Silk.NET.Input.Key.AltRight => ImGuiNET.ImGuiKey.ModAlt,
+            Silk.NET.Input.Key.SuperLeft or Silk.NET.Input.Key.SuperRight => ImGuiNET.ImGuiKey.ModSuper,
+            Silk.NET.Input.Key.Menu => ImGuiNET.ImGuiKey.Menu,
+            Silk.NET.Input.Key.Up => ImGuiNET.ImGuiKey.UpArrow,
+            Silk.NET.Input.Key.Down => ImGuiNET.ImGuiKey.DownArrow,
+            Silk.NET.Input.Key.Left => ImGuiNET.ImGuiKey.LeftArrow,
+            Silk.NET.Input.Key.Right => ImGuiNET.ImGuiKey.RightArrow,
+            Silk.NET.Input.Key.Enter => ImGuiNET.ImGuiKey.Enter,
+            Silk.NET.Input.Key.Escape => ImGuiNET.ImGuiKey.Escape,
+            Silk.NET.Input.Key.Space => ImGuiNET.ImGuiKey.Space,
+            Silk.NET.Input.Key.Tab => ImGuiNET.ImGuiKey.Tab,
+            Silk.NET.Input.Key.Backspace => ImGuiNET.ImGuiKey.Backspace,
+            Silk.NET.Input.Key.Insert => ImGuiNET.ImGuiKey.Insert,
+            Silk.NET.Input.Key.Delete => ImGuiNET.ImGuiKey.Delete,
+            Silk.NET.Input.Key.PageUp => ImGuiNET.ImGuiKey.PageUp,
+            Silk.NET.Input.Key.PageDown => ImGuiNET.ImGuiKey.PageDown,
+            Silk.NET.Input.Key.Home => ImGuiNET.ImGuiKey.Home,
+            Silk.NET.Input.Key.End => ImGuiNET.ImGuiKey.End,
+            Silk.NET.Input.Key.CapsLock => ImGuiNET.ImGuiKey.CapsLock,
+            Silk.NET.Input.Key.ScrollLock => ImGuiNET.ImGuiKey.ScrollLock,
+            Silk.NET.Input.Key.PrintScreen => ImGuiNET.ImGuiKey.PrintScreen,
+            Silk.NET.Input.Key.Pause => ImGuiNET.ImGuiKey.Pause,
+            Silk.NET.Input.Key.NumLock => ImGuiNET.ImGuiKey.NumLock,
+            Silk.NET.Input.Key.KeypadDivide => ImGuiNET.ImGuiKey.KeypadDivide,
+            Silk.NET.Input.Key.KeypadMultiply => ImGuiNET.ImGuiKey.KeypadMultiply,
+            Silk.NET.Input.Key.KeypadSubtract => ImGuiNET.ImGuiKey.KeypadSubtract,
+            Silk.NET.Input.Key.KeypadAdd => ImGuiNET.ImGuiKey.KeypadAdd,
+            Silk.NET.Input.Key.KeypadDecimal => ImGuiNET.ImGuiKey.KeypadDecimal,
+            Silk.NET.Input.Key.KeypadEnter => ImGuiNET.ImGuiKey.KeypadEnter,
+            Silk.NET.Input.Key.GraveAccent => ImGuiNET.ImGuiKey.GraveAccent,
+            Silk.NET.Input.Key.Minus => ImGuiNET.ImGuiKey.Minus,
+            Silk.NET.Input.Key.Equal => ImGuiNET.ImGuiKey.Equal,
+            Silk.NET.Input.Key.LeftBracket => ImGuiNET.ImGuiKey.LeftBracket,
+            Silk.NET.Input.Key.RightBracket => ImGuiNET.ImGuiKey.RightBracket,
+            Silk.NET.Input.Key.Semicolon => ImGuiNET.ImGuiKey.Semicolon,
+            Silk.NET.Input.Key.Apostrophe => ImGuiNET.ImGuiKey.Apostrophe,
+            Silk.NET.Input.Key.Comma => ImGuiNET.ImGuiKey.Comma,
+            Silk.NET.Input.Key.Period => ImGuiNET.ImGuiKey.Period,
+            Silk.NET.Input.Key.Slash => ImGuiNET.ImGuiKey.Slash,
+            Silk.NET.Input.Key.BackSlash => ImGuiNET.ImGuiKey.Backslash,
             _ => ImGuiNET.ImGuiKey.None
         };
 
