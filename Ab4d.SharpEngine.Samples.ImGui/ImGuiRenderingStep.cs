@@ -74,8 +74,7 @@ public class ImGuiRenderingStep : RenderingStep
     {
         var swapChainImageIndex = renderingContext.CurrentSwapChainImageIndex;
 
-        if (_matricesDescriptorSets != null &&
-            _matricesDescriptorSets.Length != renderingContext.SwapChainImagesCount)
+        if (_matricesDescriptorSets != null && _matricesDescriptorSets.Length != renderingContext.SwapChainImagesCount)
             DisposeMatricesResources(renderingContext.GpuDevice);
 
         if (_matricesDescriptorSets == null)
@@ -129,8 +128,7 @@ public class ImGuiRenderingStep : RenderingStep
         // If GpuBuffer for the current frame is marked as dirty, then update it
         if (_isMatrixBufferDirty != null && _isMatrixBufferDirty[swapChainImageIndex] && _matricesBuffers != null)
         {
-            _matricesBuffers[swapChainImageIndex]
-                .WriteToBuffer(ref _mvpMatrix); // write from CPU's _mvpMatrix to the GpuBuffer
+            _matricesBuffers[swapChainImageIndex].WriteToBuffer(ref _mvpMatrix); // write from CPU's _mvpMatrix to the GpuBuffer
             _isMatrixBufferDirty[swapChainImageIndex] = false;
         }
 
@@ -158,10 +156,13 @@ public class ImGuiRenderingStep : RenderingStep
             // Copy indices (16-bit unsigned shorts).
             var spanNewIdxData = new ReadOnlySpan<ushort>((void*)cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size);
             var spanOldIdxData = new Span<ushort>(_indices, indicesOffset, cmdList.IdxBuffer.Size);
+
             if (!indicesChanged)
                 indicesChanged |= !spanOldIdxData.SequenceEqual(spanNewIdxData);
+
             if (indicesChanged)
                 spanNewIdxData.CopyTo(spanOldIdxData);
+
             indicesOffset += cmdList.IdxBuffer.Size;
 
             // Copy vertex data, without trying to re-interpret it (i.e., copy raw bytes). Our vertex buffer
@@ -169,15 +170,19 @@ public class ImGuiRenderingStep : RenderingStep
             // 1 32-bit integer / 4 bytes for RGBA color).
             var spanNewVtxData = new ReadOnlySpan<byte>((void*)cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size * bytesPerVertex);
             var spanOldVxtData = new Span<byte>(_vertices, verticesOffset * bytesPerVertex, cmdList.VtxBuffer.Size * bytesPerVertex);
+
             if (!verticesChanged)
                 verticesChanged |= !spanOldVxtData.SequenceEqual(spanNewVtxData);
+
             if (verticesChanged)
                 spanNewVtxData.CopyTo(spanOldVxtData);
+
             verticesOffset += cmdList.VtxBuffer.Size;
         }
 
         if (indicesChanged)
         {
+            // Dispose old index buffer. Note that the actual Vulkan buffer will be kept alive until the current "in-flight" frames are fully rendered.
             _indexBuffer?.Dispose();
 
             // Create a new index buffer.
@@ -187,6 +192,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         if (verticesChanged)
         {
+            // Dispose old vertex buffer. Note that the actual Vulkan buffer will be kept alive until the current "in-flight" frames are fully rendered.
             _vertexBuffer?.Dispose();
 
             // Create a new index buffer.
@@ -214,8 +220,7 @@ public class ImGuiRenderingStep : RenderingStep
         const int sceneDescriptorSetBindingIndex = 0;
         if (descriptorSet != currentBoundDescriptorSets[sceneDescriptorSetBindingIndex])
         {
-            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout,
-                sceneDescriptorSetBindingIndex, 1, &descriptorSet, 0, null);
+            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout, sceneDescriptorSetBindingIndex, 1, &descriptorSet, 0, null);
             currentBoundDescriptorSets[sceneDescriptorSetBindingIndex] = descriptorSet;
         }
 
@@ -224,8 +229,7 @@ public class ImGuiRenderingStep : RenderingStep
         descriptorSet = renderingContext.AllLightsDescriptorSet;
         if (descriptorSet != currentBoundDescriptorSets[allLightsDescriptorSetBindingIndex])
         {
-            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout,
-                allLightsDescriptorSetBindingIndex, 1, &descriptorSet, 0, null);
+            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout, allLightsDescriptorSetBindingIndex, 1, &descriptorSet, 0, null);
             currentBoundDescriptorSets[allLightsDescriptorSetBindingIndex] = descriptorSet;
         }
 
@@ -234,8 +238,7 @@ public class ImGuiRenderingStep : RenderingStep
         descriptorSet = _matricesDescriptorSets![swapChainImageIndex];
         if (descriptorSet != currentBoundDescriptorSets[matricesDescriptorSetBindingIndex])
         {
-            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout,
-                matricesDescriptorSetBindingIndex, descriptorSetCount: 1, &descriptorSet, 0, null);
+            vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout, matricesDescriptorSetBindingIndex, descriptorSetCount: 1, &descriptorSet, 0, null);
             currentBoundDescriptorSets[matricesDescriptorSetBindingIndex] = descriptorSet;
             renderingContext.DescriptorSetChangesCount++;
         }
@@ -244,14 +247,12 @@ public class ImGuiRenderingStep : RenderingStep
         int matrixIndex = 0;
         if (matrixIndex != renderingContext.CurrentMatrixIndex)
         {
-            vk.CmdPushConstants(commandBuffer, _pipelineLayout, ShaderStageFlags.Vertex, offset: 0, size: 4,
-                pValues: &matrixIndex);
+            vk.CmdPushConstants(commandBuffer, _pipelineLayout, ShaderStageFlags.Vertex, offset: 0, size: 4, pValues: &matrixIndex);
             renderingContext.CurrentMatrixIndex = matrixIndex;
             renderingContext.PushConstantsChangesCount++;
         }
 
-        // NOTE: MaterialDescriptorSets is bound inside the command processing loop, because technically, the texture
-        // might change.
+        // NOTE: MaterialDescriptorSets is bound inside the command processing loop, because technically, the texture might change.
 
         // Bind vertex and index buffer
         if (_vertexBuffer!.Buffer != renderingContext.CurrentVertexBuffer)
@@ -308,8 +309,7 @@ public class ImGuiRenderingStep : RenderingStep
                 vk.CmdSetScissor(commandBuffer, 0, 1, &scissor);
 
                 // Draw
-                vk.CmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, (uint)indicesOffset + cmd.IdxOffset,
-                    verticesOffset + (int)cmd.VtxOffset, 0);
+                vk.CmdDrawIndexed(commandBuffer, cmd.ElemCount, 1, (uint)indicesOffset + cmd.IdxOffset, verticesOffset + (int)cmd.VtxOffset, 0);
             }
 
             verticesOffset += cmdList.VtxBuffer.Size;
@@ -327,11 +327,8 @@ public class ImGuiRenderingStep : RenderingStep
         // We can reuse the Sprites shaders from SharpEngine.
         // The ShadersManager will get the shaders from the core assembly if shaders with the specified shaderResourceName exist.
         var shadersManager = gpuDevice.ShadersManager;
-        var vertexShaderStageInfo =
-            shadersManager.GetOrCreatePipelineShaderStage(shaderResourceName: "Sprites.spv.SpritesShader.vert.spv",
-                ShaderStageFlags.Vertex, "main");
-        var fragmentShaderStageInfo = shadersManager.GetOrCreatePipelineShaderStage(
-            shaderResourceName: "Sprites.spv.SpritesShader.frag.spv", ShaderStageFlags.Fragment, "main");
+        var vertexShaderStageInfo = shadersManager.GetOrCreatePipelineShaderStage(shaderResourceName: "Sprites.spv.SpritesShader.vert.spv", ShaderStageFlags.Vertex, "main");
+        var fragmentShaderStageInfo = shadersManager.GetOrCreatePipelineShaderStage(shaderResourceName: "Sprites.spv.SpritesShader.frag.spv", ShaderStageFlags.Fragment, "main");
 
         var pipelineShaderStages = stackalloc PipelineShaderStageCreateInfo[]
         {
@@ -459,8 +456,7 @@ public class ImGuiRenderingStep : RenderingStep
             PRasterizationState = &localRasterizationState,
             PTessellationState = &localTessellationState,
             PInputAssemblyState = &localInputAssemblyState,
-            PVertexInputState =
-                (PipelineVertexInputStateCreateInfo*)_vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
+            PVertexInputState = (PipelineVertexInputStateCreateInfo*)_vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
             RenderPass = renderingContext.SceneView.RenderPass,
             BasePipelineHandle = Pipeline.Null,
             BasePipelineIndex = -1,
@@ -469,8 +465,7 @@ public class ImGuiRenderingStep : RenderingStep
         };
 
         Pipeline pipeline;
-        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo,
-            null, &pipeline).CheckResult();
+        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo, null, &pipeline).CheckResult();
         pipeline.SetName(gpuDevice, "ImGuiPipeline");
 
         _pipeline = pipeline;
@@ -488,18 +483,14 @@ public class ImGuiRenderingStep : RenderingStep
 
         // Create GpuBuffers that will store the world-view-projection matrices on the GPU:
         int bufferSize = 16 * 4; // 16 floats
-        _matricesBuffers = gpuDevice.CreateBuffers(bufferSize, swapChainImagesCount, BufferUsageFlags.StorageBuffer,
-            typeof(Matrix4x4), itemsCount: 1, name: "ImGuiMatricesUniformBuffer");
+        _matricesBuffers = gpuDevice.CreateBuffers(bufferSize, swapChainImagesCount, BufferUsageFlags.StorageBuffer, typeof(Matrix4x4), itemsCount: 1, name: "ImGuiMatricesUniformBuffer");
 
         // Create DescriptorSets
-        _matricesDescriptorSetLayout = gpuDevice.CreateDescriptorSetLayout(DescriptorType.StorageBuffer,
-            ShaderStageFlags.Vertex, "ImGuiMatricesDescriptorSetLayout");
+        _matricesDescriptorSetLayout = gpuDevice.CreateDescriptorSetLayout(DescriptorType.StorageBuffer, ShaderStageFlags.Vertex, "ImGuiMatricesDescriptorSetLayout");
 
-        _matricesDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.StorageBuffer, swapChainImagesCount,
-            name: "ImGuiMatricesDescriptorPool");
+        _matricesDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.StorageBuffer, swapChainImagesCount, name: "ImGuiMatricesDescriptorPool");
 
-        _matricesDescriptorSets = gpuDevice.CreateDescriptorSets(_matricesDescriptorSetLayout, _matricesDescriptorPool,
-            swapChainImagesCount, "ImGuiMatricesDescriptorSets");
+        _matricesDescriptorSets = gpuDevice.CreateDescriptorSets(_matricesDescriptorSetLayout, _matricesDescriptorPool, swapChainImagesCount, "ImGuiMatricesDescriptorSets");
         gpuDevice.UpdateDescriptorSets(_matricesDescriptorSets, _matricesBuffers, DescriptorType.StorageBuffer);
 
         // Mark all GpuBuffers and DescriptorSets as dirty
@@ -518,12 +509,9 @@ public class ImGuiRenderingStep : RenderingStep
 
         // Create descriptor sets
         var texturedDescriptorTypes = new[] { DescriptorType.CombinedImageSampler };
-        _fontTextureDescriptorSetLayout = gpuDevice.CreateDescriptorSetLayout(texturedDescriptorTypes,
-            ShaderStageFlags.Fragment, name: "ImGuiFontTextureDescriptorSetLayout");
-        _fontTextureDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.StorageBuffer, swapChainImagesCount,
-            name: "ImGuiFontTextureDescriptorPool");
-        _fontTextureDescriptorSets = gpuDevice.CreateDescriptorSets(_fontTextureDescriptorSetLayout,
-            _fontTextureDescriptorPool, swapChainImagesCount, "ImGuiFontTextureDescriptorSets");
+        _fontTextureDescriptorSetLayout = gpuDevice.CreateDescriptorSetLayout(texturedDescriptorTypes, ShaderStageFlags.Fragment, name: "ImGuiFontTextureDescriptorSetLayout");
+        _fontTextureDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.StorageBuffer, swapChainImagesCount, name: "ImGuiFontTextureDescriptorPool");
+        _fontTextureDescriptorSets = gpuDevice.CreateDescriptorSets(_fontTextureDescriptorSetLayout, _fontTextureDescriptorPool, swapChainImagesCount, "ImGuiFontTextureDescriptorSets");
 
         for (int i = 0; i < swapChainImagesCount; i++)
         {
@@ -531,7 +519,6 @@ public class ImGuiRenderingStep : RenderingStep
             {
                 ImageView = _fontTextureImage.ImageView,
                 Sampler = sampler.Sampler,
-                //ImageLayout = textureImage.CurrentImageLayout // should be ImageLayout.ShaderReadOnlyOptimal
                 ImageLayout = ImageLayout.ShaderReadOnlyOptimal
             };
 
@@ -546,8 +533,8 @@ public class ImGuiRenderingStep : RenderingStep
             };
 
             gpuDevice.Vk.UpdateDescriptorSets(gpuDevice.Device, descriptorWriteCount: 1,
-                pDescriptorWrites: &writeDescriptorSets, descriptorCopyCount: 0,
-                pDescriptorCopies: (CopyDescriptorSet*)0);
+                                              pDescriptorWrites: &writeDescriptorSets, descriptorCopyCount: 0,
+                                              pDescriptorCopies: (CopyDescriptorSet*)0);
         }
     }
 
@@ -623,8 +610,7 @@ public class ImGuiRenderingStep : RenderingStep
             {
                 if (!_pipelineLayout.IsNull())
                 {
-                    gpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipelineLayout.Handle,
-                        typeof(PipelineLayout));
+                    gpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipelineLayout.Handle, typeof(PipelineLayout));
                     _pipelineLayout = PipelineLayout.Null;
                 }
 
