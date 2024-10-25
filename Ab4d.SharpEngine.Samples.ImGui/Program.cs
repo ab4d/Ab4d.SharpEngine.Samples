@@ -43,9 +43,9 @@ internal class Program
         // Ab4d.SharpEngine Samples License can be used only for Ab4d.SharpEngine samples.
         // To use Ab4d.SharpEngine in your project, get a license from ab4d.com/trial or ab4d.com/purchase
         Licensing.SetLicense(licenseOwner: "AB4D",
-            licenseType: "SamplesLicense",
-            platforms: "All",
-            license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
+                             licenseType: "SamplesLicense",
+                             platforms: "All",
+                             license: "5B53-8A17-DAEB-5B03-3B90-DD5B-958B-CA4D-0B88-CE79-FBB4-6002-D9C9-19C2-AFF8-1662-B2B2");
 
         // Enable logging of warnings and errors from SharpEngine. In debug builds, also enable Vulkan validation.
         Log.LogLevel = LogLevels.Warn;
@@ -89,18 +89,19 @@ internal class Program
         Silk.NET.Windowing.WindowExtensions.Run(_window);
 
         // Cleanup
-        _window.Dispose();
+        _imGuiRenderingStep?.Dispose();
 
         _sceneView?.Dispose();
         _sceneView = null;
 
         _scene?.Dispose();
-        _imGuiRenderingStep?.Dispose();
 
         _vulkanSurfaceProvider?.Dispose();
         _vulkanDevice?.Dispose();
 
         ImGuiNET.ImGui.DestroyContext(_imGuiCtx);
+
+        _window.Dispose();
     }
 
     private static void SetupInput()
