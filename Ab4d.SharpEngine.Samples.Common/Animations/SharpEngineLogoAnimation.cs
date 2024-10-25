@@ -61,7 +61,7 @@ public class SharpEngineLogoAnimation : IDisposable
 
 
         // Create hash symbol
-        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(centerPosition: new Vector3(0, HashModelBarThickness * -0.5f, 0),
+        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(centerPosition: new Vector3(0, 0, 0),
                                                               shapeYVector: new Vector3(0, 0, 1),
                                                               extrudeVector: new Vector3(0, HashModelBarThickness, 0),
                                                               size: HashModelSize,
