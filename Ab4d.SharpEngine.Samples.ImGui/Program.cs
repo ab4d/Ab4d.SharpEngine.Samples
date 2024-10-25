@@ -73,7 +73,7 @@ internal class Program
 
         // You can decide to use SDL or Glfw
         //Silk.NET.Windowing.Window.PrioritizeSdl();
-        //Silk.NET.Windowing.Window.PrioritizeGlfw();
+        //Silk.NET.Windowing.Window.PrioritizeGlfw();        
 
         _window = Silk.NET.Windowing.Window.Create(options);
 
@@ -207,8 +207,13 @@ internal class Program
         // Create scene view
         _sceneView = new SceneView(_scene);
         _sceneView.BackgroundColor = Color4.White;
+        
         Debug.Assert(_vulkanSurfaceProvider != null, nameof(_vulkanSurfaceProvider) + " != null");
-        _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX: 1.0f, dpiScaleY: 1.0f);
+
+        // TODO: How to read DPI scale?
+        float dpiScaleX = 1.0f;
+        float dpiScaleY = 1.0f;
+        _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX, dpiScaleY);
 
         // Camera
         var targetPositionCamera = new TargetPositionCamera()
@@ -266,7 +271,7 @@ internal class Program
 
         // Keep display size up to date
         Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
-        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width, _sceneView.Height);
+        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width / _sceneView.DpiScaleX, _sceneView.Height / _sceneView.DpiScaleY);
 
         // Begin frame
         ImGuiNET.ImGui.NewFrame();
@@ -322,11 +327,13 @@ internal class Program
 
     private static void OnMouseMove(Silk.NET.Input.IMouse mouse, Vector2 position)
     {
-        _imGuiIo.AddMousePosEvent(mouse.Position.X, mouse.Position.Y);
+        position = AdjustMousePositionForDpiScale(position);
+
+        _imGuiIo.AddMousePosEvent(position.X, position.Y);
 
         if (_imGuiIo.WantCaptureMouse)
             return;
-
+        
         _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), GetKeyboardModifiers());
     }
 
@@ -339,7 +346,10 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
+        {
+            var position = AdjustMousePositionForDpiScale(mouse.Position);
+            _pointerCameraController?.ProcessPointerPressed(position, mappedButtonSharpEngine, GetKeyboardModifiers());
+        }
     }
 
     private static void OnMouseButtonUp(Silk.NET.Input.IMouse mouse, Silk.NET.Input.MouseButton button)
@@ -351,7 +361,10 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
+        {
+            var position = AdjustMousePositionForDpiScale(mouse.Position);
+            _pointerCameraController?.ProcessPointerPressed(position, mappedButtonSharpEngine, GetKeyboardModifiers());
+        }
     }
 
     private static void OnMouseScroll(Silk.NET.Input.IMouse mouse, Silk.NET.Input.ScrollWheel wheel)
@@ -360,7 +373,16 @@ internal class Program
         if (_imGuiIo.WantCaptureMouse)
             return;
 
-        _pointerCameraController?.ProcessPointerWheelChanged(mouse.Position, wheel.Y);
+        var position = AdjustMousePositionForDpiScale(mouse.Position);
+        _pointerCameraController?.ProcessPointerWheelChanged(position, wheel.Y);
+    }
+
+    private static Vector2 AdjustMousePositionForDpiScale(Vector2 position)
+    {
+        if (_sceneView == null)
+            return position;
+
+        return new Vector2(position.X / _sceneView.DpiScaleX, position.Y / _sceneView.DpiScaleY);
     }
 
 

@@ -125,6 +125,8 @@ public class ImGuiRenderingStep : RenderingStep
             _lastDisplaySize = _imGuiIo.DisplaySize;
         }
 
+        drawData.ScaleClipRects(_imGuiIo.DisplayFramebufferScale * renderingContext.SceneView.DpiScaleX);
+
         // If GpuBuffer for the current frame is marked as dirty, then update it
         if (_isMatrixBufferDirty != null && _isMatrixBufferDirty[swapChainImageIndex] && _matricesBuffers != null)
         {
