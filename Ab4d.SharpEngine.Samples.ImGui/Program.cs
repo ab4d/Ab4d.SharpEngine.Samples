@@ -69,7 +69,11 @@ internal class Program
         // Create window using Silk; setup is performed once window is created/loaded.
         var options = Silk.NET.Windowing.WindowOptions.DefaultVulkan;
         options.Size = new Silk.NET.Maths.Vector2D<int>(1024, 600);
-        options.Title = "Ab4d.SharpEngine with ImGui on SDL";
+        options.Title = "Ab4d.SharpEngine with ImGui";
+
+        // You can decide to use SDL or Glfw
+        //Silk.NET.Windowing.Window.PrioritizeSdl();
+        //Silk.NET.Windowing.Window.PrioritizeGlfw();
 
         _window = Silk.NET.Windowing.Window.Create(options);
 
