@@ -179,15 +179,19 @@ public class ImGuiRenderingStep : RenderingStep
         if (indicesChanged)
         {
             _indexBuffer?.Dispose();
-            _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices!, BufferUsageFlags.IndexBuffer,
-                isDeviceLocal: false, name: $"ImGuiIndexBuffer");  // isDeviceLocal: true seems to corrupt data.
+
+            // Create a new index buffer.
+            // isDeviceLocal is false because this buffer is frequently changed so it is better that it stays on the CPU's side.
+            _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices!, BufferUsageFlags.IndexBuffer, isDeviceLocal: false, name: $"ImGuiIndexBuffer");
         }
 
         if (verticesChanged)
         {
             _vertexBuffer?.Dispose();
-            _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices!, BufferUsageFlags.VertexBuffer,
-                isDeviceLocal: false, name: $"ImGuiVertexBuffer");  // isDeviceLocal: true seems to corrupt data.
+
+            // Create a new index buffer.
+            // isDeviceLocal is false because this buffer is frequently changed so it is better that it stays on the CPU's side.
+            _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices!, BufferUsageFlags.VertexBuffer, isDeviceLocal: false, name: $"ImGuiVertexBuffer");
         }
 
         // Bind pipeline
