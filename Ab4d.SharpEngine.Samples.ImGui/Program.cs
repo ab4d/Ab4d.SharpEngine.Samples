@@ -66,7 +66,7 @@ internal class Program
         // Create window using Silk; setup is performed once window is created/loaded.
         var options = Silk.NET.Windowing.WindowOptions.DefaultVulkan;
         options.Size = new Silk.NET.Maths.Vector2D<int>(800, 600);
-        options.Title = "Silk.NET + SharpEngine + ImGui";
+        options.Title = "Ab4d.SharpEngine with ImGui on SDL";
 
         _window = Silk.NET.Windowing.Window.Create(options);
 
@@ -136,14 +136,13 @@ internal class Program
             {
                 Debug.Assert(_window != null, nameof(_window) + " != null");
                 Debug.Assert(_window.VkSurface != null, "_window.VkSurface != null");
-                var surfaceHandle =
-                    _window.VkSurface.Create(new Silk.NET.Core.Native.VkHandle(instance.Handle), (byte*)null);
+                var surfaceHandle = _window.VkSurface.Create(new Silk.NET.Core.Native.VkHandle(instance.Handle), (byte*)null);
                 return new SurfaceKHR(surfaceHandle.Handle);
             },
             addDefaultSurfaceExtensions: true);
 
         var engineCreateOptions =
-            new EngineCreateOptions(applicationName: "SharpEngine.Samples.ImGui", enableStandardValidation: _vulkanValidation)
+            new EngineCreateOptions(applicationName: "Ab4d.SharpEngine.Samples.ImGui", enableStandardValidation: _vulkanValidation)
             {
                 EnableSurfaceSupport = true,
             };
@@ -211,8 +210,7 @@ internal class Program
 
         // Create and register custom rendering step
         _imGuiRenderingStep = new ImGuiRenderingStep(_sceneView, _imGuiCtx, "ImGuiRenderingStep");
-        Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null,
-            "_sceneView.DefaultRenderObjectsRenderingStep != null");
+        Debug.Assert(_sceneView.DefaultRenderObjectsRenderingStep != null, "_sceneView.DefaultRenderObjectsRenderingStep != null");
         _sceneView.RenderingSteps.AddAfter(_sceneView.DefaultRenderObjectsRenderingStep, _imGuiRenderingStep);
 
         // This allows UI to be animated
