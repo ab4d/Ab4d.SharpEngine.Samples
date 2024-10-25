@@ -135,8 +135,15 @@ public class ImGuiRenderingStep : RenderingStep
         }
 
         // Collect all index and vertex data
-        var indices = new ushort[drawData.TotalIdxCount];
-        var vertices = new byte[drawData.TotalVtxCount * 5 * 4]; // x, y, u, v, rgba (each being 32-bit)
+        const int bytesPerVertex = 20; // four 32-bit floats + one 32-bit integer
+        var indicesChanged = _indices == null || _indices.Length != drawData.TotalIdxCount;
+        var verticesChanged = _vertices == null || _vertices.Length != drawData.TotalVtxCount * bytesPerVertex;
+
+        if (indicesChanged)
+            _indices = new ushort[drawData.TotalIdxCount];
+
+        if (verticesChanged)
+            _vertices = new byte[drawData.TotalVtxCount * bytesPerVertex];
 
         var verticesOffset = 0;
         var indicesOffset = 0;
@@ -144,68 +151,44 @@ public class ImGuiRenderingStep : RenderingStep
         {
             var cmdList = drawData.CmdLists[i];
 
+            // If vertex/index buffer has not been (re-)allocated, check if the chunk of data that corresponds to the
+            // given command list has changed or not, and only copy it if it has. After first change, do not keep
+            // checking anymore, and assume that all subsequent data has changed.
+
+            // Copy indices (16-bit unsigned shorts).
+            var spanNewIdxData = new ReadOnlySpan<ushort>((void*)cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size);
+            var spanOldIdxData = new Span<ushort>(_indices, indicesOffset, cmdList.IdxBuffer.Size);
+            if (!indicesChanged)
+                indicesChanged |= !spanOldIdxData.SequenceEqual(spanNewIdxData);
+            if (indicesChanged)
+                spanNewIdxData.CopyTo(spanOldIdxData);
+            indicesOffset += cmdList.IdxBuffer.Size;
+
             // Copy vertex data, without trying to re-interpret it (i.e., copy raw bytes). Our vertex buffer
             // description is set to match the format used by ImGui (2 floats for position, 2 floats for texture,
             // 1 32-bit integer / 4 bytes for RGBA color).
-            var vtxSrcSpan = new Span<byte>((void*)cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size * 5 * 4);
-            var vtxDstSpan = new Span<byte>(vertices, verticesOffset, cmdList.VtxBuffer.Size * 5 * 4);
-            vtxSrcSpan.CopyTo(vtxDstSpan);
-            verticesOffset += cmdList.VtxBuffer.Size * 5 * 4;
-
-            // Copy indices (16-bit unsigned shorts).
-            var idxSrcSpan = new Span<ushort>((void*)cmdList.IdxBuffer.Data, cmdList.IdxBuffer.Size);
-            var idxDstSpan = new Span<ushort>(indices, indicesOffset, cmdList.IdxBuffer.Size);
-            idxSrcSpan.CopyTo(idxDstSpan);
-            indicesOffset += cmdList.IdxBuffer.Size;
-        }
-
-        // Check if data has changed, and update vertex and index buffer accordingly. Note that even if buffer size
-        // remains the same and only content changes, we need to dispose the buffer and allocate new one - because the
-        // previous buffer might still be in use for rendering the previous frame (which might still be in-flight).
-        var indicesChanged = true;
-        if (_indices != null && _indices.Length == indices.Length)
-        {
-            var previousIndicesSpan = new ReadOnlySpan<ushort>(_indices);
-            var currentIndicesSpan = new ReadOnlySpan<ushort>(indices);
-            indicesChanged = !previousIndicesSpan.SequenceEqual(currentIndicesSpan);
+            var spanNewVtxData = new ReadOnlySpan<byte>((void*)cmdList.VtxBuffer.Data, cmdList.VtxBuffer.Size * bytesPerVertex);
+            var spanOldVxtData = new Span<byte>(_vertices, verticesOffset * bytesPerVertex, cmdList.VtxBuffer.Size * bytesPerVertex);
+            if (!verticesChanged)
+                verticesChanged |= !spanOldVxtData.SequenceEqual(spanNewVtxData);
+            if (verticesChanged)
+                spanNewVtxData.CopyTo(spanOldVxtData);
+            verticesOffset += cmdList.VtxBuffer.Size;
         }
 
         if (indicesChanged)
         {
-            _indices = indices; // Store current array for subsequent comparison
-
             _indexBuffer?.Dispose();
-            _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices, BufferUsageFlags.IndexBuffer,
-                isDeviceLocal: true, name: $"ImGuiIndexBuffer");
-            //_indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices, BufferUsageFlags.IndexBuffer,
-            //    isDeviceLocal: true, canUseDeviceLocalHostVisibleMemory: false, canUseBatchStagingDataUpload: false, name: $"ImGuiIndexBuffer");
-
-            //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
-        }
-
-        var verticesChanged = true;
-        if (_vertices != null && _vertices.Length == vertices.Length)
-        {
-            var previousVerticesSpan = new ReadOnlySpan<byte>(_vertices);
-            var currentVerticesSpan = new ReadOnlySpan<byte>(vertices);
-            verticesChanged = !previousVerticesSpan.SequenceEqual(currentVerticesSpan);
+            _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices!, BufferUsageFlags.IndexBuffer,
+                isDeviceLocal: false, name: $"ImGuiIndexBuffer");  // isDeviceLocal: true seems to corrupt data.
         }
 
         if (verticesChanged)
         {
-            _vertices = vertices; // Store current array for subsequent comparison
-
             _vertexBuffer?.Dispose();
-            _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices, BufferUsageFlags.VertexBuffer,
-                isDeviceLocal: true, name: $"ImGuiVertexBuffer");
-            //_vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices, BufferUsageFlags.VertexBuffer,
-            //    isDeviceLocal: true, canUseDeviceLocalHostVisibleMemory: false, canUseBatchStagingDataUpload:
-            // false, name: $"ImGuiVertexBuffer");
-
-            //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
+            _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices!, BufferUsageFlags.VertexBuffer,
+                isDeviceLocal: false, name: $"ImGuiVertexBuffer");  // isDeviceLocal: true seems to corrupt data.
         }
-
-        //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
 
         // Bind pipeline
         var currentBoundDescriptorSets = renderingContext.CurrentBoundDescriptorSets;
