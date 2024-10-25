@@ -17,11 +17,6 @@ using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
 using System.Windows.Media.Imaging;
 using System.IO;
-using Ab4d.SharpEngine.PostProcessing;
-using Ab4d.SharpEngine.RenderingSteps;
-using Ab4d.Vulkan;
-using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Meshes;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 {
@@ -50,8 +45,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
-            Utilities.Log.LogLevel = LogLevels.Warn;
-            Utilities.Log.IsLoggingToDebugOutput = true;
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message
@@ -61,28 +56,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
-
-            //MainSceneView.GpuDeviceCreated += (sender, args) =>
-            //{
-            //    var copyTexturePostProcess = new CopyTexturePostProcess();
-            //    MainSceneView.SceneView.PostProcesses.Add(copyTexturePostProcess);
-
-            //    //var copyTexturePostProcess2 = new CopyTexturePostProcess(MainSceneView.SceneView);
-            //    //MainSceneView.SceneView.PostProcesses.Add(copyTexturePostProcess2);
-
-            //    var blackAndWhitePostProcess = new BlackAndWhitePostProcess();
-            //    blackAndWhitePostProcess.ChangeViewport(0.1f, 0.1f, 0.5f, 0.5f);
-            //    MainSceneView.SceneView.PostProcesses.Add(blackAndWhitePostProcess);
-
-            //    //var blackAndWhitePostProcess2 = new BlackAndWhitePostProcess(MainSceneView.SceneView);
-            //    //MainSceneView.SceneView.PostProcesses.Add(blackAndWhitePostProcess2);
-
-            //    //var renderTestPostProcessRenderingStep = new RenderTestPostProcessRenderingStep(MainSceneView.SceneView, "RenderTestPostProcessRenderingStep");
-            //    //MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, renderTestPostProcessRenderingStep);
-
-            //    var renderTestPostProcessRenderingStep = new RenderPostProcessesRenderingStep(MainSceneView.SceneView);
-            //    MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, renderTestPostProcessRenderingStep);
-            //};
 
             // We can also manually initialize the SharpEngineSceneView ba calling Initialize method - see commented code below.
             // This would immediately create the VulkanDevice.
@@ -133,31 +106,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
         private void CreateTestScene()
         {
-            float hashModelSize = 100;
-            float hashModelBarThickness = 16;
-            float hashModelBarOffset = 20;
-
-            var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(centerPosition: new Vector3(0, 0, 0),
-                shapeYVector: new Vector3(0, 0, 1),
-                extrudeVector: new Vector3(0, hashModelBarThickness, 0),
-                size: hashModelSize,
-                barThickness: hashModelBarThickness,
-                barOffset: hashModelBarOffset,
-                name: "HashSymbolMesh");
-
-            var hashModelNode = new Ab4d.SharpEngine.SceneNodes.MeshModelNode(hashSymbolMesh, "HashSymbolModel")
-            {
-                Material = new StandardMaterial(Color3.FromByteRgb(255, 197, 0)),
-                Transform = new StandardTransform()
-            };
-        
-            MainSceneView.Scene.RootNode.Add(hashModelNode);
-
-            MainSceneView.Scene.RootNode.Add(new AxisLineNode());
-
-            return;
-
-
             var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(0, 0, 0), 
                                                     size: new Vector2(400, 300), 
                                                     normal: new Vector3(0, 1, 0), 
@@ -170,7 +118,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             MainSceneView.Scene.RootNode.Add(planeModelNode);
 
-            
             // Create a GroupNode that will group all created objects
             _groupNode = new GroupNode("GroupNode");
             _groupNode.Transform = new StandardTransform(translateX: 50, translateZ: 30);
@@ -299,11 +246,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             }
 
             System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
-        }
-
-        private void ResizeButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            Window.GetWindow(this).Width += 100;
         }
     }
 }

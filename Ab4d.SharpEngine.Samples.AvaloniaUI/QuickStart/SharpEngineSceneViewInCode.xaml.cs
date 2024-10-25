@@ -10,11 +10,10 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Media;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 {
@@ -121,8 +120,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
         private void SetupPointerCameraController()
         {
-
-            return;
             // Define the camera
             var camera = new TargetPositionCamera()
             {
@@ -171,73 +168,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             //scene.Lights.Add(new AmbientLight(new Color3(0.3f, 0.3f, 0.3f)));
         }
 
-        readonly List<SceneNode> _hitSpheres = new();
-        static readonly SolidColorMaterial _hitSphereMat = new(Colors.Yellow);
-
-        void _pointerPressed(object? o, PointerEventArgs e)
-        {
-            var pointerPosition = e.GetPosition(_sharpEngineSceneView);
-            var hits = _sharpEngineSceneView.SceneView.GetAllHitObjects((float)pointerPosition.X, (float)pointerPosition.Y);
-            if (hits.Any())
-                _resetHitSpheres();
-            foreach (var hit in hits)
-            {
-                var hitSphere = new SphereModelNode(hit.HitPosition, 0.1f, _hitSphereMat, name:"HitSphere");
-                hitSphere.IsHitTestVisible = false;
-                _sharpEngineSceneView.Scene.RootNode.Add(hitSphere);
-                _hitSpheres.Add(hitSphere);
-            }
-        }
-
-        void _resetHitSpheres()
-        {
-            foreach (var hitSphere in _hitSpheres)
-            {
-                hitSphere.Dispose();
-            }
-        }
-
         private void CreateTestScene()
         {
-            _sharpEngineSceneView.Scene.SetCoordinateSystem(CoordinateSystems.YUpLeftHanded);
-
-            _sharpEngineSceneView.PointerPressed += _pointerPressed;
-
-            var mat = new SolidColorMaterial(Colors.Blue) { Opacity = 0.3f };
-            var mat2 = new SolidColorMaterial(Colors.Red) { Opacity = 0.3f };
-
-            _sharpEngineSceneView.Scene.RootNode.Add(new PlaneModelNode {
-                Size = Vector2.One,
-                Material = mat,
-                BackMaterial = mat,
-                Transform = new StandardTransform(translateZ: 0),
-                Name="BluePlane"
-            });
-            _sharpEngineSceneView.Scene.RootNode.Add(new PlaneModelNode {
-                Size = Vector2.One,
-                Material = mat2,
-                BackMaterial = mat2,
-                Transform = new StandardTransform(translateY: 1f),
-                Name="RedPlane"
-            });
-            _sharpEngineSceneView.Scene.RootNode.Add(new BoxModelNode {
-                Size = Vector3.One,
-                Material = mat2,
-                BackMaterial = mat2,
-                Transform = new StandardTransform(translateY: -1f),
-                Name="BlueBox"
-            });
-
-            var sceneView = _sharpEngineSceneView.SceneView;
-            var cam = new TargetPositionCamera() {
-                Distance = 10,
-            };
-            _sharpEngineSceneView.SceneView.Camera = cam;
-            _ = new PointerCameraController(sceneView, this);
-
-            return;
-
-
             // The 3D objects in SharpEngine are defined in a hierarchical collection of SceneNode objects
             // that are added to the Scene.RootNode object.
             // The SceneNode object are defined in the Ab4d.SharpEngine.SceneNodes namespace.
@@ -259,7 +191,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             var errorTextBlock = new TextBlock()
             {
                 Text = "Error creating VulkanDevice:\r\n" + ex.Message,
-                //Foreground = Brushes.Red,
+                Foreground = Brushes.Red,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
