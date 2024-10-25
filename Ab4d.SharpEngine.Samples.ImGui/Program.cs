@@ -3,7 +3,10 @@ using System.Numerics;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Lights;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
@@ -65,7 +68,7 @@ internal class Program
 
         // Create window using Silk; setup is performed once window is created/loaded.
         var options = Silk.NET.Windowing.WindowOptions.DefaultVulkan;
-        options.Size = new Silk.NET.Maths.Vector2D<int>(800, 600);
+        options.Size = new Silk.NET.Maths.Vector2D<int>(1024, 600);
         options.Title = "Ab4d.SharpEngine with ImGui on SDL";
 
         _window = Silk.NET.Windowing.Window.Create(options);
@@ -161,7 +164,8 @@ internal class Program
         _scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
         _scene.SetAmbientLight(intensity: 0.3f);
 
-        // Create test mesh
+
+        // Create test 3D scene: wire grid and a hash symbol
         var wireGridNode = new WireGridNode()
         {
             CenterPosition = new Vector3(0, -0.1f, 0),
@@ -170,6 +174,30 @@ internal class Program
 
         _scene.RootNode.Add(wireGridNode);
 
+
+        float hashModelSize = 100;
+        float hashModelBarThickness = 16;
+        float hashModelBarOffset = 20;
+
+        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(new Vector3(0, 0, 0),
+                                                              shapeYVector: new Vector3(0, 0, 1),
+                                                              extrudeVector: new Vector3(0, hashModelBarThickness, 0),
+                                                              size: hashModelSize,
+                                                              barThickness: hashModelBarThickness,
+                                                              barOffset: hashModelBarOffset,
+                                                              name: "HashSymbolMesh");
+
+        var hashModelNode = new Ab4d.SharpEngine.SceneNodes.MeshModelNode(hashSymbolMesh, "HashSymbolModel")
+        {
+            Material = new StandardMaterial(Color3.FromByteRgb(255, 197, 0)),
+            Transform = new StandardTransform()
+        };
+        
+        _scene.RootNode.Add(hashModelNode);
+
+        // See Avalonia, WPF or WinForms samples for more 3D objects and demonstration of other SharpEngine features.
+
+
         // Create scene view
         _sceneView = new SceneView(_scene);
         _sceneView.BackgroundColor = Color4.White;
@@ -177,14 +205,18 @@ internal class Program
         _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX: 1.0f, dpiScaleY: 1.0f);
 
         // Camera
-        _sceneView.Camera = new TargetPositionCamera()
-        {
-            Heading = -40,
-            Attitude = -25,
-            Distance = 300,
-            TargetPosition = new Vector3(0, 0, 0),
-            ShowCameraLight = ShowCameraLightType.Auto
-        };
+        var targetPositionCamera = new TargetPositionCamera()
+                                   {
+                                       Heading = -40,
+                                       Attitude = -25,
+                                       Distance = 300,
+                                       TargetPosition = new Vector3(0, 0, 0),
+                                       ShowCameraLight = ShowCameraLightType.Auto
+                                   };
+
+        targetPositionCamera.StartRotation(headingChangeInSecond: 30);
+
+        _sceneView.Camera = targetPositionCamera;
 
         // Controller
         _pointerCameraController = new ManualPointerCameraController(_sceneView)
@@ -235,8 +267,8 @@ internal class Program
 
         if (_showOtherWindow)
         {
-            ImGuiNET.ImGui.Begin("Another window", ref _showOtherWindow);
-            ImGuiNET.ImGui.Text("Some text");
+            ImGuiNET.ImGui.Begin("Camera controls info", ref _showOtherWindow);
+            ImGuiNET.ImGui.Text("ROTATE: left mouse button\nMOVE: CTRL + left mouse button\nQUICK ZOOM: left + right mouse button");
             ImGuiNET.ImGui.End();
         }
 
