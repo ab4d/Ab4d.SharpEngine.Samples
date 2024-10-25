@@ -9,20 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <!--<PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />-->
-      <!--<PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />-->
+      <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
       <PackageReference Include="ImGui.NET" Version="1.91.0.1" />
       <PackageReference Include="Silk.NET.Input" Version="2.21.0" />
       <PackageReference Include="Silk.NET.Windowing.Sdl" Version="2.21.0" />
     </ItemGroup>
-
-   <ItemGroup>
-      <ProjectReference Include="..\..\..\My\Ab4d\SharpEngine\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
-    </ItemGroup>
- <!--
-    <ItemGroup>
-      <Reference Include="Ab4d.SharpEngine">
-        <HintPath>..\..\..\My\Ab4d\SharpEngine\Ab4d.SharpEngine\bin\Debug\net6.0\Ab4d.SharpEngine.dll</HintPath>
-      </Reference>
-    </ItemGroup>-->
 </Project>
