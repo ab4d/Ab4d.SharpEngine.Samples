@@ -29,6 +29,7 @@
 
                 <TextBlock Text="Actions:" FontWeight="Bold" Margin="0 5 0 2" />
 
+                <Button Name="ResizeButton" Content="Resize" Margin="0 2 0 2" Click="ResizeButton_OnClick" />
                 <Button Name="AddNewButton" Content="Add new" Margin="0 2 0 2" Click="AddNewButton_OnClick" />
                 <Button Name="RemoveButton" Content="Remove" Margin="0 2 0 2" Click="RemoveButton_OnClick" />
                 <Button Name="ChangeMaterial1Button" Content="Change material 1" Margin="0 2 0 2" Click="ChangeMaterial1Button_OnClick" />

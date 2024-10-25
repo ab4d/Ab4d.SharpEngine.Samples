@@ -30,8 +30,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        //private string? _startupPage = "AdvancedModels.MultiMaterialModelNodeSample";
-        private string? _startupPage = null;
+        //private string? _startupPage = "QuickStart.SharpEngineSceneViewInXaml";
+        private string? _startupPage = "QuickStart.SharpEngineSceneViewInCode";
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 

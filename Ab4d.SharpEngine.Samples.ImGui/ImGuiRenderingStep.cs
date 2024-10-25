@@ -177,6 +177,10 @@ public class ImGuiRenderingStep : RenderingStep
             _indexBuffer?.Dispose();
             _indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices, BufferUsageFlags.IndexBuffer,
                 isDeviceLocal: true, name: $"ImGuiIndexBuffer");
+            //_indexBuffer = renderingContext.GpuDevice.CreateBuffer(_indices, BufferUsageFlags.IndexBuffer,
+            //    isDeviceLocal: true, canUseDeviceLocalHostVisibleMemory: false, canUseBatchStagingDataUpload: false, name: $"ImGuiIndexBuffer");
+
+            //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
         }
 
         var verticesChanged = true;
@@ -194,7 +198,14 @@ public class ImGuiRenderingStep : RenderingStep
             _vertexBuffer?.Dispose();
             _vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices, BufferUsageFlags.VertexBuffer,
                 isDeviceLocal: true, name: $"ImGuiVertexBuffer");
+            //_vertexBuffer = renderingContext.GpuDevice.CreateBuffer(_vertices, BufferUsageFlags.VertexBuffer,
+            //    isDeviceLocal: true, canUseDeviceLocalHostVisibleMemory: false, canUseBatchStagingDataUpload:
+            // false, name: $"ImGuiVertexBuffer");
+
+            //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
         }
+
+        //renderingContext.GpuDevice.StagingGpuBuffer.WriteToGpu();
 
         // Bind pipeline
         var currentBoundDescriptorSets = renderingContext.CurrentBoundDescriptorSets;

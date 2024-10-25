@@ -17,6 +17,10 @@ using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
 using System.Windows.Media.Imaging;
 using System.IO;
+using Ab4d.SharpEngine.PostProcessing;
+using Ab4d.SharpEngine.RenderingSteps;
+using Ab4d.Vulkan;
+using Ab4d.SharpEngine.Core;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 {
@@ -45,8 +49,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
-            //Utilities.Log.LogLevel = LogLevels.Warn;
-            //Utilities.Log.IsLoggingToDebugOutput = true;
+            Utilities.Log.LogLevel = LogLevels.Warn;
+            Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
             // In case when VulkanDevice cannot be created, show an error message
@@ -55,6 +59,28 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             {
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
+            };
+
+            MainSceneView.GpuDeviceCreated += (sender, args) =>
+            {
+                var copyTexturePostProcess = new CopyTexturePostProcess();
+                MainSceneView.SceneView.PostProcesses.Add(copyTexturePostProcess);
+
+                //var copyTexturePostProcess2 = new CopyTexturePostProcess(MainSceneView.SceneView);
+                //MainSceneView.SceneView.PostProcesses.Add(copyTexturePostProcess2);
+
+                var blackAndWhitePostProcess = new BlackAndWhitePostProcess();
+                blackAndWhitePostProcess.ChangeViewport(0.1f, 0.1f, 0.5f, 0.5f);
+                MainSceneView.SceneView.PostProcesses.Add(blackAndWhitePostProcess);
+
+                //var blackAndWhitePostProcess2 = new BlackAndWhitePostProcess(MainSceneView.SceneView);
+                //MainSceneView.SceneView.PostProcesses.Add(blackAndWhitePostProcess2);
+
+                //var renderTestPostProcessRenderingStep = new RenderTestPostProcessRenderingStep(MainSceneView.SceneView, "RenderTestPostProcessRenderingStep");
+                //MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, renderTestPostProcessRenderingStep);
+
+                var renderTestPostProcessRenderingStep = new RenderPostProcessesRenderingStep(MainSceneView.SceneView);
+                MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, renderTestPostProcessRenderingStep);
             };
 
             // We can also manually initialize the SharpEngineSceneView ba calling Initialize method - see commented code below.
@@ -77,6 +103,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             SetupPointerCameraController();
 
             this.Unloaded += (sender, args) => MainSceneView.Dispose();
+        }
+
+        private void MainSceneView_SceneViewInitialized(object? sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void SetupPointerCameraController()
@@ -118,6 +149,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             MainSceneView.Scene.RootNode.Add(planeModelNode);
 
+            
             // Create a GroupNode that will group all created objects
             _groupNode = new GroupNode("GroupNode");
             _groupNode.Transform = new StandardTransform(translateX: 50, translateZ: 30);
@@ -246,6 +278,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             }
 
             System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
+        }
+
+        private void ResizeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Window.GetWindow(this).Width += 100;
         }
     }
 }
