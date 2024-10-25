@@ -92,6 +92,8 @@ internal class Program
         Silk.NET.Windowing.WindowExtensions.Run(_window);
 
         // Cleanup
+        _scene?.GpuDevice?.WaitUntilIdle(); // Finish rendering before we start disposing objects
+
         _imGuiRenderingStep?.Dispose();
 
         _sceneView?.Dispose();
