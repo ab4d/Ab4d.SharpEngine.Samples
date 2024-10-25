@@ -321,7 +321,7 @@ internal class Program
         if (_imGuiIo.WantCaptureMouse)
             return;
 
-        _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), KeyboardModifiers.None);
+        _pointerCameraController?.ProcessPointerMoved(position, GetPressedMouseButtons(), GetKeyboardModifiers());
     }
 
     private static void OnMouseButtonDown(Silk.NET.Input.IMouse mouse, Silk.NET.Input.MouseButton button)
@@ -333,8 +333,7 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine,
-                GetKeyboardModifiers());
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
     }
 
     private static void OnMouseButtonUp(Silk.NET.Input.IMouse mouse, Silk.NET.Input.MouseButton button)
@@ -346,8 +345,7 @@ internal class Program
             return;
 
         if (MapMouseButtonToSharpEngine(button, out var mappedButtonSharpEngine))
-            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine,
-                GetKeyboardModifiers());
+            _pointerCameraController?.ProcessPointerPressed(mouse.Position, mappedButtonSharpEngine, GetKeyboardModifiers());
     }
 
     private static void OnMouseScroll(Silk.NET.Input.IMouse mouse, Silk.NET.Input.ScrollWheel wheel)
@@ -379,6 +377,7 @@ internal class Program
     {
         if (_mouse == null)
             return PointerButtons.None;
+
         return (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Left) ? PointerButtons.Left : 0) |
                (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Middle) ? PointerButtons.Middle : 0) |
                (_mouse.IsButtonPressed(Silk.NET.Input.MouseButton.Right) ? PointerButtons.Right : 0) |
@@ -416,8 +415,7 @@ internal class Program
 
     private static bool MapKeyImGui(Silk.NET.Input.Key key, out ImGuiNET.ImGuiKey result)
     {
-        ImGuiNET.ImGuiKey KeyToImGuiKeyShortcut(Silk.NET.Input.Key keyToConvert, Silk.NET.Input.Key startKey1,
-            ImGuiNET.ImGuiKey startKey2)
+        ImGuiNET.ImGuiKey KeyToImGuiKeyShortcut(Silk.NET.Input.Key keyToConvert, Silk.NET.Input.Key startKey1, ImGuiNET.ImGuiKey startKey2)
         {
             var changeFromStart1 = (int)keyToConvert - (int)startKey1;
             return startKey2 + changeFromStart1;
