@@ -26,15 +26,17 @@ The following features are supported by the current version:
 **Windows:**
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - WPF full composition support with SharpEngineSceneView control (Ab4d.SharpEngine.Wpf library)
+  - MAUI
   - WinUI 3 support with SharpEngineSceneView control (Ab4d.SharpEngine.WinUI library)
   - WinForms support with SharpEngineSceneView control (Ab4d.SharpEngine.WinForms library)
-  - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Linux)
-  - MAUI
+  - Using SDL or Glfw (using a third-party Silk.Net library; the same project also works on Linux)
+  - ImGui (using a third-party ImGui.NET library)
   
 **Linux** (including Raspberry PI 4 and similar devices):
   - AvaloniaUI support with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library)
   - Using SDL or Glfw (using third-party Silk.Net library; the same project also works on Windows)
   - Off-screen rendering combined with Linux framebuffer display (FbDev or DRM/KMS).
+  - ImGui (using a third-party ImGui.NET library)
   - See ["Vulkan on Raspberry Pi 4"](https://www.ab4d.com/SharpEngine/Vulkan-rendering-engine-on-Raspberry-Pi-4.aspx) guide on how to use SharpEngine on Raspberry Pi 4 with an external monitor.
   
 **Android:**
@@ -104,18 +106,15 @@ The following Visual Studio solutions are available:
   build UI controls and can run on Windows, Linux and macOS.
   This sample uses Ab4d.SharpEngine.AvaloniaUI library that provides SharpEngineSceneView control.
   The SharpEngineSceneView provides an Avalonia control that is very easy to use and can 
-  compose the 3D scene with the Avalonia UI objects (for example showing buttons on top of 3D scene).
+  compose the 3D scene with the Avalonia UI objects (for example, showing buttons on top of the 3D scene).
   The sample can be started on Windows, Linux and on macOS (use a special macOS solution).
   See also "Building for macOS and iOS" section for more information on how to compile for macOS.
 
 - **Ab4d.SharpEngine.Samples.AvaloniaUI.VulkanBackend**\
-  This sample uses Avalonia UI which uses Vulkan as a backend, so the whole application is using Vulkan API
+  This sample uses Avalonia UI, which uses Vulkan as a backend, so the whole application is using Vulkan API
   (the UI controls are also rendered by Vulkan instead of DirectX or OpenGL as by default).
   Vulkan backend is setup in the Program.cs file.
   This provides the best integration of 2D UI and 3D graphics.
-  This requires Avalonia v11.1 which is currently in release candidate version (2024-07-05).
-  Because of this, the project is using Ab4d.SharpEngine.Samples.AvaloniaUI v2.0.8953-rc1 version.
-  When the Avalonia version will be released, a new Ab4d.SharpEngine.Samples.AvaloniaUI library will also be released.
   This sample can run only on Windows.
 
 - **Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform**\
@@ -129,31 +128,31 @@ The following Visual Studio solutions are available:
   This solution provides the samples for WPF and can run only on Windows.
   The samples also use Ab4d.SharpEngine.Wpf library that provides SharpEngineSceneView control for WPF.
   The SharpEngineSceneView provides a WPF control that is very easy to use and can 
-  compose the 3D scene with the WPF objects (for example showing buttons on top of 3D scene).
+  compose the 3D scene with the WPF objects (for example, showing buttons on top of the 3D scene).
   
 - **Ab4d.SharpEngine.Samples.WinUI**\
-  This sample uses WinUI 3.0 that provides the latest UI technology to create applications for Windows.
+  This sample uses WinUI 3.0, which provides the latest UI technology to create applications for Windows.
   This sample uses Ab4d.SharpEngine.WinUI library that provides SharpEngineSceneView control.
-  The SharpEngineSceneView provides an WinUI control that is very easy to be used and can 
-  compose the 3D scene with the WinUI UI objects (for example showing buttons on top of 3D scene).
+  The SharpEngineSceneView provides a WinUI control that is very easy to use and can 
+  compose the 3D scene with the WinUI UI objects (for example, showing buttons on top of the 3D scene).
 
 - **Ab4d.SharpEngine.Samples.WinForms**\
   This solution provides the samples for WinForms and can run only on Windows.
   The samples also use Ab4d.SharpEngine.WinForms library that provides SharpEngineSceneView Control for WinForms.
-  The SharpEngineSceneView provides a WinForms Control that is very easy to be used and can 
-  compose the 3D scene with other UI Controls (for example showing buttons on top of 3D scene).
+  The SharpEngineSceneView provides a WinForms Control that is very easy to use and can 
+  compose the 3D scene with other UI Controls (for example, showing buttons on top of the 3D scene).
   
 - **Ab4d.SharpEngine.Samples.CrossPlatform**\
-  This sample uses third-party Silk.Net library that provides support for SDL and GLFW.
-  SDL and GLFW are used to get platform-independent way to create windows and views.
+  This sample uses a third-party Silk.Net library that provides support for SDL and GLFW.
+  SDL and GLFW are used to get platform-independent ways to create windows and views.
   The 3D scene here is shown in the whole window area.
-  Because of this project can work on Windows and Linux.
+  This project can work on Windows and Linux.
   
 - **Ab4d.SharpEngine.Samples.Android.Generic**\
   This solution is similar to Ab4d.SharpEngine.Samples.CrossPlatform because it also uses Silk.Net library.
   To work on Android the code to initialize SharpEngine and define the 3D scene can be the same
   as for other platforms, but there needs to be some special startup code to create the Android Activity.
-  The 3D scene here is shown on the whole view area.
+  The 3D scene here is shown in the whole window area.
 
 - **Ab4d.SharpEngine.Samples.Android.Application**\
   This solution uses an Android.Application project template for .Net 6.
@@ -166,10 +165,15 @@ The following Visual Studio solutions are available:
   See "Building for macOS and iOS" section for more information on how to compile for macOS and iOS.
 
 - **Ab4d.SharpEngine.Samples.LinuxFramebuffer**\
-  This solution uses SharpEngine with off-screen Vulkan renderer, and displays
-  the rendered frames on Linux framebuffer display (FbDev or DRM/KMS). See
+  This solution uses SharpEngine with an off-screen Vulkan renderer and displays
+  the rendered frames on a Linux framebuffer display (FbDev or DRM/KMS). See
   [the example's README](Ab4d.SharpEngine.Samples.LinuxFramebuffer/README.md)
   for details.
+
+- **Ab4d.SharpEngine.Samples.ImGui**
+  This solution shows how to render user interface that is defined by ImGui.
+  It includes the ImGuiRenderingStep class with full source code that shows how to render ImGui by using Ab4d.SharpEngine.
+  The solution is using a third-party ImGui.NET library (https://github.com/ImGuiNET/ImGui.NET).
 
 
 ## Quick Start
@@ -267,13 +271,9 @@ The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
 
 If you get build errors on Windows (for example 'project.assets.json' not found) than maybe the total path length is larger than max path (260 chars). Move the samples solution to a folder with a shorter path and try compiling again.
 
+The latest version of branches that start with "version/" may not compile with the latest published NuGet package and require the latest development version of the engine. If you need a feature from that branch, you can contact support to get the pre-release version.
 
-Known issues:
-
-- Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
-
-- When using SharedTexture in a WPF application, some older graphics cards may produce WPF's UCEERR_RENDERTHREADFAILURE (0x88980406) error. Set SharpEngineSceneView.PresentationType to WriteableBitmap as a workaround.
-
+Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (writable bitmap is used instead, but this is slower).
 
 To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/
 When Vulkan validation is installed and enabled by the SharpEngine (EnableStandardValidation is set to true when creating the engine),
@@ -306,50 +306,8 @@ Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = false;
 
 
 ## Change log
+See https://www.ab4d.com/SharpEngine-history.aspx.
 
-**v2.0.8951** (2024-07-04):
-
-Major new features:
-- Added PixelsNode, PixelMaterial and PixelEffect which can be used to render 3D pixels and point-clouds.
-- Added ModelMover that can be used to move selected 3D models in the 3D space.
-- Added ModelScalar that can be used to scale selected 3D models.
-- Added ModelRotator that can be used to rotate selected 3D models.
-- Added MultiMaterialModelNode that defines a SceneNode with a single mesh and multiple materials. It uses SubMesh objects to define which triangles in the mesh are rendered with which material.
-- Added InputEventsManager (platform specific) and ManualInputEventsManager (generic) that can be used to easily subscribe to pointer and mouse events on 3D objects.
-- Significantly improved the performance of generating edge lines (can be more than 100 times faster than before). To use the new method create an instance of the EdgeLinesFactory class and call any of its public methods.
-- Significantly improved the performance of LineSelectorData, which can be used to select lines with a pointer or mouse. See the updated "HitTesting / Line selection" sample.
-- Added SliceSceneNode, SliceGroupNode and SliceModelNode methods to ModelUtils. They can slice SceneNode objects by a plane.
-
-Breaking changes:
-- Renamed all classes, methods and parameters with "mouse" text to use "pointer" instead, for example: MouseCameraController => PointerCameraController, MouseButtons => PointerButtons, MouseAndKeyboardConditions => PointerAndKeyboardConditions, etc.
-- Marked all methods in Color3, Color4 and BoundingBox that take parameters by ref as obsolete. There are new methods that take parameters by in keyword instead.
-- BoundingBox.Transform and protected Camera.SetCameraMatrices changed ref parameter to in parameter.
-
-Created a new **Ab4d.SharpEngine.glTF** library that can read 3D objects from glTF files and export an existing 3D scene to glTF file.
-
-Created a new **Ab4d.SharpEngine.WinForms** library that provides helper classes (SharpEngineSceneView, MouseCameraController, InputEventsManager and SystemDrawingBitmapIO). There are also new samples for WinForms.
-
-Many other improvements and fixes. See https://www.ab4d.com/SharpEngine-history.aspx for the whole list of changes.
-
-**v1.0.8740** (2023-12-07):
-- Added licensing code. Now license must be activated by calling SetLicense method.
-- Simplified GetChild, GetAllChildren and ForEachChild in GroupNode. Removed search by regular expression. The wildcard (using '*') search is now automatically determined from the specified name.
-- Removed SerializeToJson and DeserializeJson from Camera because they were rarely used. This removed reference to System.Text.Json assembly.
-- Added Camera.Name property that can be set when creating the camera.
-- Prevented throwing "Value cannot be null" exception when CreateOptions.ApplicationName was null or empty string.
-- Fixed rendering semi-transparent rectangles with SpriteBatch
-- Fixed WpfBitmapIO to set HasTransparency property
-- Fixed WinUIBitmapIO by converting to pre-multiplied alpha
-- Changed default sampler type from Wrap to Mirror.
-- Documented many additional classes, properties and methods. See online help here: https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm
-
-Breaking changes:
-- Change the order of parameters in the VulkanDevice.Create methods - the EngineCreateOptions parameter was moved after surface parameters because it is now optional.
-- Removed IRotatedViewCamera interface and moved ViewRotation property from camera to SceneView
-- Removed public VulkanInstance and VulkanDevice constructors. Now it is possible to create VulkanInstance and VulkanDevice objects only by using static Create methods (before both constructor and Create method were available).
-- Renamed some parameter names in some methods in transformation classes (uniformScale to scale)
-- Renamed FreeCamera.CalculateUpDirectionFromPositions to CalculateCurrentUpDirection
- 
 
 ## Plans for later versions
 
