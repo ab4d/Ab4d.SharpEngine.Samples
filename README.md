@@ -1,6 +1,6 @@
 # Ab4d.SharpEngine.Samples
 
-![Ab4d.SharpEngine logo](https://www.ab4d.com/images/SharpEngine/sharp-engine_512x218.png)
+![Ab4d.SharpEngine logo](doc/animated-samples.png)
 
 Welcome to the Samples for Ab4d.SharpEngine.
 
