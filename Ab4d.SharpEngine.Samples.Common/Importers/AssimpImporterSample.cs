@@ -420,7 +420,7 @@ Note: The current version does not support exporting SharpEngine Scene objects, 
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
         ui.CreateLabel("View", isHeader: true);
-        ui.CreateRadioButtons(new string[] { "Solid objects only", "Solid + EdgeLines", "Solid + Wireframe" }, (selectedIndex, selectedText) =>
+        ui.CreateRadioButtons(new string[] { "Solid objects only", "Solid + generated EdgeLines", "Solid + Wireframe" }, (selectedIndex, selectedText) =>
         {
             _currentViewType = (ViewTypes)selectedIndex;
             UpdateShownLines();
