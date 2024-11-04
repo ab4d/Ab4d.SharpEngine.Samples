@@ -153,6 +153,15 @@ public class CustomFogEffectSample : CommonSample
         base.OnSceneViewInitialized(sceneView);
     }
 
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (SceneView != null)
+            SceneView.BackgroundColor = Color4.Transparent;
+
+        base.OnDisposed();
+    }
+
     private void UpdateFogMaterial()
     {
         foreach (var fogMaterial in _allFogMaterials)
