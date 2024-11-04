@@ -118,5 +118,6 @@
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
+  <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
 
 </Samples>
