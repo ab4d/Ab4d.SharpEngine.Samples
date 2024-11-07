@@ -240,9 +240,13 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                 {
                     // ... then call resize and Render in the lines below ...
                     // Calling Resize (and aquiring the new size of the surface) is required on some platforms (for example Glfw).
+                    // We supply the event-provided size information for cases when the surface itself does not provide
+                    // size information (e.g., Silk.NET under Linux with Wayland).
                     // For other (WPF) a new Render would be enough, but it does not hurt to also call Resize.
 
-                    _sceneView.Resize(renderNextFrameAfterResize: true);
+                    _sceneView.Resize(renderNextFrameAfterResize: true,
+                                      fallbackWidth: e.Width > 0 ? (int)e.Width : 800,
+                                      fallbackHeight: e.Height > 0 ? (int)e.Height : 600);
                 }
             };
 
@@ -508,17 +512,23 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             if (_vulkanSurfaceProvider == null)
             {
                 // When we are not rendering to a surface, then we need to provide the size of the SceneView
-                _sceneView.Initialize(width: _presentationControl.Width != 0 ? (int)_presentationControl.Width : 800,
-                                      height: _presentationControl.Height != 0 ? (int)_presentationControl.Height : 600,
+                _sceneView.Initialize(width: _presentationControl.Width > 0 ? (int)_presentationControl.Width : 800,
+                                      height: _presentationControl.Height > 0 ? (int)_presentationControl.Height : 600,
                                       dpiScaleX: _presentationControl.DpiScaleX,
                                       dpiScaleY: _presentationControl.DpiScaleY);
             }
             else
             {
-                // When we are rendering to a surface, then we do not provide the size (width and height) 
-                // but only DPI scale because this cannot be read from the surface data.
+                // When we are rendering to a surface, we provide the size (width and height) of the SceneView (based
+                // on presentation control's dimensions) as fallback values, to be used in cases when size information
+                // is not provided by the surface (e.g., Silk.NET under Linux with Wayland).
+                // We also need to supply the DPI scale because it cannot be read from the surface data.
                 // Note that without correct DPI scale the hit testing will not work correctly.
-                _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX: _presentationControl.DpiScaleX, dpiScaleY: _presentationControl.DpiScaleY);
+                _sceneView.Initialize(_vulkanSurfaceProvider,
+                                      dpiScaleX: _presentationControl.DpiScaleX,
+                                      dpiScaleY: _presentationControl.DpiScaleY,
+                                      fallbackWidth: _presentationControl.Width > 0 ? (int)_presentationControl.Width : 800,
+                                      fallbackHeight: _presentationControl.Height > 0 ? (int)_presentationControl.Height : 600);
             }
 
 
