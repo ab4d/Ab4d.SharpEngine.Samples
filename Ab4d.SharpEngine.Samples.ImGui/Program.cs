@@ -211,6 +211,7 @@ internal class Program
 
         // Create scene view
         _sceneView = new SceneView(_scene);
+        _sceneView.PreferredSupersamplingCount = 1; /* TODO: ImGuiRenderingStep does not work with supersampling yet */
         _sceneView.BackgroundColor = Color4.White;
         
         Debug.Assert(_vulkanSurfaceProvider != null, nameof(_vulkanSurfaceProvider) + " != null");
