@@ -91,9 +91,9 @@ internal class Program
         // ReSharper disable once AccessToDisposedClosure
         _window.FramebufferResize += (size) =>
         {
-            _sceneView?.Resize(renderNextFrameAfterResize: true,
-                               fallbackWidth: size.X > 0 ? size.X : 800,
-                               fallbackHeight: size.Y > 0 ? size.Y : 600);
+            _sceneView?.Resize(newWidth: size.X > 0 ? size.X : 800,
+                               newHeight: size.Y > 0 ? size.Y : 600,
+                               renderNextFrameAfterResize: true);
         };
 
         _window.Initialize();
