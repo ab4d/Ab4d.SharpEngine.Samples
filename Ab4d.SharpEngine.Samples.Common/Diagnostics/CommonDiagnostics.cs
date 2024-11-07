@@ -217,10 +217,9 @@ public class CommonDiagnostics
             if (sceneView.UsedMultiSampleCount > 1)
                 viewInfo += $" x {sceneView.UsedMultiSampleCount}xMSAA";
 
-            // Supersampling is not yet supported
-            //var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
-            //if (supersamplingCount > 1)
-            //    viewInfo += string.Format(" x {0}xSSAA", supersamplingCount);
+            var supersamplingCount = sceneView.UsedSupersamplingCount; // number of pixels used for one final pixel
+            if (supersamplingCount > 1)
+                viewInfo += string.Format(" x {0:0.#}xSSAA", supersamplingCount);
 
             viewInfo += $" ({_sharpEngineSceneView.PresentationType})";
         }

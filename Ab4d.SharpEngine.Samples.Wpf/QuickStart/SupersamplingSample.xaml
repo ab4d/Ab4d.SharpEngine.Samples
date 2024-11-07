@@ -1,0 +1,32 @@
+﻿<Page x:Class="Ab4d.SharpEngine.Samples.Wpf.QuickStart.SupersamplingSample"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.QuickStart"
+        xmlns:common="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Common"
+        xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.Wpf;assembly=Ab4d.SharpEngine.Wpf"
+        mc:Ignorable="d"
+        Title="SharedSurfaceSample"
+        d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="Super smooth lines with multi-sampling (MSAA) and super-sampling (SSAA)" FontSize="20" FontWeight="Bold" Margin="5 0" Foreground="#444" HorizontalAlignment="Left"/>
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0" VerticalAlignment="Center">
+            <Button Name="ResetCamerasButton" Content="Reset cameras" Click="ResetCamerasButton_OnClick" />
+            
+            <TextBlock Text="LineThickness:" Margin="20 0 3 0" VerticalAlignment="Center"/>
+            <ComboBox Name="LineThicknessComboBox" SelectionChanged="LineThicknessComboBox_OnSelectionChanged"></ComboBox>
+        </StackPanel>
+    </Grid>
+</Page>
