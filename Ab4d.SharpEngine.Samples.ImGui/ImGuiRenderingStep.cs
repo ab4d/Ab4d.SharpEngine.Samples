@@ -113,8 +113,8 @@ public class ImGuiRenderingStep : RenderingStep
         {
             _mvpMatrix = Matrix4x4.CreateOrthographicOffCenter(
                 0f,
-                _imGuiIo.DisplaySize.X,
-                _imGuiIo.DisplaySize.Y,
+                SceneView.Width,
+                SceneView.Height,
                 0.0f,
                 -1.0f,
                 1.0f);
@@ -125,7 +125,7 @@ public class ImGuiRenderingStep : RenderingStep
             _lastDisplaySize = _imGuiIo.DisplaySize;
         }
 
-        drawData.ScaleClipRects(_imGuiIo.DisplayFramebufferScale * renderingContext.SceneView.DpiScaleX);
+        drawData.ScaleClipRects(_imGuiIo.DisplayFramebufferScale * renderingContext.SceneView.DpiScaleX * renderingContext.SupersamplingFactor);
 
         // If GpuBuffer for the current frame is marked as dirty, then update it
         if (_isMatrixBufferDirty != null && _isMatrixBufferDirty[swapChainImageIndex] && _matricesBuffers != null)

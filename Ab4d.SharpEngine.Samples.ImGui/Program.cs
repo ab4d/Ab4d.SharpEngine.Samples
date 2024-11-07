@@ -211,9 +211,13 @@ internal class Program
 
         // Create scene view
         _sceneView = new SceneView(_scene);
-        _sceneView.PreferredSupersamplingCount = 1; /* TODO: ImGuiRenderingStep does not work with supersampling yet */
         _sceneView.BackgroundColor = Color4.White;
+
+        // By default, on dedicated desktop GPU, the 4xSSAA (super-sampling anti-aliasing) is used.
+        // To disabled that, set PreferredSupersamplingCount to 1:
+        //_sceneView.PreferredSupersamplingCount = 1;
         
+
         Debug.Assert(_vulkanSurfaceProvider != null, nameof(_vulkanSurfaceProvider) + " != null");
 
         // TODO: How to read DPI scale?
@@ -224,6 +228,7 @@ internal class Program
                               dpiScaleY: dpiScaleY,
                               fallbackWidth: (_window!.FramebufferSize.X > 0) ? _window!.FramebufferSize.X : 800,
                               fallbackHeight: (_window!.FramebufferSize.Y > 0) ? _window!.FramebufferSize.Y : 600);
+        
 
         // Camera
         var targetPositionCamera = new TargetPositionCamera()
@@ -256,7 +261,7 @@ internal class Program
     private static void SetupImGui()
     {
         Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
-        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width, _sceneView.Height);
+        _imGuiIo.DisplaySize = new Vector2(_sceneView.RenderWidth, _sceneView.RenderHeight);
         _imGuiIo.DeltaTime = 0;
 
         _previousFrameTime = DateTime.Now;
@@ -281,7 +286,7 @@ internal class Program
 
         // Keep display size up to date
         Debug.Assert(_sceneView != null, nameof(_sceneView) + " != null");
-        _imGuiIo.DisplaySize = new Vector2(_sceneView.Width / _sceneView.DpiScaleX, _sceneView.Height / _sceneView.DpiScaleY);
+        _imGuiIo.DisplaySize = new Vector2(_sceneView.RenderWidth / _sceneView.DpiScaleX, _sceneView.RenderHeight / _sceneView.DpiScaleY);
 
         // Begin frame
         ImGuiNET.ImGui.NewFrame();
