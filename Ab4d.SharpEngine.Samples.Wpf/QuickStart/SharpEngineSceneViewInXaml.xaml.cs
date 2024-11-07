@@ -17,13 +17,6 @@ using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
 using System.Windows.Media.Imaging;
 using System.IO;
-using Ab4d.SharpEngine.PostProcessing;
-using Ab4d.SharpEngine.RenderingSteps;
-using Ab4d.Vulkan;
-using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Meshes;
-using System.Windows.Media.Media3D;
-using Colors = System.Windows.Media.Colors;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 {
@@ -39,35 +32,22 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
         private TargetPositionCamera? _targetPositionCamera;
 
         private int _newObjectsCounter;
-        private BlackAndWhitePostProcess _blackAndWhitePostProcess;
 
         public SharpEngineSceneViewInXaml()
         {
-#if DEBUG
-            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-
-
-            // Logging was already enabled in SamplesWindow constructor
-            //Utilities.Log.LogLevel = LogLevels.Trace;
-            //Utilities.Log.LogFileName = @"c:\temp\SharpEngineFromRenderDoc.log";
-            //Utilities.Log.IsLoggingToDebugOutput = true;
-
-            //AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs e)
-            //{
-            //    System.IO.File.AppendAllText(Utilities.Log.LogFileName, $"EXCEPTION: {e.ExceptionObject.GetType().Name}: {((Exception)e.ExceptionObject).Message}\r\n{((Exception)e.ExceptionObject).StackTrace}");
-            //};
-#endif
-
-            //Ab4d.SharpEngine.Wpf.Controls.OverlaySurfaceHost.RenderAsManyFramesAsPossible = true;
-
             InitializeComponent();
-
+            
             // This sample shows how to create SharpEngineSceneView in XAML.
             // To see how do create SharpEngineSceneView in code, see the SharpEngineSceneViewInCode sample.
 
-
-            MainSceneView.CreateOptions.PreferredSwapChainImagesCount = 3;
+#if DEBUG
+            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
             MainSceneView.CreateOptions.EnableStandardValidation = true;
+
+            // Logging was already enabled in SamplesWindow constructor
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
+#endif
 
             // In case when VulkanDevice cannot be created, show an error message
             // If this is not handled by the user, then SharpEngineSceneView will show its own error message
@@ -76,37 +56,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 ShowDeviceCreateFailedError(args.Exception); // Show error message
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
-
-
-            MainSceneView.BackgroundColor = Colors.White;
-
-            MainSceneView.PreferredMultiSampleCount = 0;
-            MainSceneView.PreferredSupersamplingCount = 4;
-
-
-
-            //// Super-sampling:
-            //MainSceneView.GpuDeviceCreated += (sender, args) =>
-            //{
-            //    var downSampleRenderingStep = new ResolveSupersamplingRenderingStep(MainSceneView.SceneView);
-            //    MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, downSampleRenderingStep);
-            //};
-
-
-            // B&W post-process:
-            //MainSceneView.GpuDeviceCreated += (sender, args) =>
-            //{
-            //    var copyTexturePostProcess = new CopyTexturePostProcess();
-            //    MainSceneView.SceneView.PostProcesses.Add(copyTexturePostProcess);
-
-            //    _blackAndWhitePostProcess = new BlackAndWhitePostProcess();
-            //    _blackAndWhitePostProcess.ChangeViewport(0.1f, 0.1f, 0.5f, 0.5f);
-            //    MainSceneView.SceneView.PostProcesses.Add(_blackAndWhitePostProcess);
-
-            //    var renderTestPostProcessRenderingStep = new RenderPostProcessesRenderingStep(MainSceneView.SceneView);
-            //    MainSceneView.SceneView.RenderingSteps.AddBefore(MainSceneView.SceneView.DefaultCompleteRenderingStep, renderTestPostProcessRenderingStep);
-            //};
-
 
             // We can also manually initialize the SharpEngineSceneView ba calling Initialize method - see commented code below.
             // This would immediately create the VulkanDevice.
@@ -169,7 +118,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             MainSceneView.Scene.RootNode.Add(planeModelNode);
 
-            
             // Create a GroupNode that will group all created objects
             _groupNode = new GroupNode("GroupNode");
             _groupNode.Transform = new StandardTransform(translateX: 50, translateZ: 30);
@@ -197,10 +145,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
                 _groupNode.Add(sphereModelNode);
             }
-
-
-            AddLinesFan(_groupNode, startPosition: new Vector3(-210, -5, 0), lineThickness: 0.6f, linesLength: 100);
-            AddLinesFan(_groupNode, startPosition: new Vector3(-50, -5, 0), lineThickness: 0.8f, linesLength: 100);
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)
@@ -302,40 +246,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             }
 
             System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
-        }
-
-        private void ResizeButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            _blackAndWhitePostProcess.ChangeViewport(_blackAndWhitePostProcess.ViewportOffset.X + 0.1f, 0.1f, 0.5f, 0.5f);
-
-            //if (_blackAndWhitePostProcess.IsFullScreenPostProcess)
-            //    _blackAndWhitePostProcess.ChangeViewport(0.1f, 0.1f, 0.5f, 0.5f);
-            //else
-            //    _blackAndWhitePostProcess.ChangeViewport(0f, 0f, 1f, 1f);
-
-            //Window.GetWindow(this).Width += 100;
-        }
-
-        private void AddLinesFan(GroupNode parentNode, Vector3 startPosition, float lineThickness, float linesLength, string titleText = null)
-        {
-            var linePositions = new List<Vector3>();
-
-            for (int a = 0; a <= 90; a += 5)
-            {
-                Vector3 endPosition = startPosition + new Vector3(linesLength * MathF.Cos(a / 180.0f * MathF.PI), linesLength * MathF.Sin(a / 180.0f * MathF.PI), 0);
-
-                linePositions.Add(startPosition);
-                linePositions.Add(endPosition);
-            }
-
-            var multiLineVisual3D = new MultiLineNode()
-            {
-                Positions     = linePositions.ToArray(),
-                LineColor     = Color4.Black,
-                LineThickness = lineThickness
-            };
-
-            parentNode.Add(multiLineVisual3D);
         }
     }
 }

@@ -11,12 +11,9 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using System.IO;
-using System.Runtime.InteropServices;
 using Ab4d.SharpEngine.AvaloniaUI;
-using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Vulkan;
-using Ab4d.Vulkan;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -59,8 +56,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             //Utilities.Log.IsLoggingToDebugOutput = true;
 #endif
 
-            MainSceneView.PreferredMultiSampleCount = 1;
-
             // In case when VulkanDevice cannot be created, show an error message
             // If this is not handled by the user, then SharpEngineSceneView will show its own error message
             MainSceneView.GpuDeviceCreationFailed += delegate (object sender, DeviceCreateFailedEventArgs args)
@@ -87,60 +82,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
             CreateTestScene();
             SetupPointerCameraController();
-
-            MainSceneView.GpuDeviceCreated += (sender, args) =>
-            {
-                var planeModelNode = CreateTextBlockNode(args.GpuDevice, "TEST 123", new Vector3(0, 0, 0), 200, 100, 100, 100);
-                MainSceneView.Scene.RootNode.Add(planeModelNode);
-            };
-
-            this.Unloaded += (sender, args) => MainSceneView.Dispose();
-        }
-
-        private PlaneModelNode CreateTextBlockNode(VulkanDevice gpuDevice, string text, Vector3 position, float width, float height, int bitmapWidth, int bitmapHeight)
-        {
-            var textBlock = new TextBlock()
-            {
-                Text = text,
-                //FontFamily = new FontFamily("Arial"),
-                FontSize = 20,
-                Foreground = Brushes.Orange,
-                Background = Brushes.Aqua
-            };
-
-
-
-            var rawBitmapBytes = new byte[bitmapWidth * 4 * bitmapHeight];
             
-
-            var pixelSize = new Avalonia.PixelSize(bitmapWidth, bitmapHeight);
-            var size = new Avalonia.Size(bitmapWidth, bitmapHeight);
-            using (var bitmap = new Avalonia.Media.Imaging.RenderTargetBitmap(pixelSize, new Avalonia.Vector(96, 96)))
-            {
-                var textRect = new Avalonia.Rect(size);
-
-                textBlock.Measure(size);
-                textBlock.Arrange(textRect);
-                bitmap.Render(textBlock);
-
-                //bitmap.Save();
-                var gcHandle = GCHandle.Alloc(rawBitmapBytes, GCHandleType.Pinned);
-                bitmap.CopyPixels(new Avalonia.PixelRect(0, 0, bitmapWidth, bitmapHeight), gcHandle.AddrOfPinnedObject(), rawBitmapBytes.Length, bitmapWidth  * 4);
-                gcHandle.Free();
-            }
-
-            var rawBitmap = new RawImageData(bitmapWidth, bitmapHeight, bitmapWidth * 4, Format.B8G8R8A8Unorm, rawBitmapBytes, checkTransparency: false);
-
-            var gpuImage = new GpuImage(gpuDevice, rawBitmap, generateMipMaps: true, "TextBlockBitmap");
-
-            var planeModelNode = new PlaneModelNode()
-            {
-                Position = position,
-                Size = new Vector2(width, height),
-                Material = new StandardMaterial(gpuImage)
-            };
-
-            return planeModelNode;
+            this.Unloaded += (sender, args) => MainSceneView.Dispose();
         }
 
         private void SetupPointerCameraController()
