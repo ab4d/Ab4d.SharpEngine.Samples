@@ -73,7 +73,7 @@ internal class Program
 
         // You can decide to use SDL or Glfw
         //Silk.NET.Windowing.Window.PrioritizeSdl();
-        //Silk.NET.Windowing.Window.PrioritizeGlfw();        
+        //Silk.NET.Windowing.Window.PrioritizeGlfw();
 
         _window = Silk.NET.Windowing.Window.Create(options);
 
@@ -89,7 +89,12 @@ internal class Program
         _window.Render += (_) => { _sceneView?.Render(); };
 
         // ReSharper disable once AccessToDisposedClosure
-        _window.FramebufferResize += (_) => { _sceneView?.Resize(renderNextFrameAfterResize: true); };
+        _window.FramebufferResize += (size) =>
+        {
+            _sceneView?.Resize(renderNextFrameAfterResize: true,
+                               fallbackWidth: size.X > 0 ? size.X : 800,
+                               fallbackHeight: size.Y > 0 ? size.Y : 600);
+        };
 
         _window.Initialize();
 
@@ -213,7 +218,11 @@ internal class Program
         // TODO: How to read DPI scale?
         float dpiScaleX = 1.0f;
         float dpiScaleY = 1.0f;
-        _sceneView.Initialize(_vulkanSurfaceProvider, dpiScaleX, dpiScaleY);
+        _sceneView.Initialize(_vulkanSurfaceProvider,
+                              dpiScaleX: dpiScaleX,
+                              dpiScaleY: dpiScaleY,
+                              fallbackWidth: (_window!.FramebufferSize.X > 0) ? _window!.FramebufferSize.X : 800,
+                              fallbackHeight: (_window!.FramebufferSize.Y > 0) ? _window!.FramebufferSize.Y : 600);
 
         // Camera
         var targetPositionCamera = new TargetPositionCamera()
