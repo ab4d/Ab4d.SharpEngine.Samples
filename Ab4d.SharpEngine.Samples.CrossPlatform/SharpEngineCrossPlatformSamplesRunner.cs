@@ -244,9 +244,9 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
                     // size information (e.g., Silk.NET under Linux with Wayland).
                     // For other (WPF) a new Render would be enough, but it does not hurt to also call Resize.
 
-                    _sceneView.Resize(renderNextFrameAfterResize: true,
-                                      fallbackWidth: e.Width > 0 ? (int)e.Width : 800,
-                                      fallbackHeight: e.Height > 0 ? (int)e.Height : 600);
+                    _sceneView.Resize(newWidth: e.Width > 0 ? (int)e.Width : 800,
+                                      newHeight: e.Height > 0 ? (int)e.Height : 600,
+                                      renderNextFrameAfterResize: true);
                 }
             };
 
