@@ -215,6 +215,8 @@ public class ImGuiRenderingStep : RenderingStep
                 currentBoundDescriptorSets[i] = DescriptorSet.Null;
 
             renderingContext.IsNonStandardPipelineLayout = false; // We are using standard pipeline
+
+            renderingContext.CurrentMatrixIndex = -1; // Set the push constants again
         }
 
         // Bind SceneDescriptorSet as set 0
