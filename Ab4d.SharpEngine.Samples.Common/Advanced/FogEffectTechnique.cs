@@ -411,6 +411,15 @@ public class FogEffectTechnique : EffectTechnique
 
             renderingContext.CurrentPipeline = Pipeline;
             renderingContext.PipelineChangesCount++;
+
+            if (PipelineLayout != renderingContext.CurrentPipelineLayout)
+            {
+                // When PipelineLayout is changed, then all push constants are undefined and need to be set again
+                renderingContext.CurrentMatrixIndex = -1;
+                renderingContext.CurrentMaterialIndex = -1;
+
+                renderingContext.CurrentPipelineLayout = PipelineLayout;
+            }
         }
 
 
