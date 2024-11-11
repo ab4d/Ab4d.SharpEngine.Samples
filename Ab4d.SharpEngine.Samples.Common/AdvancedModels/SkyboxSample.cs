@@ -13,6 +13,8 @@ public class SkyboxSample : CommonSample
 {
     public override string Title => "Skybox created with MultiMaterialModelNode";
 
+    private ManualPointerCameraController? _pointerCameraController;
+
     public SkyboxSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -58,6 +60,8 @@ public class SkyboxSample : CommonSample
         // Limit camera distance so the user does not go farther away as the size of the SkyBox (500)
         pointerCameraController.MaxCameraDistance = 490;
 
+        _pointerCameraController = pointerCameraController;
+
         base.InitializePointerCameraController(pointerCameraController);
     }
 
@@ -74,6 +78,15 @@ public class SkyboxSample : CommonSample
 
         // Use SolidColorMaterial so there is no shading based on lights
         return new SolidColorMaterial(texture);
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_pointerCameraController != null)
+            _pointerCameraController.MaxCameraDistance = float.NaN; // Reset the MaxCameraDistance
+
+        base.OnDisposed();
     }
 }
 
