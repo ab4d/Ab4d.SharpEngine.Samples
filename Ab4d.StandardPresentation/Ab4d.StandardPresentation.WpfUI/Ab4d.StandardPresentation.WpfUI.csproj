@@ -10,9 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+	  <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+	  <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
+  </ItemGroup>  
   
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.StandardPresentation\Ab4d.StandardPresentation.csproj" />

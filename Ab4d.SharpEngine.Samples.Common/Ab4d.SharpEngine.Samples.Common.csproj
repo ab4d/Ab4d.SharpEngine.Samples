@@ -11,11 +11,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.1.9028-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.1.9060-beta1" />
   </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.1.9028-beta1" />  
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.1.9060-beta1" />  
+  </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Assimp\Ab4d.SharpEngine.Assimp.csproj" />
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF\Ab4d.SharpEngine.glTF.csproj" />
+  </ItemGroup>    
 
   <ItemGroup>
     <None Remove="Resources\CadImporter-for-SharpEngine.png" />

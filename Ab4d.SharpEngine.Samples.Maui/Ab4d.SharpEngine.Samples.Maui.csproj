@@ -62,13 +62,17 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.90" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
-  </ItemGroup>
-
+	<ItemGroup>
+	    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.90" />
+	    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
+	</ItemGroup>
+	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+	    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
+	</ItemGroup>
+	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+	    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
+	</ItemGroup>  
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
       <RuntimeIdentifier>maccatalyst-arm64</RuntimeIdentifier> 

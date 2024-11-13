@@ -256,7 +256,3 @@ paket-files/
 !*.obj
 
 .DS_STORE
-
-
-# Private csproj files by AB4D team
-*.private.csproj
