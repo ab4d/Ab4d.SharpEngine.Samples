@@ -140,7 +140,7 @@ public class FogEffectTechnique : EffectTechnique
         return CreatePipeline(renderingContext.SceneView.RenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
-                              renderingContext.SceneView.UsedMultiSampleCountFlags,
+                              renderingContext.SceneView.MultisampleCountFlags,
                               flags,
                               Pipeline.Null,
                               pipelineName);
@@ -171,7 +171,7 @@ public class FogEffectTechnique : EffectTechnique
         return CreatePipeline(renderingContext.SceneView.RenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
-                              renderingContext.SceneView.UsedMultiSampleCountFlags,
+                              renderingContext.SceneView.MultisampleCountFlags,
                               flags,
                               parentPipeline,
                               pipelineName);

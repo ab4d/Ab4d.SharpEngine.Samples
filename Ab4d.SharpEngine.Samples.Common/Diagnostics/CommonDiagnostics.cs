@@ -214,10 +214,10 @@ public class CommonDiagnostics
         {
             viewInfo = $"{sceneView.Width} x {sceneView.Height}";
 
-            if (sceneView.UsedMultiSampleCount > 1)
-                viewInfo += $" x {sceneView.UsedMultiSampleCount}xMSAA";
+            if (sceneView.MultisampleCount > 1)
+                viewInfo += $" x {sceneView.MultisampleCount}xMSAA";
 
-            var supersamplingCount = sceneView.UsedSupersamplingCount; // number of pixels used for one final pixel
+            var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
             if (supersamplingCount > 1)
                 viewInfo += string.Format(" x {0:0.#}xSSAA", supersamplingCount);
 

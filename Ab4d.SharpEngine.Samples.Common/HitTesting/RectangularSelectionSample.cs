@@ -593,8 +593,6 @@ public abstract class RectangularSelectionSample : CommonSample
         var savedBackground = SceneView.BackgroundColor;
         SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
 
-        SceneView.PreferredMultiSampleCount = 1;
-
         // Recreate _rawRenderedBitmap when size is changed
         if (_rawRenderedBitmap != null && (_rawRenderedBitmap.Width != SceneView.Width || _rawRenderedBitmap.Height != SceneView.Height))
             _rawRenderedBitmap = null; 
@@ -607,10 +605,7 @@ public abstract class RectangularSelectionSample : CommonSample
 
 
         // Revert back BackgroundColor and materials
-
         SceneView.BackgroundColor = savedBackground;
-        SceneView.PreferredMultiSampleCount = 4;
-
         ResetOriginalMaterials(Scene.RootNode);
 
         _isIdBitmapDirty = false; // Mark ID Bitmap as correct
@@ -834,7 +829,7 @@ Disadvantages:
             selectedItemIndex: 0);
 
 
-        if (SceneView != null && SceneView.UsedMultiSampleCount > 1)
+        if (SceneView != null && SceneView.MultisampleCount > 1)
         {
             // See comments at the start of this file for more info
             ui.CreateLabel("Object ID bitmap\nDOES NOT WORK WITH MSSA!\nSee code comments for info.").SetColor(Colors.Red);

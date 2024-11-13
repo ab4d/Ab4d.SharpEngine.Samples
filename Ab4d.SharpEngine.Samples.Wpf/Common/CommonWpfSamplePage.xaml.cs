@@ -71,7 +71,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             //MainSceneView.PresentationType = PresentationTypes.OverlayTexture;
             //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
 
-            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
+            //MainSceneView.MultisampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 

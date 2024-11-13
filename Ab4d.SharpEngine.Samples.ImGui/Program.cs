@@ -208,25 +208,24 @@ internal class Program
 
         // See Avalonia, WPF or WinForms samples for more 3D objects and demonstration of other SharpEngine features.
 
-
         // Create scene view
         _sceneView = new SceneView(_scene);
         _sceneView.BackgroundColor = Color4.White;
-
-        // By default, on dedicated desktop GPU, the 4xSSAA (super-sampling anti-aliasing) is used.
-        // To disabled that, set PreferredSupersamplingCount to 1:
-        //_sceneView.PreferredSupersamplingCount = 1;
         
-
         Debug.Assert(_vulkanSurfaceProvider != null, nameof(_vulkanSurfaceProvider) + " != null");
 
         // TODO: How to read DPI scale?
         float dpiScaleX = 1.0f;
         float dpiScaleY = 1.0f;
+
+
+        // Initialize the SceneView
         _sceneView.Initialize(_vulkanSurfaceProvider,
                               dpiScaleX: dpiScaleX,
                               dpiScaleY: dpiScaleY,
-                              fallbackWidth: (_window!.FramebufferSize.X > 0) ? _window!.FramebufferSize.X : 800,
+                              multisampleCount: 1,
+                              supersamplingCount: 1,
+                              fallbackWidth: (_window!.FramebufferSize.X > 0) ? _window!.FramebufferSize.X : 800,   // fallback width and height is used in case when the surface does not provide a valid size (for example in Wayland)
                               fallbackHeight: (_window!.FramebufferSize.Y > 0) ? _window!.FramebufferSize.Y : 600);
         
 

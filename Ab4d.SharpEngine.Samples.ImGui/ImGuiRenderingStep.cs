@@ -415,7 +415,7 @@ public class ImGuiRenderingStep : RenderingStep
         var vkPipelineMultisampleStateCreateInfo = new PipelineMultisampleStateCreateInfo
         {
             SType = StructureType.PipelineMultisampleStateCreateInfo,
-            RasterizationSamples = renderingContext.SceneView.UsedMultiSampleCountFlags
+            RasterizationSamples = renderingContext.SceneView.MultisampleCountFlags
         };
 
 

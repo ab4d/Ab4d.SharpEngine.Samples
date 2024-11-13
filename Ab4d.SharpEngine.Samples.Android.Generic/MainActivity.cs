@@ -172,7 +172,7 @@ namespace AndroidDemo
             Log.Info?.Write("Resize to " + newSize);
 
             if (_sceneView != null)
-                _sceneView.Resize();
+                _sceneView.Resize(newWidth: newSize.X, newHeight: newSize.Y, renderNextFrameAfterResize: true);
         }
 
         private void OnClose()
