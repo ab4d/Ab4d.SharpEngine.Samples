@@ -3,13 +3,12 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.WinUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.WinUI</RootNamespace>    
     <OutputType>WinExe</OutputType>
-    <Version>2.1.9028-beta1</Version>   
-    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <Version>2.0.8956</Version>   
+    <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
-    <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &gt;= 8">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <RuntimeIdentifiers Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)')) &lt; 8">win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
@@ -17,7 +16,6 @@
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <ApplicationIcon>Assets\sharp-engine-logo.ico</ApplicationIcon>
   </PropertyGroup>
-
 
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
@@ -34,8 +32,8 @@
   </ItemGroup>    
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241106002" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
