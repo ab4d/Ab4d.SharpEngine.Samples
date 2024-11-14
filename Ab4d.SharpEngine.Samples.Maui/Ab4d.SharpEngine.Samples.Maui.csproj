@@ -4,9 +4,9 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
 
-    <TargetFrameworks>net8.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net9.0-android</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -39,9 +39,6 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 
-    <!-- Workaround for problem with SkiaSharp.Views.Maui.Controls with new Windows SDK that is installed with Viusal Studio v17.11.5 -->
-		<!-- See: https://github.com/mono/SkiaSharp/issues/2999 -->
-    <WindowsSdkPackageVersion>10.0.19041.34</WindowsSdkPackageVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -63,8 +60,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.90" />
-	    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.8" />
 	</ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
@@ -125,9 +122,5 @@
     <CodesignEntitlements>Platforms/MacCatalyst/Entitlements.Release.plist</CodesignEntitlements>
     <UseHardenedRuntime>true</UseHardenedRuntime>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.90" />
-  </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
 ﻿using Ab4d.SharpEngine.Common;
-using System;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
 
