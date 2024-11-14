@@ -12,13 +12,15 @@ using System.Runtime.InteropServices;
 using SkiaSharp.Views.Maui;
 using Colors = Ab4d.SharpEngine.Common.Colors;
 using Ab4d.SharpEngine.Core;
+using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
 
 public partial class MainPage : ContentPage
 {
-    private BoxModelNode? _boxModelNode;
-    private StandardMaterial? _boxMaterial;
+    private StandardMaterial? _hashMaterial;
+    private MeshModelNode? _hashModelNode;
 
     private MauiCameraController? _mauiCameraController;
     
@@ -139,25 +141,48 @@ public partial class MainPage : ContentPage
         var scene = _sharpEngineSceneView.Scene;
 
 
-        _boxMaterial = StandardMaterials.Gold;
+        float hashModelSize = 100;
+        float hashModelBarThickness = 16;
+        float hashModelBarOffset = 20;
 
-        _boxModelNode = new BoxModelNode()
+        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(new Vector3(0, 0, 0),
+            shapeYVector: new Vector3(0, 0, 1),
+            extrudeVector: new Vector3(0, hashModelBarThickness, 0),
+            size: hashModelSize,
+            barThickness: hashModelBarThickness,
+            barOffset: hashModelBarOffset,
+            name: "HashSymbolMesh");
+
+        _hashMaterial = new StandardMaterial(Color3.FromByteRgb(255, 197, 0));
+
+        _hashModelNode = new MeshModelNode(hashSymbolMesh, "HashSymbolModel")
         {
-            Position     = new Vector3(0, 0, 0),
-            PositionType = PositionTypes.Bottom | PositionTypes.Center,
-            Size         = new Vector3(80, 40, 60),
-            Material     = _boxMaterial
+            Material = _hashMaterial,
+            Transform = new StandardTransform()
         };
+        
+        scene.RootNode.Add(_hashModelNode);
 
-        scene.RootNode.Add(_boxModelNode);
+        
+        //_boxMaterial = StandardMaterials.Gold;
 
+        //_boxModelNode = new BoxModelNode()
+        //{
+        //    Position     = new Vector3(0, 0, 0),
+        //    PositionType = PositionTypes.Bottom | PositionTypes.Center,
+        //    Size         = new Vector3(80, 40, 60),
+        //    Material     = _boxMaterial
+        //};
+
+        //scene.RootNode.Add(_boxModelNode);
+        
 
         var wireGridNode = new WireGridNode()
         {
-            CenterPosition   = new Vector3(0, 0, 0),
-            Size             = new Vector2(160, 160),
-            WidthCellsCount  = 8,
-            HeightCellsCount = 8
+            CenterPosition   = new Vector3(0, -0.1f, 0),
+            Size             = new Vector2(200, 200),
+            WidthCellsCount  = 5,
+            HeightCellsCount = 5
         };
 
         scene.RootNode.Add(wireGridNode);
@@ -170,7 +195,7 @@ public partial class MainPage : ContentPage
         _targetPositionCamera = new TargetPositionCamera()
         {
             Heading  = 30,
-            Attitude = -20,
+            Attitude = -35,
             Distance = 300,
         };
 
@@ -194,12 +219,12 @@ public partial class MainPage : ContentPage
 
     private void OnChangeColorButtonClicked(object sender, EventArgs e)
     {
-        if (_boxMaterial == null)
+        if (_hashMaterial == null)
             return;
 
         // Change color of the material
         _rnd ??= new Random();
-        _boxMaterial.DiffuseColor = new Color3(_rnd.NextSingle(), _rnd.NextSingle(), _rnd.NextSingle());
+        _hashMaterial.DiffuseColor = new Color3(_rnd.NextSingle(), _rnd.NextSingle(), _rnd.NextSingle());
 
         // Render the scene again
         _sharpEngineSceneView.Refresh();

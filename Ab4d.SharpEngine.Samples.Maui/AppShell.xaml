@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Ab4d.SharpEngine.Samples.Maui"
     Shell.FlyoutBehavior="Disabled"
+    BackgroundColor="LightSkyBlue"
     Title="Ab4d.SharpEngine.Samples.Maui">
 
     <ShellContent
