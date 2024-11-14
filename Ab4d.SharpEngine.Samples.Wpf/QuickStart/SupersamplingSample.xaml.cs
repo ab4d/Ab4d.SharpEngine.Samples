@@ -126,8 +126,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             //sharpEngineSceneView.BackgroundColor = Colors.White;
 
-            sharpEngineSceneView.PreferredMultiSampleCount   = multiSampleCount;
-            sharpEngineSceneView.PreferredSupersamplingCount = supersamplingCount;
+            sharpEngineSceneView.MultisampleCount   = multiSampleCount;
+            sharpEngineSceneView.SupersamplingCount = supersamplingCount;
 
             //// TODO: Add DownSampleRenderingStep automatically
             //if (supersamplingCount > 1)
@@ -185,7 +185,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             
             var msaaComboBox = new ComboBox() { ItemsSource = _possibleMultiSamplingValues, VerticalAlignment = VerticalAlignment.Top };
             msaaComboBox.SelectedIndex = Array.IndexOf(_possibleMultiSamplingValues, multiSampleCount);
-            msaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.PreferredMultiSampleCount = (int)msaaComboBox.SelectedItem;
+            msaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.MultisampleCount = (int)msaaComboBox.SelectedItem;
             stackPanel.Children.Add(msaaComboBox);
             
             var saaTextBlock = new TextBlock() { Text = "SSAA: ", FontWeight = FontWeights.Bold, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(10, 4, 0, 0) };
@@ -193,7 +193,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             
             var ssaaComboBox = new ComboBox() { ItemsSource = _possibleSuperSamplingValues, VerticalAlignment = VerticalAlignment.Top };
             ssaaComboBox.SelectedIndex = Array.IndexOf(_possibleSuperSamplingValues, supersamplingCount);
-            ssaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.PreferredSupersamplingCount = (float)ssaaComboBox.SelectedItem;
+            ssaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.SupersamplingCount = (float)ssaaComboBox.SelectedItem;
             stackPanel.Children.Add(ssaaComboBox);
 
 
@@ -297,8 +297,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             if (sceneView.Width == 0 || sceneView.Height == 0) 
                 return; // Not yet initialized
             
-            var multiSampleCount = sceneView.UsedMultiSampleCount;
-            var supersamplingCount = sceneView.UsedSupersamplingCount;
+            var multiSampleCount = sceneView.MultisampleCount;
+            var supersamplingCount = sceneView.SupersamplingCount;
 
             //string infoText = (multiSampleCount == 0 ? "No" : $"{multiSampleCount}x") + " multi-sampling, " +
             //                  (supersamplingCount <= 1 ? "No" : $"{supersamplingCount}x") + " super-sampling";
