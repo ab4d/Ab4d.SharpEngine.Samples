@@ -29,6 +29,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                         Win32RenderingMode.Vulkan
                     }
                 })
+                .With(new X11PlatformOptions
+                {
+                    RenderingMode = new[]
+                    {
+                        X11RenderingMode.Vulkan
+                    }
+                })
                 .With(new Avalonia.Vulkan.VulkanOptions()
                 {
                     VulkanInstanceCreationOptions = new Avalonia.Vulkan.VulkanInstanceCreationOptions()
