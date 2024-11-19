@@ -52,7 +52,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
         private float _lineThickness = 1;
 
-        private readonly int[] _possibleMultiSamplingValues = new int[] { 0, 2, 4, 8 };
+        private readonly int[] _possibleMultiSamplingValues = new int[] { 1, 2, 4, 8 };
         private readonly float[] _possibleSuperSamplingValues = new float[] { 1, 2, 3, 4, 9, 16 };
 
         public SupersamplingSample()
@@ -75,7 +75,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             (_dpiScale, _) = SharpEngineSceneView.GetDpiScale(this);
 
 
-            var sharpEngineSceneView = AddSharpEngineSceneView(gpuDevice: null, columnIndex: 0, rowIndex: 1, multiSampleCount: 0, supersamplingCount: 1);
+            var sharpEngineSceneView = AddSharpEngineSceneView(gpuDevice: null, columnIndex: 0, rowIndex: 1, multiSampleCount: 1, supersamplingCount: 1);
 
             sharpEngineSceneView.Initialize();
 
