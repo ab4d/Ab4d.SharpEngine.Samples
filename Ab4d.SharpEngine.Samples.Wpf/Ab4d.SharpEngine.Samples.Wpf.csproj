@@ -30,32 +30,6 @@
   </ItemGroup>   
 
   <ItemGroup>
-    <Compile Update="CameraControllers\MouseCameraControllerSample.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="QuickStart\SharpEngineSceneViewInXaml.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="QuickStart\SharpEngineSceneViewInCode.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="CameraControllers\MouseCameraControllerSample.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="QuickStart\SharpEngineSceneViewInXaml.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="QuickStart\SharpEngineSceneViewInCode.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Titles\QuickStartTitle.md" />
   </ItemGroup>
 
@@ -89,13 +63,6 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Importers\**" />
-    <EmbeddedResource Remove="Importers\**" />
-    <None Remove="Importers\**" />
-    <Page Remove="Importers\**" />
   </ItemGroup>
 
 </Project>

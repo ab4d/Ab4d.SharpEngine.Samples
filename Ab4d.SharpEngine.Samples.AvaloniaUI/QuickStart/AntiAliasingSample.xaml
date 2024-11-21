@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart.AntiAliasingSample"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid Name="RootGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,*,*">
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="Anti-aliasing with multi-sampling (MSAA) and super-sampling (SSAA)" FontSize="20" FontWeight="Bold" Margin="5 0" Foreground="#444" HorizontalAlignment="Left"/>
+        <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 0" VerticalAlignment="Center">
+            <Button Name="ResetCamerasButton" Content="Reset cameras" Click="ResetCamerasButton_OnClick" />
+            
+            <TextBlock Text="LineThickness:" Margin="20 0 3 0" VerticalAlignment="Center"/>
+            <ComboBox Name="LineThicknessComboBox" SelectionChanged="LineThicknessComboBox_OnSelectionChanged"></ComboBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

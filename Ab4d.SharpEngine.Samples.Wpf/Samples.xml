@@ -8,8 +8,8 @@
   <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
   <Sample Location="QuickStart/SharpEngineSceneViewInCode.xaml" Title="SharpEngineSceneView in code" />
   <Sample Location="QuickStart/SharpEngineSceneViewInXaml.xaml" Title="SharpEngineSceneView in XAML" />
-  <Sample Location="QuickStart/SupersamplingSample.xaml" Title="Super-sampling" />
-
+  <Sample Location="QuickStart/AntiAliasingSample.xaml" Title="Anti-aliasing (MSAA + SSAA)" />
+  
   <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
   <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
   <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
