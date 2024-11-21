@@ -11,16 +11,16 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // This sample shows how to render the 3D scene to a bitmap where the colors of the objects are 
 // set from the object IDs. This way it is possible to get the object from the pixel's color.
 //
-// This can be used for rectangular selection or some other more complex selection types.
+// This can be used for rectangular selection or some other more complex selection types (see RectangularSelectionSample).
 //
 // ADVANTAGES of this technique compared to standard hit-testing:
-// - after ID bitmap is generated it is you can get hit object with almost no CPU cost
-// - can be used for rectangular and other complicated selection
-// - can be used to select objects or lines by moving the mouse close to it
+// - after ID bitmap is generated, you can get hit object with almost no CPU cost
+// - can be used for rectangular and other complicated selection (see RectangularSelectionSample)
+// - can be used to select objects or lines by moving the mouse close to them
 //
 // DISADVANTAGES:
 // - cannot be used for instanced object (for now)
-// - cannot be used to get all selected objects but only gets the object closest to the camera
+// - cannot be used to get all objects behind the mouse position but only gets the object closest to the camera (only the object that is shown on a rendered scene)
 // - slow to change all the materials, render the scene and transfer the ID bitmap from GPU to CPU memory (change window to full scree to see the slow transfer rate)
 // - when camera is rotated, then new ID bitmap must be generated for each frame.
 
@@ -63,6 +63,8 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
     private DateTime _lastCameraChangedTime;
     private Stopwatch _renderStopwatch = new Stopwatch();
+    
+    private SceneView? _bitmapIdSceneView;
 
 
     public HitTestingWithIdBitmapSample(ICommonSamplesContext context)
@@ -123,6 +125,18 @@ public class HitTestingWithIdBitmapSample : CommonSample
                 _lastCameraChangedTime = DateTime.Now;
             };
         }
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_bitmapIdSceneView != null)
+        {
+            _bitmapIdSceneView.Dispose();
+            _bitmapIdSceneView = null;
+        }
+
+        base.OnDisposed();
     }
 
     protected void ProcessPointerMove(Vector2 pointerPosition)
@@ -201,27 +215,62 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
         // Change materials of all object to color that is created from object ID (index)
         UseObjectIdMaterials(Scene.RootNode);
-        
-        // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+
         var savedBackground = SceneView.BackgroundColor;
-        SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
+
+
+        SceneView usedBitmapIdSceneView;
+
+        // IMPORTANT:
+        // When rendering ID bitmap, we need to disable multi-sampling (MSAA) and super-sampling (SSAA)
+        // otherwise the aliasing smooth the colors from one to another object and this would produce invalid id values
+        // when it is retrieved from the smoothed color.
+        if (SceneView.MultisampleCount > 1 || SceneView.SupersamplingCount > 1)
+        {
+            // To disable MSAA and SSAA we create another SceneView without any multi-sampling and super-sampling.
+            if (_bitmapIdSceneView == null)
+            {
+                _bitmapIdSceneView = new SceneView(Scene, "BitmapID-SceneView");
+                _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
+                _bitmapIdSceneView.BackgroundColor = new Color4(0, 0, 0, 0); // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+            }
+            else if (_bitmapIdSceneView.Width != SceneView.Width || _bitmapIdSceneView.Height != SceneView.Height)
+            {
+                _bitmapIdSceneView.Resize(SceneView.Width, SceneView.Height, renderNextFrameAfterResize: false);
+            }
+
+            _bitmapIdSceneView.Camera = SceneView.Camera; // Use the same camera
+
+            usedBitmapIdSceneView = _bitmapIdSceneView;
+        }
+        else
+        {
+            // When the SceneView does not use multi-sampling or super-sampling, 
+            // then we can render bitmap id directly to this SceneView.
+            usedBitmapIdSceneView = SceneView;
+
+            // But we still need to make sure that the BackgroundColor is set to black (no object id)
+            // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+            SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
+        }
 
 
         // Recreate _rawRenderedBitmap when size is changed
         if (_rawRenderedBitmap != null && (_rawRenderedBitmap.Width != SceneView.Width || _rawRenderedBitmap.Height != SceneView.Height))
             _rawRenderedBitmap = null; 
 
-        // Render the updated scene to RawImageData object
+        // Render the updated scene to the RawImageData object
         if (_rawRenderedBitmap == null)
-            _rawRenderedBitmap = SceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
+            _rawRenderedBitmap = usedBitmapIdSceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
         else
-            SceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
+            usedBitmapIdSceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
 
 
-        // Revert back BackgroundColor and materials
+        // Revert back BackgroundColor (when rendering to the current SceneView)
+        if (_bitmapIdSceneView == null)
+            SceneView.BackgroundColor = savedBackground;
 
-        SceneView.BackgroundColor = savedBackground;
-
+        // Revert back materials
         ResetOriginalMaterials(Scene.RootNode);
 
         _isIdBitmapDirty = false; // Mark ID Bitmap as correct

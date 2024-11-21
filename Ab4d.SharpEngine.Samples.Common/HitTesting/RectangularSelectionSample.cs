@@ -14,14 +14,6 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // needs to be done differently for WPF, Avalonia and WinUI
 
 
-// IMPORTANT !!!
-// Object ID bitmap technique DOES NOT WORK WITH CURRENT Ab4d.SharpEngine WHEN USING MSSA (multi-sampled anti-aliasing).
-// To make it working, disable MSSA by adding the following to constructor of CommonWpfSamplePage, CommonAvaloniaSampleUserControl or CommonWinUISampleUserControl:
-// MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA
-//
-// This will be fixed in the next version!
-
-
 // This sample demonstrates two rectangular selection techniques:
 // 1) Object bounds in 2D
 // 2) Object ID bitmap
@@ -34,13 +26,12 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // Advantages:
 // - Very simple and fast when there is not a lot of 3D objects.
 // - Also selects the objects that are behind the objects closer to the camera.
-// - Can be used with only Ab3d.PowerToys (without Ab3d.DXEngine).
 // 
 // Disadvantages:
-// - Not accurate - the bounding box of 3D objects and its bounding box in 2D world are bigger then 
+// - NOT ACCURATE - the bounding box of 3D objects and its bounding box in 2D world are bigger then 
 //                  the actual 3D object - selection is done before the user actually touches the 3D object.
 // - Slow when checking a lot of 3D objects.
-// - Cannot be used to select 3D lines.",
+// - Cannot be used to select 3D lines.
 // 
 //
 // 2) Object ID bitmap:
@@ -48,6 +39,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // each object is rendered with a different color where the color represents the object's id. 
 // When such a bitmap is rendered it is possible to get individual pixel colors and from that 
 // get the original object that was used to render the pixel.
+// See also HitTestingWithIdBitmapSample sample.
 // 
 // Advantages:
 // - Pixel perfect accuracy.
@@ -58,7 +50,8 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // Disadvantages:
 // - More complex (changing materials and rendering to bitmap) than using simple bounding boxes.
 // - Slower when using a simple 3D scene.
-// - Cannot select objects that are behind some other objects that are closer to the camera."
+// - Cannot select objects that are behind other objects (only the objects that are shown on a rendered scene can be detected).    
+
 
 public abstract class RectangularSelectionSample : CommonSample
 {
@@ -107,6 +100,8 @@ public abstract class RectangularSelectionSample : CommonSample
     private bool _isIdBitmapDirty = true;
 
     private DateTime _lastCameraChangedTime;
+
+    private SceneView? _bitmapIdSceneView;
 
 
     protected RectangularSelectionSample(ICommonSamplesContext context)
@@ -181,6 +176,18 @@ public abstract class RectangularSelectionSample : CommonSample
                 _lastCameraChangedTime = DateTime.Now;
             };
         }
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_bitmapIdSceneView != null)
+        {
+            _bitmapIdSceneView.Dispose();
+            _bitmapIdSceneView = null;
+        }
+
+        base.OnDisposed();
     }
 
     public static void AddModels(GroupNode parentGroupNode, Mesh mesh, Vector3 center, Vector3 size, float modelScaleFactor, int xCount, int yCount, int zCount, string name, bool useBackMaterial = false)
@@ -589,23 +596,61 @@ public abstract class RectangularSelectionSample : CommonSample
         // Change materials of all object to color that is created from object ID (index)
         UseObjectIdMaterials(Scene.RootNode);
         
-        // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
         var savedBackground = SceneView.BackgroundColor;
-        SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
+
+
+        SceneView usedBitmapIdSceneView;
+
+        // IMPORTANT:
+        // When rendering ID bitmap, we need to disable multi-sampling (MSAA) and super-sampling (SSAA)
+        // otherwise the aliasing smooth the colors from one to another object and this would produce invalid id values
+        // when it is retrieved from the smoothed color.
+        if (SceneView.MultisampleCount > 1 || SceneView.SupersamplingCount > 1)
+        {
+            // To disable MSAA and SSAA we create another SceneView without any multi-sampling and super-sampling.
+            if (_bitmapIdSceneView == null)
+            {
+                _bitmapIdSceneView = new SceneView(Scene, "BitmapID-SceneView");
+                _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
+                _bitmapIdSceneView.BackgroundColor = new Color4(0, 0, 0, 0); // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+            }
+            else if (_bitmapIdSceneView.Width != SceneView.Width || _bitmapIdSceneView.Height != SceneView.Height)
+            {
+                _bitmapIdSceneView.Resize(SceneView.Width, SceneView.Height, renderNextFrameAfterResize: false);
+            }
+
+            _bitmapIdSceneView.Camera = SceneView.Camera; // Use the same camera
+
+            usedBitmapIdSceneView = _bitmapIdSceneView;
+        }
+        else
+        {
+            // When the SceneView does not use multi-sampling or super-sampling, 
+            // then we can render bitmap id directly to this SceneView.
+            usedBitmapIdSceneView = SceneView;
+
+            // But we still need to make sure that the BackgroundColor is set to black (no object id)
+            // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+            SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
+        }
+
 
         // Recreate _rawRenderedBitmap when size is changed
         if (_rawRenderedBitmap != null && (_rawRenderedBitmap.Width != SceneView.Width || _rawRenderedBitmap.Height != SceneView.Height))
-            _rawRenderedBitmap = null; 
+            _rawRenderedBitmap = null;
 
-        // Render the updated scene to RawImageData object
+        // Render the updated scene to the RawImageData object
         if (_rawRenderedBitmap == null)
-            _rawRenderedBitmap = SceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
+            _rawRenderedBitmap = usedBitmapIdSceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
         else
-            SceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
+            usedBitmapIdSceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
 
 
-        // Revert back BackgroundColor and materials
-        SceneView.BackgroundColor = savedBackground;
+        // Revert back BackgroundColor (when rendering to the current SceneView)
+        if (_bitmapIdSceneView == null)
+            SceneView.BackgroundColor = savedBackground;
+
+        // Revert back materials
         ResetOriginalMaterials(Scene.RootNode);
 
         _isIdBitmapDirty = false; // Mark ID Bitmap as correct
@@ -797,7 +842,6 @@ Then we can simply call IntersectsWith method that checks if the two 2D rectangl
 Advantages:
 - Very simple and fast when there is not a lot of 3D objects.
 - Also selects the objects that are behind the objects closer to the camera.
-- Can be used with only Ab3d.PowerToys (without Ab3d.DXEngine).
 
 Disadvantages:
 - Not accurate - the bounding box of 3D objects and its bounding box in 2D world are bigger then 
@@ -827,13 +871,6 @@ Disadvantages:
                 _useObjectIdBitmap = selectedIndex == 1;
             },
             selectedItemIndex: 0);
-
-
-        if (SceneView != null && SceneView.MultisampleCount > 1)
-        {
-            // See comments at the start of this file for more info
-            ui.CreateLabel("Object ID bitmap\nDOES NOT WORK WITH MSSA!\nSee code comments for info.").SetColor(Colors.Red);
-        }
 
 
         ui.AddSeparator();
