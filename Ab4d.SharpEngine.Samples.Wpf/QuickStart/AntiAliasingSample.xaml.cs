@@ -49,6 +49,19 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
         {
             InitializeComponent();
 
+            // IMPORTANT:
+            // It is very important that you enable UseLayoutRounding on the root Window 
+            // or at least on a parent WPF control like Grid that dynamically sets the sizes of its children.
+            // Without that the rendered scene my have some tearing artifacts.
+            // To see that, uncomment this line and the same line in MainWindow.xaml.cs,
+            // start the samples and resize the window when showing the AntiAliasingSample.
+            //
+            // To use SharpEngineSceneView without setting UseLayoutRounding to true,
+            // set the SharpEngineSceneView.DisableWpfResizingOfRenderedImage to false.
+            // This will use linear scale by WPF to scale the rendered scene, but the 
+            // final result can appear more blurry.
+            RootGrid.UseLayoutRounding = true;
+
             LineThicknessComboBox.ItemsSource = new float[] { 0.4f, 0.6f, 0.8f, 1f, 2f, 3f };
             LineThicknessComboBox.SelectedIndex = 3;
 

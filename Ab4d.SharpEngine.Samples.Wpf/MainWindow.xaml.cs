@@ -93,6 +93,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             InitializeComponent();
 
+            // Snap WPF objects to device pixels. This shows sharper image because the rendered 3D scene is not linearly scaled by WPF.
+            // See comment in the constructor of QuickStart/AntiAliasingSample.xaml.cs for more info.
+            this.UseLayoutRounding = true;
+
             DisableDiagnosticsButton();
 
             WpfSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
