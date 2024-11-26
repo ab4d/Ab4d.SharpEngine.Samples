@@ -1,0 +1,315 @@
+#version 460
+
+struct SurfaceInfo
+{
+    vec3 pos;
+    vec3 normal;
+    float specPower;
+    vec3 toEye;
+};
+
+struct Light
+{
+    vec3 pos;
+    float phi;
+    vec3 dir;
+    float theta;
+    vec3 diffuse;
+    float falloff;
+    vec3 spec;
+    vec3 att;
+    float range;
+};
+
+struct ColorPair
+{
+    vec3 diffuse;
+    vec3 specular;
+};
+
+struct Mat
+{
+    vec4 diffuseColor;
+    vec3 specularColor;
+    float specularPower;
+    vec3 emissiveColor;
+    float alphaClipThreshold;
+    bool isTwoSided;
+    bool isSolidColor;
+    bool blendVertexColors;
+    float vertexColorsOpacity;
+};
+
+struct Mat_1
+{
+    vec4 diffuseColor;
+    vec3 specularColor;
+    float specularPower;
+    vec3 emissiveColor;
+    float alphaClipThreshold;
+    uint isTwoSided;
+    uint isSolidColor;
+    uint blendVertexColors;
+    float vertexColorsOpacity;
+};
+
+layout(constant_id = 1) const bool USE_VERTEX_COLORS = false;
+const bool _349 = (!USE_VERTEX_COLORS);
+layout(constant_id = 0) const bool USE_DIFFUSE_TEXTURE = false;
+
+layout(set = 3, binding = 0, std430) readonly buffer Materials
+{
+    Mat_1 materials[];
+} materials;
+
+layout(set = 0, binding = 0, std140) uniform Scene
+{
+    mat4 viewProjection;
+    vec3 eyePosW;
+    vec2 viewSize;
+    float dpiScale;
+    float superSampling;
+    vec3 ambientColor;
+    int dirLightStart;
+    int dirLightCount;
+    int pointLightStart;
+    int pointLightCount;
+    int spotLightStart;
+    int spotLightCount;
+} scene;
+
+layout(set = 1, binding = 0, std430) readonly buffer Lights
+{
+    Light lights[];
+} lights;
+
+layout(push_constant, std430) uniform PushConstants
+{
+    layout(offset = 4) int materialIndex;
+} pushConstants;
+
+layout(set = 3, binding = 1) uniform sampler2D diffuseTextureSampler;
+
+layout(location = 0) out vec4 outColor;
+layout(location = 2) in vec2 inUv;
+layout(location = 3) in vec4 inColor;
+layout(location = 1) in vec3 inNormal;
+layout(location = 0) in vec3 inPosition;
+
+ColorPair DirectionalLight(SurfaceInfo v, Light L)
+{
+    ColorPair colors = ColorPair(vec3(0.0), vec3(0.0));
+    vec3 lightVec = -L.dir;
+    float diffuseFactor = dot(lightVec, v.normal);
+    if (diffuseFactor > 0.0)
+    {
+        colors.diffuse = L.diffuse * diffuseFactor;
+        if (v.specPower > 0.0)
+        {
+            vec3 halfDir = normalize(lightVec + v.toEye);
+            float specFactor = pow(clamp(dot(v.normal, halfDir), 0.0, 1.0), v.specPower);
+            colors.specular = L.spec * specFactor;
+        }
+    }
+    return colors;
+}
+
+ColorPair PointLight(SurfaceInfo v, Light L)
+{
+    ColorPair colors = ColorPair(vec3(0.0), vec3(0.0));
+    vec3 lightVec = L.pos - v.pos;
+    float d = length(lightVec);
+    if (d > L.range)
+    {
+        return colors;
+    }
+    else
+    {
+        lightVec /= vec3(d);
+        float attenuation = dot(L.att, vec3(1.0, d, d * d));
+        float diffuseFactor = dot(lightVec, v.normal);
+        if (diffuseFactor > 0.0)
+        {
+            colors.diffuse = L.diffuse * diffuseFactor;
+            if (v.specPower > 0.0)
+            {
+                vec3 halfDir = normalize(lightVec + v.toEye);
+                float specFactor = pow(clamp(dot(v.normal, halfDir), 0.0, 1.0), v.specPower);
+                colors.specular = L.spec * specFactor;
+            }
+        }
+        colors.diffuse /= vec3(attenuation);
+        return colors;
+    }
+}
+
+ColorPair Spotlight(SurfaceInfo v, Light L)
+{
+    ColorPair colors = ColorPair(vec3(0.0), vec3(0.0));
+    vec3 lightVec = L.pos - v.pos;
+    float d = length(lightVec);
+    if (d > L.range)
+    {
+        return colors;
+    }
+    else
+    {
+        lightVec /= vec3(d);
+        float attenuation = dot(L.att, vec3(1.0, d, d * d));
+        float diffuseFactor = dot(lightVec, v.normal);
+        if (diffuseFactor > 0.0)
+        {
+            colors.diffuse = L.diffuse * diffuseFactor;
+            if (v.specPower > 0.0)
+            {
+                vec3 halfDir = normalize(lightVec + v.toEye);
+                float specFactor = pow(clamp(dot(v.normal, halfDir), 0.0, 1.0), v.specPower);
+                colors.specular = L.spec * specFactor;
+            }
+        }
+        colors.diffuse /= vec3(attenuation);
+        float rho = dot(L.dir, -lightVec);
+        float s;
+        if (rho <= L.phi)
+        {
+            s = 0.0;
+        }
+        else
+        {
+            if (rho > L.theta)
+            {
+                s = 1.0;
+            }
+            else
+            {
+                s = pow(max((rho - L.phi) / (L.theta - L.phi), 0.0), L.falloff);
+            }
+        }
+        colors.diffuse *= s;
+        colors.specular *= s;
+        return colors;
+    }
+}
+
+void main()
+{
+    int materialSign = sign(pushConstants.materialIndex);
+    int _318 = pushConstants.materialIndex * materialSign;
+    Mat material;
+    material.diffuseColor = materials.materials[_318].diffuseColor;
+    material.specularColor = materials.materials[_318].specularColor;
+    material.specularPower = materials.materials[_318].specularPower;
+    material.emissiveColor = materials.materials[_318].emissiveColor;
+    material.alphaClipThreshold = materials.materials[_318].alphaClipThreshold;
+    material.isTwoSided = materials.materials[_318].isTwoSided != 0u;
+    material.isSolidColor = materials.materials[_318].isSolidColor != 0u;
+    material.blendVertexColors = materials.materials[_318].blendVertexColors != 0u;
+    material.vertexColorsOpacity = materials.materials[_318].vertexColorsOpacity;
+    if (material.blendVertexColors || _349)
+    {
+        if (USE_DIFFUSE_TEXTURE)
+        {
+            outColor = texture(diffuseTextureSampler, inUv);
+            float _371 = outColor.w;
+            vec4 _372 = outColor;
+            float _376 = outColor.w;
+            vec3 _382 = (_372.xyz * _371) + (material.diffuseColor.xyz * (1.0 - _376));
+            outColor.x = _382.x;
+            outColor.y = _382.y;
+            outColor.z = _382.z;
+            outColor.w += material.diffuseColor.w;
+        }
+        else
+        {
+            outColor = material.diffuseColor;
+        }
+        if (USE_VERTEX_COLORS)
+        {
+            float inAlpha = inColor.w * material.vertexColorsOpacity;
+            vec4 _417 = outColor;
+            vec3 _420 = (inColor.xyz * inAlpha) + (_417.xyz * (1.0 - inAlpha));
+            outColor.x = _420.x;
+            outColor.y = _420.y;
+            outColor.z = _420.z;
+            outColor.w += inAlpha;
+        }
+    }
+    else
+    {
+        outColor = inColor;
+        outColor.w *= material.vertexColorsOpacity;
+    }
+    if (!material.isSolidColor)
+    {
+        float multiplyNormal = float(materialSign);
+        vec3 normal = normalize(inNormal) * multiplyNormal;
+        vec3 toEye = normalize(scene.eyePosW - inPosition);
+        SurfaceInfo surface = SurfaceInfo(inPosition, normal, material.specularPower, toEye);
+        vec3 finalDiffuse = vec3(0.0);
+        vec3 finalSpecular = vec3(0.0);
+        int i = scene.dirLightCount - 1;
+        Light light;
+        ColorPair lightColors;
+        for (; i >= scene.dirLightStart; i--)
+        {
+            light.pos = lights.lights[i].pos;
+            light.phi = lights.lights[i].phi;
+            light.dir = lights.lights[i].dir;
+            light.theta = lights.lights[i].theta;
+            light.diffuse = lights.lights[i].diffuse;
+            light.falloff = lights.lights[i].falloff;
+            light.spec = lights.lights[i].spec;
+            light.att = lights.lights[i].att;
+            light.range = lights.lights[i].range;
+            SurfaceInfo param = surface;
+            Light param_1 = light;
+            lightColors = DirectionalLight(param, param_1);
+            finalDiffuse += lightColors.diffuse;
+            finalSpecular += lightColors.specular;
+        }
+        i = scene.pointLightCount - 1;
+        for (; i >= scene.pointLightStart; i--)
+        {
+            light.pos = lights.lights[i].pos;
+            light.phi = lights.lights[i].phi;
+            light.dir = lights.lights[i].dir;
+            light.theta = lights.lights[i].theta;
+            light.diffuse = lights.lights[i].diffuse;
+            light.falloff = lights.lights[i].falloff;
+            light.spec = lights.lights[i].spec;
+            light.att = lights.lights[i].att;
+            light.range = lights.lights[i].range;
+            SurfaceInfo param_2 = surface;
+            Light param_3 = light;
+            lightColors = PointLight(param_2, param_3);
+            finalDiffuse += lightColors.diffuse;
+            finalSpecular += lightColors.specular;
+        }
+        i = scene.spotLightCount - 1;
+        for (; i >= scene.spotLightStart; i--)
+        {
+            light.pos = lights.lights[i].pos;
+            light.phi = lights.lights[i].phi;
+            light.dir = lights.lights[i].dir;
+            light.theta = lights.lights[i].theta;
+            light.diffuse = lights.lights[i].diffuse;
+            light.falloff = lights.lights[i].falloff;
+            light.spec = lights.lights[i].spec;
+            light.att = lights.lights[i].att;
+            light.range = lights.lights[i].range;
+            SurfaceInfo param_4 = surface;
+            Light param_5 = light;
+            lightColors = Spotlight(param_4, param_5);
+            finalDiffuse += lightColors.diffuse;
+            finalSpecular += lightColors.specular;
+        }
+        finalDiffuse = clamp(finalDiffuse + scene.ambientColor, vec3(0.0), vec3(1.0)) * outColor.xyz;
+        finalSpecular = clamp(finalSpecular, vec3(0.0), vec3(1.0)) * material.specularColor;
+        vec3 finalColor = (finalDiffuse + finalSpecular) + material.emissiveColor;
+        vec3 _655 = clamp(finalColor, vec3(0.0), vec3(1.0));
+        outColor.x = _655.x;
+        outColor.y = _655.y;
+        outColor.z = _655.z;
+    }
+}
+

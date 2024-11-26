@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Effects;
-using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 

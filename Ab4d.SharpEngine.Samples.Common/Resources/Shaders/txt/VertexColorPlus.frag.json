@@ -1,0 +1,423 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_8" : {
+            "name" : "SurfaceInfo",
+            "members" : [
+                {
+                    "name" : "pos",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "normal",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "specPower",
+                    "type" : "float"
+                },
+                {
+                    "name" : "toEye",
+                    "type" : "vec3"
+                }
+            ]
+        },
+        "_10" : {
+            "name" : "Light",
+            "members" : [
+                {
+                    "name" : "pos",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "phi",
+                    "type" : "float"
+                },
+                {
+                    "name" : "dir",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "theta",
+                    "type" : "float"
+                },
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "falloff",
+                    "type" : "float"
+                },
+                {
+                    "name" : "spec",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "att",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "range",
+                    "type" : "float"
+                }
+            ]
+        },
+        "_12" : {
+            "name" : "ColorPair",
+            "members" : [
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "specular",
+                    "type" : "vec3"
+                }
+            ]
+        },
+        "_298" : {
+            "name" : "PushConstants",
+            "members" : [
+                {
+                    "name" : "materialIndex",
+                    "type" : "int",
+                    "offset" : 4
+                }
+            ]
+        },
+        "_306" : {
+            "name" : "Mat",
+            "members" : [
+                {
+                    "name" : "diffuseColor",
+                    "type" : "vec4"
+                },
+                {
+                    "name" : "specularColor",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "specularPower",
+                    "type" : "float"
+                },
+                {
+                    "name" : "emissiveColor",
+                    "type" : "vec3"
+                },
+                {
+                    "name" : "alphaClipThreshold",
+                    "type" : "float"
+                },
+                {
+                    "name" : "isTwoSided",
+                    "type" : "bool"
+                },
+                {
+                    "name" : "isSolidColor",
+                    "type" : "bool"
+                },
+                {
+                    "name" : "blendVertexColors",
+                    "type" : "bool"
+                },
+                {
+                    "name" : "vertexColorsOpacity",
+                    "type" : "float"
+                }
+            ]
+        },
+        "_310" : {
+            "name" : "Mat",
+            "members" : [
+                {
+                    "name" : "diffuseColor",
+                    "type" : "vec4",
+                    "offset" : 0
+                },
+                {
+                    "name" : "specularColor",
+                    "type" : "vec3",
+                    "offset" : 16
+                },
+                {
+                    "name" : "specularPower",
+                    "type" : "float",
+                    "offset" : 28
+                },
+                {
+                    "name" : "emissiveColor",
+                    "type" : "vec3",
+                    "offset" : 32
+                },
+                {
+                    "name" : "alphaClipThreshold",
+                    "type" : "float",
+                    "offset" : 44
+                },
+                {
+                    "name" : "isTwoSided",
+                    "type" : "uint",
+                    "offset" : 48
+                },
+                {
+                    "name" : "isSolidColor",
+                    "type" : "uint",
+                    "offset" : 52
+                },
+                {
+                    "name" : "blendVertexColors",
+                    "type" : "uint",
+                    "offset" : 56
+                },
+                {
+                    "name" : "vertexColorsOpacity",
+                    "type" : "float",
+                    "offset" : 60
+                }
+            ]
+        },
+        "_312" : {
+            "name" : "Materials",
+            "members" : [
+                {
+                    "name" : "materials",
+                    "type" : "_310",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 64
+                }
+            ]
+        },
+        "_457" : {
+            "name" : "Scene",
+            "members" : [
+                {
+                    "name" : "viewProjection",
+                    "type" : "mat4",
+                    "offset" : 0,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "eyePosW",
+                    "type" : "vec3",
+                    "offset" : 64
+                },
+                {
+                    "name" : "viewSize",
+                    "type" : "vec2",
+                    "offset" : 80
+                },
+                {
+                    "name" : "dpiScale",
+                    "type" : "float",
+                    "offset" : 88
+                },
+                {
+                    "name" : "superSampling",
+                    "type" : "float",
+                    "offset" : 92
+                },
+                {
+                    "name" : "ambientColor",
+                    "type" : "vec3",
+                    "offset" : 96
+                },
+                {
+                    "name" : "dirLightStart",
+                    "type" : "int",
+                    "offset" : 108
+                },
+                {
+                    "name" : "dirLightCount",
+                    "type" : "int",
+                    "offset" : 112
+                },
+                {
+                    "name" : "pointLightStart",
+                    "type" : "int",
+                    "offset" : 116
+                },
+                {
+                    "name" : "pointLightCount",
+                    "type" : "int",
+                    "offset" : 120
+                },
+                {
+                    "name" : "spotLightStart",
+                    "type" : "int",
+                    "offset" : 124
+                },
+                {
+                    "name" : "spotLightCount",
+                    "type" : "int",
+                    "offset" : 128
+                }
+            ]
+        },
+        "_491" : {
+            "name" : "Light",
+            "members" : [
+                {
+                    "name" : "pos",
+                    "type" : "vec3",
+                    "offset" : 0
+                },
+                {
+                    "name" : "phi",
+                    "type" : "float",
+                    "offset" : 12
+                },
+                {
+                    "name" : "dir",
+                    "type" : "vec3",
+                    "offset" : 16
+                },
+                {
+                    "name" : "theta",
+                    "type" : "float",
+                    "offset" : 28
+                },
+                {
+                    "name" : "diffuse",
+                    "type" : "vec3",
+                    "offset" : 32
+                },
+                {
+                    "name" : "falloff",
+                    "type" : "float",
+                    "offset" : 44
+                },
+                {
+                    "name" : "spec",
+                    "type" : "vec3",
+                    "offset" : 48
+                },
+                {
+                    "name" : "att",
+                    "type" : "vec3",
+                    "offset" : 64
+                },
+                {
+                    "name" : "range",
+                    "type" : "float",
+                    "offset" : 76
+                }
+            ]
+        },
+        "_493" : {
+            "name" : "Lights",
+            "members" : [
+                {
+                    "name" : "lights",
+                    "type" : "_491",
+                    "array" : [
+                        0
+                    ],
+                    "array_size_is_literal" : [
+                        true
+                    ],
+                    "offset" : 0,
+                    "array_stride" : 80
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "inUv",
+            "location" : 2
+        },
+        {
+            "type" : "vec4",
+            "name" : "inColor",
+            "location" : 3
+        },
+        {
+            "type" : "vec3",
+            "name" : "inNormal",
+            "location" : 1
+        },
+        {
+            "type" : "vec3",
+            "name" : "inPosition",
+            "location" : 0
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "diffuseTextureSampler",
+            "set" : 3,
+            "binding" : 1
+        }
+    ],
+    "ssbos" : [
+        {
+            "type" : "_312",
+            "name" : "Materials",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 3,
+            "binding" : 0
+        },
+        {
+            "type" : "_493",
+            "name" : "Lights",
+            "readonly" : true,
+            "block_size" : 0,
+            "set" : 1,
+            "binding" : 0
+        }
+    ],
+    "ubos" : [
+        {
+            "type" : "_457",
+            "name" : "Scene",
+            "block_size" : 132,
+            "set" : 0,
+            "binding" : 0
+        }
+    ],
+    "push_constants" : [
+        {
+            "type" : "_298",
+            "name" : "pushConstants",
+            "push_constant" : true
+        }
+    ],
+    "specialization_constants" : [
+        {
+            "name" : "USE_VERTEX_COLORS",
+            "id" : 1,
+            "type" : "bool",
+            "variable_id" : 348,
+            "default_value" : false
+        },
+        {
+            "name" : "USE_DIFFUSE_TEXTURE",
+            "id" : 0,
+            "type" : "bool",
+            "variable_id" : 353,
+            "default_value" : false
+        }
+    ]
+}

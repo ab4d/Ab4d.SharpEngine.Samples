@@ -51,6 +51,8 @@
     <EmbeddedResource Include="Importers\CadImporterInfo.md" />
     <EmbeddedResource Include="Resources\Shaders\spv\FogShader.frag.spv" />
     <EmbeddedResource Include="Resources\Shaders\spv\FogShader.vert.spv" />
+    <EmbeddedResource Include="Resources\Shaders\spv\VertexColorPlus.frag.spv" />
+    <EmbeddedResource Include="Resources\Shaders\spv\VertexColorPlus.vert.spv" />
     <EmbeddedResource Include="Titles\AdvancedTitle.md" />   
     <EmbeddedResource Include="Titles\AnimationsTitle.md" />
     <EmbeddedResource Include="Titles\LightsTitle.md" />
