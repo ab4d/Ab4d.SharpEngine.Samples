@@ -20,43 +20,26 @@ del spv\*.spv /Q
 del txt\*.txt /Q
 del txt\*.json /Q
 
+echo #### Started compiling shaders ####
 
+setlocal EnableDelayedExpansion
+for %%f in (*.glsl) do (
+    set IN_FILE_NAME="%%f"
+    set OUT_FILE_NAME="spv\%%~nf.spv"
 
-set SHADER_NAME=FogShader
+	rem We use glslc instead of glslangvalidator because glslc supports include
+	rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt 
+	glslc !IN_FILE_NAME! -o !OUT_FILE_NAME!
+	if errorlevel 1 goto onError
+	echo Compiled !IN_FILE_NAME! into !OUT_FILE_NAME!
 
-echo #### Start compiling %SHADER_NAME% shaders ####
-
-
-set IN_FILE_NAME=%SHADER_NAME%.vert
-set OUT_FILE_NAME=%IN_FILE_NAME%
-
-rem We use glslc instead of glslangvalidator because glslc supports include
-rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt 
-glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
-if errorlevel 1 goto onError
-echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
-
-rem To generate human readable form of SPIR-V add "-H > txt\%IN_FILE_NAME%.txt" to glslangvalidator
-rem "spirv-cross --dump-resources" writes to stderr so we need to use "2>" instead of ">" to redirest stderr to output
-spirv-cross --vulkan-semantics --dump-resources spv\%OUT_FILE_NAME%.spv 2> txt\%OUT_FILE_NAME%.resources.txt --output txt\%OUT_FILE_NAME%.txt
-spirv-cross --reflect --vulkan-semantics --output txt\%OUT_FILE_NAME%.json spv\%OUT_FILE_NAME%.spv
-
-
-set IN_FILE_NAME=%SHADER_NAME%.frag
-set OUT_FILE_NAME=%IN_FILE_NAME%
-
-rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt
-glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
-if errorlevel 1 goto onError
-echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
-
-spirv-cross --vulkan-semantics --dump-resources spv\%OUT_FILE_NAME%.spv 2> txt\%OUT_FILE_NAME%.resources.txt --output txt\%OUT_FILE_NAME%.txt
-spirv-cross --reflect --vulkan-semantics --output txt\%OUT_FILE_NAME%.json spv\%OUT_FILE_NAME%.spv
-
-echo.
-
-
-
+	rem To generate human readable form of SPIR-V add "-H > txt\%IN_FILE_NAME%.txt" to glslangvalidator
+	rem "spirv-cross --dump-resources" writes to stderr so we need to use "2>" instead of ">" to redirest stderr to output
+	spirv-cross --vulkan-semantics --dump-resources !OUT_FILE_NAME! 2> "txt\%%~nf.resources.txt" --output "txt\%%~nf.txt"
+	spirv-cross --reflect --vulkan-semantics --output "txt\%%~nf.json" !OUT_FILE_NAME!
+	
+	echo.
+)
 
 if [%1%] == [debug] (
 echo ######## Compiled shaders with DEBUG options ########
