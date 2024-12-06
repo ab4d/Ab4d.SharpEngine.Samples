@@ -58,6 +58,11 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 //   This can show you how the existing effects are implemented. Contact support (https://www.ab4d.com/Feedback.aspx) for more info.
 //
 
+// To get another example of a more complex custom effect, see the VertexColorPlusEffect that created by zacfromaustinpowder:
+// https://github.com/zacfromaustinpowder/Ab4d.SharpEngine.Samples/tree/customEffect2
+//
+// NOTE: This custom effect was not fully tested by AB4D company. Also, we do not offer any support for that.
+
 public class CustomFogEffectSample : CommonSample
 {
     public override string Title => "Custom fog effect ";
