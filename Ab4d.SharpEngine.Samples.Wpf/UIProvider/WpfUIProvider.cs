@@ -284,9 +284,9 @@ public class WpfUIProvider : ICommonSampleUIProvider
         {
             text = textWithToolTip.Substring(0, index); // strip off the " (?):"
             if (text.EndsWith(':'))
-                text = text.Substring(0, text.Length - 1) + " (?):";
+                text = text.Substring(0, text.Length - 1) + " 🛈:"; // " (?):";
             else
-                text += " (?)";
+                text += " 🛈"; // " (?)";
         }
 
         string? toolTip;
