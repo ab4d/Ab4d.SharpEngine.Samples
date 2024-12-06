@@ -39,6 +39,18 @@ public sealed class CustomOverlayPanelSample : CommonSample
         };
     }
 
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (Scene != null && _spriteBatch != null)
+            Scene.RemoveSpriteBatch(_spriteBatch);
+
+        if (SceneView != null)
+            SceneView.SceneUpdating += _parentSceneView_SceneUpdating;
+
+        base.OnDisposed();
+    }
+
     protected override void OnCreateScene(Scene scene)
     {
         _spriteBatch = scene.CreateOverlaySpriteBatch();
