@@ -12,14 +12,14 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 // The shaders for the FogEffect are stored in Resources/Shaders folder.
 // There are also two scripts that can be used to compile the shaders.
 // Vulkan SDK must be installed on the computer to be able to run the compile script.
-// The compiled versions of the shaders are stored in the spv filder.
+// The compiled versions of the shaders are stored in the spv folder.
 // In txt folder there are some helper files that can be used to check the structure of the required shader resources.
 //
 // The new effect can be used by creating an instance of FogMaterial and setting it to a ModelNode object.
 // The FogMaterial defines the properties for the new material.
 // It also sets the Effect property to the FogEffect.
 //
-// The FogEffect is be used to prepare all the resources for rendering.
+// The FogEffect is used to prepare all the resources for rendering.
 // Those resources are stored to the RenderingItem in the FogEffect.ApplyRenderingItemMaterial method.
 //
 // The most important property for rendering in RenderingItem is the EffectTechnique.
@@ -45,7 +45,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 // - For simple debugging of the shaders update the fragment shader to write fixed colors values or
 //   color values based on some properties (for example normal vector).
 //
-// - For advanced debugging Use RenderDoc application (free and availabe from https://renderdoc.org/).
+// - For advanced debugging Use RenderDoc application (free and available from https://renderdoc.org/).
 //   You will need to use WPF or Generic SDL / Gltf (Ab4d.SharpEngine.Samples.CrossPlatform.sln) to 
 //   debug the Vulkan shaders. Using Avalonia will not work because Avalonia is using OpenGL to render its UI.
 //   To start debugging, start your application from RenderDoc.
