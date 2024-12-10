@@ -124,11 +124,11 @@ public class FogEffectTechnique : EffectTechnique
     }
 
     public Pipeline CreatePipeline(RenderPass renderPass,
-                               float width,
-                               float height, // height can be negative when SceneView.IsYAxisUp is true
-                               SampleCountFlags multisampleCount,
-                               PipelineCreateFlags flags,
-                               string? pipelineName)
+                                   float width,
+                                   float height, // height can be negative when SceneView.IsYAxisUp is true
+                                   SampleCountFlags multisampleCount,
+                                   PipelineCreateFlags flags,
+                                   string? pipelineName)
     {
         return CreatePipeline(renderPass, width, height, multisampleCount, flags, Pipeline.Null, pipelineName);
     }
@@ -137,7 +137,10 @@ public class FogEffectTechnique : EffectTechnique
                                    PipelineCreateFlags flags,
                                    string? pipelineName)
     {
-        return CreatePipeline(renderingContext.SceneView.RenderPass,
+        if (renderingContext.SceneView.MainRenderPass == null)
+            throw new InvalidOperationException("SceneView is not initialized");
+
+        return CreatePipeline(renderingContext.SceneView.MainRenderPass.RenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
                               renderingContext.SceneView.MultisampleCountFlags,
@@ -168,7 +171,10 @@ public class FogEffectTechnique : EffectTechnique
         if (parentPipeline.IsNull())
             throw new SharpEngineException("CreateDerivativePipeline called without parentPipeline set");
 
-        return CreatePipeline(renderingContext.SceneView.RenderPass,
+        if (renderingContext.SceneView.MainRenderPass == null)
+            throw new InvalidOperationException("SceneView is not initialized");
+
+        return CreatePipeline(renderingContext.SceneView.MainRenderPass.RenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
                               renderingContext.SceneView.MultisampleCountFlags,

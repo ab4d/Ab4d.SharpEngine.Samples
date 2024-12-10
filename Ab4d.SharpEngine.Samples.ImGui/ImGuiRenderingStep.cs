@@ -461,7 +461,7 @@ public class ImGuiRenderingStep : RenderingStep
             PTessellationState = &localTessellationState,
             PInputAssemblyState = &localInputAssemblyState,
             PVertexInputState = (PipelineVertexInputStateCreateInfo*)_vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
-            RenderPass = renderingContext.SceneView.RenderPass,
+            RenderPass = renderingContext.SceneView.MainRenderPass!.RenderPass,
             BasePipelineHandle = Pipeline.Null,
             BasePipelineIndex = -1,
             Subpass = 0,
