@@ -78,8 +78,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             AlwaysOnTopCheckBox.IsChecked = true;
 
             // Only show "Full Logging" CheckBox when SharpEngine is compiled with full logging
+            #pragma warning disable CS0162 // Unreachable code detected
             if (Ab4d.SharpEngine.Utilities.Log.MinUsedLogLevel != LogLevels.Trace)
                 ActionsRootMenuItem.Items.Remove(FullLoggingCheckBox);
+            #pragma warning restore CS0162 // Unreachable code detected
 
             if (!_commonDiagnostics.IsGltfExporterAvailable)
             {
