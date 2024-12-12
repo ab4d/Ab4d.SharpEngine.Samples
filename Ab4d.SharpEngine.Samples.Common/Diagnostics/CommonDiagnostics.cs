@@ -758,6 +758,15 @@ PipelineChangesCount: {8:#,##0}",
             DumpObjectProperties(SharpEngineSceneView.GpuDevice, sb, indent);
             sb.AppendLine();
             
+            DumpObjectProperties(SharpEngineSceneView.GpuDevice.PhysicalDeviceDetails, sb, indent);
+            sb.AppendLine();
+
+            sb.AppendLine($"{indent}Memory types:");
+            var memoryTypes = SharpEngineSceneView.GpuDevice.PhysicalDeviceDetails.MemoryTypes;
+            for (var i = 0; i < memoryTypes.Length; i++)
+                sb.AppendLine($"{indent}  [{i}]: heap {memoryTypes[i].HeapIndex}: {memoryTypes[i].PropertyFlags}");
+            sb.AppendLine();
+            
             // Manually dump some properties of EngineRuntimeOptions because this class is static and have no instance properties
             sb.AppendLine($"{indent}EngineRuntimeOptions properties:");
             sb.AppendLine($"{indent}  InitialBufferMemoryBlockSize: {EngineRuntimeOptions.InitialBufferMemoryBlockSize}");
