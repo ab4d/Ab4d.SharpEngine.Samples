@@ -23,16 +23,16 @@
       android:orientation="horizontal">
 
       <Button
+        android:id="@+id/button_camera_rotation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_start_camera_rotation"/>
+      
+      <Button
         android:id="@+id/button_change_scene"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_change_scene_text"/>
-
-      <Button
-        android:id="@+id/button_start_logging"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_start_logging_text"/>
 
     </LinearLayout>
   </LinearLayout>
@@ -44,7 +44,7 @@
     android:layout_margin="20dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_red_dark"
+    android:background="@android:color/holo_orange_light"
     android:padding="10dp"
     android:text="@string/button_change_color_text"/>
 

@@ -10,10 +10,12 @@ using Ab4d.Vulkan;
 using System.Numerics;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.TestScenes;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
 using Android.Content;
 using Android.Content.PM;
 using Android.Content.Res;
@@ -21,7 +23,7 @@ using Android.Graphics;
 using Android.Views;
 using Activity = Android.App.Activity;
 
-// This Android sample is using a .Net 6 Android Application template.
+// This Android sample is using an Android Application template.
 // It uses only standard Android objects like Activity and SurfaceView to show the 3D scene by SharpEngine.
 
 // There is another Android sample that uses third-party Silk.NET library and can use SDL or GLFW to create a Vulkan Surface.
@@ -35,7 +37,6 @@ namespace AndroidApp1
     public class MainActivity : Activity
     {
         private static readonly bool StartWithFullLogging = false;
-        private static readonly bool ShowStartLoggingButton = true;
 
 
         private VulkanDevice? _vulkanDevice;
@@ -48,7 +49,6 @@ namespace AndroidApp1
         private bool _isForceResizeWithRenderCalled;
 
         private Random? _rnd;
-        private BoxModelNode? _boxModel;
 
         private AllObjectsTestScene? _allObjectsTestScene;
         private string[]? _allManifestResourceNames;
@@ -56,11 +56,12 @@ namespace AndroidApp1
 
         private SharpEngineSceneView? _vulkanView;
 
+        private StandardMaterial? _hashMaterial;
+
         // Saved app state:
         private bool _isComplexScene = false;
         private Color3 _lastUsedColor = Color3.Black;
-
-
+        
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -95,21 +96,29 @@ namespace AndroidApp1
                 };
             }
 
-            var startLoggingButton = FindViewById<Button>(Resource.Id.button_start_logging);
-            if (startLoggingButton != null)
+            var cameraRotationButton = FindViewById<Button>(Resource.Id.button_camera_rotation);
+            if (cameraRotationButton != null)
             {
-                if (ShowStartLoggingButton && !StartWithFullLogging)
+                cameraRotationButton.Click += delegate (object? sender, EventArgs args)
                 {
-                    startLoggingButton.Click += delegate (object? sender, EventArgs args)
+                    if (_targetPositionCamera != null)
                     {
-                        Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Trace;
-                        Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
-                    };
-                }
-                else
-                {
-                    startLoggingButton.Visibility = ViewStates.Gone;
-                }
+                        if (_targetPositionCamera.IsRotating)
+                        {
+                            _targetPositionCamera.StopRotation(decelerationSpeed: 40, easingFunction: EasingFunctions.QuadraticEaseOutFunction);
+                            //_targetPositionCamera.StopRotation(); // Stop immediately
+
+                            cameraRotationButton.Text = GetString(Resource.String.button_start_camera_rotation);
+                        }
+                        else
+                        {
+                            _targetPositionCamera.StartRotation(headingChangeInSecond: 40, attitudeChangeInSecond: 0, accelerationSpeed: 40, easingFunction: EasingFunctions.QuadraticEaseInFunction);
+                            //_targetPositionCamera.StartRotation(headingChangeInSecond: 40, attitudeChangeInSecond: 0); // Start immediately
+
+                            cameraRotationButton.Text = GetString(Resource.String.button_stop_camera_rotation);
+                        }
+                    }
+                };
             }
 
 
@@ -198,7 +207,8 @@ namespace AndroidApp1
 
 
             // Initialize GPU resources after we have a valid surface
-            _sceneView.Initialize(_vulkanDevice, vulkanSurface);
+            // Use 4xMSAA (multi-sampled anti-aliasing) and no SSAA (super-sampling anti-aliasing)
+            _sceneView.Initialize(_vulkanDevice, vulkanSurface, multisampleCount: 4, supersamplingCount: 1);
 
 
             // Setup camera
@@ -280,12 +290,34 @@ namespace AndroidApp1
 
             _scene.RootNode.Clear();
 
-            _boxModel = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(100, 80, 60), name: "BoxModel")
-            {
-                Material = StandardMaterials.Green
-            };
+            float hashModelSize = 100;
+            float hashModelBarThickness = 16;
+            float hashModelBarOffset = 20;
 
-            _scene.RootNode.Add(_boxModel);
+            var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(new Vector3(0, 0, 0),
+                                                                  shapeYVector: new Vector3(0, 0, 1),
+                                                                  extrudeVector: new Vector3(0, hashModelBarThickness, 0),
+                                                                  size: hashModelSize,
+                                                                  barThickness: hashModelBarThickness,
+                                                                  barOffset: hashModelBarOffset,
+                                                                  name: "HashSymbolMesh");
+
+            _hashMaterial = new StandardMaterial(Color3.FromByteRgb(255, 197, 0));
+
+            var hashModelNode = new MeshModelNode(hashSymbolMesh, "HashSymbolModel")
+            {
+                Material = _hashMaterial,
+                Transform = new StandardTransform()
+            };
+        
+            _scene.RootNode.Add(hashModelNode);
+
+            //_boxModel = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(100, 80, 60), name: "BoxModel")
+            //{
+            //    Material = StandardMaterials.Green
+            //};
+
+            //_scene.RootNode.Add(_boxModel);
         }
 
         private void CreateComplexScene()
@@ -305,8 +337,14 @@ namespace AndroidApp1
             // Add demo objects to _scene
             _allObjectsTestScene.CreateTestScene();
 
-            if (_targetPositionCamera != null && _targetPositionCamera.Distance < 1500)
+            if (_targetPositionCamera != null)
+            {
+                _targetPositionCamera.Heading = -40;
+                _targetPositionCamera.Attitude = -25;
                 _targetPositionCamera.Distance = 1500;
+                _targetPositionCamera.ViewWidth = 1500;
+                _targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+            }
         }
 
         private void SaveAppState()
@@ -376,8 +414,8 @@ namespace AndroidApp1
         {
             if (_allObjectsTestScene != null)
                 _allObjectsTestScene.ChangeBasePlaneColor(color);
-            else if (_boxModel != null)
-                _boxModel.Material = new StandardMaterial(color);
+            else if (_hashMaterial != null)
+                _hashMaterial.DiffuseColor = color;
 
             _lastUsedColor = color;
         }
