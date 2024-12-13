@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define ADVANCED_TIME_MEASUREMENT
+
+using System;
 using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
@@ -11,6 +13,11 @@ namespace Ab4d.SharpEngine.Utilities;
 
 public class AndroidTextureLoader
 {
+#if ADVANCED_TIME_MEASUREMENT
+    public static double LoadBitmapTimeMs;
+    public static double CreateGpuImageTimeMs;
+#endif
+
     public static StandardMaterial CreateTextureMaterial(Resources resources,
                                                          int drawableId,
                                                          AndroidBitmapIO bitmapIO,
