@@ -26,26 +26,41 @@
         android:id="@+id/button_camera_rotation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_light"
+        android:padding="10dp"        
         android:text="@string/button_start_camera_rotation"/>
+
+      <Button
+        android:id="@+id/button_change_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_light"
+        android:padding="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/button_change_color_text"/>
       
       <Button
         android:id="@+id/button_change_scene"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_light"
+        android:padding="10dp"        
+        android:layout_marginLeft="10dp"
         android:text="@string/button_change_scene_text"/>
 
     </LinearLayout>
   </LinearLayout>
-    
-  <Button
-    android:id="@+id/button_change_color"
+
+  <TextView
+    android:id="@+id/sample_info_text"
     android:layout_alignParentBottom="true"
-    android:layout_alignParentRight="true"
+    android:layout_alignParentLeft="true"
     android:layout_margin="20dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@android:color/holo_orange_light"
     android:padding="10dp"
-    android:text="@string/button_change_color_text"/>
+    android:textSize="18sp"
+    android:text="@string/sample_info_text"
+  />
 
 </RelativeLayout>

@@ -23,6 +23,9 @@ using Android.Graphics;
 using Android.Views;
 using Activity = Android.App.Activity;
 
+// This sample demonstrates only how to integrate Ab4d.SharpEngine into an Android app.
+// See samples for WinUI, Wpf, Avalonia or WinForms for more features of the engine
+
 // This Android sample is using an Android Application template.
 // It uses only standard Android objects like Activity and SurfaceView to show the 3D scene by SharpEngine.
 
@@ -318,6 +321,15 @@ namespace AndroidApp1
             //};
 
             //_scene.RootNode.Add(_boxModel);
+
+            if (_targetPositionCamera != null)
+            {
+                _targetPositionCamera.Heading = -40;
+                _targetPositionCamera.Attitude = -25;
+                _targetPositionCamera.Distance = 500;
+                _targetPositionCamera.ViewWidth = 500;
+                _targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+            }
         }
 
         private void CreateComplexScene()
