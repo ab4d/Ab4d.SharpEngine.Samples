@@ -45,6 +45,7 @@
     <AvaloniaXaml Include="Diagnostics\LogMessagesWindow.xaml" />    
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
+    <AvaloniaXaml Include="QuickStart\AntiAliasingSample.xaml" />
     <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
