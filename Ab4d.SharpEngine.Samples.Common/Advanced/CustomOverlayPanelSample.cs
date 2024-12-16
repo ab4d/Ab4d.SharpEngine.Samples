@@ -13,94 +13,145 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 public sealed class CustomOverlayPanelSample : CommonSample
 {
     public override string Title { get; } = "Custom Overlay Panel";
+    public override string Subtitle { get; } = "This samples shows how to render a custom scene to a texture that is shown as a sprite on top of another 3D scene.";
 
-    readonly int _overlayPanelWidth = 256;
-    readonly int _overlayPanelHeight = 256;
-    readonly PositionTypes _alignment = PositionTypes.Center;
-    readonly Vector2 _offset = new(50, 50);
+    private readonly int _overlayPanelWidth = 256;
+    private readonly int _overlayPanelHeight = 256;
+     
+    private SpriteBatch? _spriteBatch;
+     
+    private Scene? _overlayPanelScene;
+    private SceneView? _overlayPanelSceneView;
+     
+    private RawImageData? _rawImageData;
+    private GpuImage? _gpuImage;
 
-    SpriteBatch? _spriteBatch;
-
-    Scene? _overlayPanelScene;
-    SceneView? _overlayPanelSceneView;
-
-    readonly RawImageData _rawImageData;
-    GpuImage? _gpuImage;
-
-    public CustomOverlayPanelSample(ICommonSamplesContext context) : base(context)
+    public CustomOverlayPanelSample(ICommonSamplesContext context) 
+        : base(context)
     {
-        _rawImageData = new(
-            _overlayPanelWidth, _overlayPanelHeight,
-            4 * _overlayPanelWidth,
-            Format.R8G8B8A8Unorm,
-            new byte[4 * _overlayPanelWidth * _overlayPanelHeight],
-            false) {
-            HasTransparentPixels = true
-        };
+    }
+
+    protected override void OnDisposed()
+    {
+        if (Scene != null && _spriteBatch != null)
+            Scene.RemoveSpriteBatch(_spriteBatch);
+
+        if (SceneView != null)
+            SceneView.SceneUpdating -= ParentSceneView_SceneUpdating;
+
+        base.OnDisposed();
     }
 
     protected override void OnCreateScene(Scene scene)
     {
-        _spriteBatch = scene.CreateOverlaySpriteBatch();
-
         var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
                                                 position: new Vector3(0, 0, 0),
-                                                positionType: PositionTypes.Center,
-                                                finalSize: Vector3.One);
+                                                positionType: PositionTypes.Bottom,
+                                                finalSize: new Vector3(100, 100, 100));
 
-        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Blue));
+        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Silver.SetSpecular(32)));
+
+
+        var wireGridNode = new WireGridNode()
+        {
+            CenterPosition = new Vector3(0, -0.1f, 0),
+            Size = new Vector2(200, 200),
+        };
+
+        scene.RootNode.Add(wireGridNode);
     }
 
     protected override void OnSceneViewInitialized(SceneView parentSceneView)
     {
-        parentSceneView.Camera = new TargetPositionCamera { Distance = 3 };
-
-        var gpuDevice = parentSceneView.GpuDevice!;
-
-        _overlayPanelScene = new(gpuDevice);
-        _overlayPanelSceneView = new(_overlayPanelScene) {
-            Camera = new TargetPositionCamera { Distance = 5 }
+        // Create a TargetPositionCamera for the main scene (with teapot)
+        parentSceneView.Camera = new TargetPositionCamera
+        {
+            Heading = 30,
+            Attitude = -20,
+            Distance = 300
         };
-        _overlayPanelSceneView.Initialize(_overlayPanelWidth, _overlayPanelHeight);
 
-        _setupOverlayPanelScene(_overlayPanelScene);
-
-        _gpuImage = new(gpuDevice, _rawImageData);
-
-        parentSceneView.SceneUpdating += _parentSceneView_SceneUpdating;
+        // Initialize overlay 3D scene
+        InitializeOverlayScene(parentSceneView);
 
         base.OnSceneViewInitialized(parentSceneView);
     }
 
-    void _parentSceneView_SceneUpdating(object? o, EventArgs e)
+    private void InitializeOverlayScene(SceneView parentSceneView)
     {
-        var parentSceneView = SceneView!;
+        var gpuDevice = parentSceneView.GpuDevice!;
 
-        _overlayPanelSceneView!.RenderToRawImageData(_rawImageData);
-        _gpuImage!.CopyDataToImage(_rawImageData.Data);
+        _overlayPanelScene = new Scene(gpuDevice);
 
-        _spriteBatch!.Begin();
-        _spriteBatch.SetSpriteTexture(_gpuImage);
-        _spriteBatch.SetCoordinateCenter(_alignment);
-        _spriteBatch.DrawSprite(_offset / new Vector2(parentSceneView.Width, parentSceneView.Height));
-        _spriteBatch.End();
+
+        _overlayPanelSceneView = new SceneView(_overlayPanelScene) 
+        {
+            //BackgroundColor = Colors.Aqua // Transparent by default
+        };
+
+
+        var overlayPanelCamera = new TargetPositionCamera
+        {
+            Heading = 30,
+            Attitude = -20,
+            Distance = 4
+        };
+
+        overlayPanelCamera.StartRotation(40);
+
+        _overlayPanelSceneView.Camera = overlayPanelCamera;
+        
+
+        _overlayPanelSceneView.Initialize(_overlayPanelWidth, _overlayPanelHeight, multisampleCount: 4, supersamplingCount: 2);
+
+
+        // Create a 3D box that will be shown in the overlay SceneView
+        var boxModel = new BoxModelNode(centerPosition: Vector3.Zero, size: new Vector3(2f, 0.2f, 1.3f), material: StandardMaterials.Gold);
+        _overlayPanelScene.RootNode.Add(boxModel);
+
+
+        // Create RawImageData and GpuImage that will be used to show the rendered SceneView as a sprite (see _parentSceneView_SceneUpdating)
+        _rawImageData = new RawImageData(width: _overlayPanelWidth, 
+                                         height: _overlayPanelHeight,
+                                         stride: 4 * _overlayPanelWidth,
+                                         format: Format.R8G8B8A8Unorm,
+                                         data: new byte[4 * _overlayPanelWidth * _overlayPanelHeight],
+                                         checkTransparency: false)
+        {
+            HasTransparentPixels = true
+        };
+
+        _gpuImage = new GpuImage(gpuDevice, _rawImageData);
+
+
+        // Create SpriteBatch
+        _spriteBatch = parentSceneView.CreateOverlaySpriteBatch("OverlaySceneViewSpriteBatch");
+
+
+        // Subscribe to SceneUpdating - there we will update the sprite
+        parentSceneView.SceneUpdating += ParentSceneView_SceneUpdating;
     }
-
-    void _setupOverlayPanelScene(Scene scene)
+    
+    private void ParentSceneView_SceneUpdating(object? o, EventArgs e)
     {
-        var boxModel = new BoxModelNode(Vector3.Zero, Vector3.One, StandardMaterials.Gold);
+        if (_overlayPanelSceneView == null || _gpuImage == null || _spriteBatch == null || _rawImageData == null)
+            return;
 
-        scene.RootNode.Add(boxModel);
+        // Render Overlay 3D scene to _rawImageData
+        // NOTE that this copies the rendered texture to CPU memory.
+        // In the next version it will be possible to render to a GpuImage that would stay in GPU memory.
+        _overlayPanelSceneView.RenderToRawImageData(_rawImageData);
 
-        var animation = AnimationBuilder.CreateTransformationAnimation(scene);
-        animation.SetDuration(5_000);
-        animation.Loop = true;
+        // Copy the _rawImageData to a GpuImage that is rendered as a sprite
+        _gpuImage.CopyDataToImage(_rawImageData.Data);
 
-        animation.AddRotateKeyframe(0, Vector3.Zero);
-        animation.AddRotateKeyframe(1, new(360, 360, 0));
 
-        animation.AddTarget(boxModel);
-
-        animation.Start();
+        _spriteBatch.Begin(useAbsoluteCoordinates: true);
+        _spriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
+        
+        _spriteBatch.SetSpriteTexture(_gpuImage);
+        _spriteBatch.DrawSprite(topLeftPosition: new Vector2(30, 286), spriteSize: new Vector2(256, 256));
+        
+        _spriteBatch.End();
     }
 }
