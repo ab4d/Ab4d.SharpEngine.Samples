@@ -46,7 +46,7 @@ public sealed class CustomOverlayPanelSample : CommonSample
             Scene.RemoveSpriteBatch(_spriteBatch);
 
         if (SceneView != null)
-            SceneView.SceneUpdating += _parentSceneView_SceneUpdating;
+            SceneView.SceneUpdating -= _parentSceneView_SceneUpdating;
 
         base.OnDisposed();
     }
