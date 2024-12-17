@@ -51,14 +51,24 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
+
+            // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
+            // Otherwise, the default values will be used:
+            // MSAA: 4x for fast desktop device; 1x otherwise
+            // SSAA: 4x for dedicated desktop devices; 2x for integrated devices; 1x otherwise
+            if (GlobalSharpEngineSettings.MultisampleCount > 0)
+                MainSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
+            
+            if (GlobalSharpEngineSettings.SupersamplingCount > 0)
+                MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
+
+
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
-
-            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 

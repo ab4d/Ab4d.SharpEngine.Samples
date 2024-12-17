@@ -35,6 +35,7 @@ using Ab4d.SharpEngine.Samples.Common;
 using Microsoft.UI.Input;
 using System.IO;
 using Ab4d.SharpEngine.Samples.WinUI.Diagnostics;
+using Ab4d.SharpEngine.Samples.WinUI.Settings;
 using Microsoft.Graphics.Display;
 
 
@@ -64,6 +65,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
         private bool _isSceneViewInitializedSubscribed;
         private bool _isPresentationTypeChangedSubscribed;
+        private bool _isSceneViewSizeChangedSubscribed;
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
 
         private BitmapImage? _disabledDiagnosticsImage;
@@ -450,6 +452,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                     _isPresentationTypeChangedSubscribed = false;
                 }
 
+                if (_isSceneViewSizeChangedSubscribed)
+                {
+                    _currentSharpEngineSceneView.ViewSizeChanged -= OnSceneViewOnViewSizeChanged;
+                    _isSceneViewSizeChangedSubscribed = false;
+                }
+
                 _currentSharpEngineSceneView = null;
             }
 
@@ -459,6 +467,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private void UpdateGraphicsCardInfo()
         {
             var sharpEngineSceneView = WinUISamplesContext.Current.CurrentSharpEngineSceneView;
+
+            if (sharpEngineSceneView != null && !_isSceneViewSizeChangedSubscribed)
+            {
+                sharpEngineSceneView.ViewSizeChanged += OnSceneViewOnViewSizeChanged;
+                _isSceneViewSizeChangedSubscribed = true;
+            }
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.IsInitialized)
             {
@@ -478,6 +492,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 // We need to set a space otherwise the height will be calculated differently
                 SelectedGraphicInfoTextBlock.Text = " ";
                 UsedGpuTextBlock.Text = " ";
+                ViewSizeInfoTextBlock.Text = " ";
 
                 if (sharpEngineSceneView != null)
                 {
@@ -493,20 +508,10 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 return;
             }
 
-            if (sharpEngineSceneView.GpuDevice != null)
-            {
-                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName + $" ({sharpEngineSceneView.PresentationType.ToString()})";
-                UsedGpuTextBlock.Text = "Used graphics card:"; // we cannot use Hidden as Visibility so just remove and set Text
-            }
-            else
-            {
-                // we cannot use Hidden as Visibility so just remove and set Text
-                // We need to set a space otherwise the height will be calculated differently
-                SelectedGraphicInfoTextBlock.Text = " ";
-                UsedGpuTextBlock.Text = " ";
-            }
 
-            ToolTipService.SetToolTip(SelectedGraphicInfoTextBlock, null);
+            UpdateSelectedGraphicInfo(sharpEngineSceneView);
+            UpdateViewSizeInfo(sharpEngineSceneView);
+            ToolTipService.SetToolTip(ViewSizeInfoTextBlock, null);
 
 
             if (!_isPresentationTypeChangedSubscribed)
@@ -542,9 +547,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             UpdateGraphicsCardInfo();
 
             if (reason != null)
-                ToolTipService.SetToolTip(SelectedGraphicInfoTextBlock, reason);
+                ToolTipService.SetToolTip(ViewSizeInfoTextBlock, reason);
             else
-                ToolTipService.SetToolTip(SelectedGraphicInfoTextBlock, null);
+                ToolTipService.SetToolTip(ViewSizeInfoTextBlock, null);
         }
 
         private void OnSceneViewInitialized(object? sender, EventArgs e)
@@ -613,6 +618,60 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
             return foundDViewportView;
         }
+                
+        
+        private void UpdateSelectedGraphicInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                UsedGpuTextBlock.Text = "Used graphics card:"; // we cannot use Hidden as Visibility so just remove and set Text
+                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName;
+                UsedGpuTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                UsedGpuTextBlock.Text = " "; // we cannot use Hidden as Visibility so just remove and set Text
+                SelectedGraphicInfoTextBlock.Text = " ";
+                UsedGpuTextBlock.Visibility = Visibility.Collapsed;
+            }
+
+            ToolTipService.SetToolTip(SelectedGraphicInfoTextBlock, null);
+        }
+        
+        private void UpdateViewSizeInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                var sceneView = sharpEngineSceneView.SceneView;
+                string viewInfo;
+                if (sceneView.BackBuffersInitialized)
+                {
+                    viewInfo = $"{sceneView.Width} x {sceneView.Height}";
+                    if (sceneView.MultisampleCount > 1)
+                        viewInfo += $" {sceneView.MultisampleCount}xMSAA";
+                    var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
+                    if (supersamplingCount > 1)
+                        viewInfo += string.Format(" {0:0.#}xSSAA", supersamplingCount);
+                    viewInfo += $" ({sharpEngineSceneView.PresentationType})";
+                }
+                else
+                {
+                    viewInfo = "";
+                }
+
+                ViewSizeInfoTextBlock.Text = viewInfo;
+            }
+            else
+            {
+                ViewSizeInfoTextBlock.Text = "";
+            }
+        }
+        private void OnSceneViewOnViewSizeChanged(object sender, ViewSizeChangedEventArgs e)
+        {
+            var sharpEngineSceneView = WinUISamplesContext.Current.CurrentSharpEngineSceneView;
+            if (sharpEngineSceneView != null)
+                UpdateViewSizeInfo(sharpEngineSceneView);
+        }
 
         private void EnableDiagnosticsButton()
         {
@@ -680,6 +739,41 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             _diagnosticsWindow.Activate();
         }
 
+        private async void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow();
+
+            var contentDialog = new ContentDialog()
+            {
+                XamlRoot = this.RootGrid.XamlRoot,
+                Content = settingsWindow
+            };
+
+            settingsWindow.ContentDialog = contentDialog;
+
+            await contentDialog.ShowAsync();
+
+            if (settingsWindow.IsChanged)
+            {
+                if (_currentSharpEngineSceneView != null)
+                {
+                    _currentSharpEngineSceneView.SceneView.Resize(newMultisampleCount: GlobalSharpEngineSettings.MultisampleCount,
+                                                                  newSupersamplingCount: GlobalSharpEngineSettings.SupersamplingCount,
+                                                                  renderNextFrameAfterResize: false);
+
+                    // We need to call RenderScene on SharpEngineSceneView and not only on SceneView, otherwise in SharedTexture mode, the shared texture is not updated.
+                    _currentSharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
+
+                    UpdateViewSizeInfo(_currentSharpEngineSceneView);
+                }
+            }
+        }
+
+        private void GraphicsSettingsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenSettingsWindow();
+        }
+        
         private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenDiagnosticsWindow();

@@ -1,0 +1,54 @@
+﻿<Page
+    x:Class="Ab4d.SharpEngine.Samples.WinUI.Settings.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Ab4d.SharpEngine.Samples.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sharpEngine="using:Ab4d.SharpEngine.WinUI"
+    mc:Ignorable="d">
+
+    <Grid Name="RootGrid" Margin="20 10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Graphics Settings" FontSize="18" />
+
+        <Grid Grid.Row="1" Margin="0 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Name="GpuDevicesTextBlock" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="GPU device:" Margin="0 2 5 5" VerticalAlignment="Center" />
+            <StackPanel Name="AdapterStackPanel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Vertical" Margin="0 0 0 15"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Multi-sampling (MSAA):" Margin="0 0 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="MultisamplingComboBox" Grid.Row="2" Grid.Column="1" Margin="0 0 0 2"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Super-sampling (SSAA):" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="SuperSamplingComboBox" Grid.Row="3" Grid.Column="1" Margin="0 2 0 2" />
+
+            <TextBlock Name="DefaultInfoTextBlock" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 5 0 2" TextWrapping="Wrap" />
+            
+            <TextBlock Name="ErrorTextBlock" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 15 0 2" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed" />
+        </Grid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 15 0 0">
+            <Button Name="CancelButton" Content="Cancel" Width="100" Click="CancelButton_OnClick" />
+            <Button Name="OkButton" Content="OK" Margin="10 0 0 0" Width="100" Click="OkButton_OnClick" />
+        </StackPanel>
+    </Grid>
+</Page>

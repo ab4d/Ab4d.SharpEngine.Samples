@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.WinUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.WinUI</RootNamespace>    
@@ -49,6 +49,7 @@
     <None Remove="Diagnostics\LogMessagesWindow.xaml" />
     <None Remove="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <None Remove="QuickStart\SharpEngineSceneViewInXaml.xaml" />
+    <None Remove="Settings\SettingsWindow.xaml" />
     <None Remove="Samples.xml" />
     <None Remove="SamplesWindow.xaml" />
     <None Remove="Titles\IntroductionPage.xaml" />
@@ -93,6 +94,9 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Diagnostics\LogMessagesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Settings\SettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup> 

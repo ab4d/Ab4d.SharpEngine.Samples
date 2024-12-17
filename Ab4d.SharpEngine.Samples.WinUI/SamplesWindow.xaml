@@ -38,28 +38,18 @@
             <TextBlock Name="UsedGpuTextBlock" Grid.Row="2" Margin="10 13 5 0" HorizontalAlignment="Left"
                        Text="Used graphics card:" FontWeight="Bold" Foreground="{StaticResource ForegroundBrush}"/>
 
-            <Grid Grid.Row="4" Margin="10 0 5 0" HorizontalAlignment="Left">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Image Name="RejectedGraphicsProfileWarningImage" Grid.Column="0" Margin="0 0 5 0" Height="14"
-                   Source="Assets/warningIcon.png" Visibility="Collapsed" />
-
-                <TextBlock Name="SelectedGraphicInfoTextBlock" Grid.Column="1" Text="" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" />
-
-            </Grid>
+            <TextBlock Name="SelectedGraphicInfoTextBlock" Grid.Row="3" Text="" FontSize="13" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" Margin="10 0 5 0" HorizontalAlignment="Left"/>
+            <TextBlock Name="ViewSizeInfoTextBlock" Grid.Row="4" Text="" FontSize="13" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" Margin="10 0 5 0" HorizontalAlignment="Left"/>
 
             <StackPanel Grid.Row="5" Margin="10 10 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
-                <!--<Button Name="GraphicsSettingsButton" Width="100" Margin="0 0 20 0" HorizontalContentAlignment="Left" Click="GraphicsSettingsButton_OnClick">
+                <Button Name="GraphicsSettingsButton" Padding="3 0" Click="GraphicsSettingsButton_OnClick">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources/Settings.png" Width="18" Height="18" Margin="5 1 0 0" />
-                        <TextBlock Name="SettingsTextBlock" Text="Settings" Margin="5 3" />
+                        <Image Source="/Assets/Settings.png" Width="18" Height="18" Margin="5 1 0 0" />
+                        <TextBlock Name="SettingsTextBlock" Text="Settings" Margin="5 3 5 3" />
                     </StackPanel>
-                </Button>-->
+                </Button>
 
-                <Button Name="DiagnosticsButton" IsEnabled="False" Padding="3 0" Click="DiagnosticsButton_OnClick">
+                <Button Name="DiagnosticsButton" IsEnabled="False" Padding="3 0" Margin="10 0 0 0" Click="DiagnosticsButton_OnClick">
                     <StackPanel Orientation="Horizontal">
                         <Image Name="DiagnosticsImage" Source="Assets/Diagnostics.png" Width="18" Height="18" Margin="2 1 0 0" />
                         <TextBlock Name="DiagnosticsTextBlock" Text="Diagnostics" Margin="5 3 5 3" />
@@ -68,7 +58,7 @@
             </StackPanel>
 
             <ListBox Name="SamplesListBox" Grid.Row="6" 
-                     Margin="2 15 0 5" Padding="0 0 0 0"
+                     Margin="2 10 0 5" Padding="0 0 0 0"
                      ItemContainerStyle="{StaticResource SharpEngineListBoxItemStyle}"
                      SelectionChanged="SamplesListBox_OnSelectionChanged"
                      Background="{StaticResource BackgroundBrush}"
