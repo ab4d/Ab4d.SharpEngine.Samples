@@ -47,6 +47,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             // To get the Scene and SceneView event when they are created, we can use the SceneViewCreated event.
             //
 
+
+            // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
+            // Otherwise, the default values will be used:
+            // MSAA: 4x for fast desktop device; 1x otherwise
+            // SSAA: 4x for dedicated desktop devices; 2x for integrated devices; 1x otherwise
+            if (GlobalSharpEngineSettings.MultisampleCount > 0)
+                MainSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
+            
+            if (GlobalSharpEngineSettings.SupersamplingCount > 0)
+                MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
+
+
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             //_sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
 

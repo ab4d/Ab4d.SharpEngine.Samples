@@ -47,6 +47,7 @@
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
     <AvaloniaXaml Include="QuickStart\AntiAliasingSample.xaml" />
+    <AvaloniaXaml Include="Settings\SettingsWindow.xaml" />
     <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -101,6 +102,12 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" /> 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="Settings\SettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
 </Project>

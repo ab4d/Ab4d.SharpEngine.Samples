@@ -14,6 +14,7 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Settings;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Avalonia;
@@ -51,6 +52,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private CommonSample? _currentCommonSample;
         private bool _isSceneViewInitializedSubscribed;
         private bool _isPresentationTypeChangedSubscribed;
+        private bool _isSceneViewSizeChangedSubscribed;
+
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
 
         private TextBlock? _errorTextBlock;
@@ -106,6 +109,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         private void LoadSamples()
         {
+            if (Avalonia.Controls.Design.IsDesignMode)
+                return;
+
             var xmlDcoument = new XmlDocument();
             xmlDcoument.Load(@"Samples.xml");
 
@@ -241,6 +247,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
+        private void GraphicsSettingsButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            OpenSettingsWindow();
+        }
+        
         private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
         {
             OpenDiagnosticsWindow();
@@ -494,6 +505,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     _isPresentationTypeChangedSubscribed = false;
                 }
 
+                if (_isSceneViewSizeChangedSubscribed)
+                {
+                    _currentSharpEngineSceneView.ViewSizeChanged -= OnSceneViewOnViewSizeChanged;
+                    _isSceneViewSizeChangedSubscribed = false;
+                }
+
                 _currentSharpEngineSceneView = null;
             }
 
@@ -503,6 +520,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private void UpdateGraphicsCardInfo()
         {
             var sharpEngineSceneView = AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView;
+
+            if (sharpEngineSceneView != null && !_isSceneViewSizeChangedSubscribed)
+            {
+                sharpEngineSceneView.ViewSizeChanged += OnSceneViewOnViewSizeChanged;
+                _isSceneViewSizeChangedSubscribed = true;
+            }
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
@@ -516,6 +539,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 // we cannot use Hidden as Visibility so just remove and set Text
                 SelectedGraphicInfoTextBlock.Text = "";
                 UsedGpuTextBlock.Text = "";
+                ViewSizeInfoTextBlock.Text = "";
 
                 if (sharpEngineSceneView != null)
                 {
@@ -531,16 +555,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return;
             }
 
-            if (sharpEngineSceneView.GpuDevice != null)
-            {
-                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName + $" ({sharpEngineSceneView.PresentationType.ToString()})";
-                UsedGpuTextBlock.Text = "Used graphics card:";
-            }
-            else
-            {
-                SelectedGraphicInfoTextBlock.Text = "";
-                UsedGpuTextBlock.Text = "";
-            }
+            UpdateSelectedGraphicInfo(sharpEngineSceneView);
+            UpdateViewSizeInfo(sharpEngineSceneView);
 
             ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
 
@@ -566,6 +582,56 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             }
         }
 
+        private void UpdateSelectedGraphicInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName;
+                UsedGpuTextBlock.IsVisible = true;
+            }
+            else
+            {
+                SelectedGraphicInfoTextBlock.Text = "";
+                UsedGpuTextBlock.IsVisible = false;
+            }
+
+            ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+        }
+        
+        private void UpdateViewSizeInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                var sceneView = sharpEngineSceneView.SceneView;
+                string viewInfo;
+                if (sceneView.BackBuffersInitialized)
+                {
+                    viewInfo = $"{sceneView.Width} x {sceneView.Height}";
+                    if (sceneView.MultisampleCount > 1)
+                        viewInfo += $" {sceneView.MultisampleCount}xMSAA";
+                    var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
+                    if (supersamplingCount > 1)
+                        viewInfo += string.Format(" {0:0.#}xSSAA", supersamplingCount);
+                    viewInfo += $" ({sharpEngineSceneView.PresentationType})";
+                }
+                else
+                {
+                    viewInfo = "";
+                }
+                ViewSizeInfoTextBlock.Text = viewInfo;
+            }
+            else
+            {
+                ViewSizeInfoTextBlock.Text = "";
+            }
+        }
+        private void OnSceneViewOnViewSizeChanged(object sender, ViewSizeChangedEventArgs e)
+        {
+            var sharpEngineSceneView = AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView;
+            if (sharpEngineSceneView != null)
+                UpdateViewSizeInfo(sharpEngineSceneView);
+        }
+
         private void OnPresentationTypeChanged(object? sender, string? reason)
         {
             UpdateGraphicsCardInfo();
@@ -573,7 +639,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (reason != null)
                 ToolTip.SetTip(SelectedGraphicInfoTextBlock, reason);
             else
-            ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+                ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
         }
 
         private void OnSceneViewInitialized(object? sender, EventArgs e)
@@ -635,6 +701,25 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             }
 
             return foundDViewportView;
+        }
+
+        private async void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow();
+            await settingsWindow.ShowDialog(this);
+
+            if (settingsWindow.IsChanged)
+            {
+                if (_currentSharpEngineSceneView != null)
+                {
+                    _currentSharpEngineSceneView.SceneView.Resize(newMultisampleCount: GlobalSharpEngineSettings.MultisampleCount,
+                                                                  newSupersamplingCount: GlobalSharpEngineSettings.SupersamplingCount,
+                                                                  renderNextFrameAfterResize: false);
+
+                    // We need to call RenderScene on SharpEngineSceneView and not only on SceneView, otherwise in SharedTexture mode, the shared texture is not updated.
+                    _currentSharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
+                }
+            }
         }
 
         private void OpenDiagnosticsWindow()
