@@ -447,6 +447,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
                     // We need to call RenderScene on SharpEngineSceneView and not only on SceneView, otherwise in SharedTexture mode, the shared texture is not updated.
                     _currentSharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
+
+                    UpdateViewSizeInfo(_currentSharpEngineSceneView);
                 }
             }
         }
