@@ -51,8 +51,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
-            // By default, enable Vulkan's standard validation (this may slightly reduce performance)
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
+            // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
+            //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;

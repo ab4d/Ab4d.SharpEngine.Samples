@@ -44,7 +44,6 @@ public class WinUISamplesContext : ICommonSamplesContext
         PreferredEngineCreateOptions = new EngineCreateOptions()
         {
             ApplicationName = "SharpEngine WinUI Samples",
-            EnableStandardValidation = true,
             DeviceSelectionType = EngineCreateOptions.DeviceSelectionTypes.DefaultDevice, // Select default device (same as wpf)
             CustomDeviceId = 0,     // no preferred device
         };

@@ -45,7 +45,6 @@ public class AvaloniaSamplesContext : ICommonSamplesContext
         PreferredEngineCreateOptions = new EngineCreateOptions()
         {
             ApplicationName = "SharpEngine AvaloniaUI Samples",
-            EnableStandardValidation = true,
             DeviceSelectionType = EngineCreateOptions.DeviceSelectionTypes.DefaultDevice, // Select default device (same as wpf)
             CustomDeviceId = 0,     // no preferred device
         };

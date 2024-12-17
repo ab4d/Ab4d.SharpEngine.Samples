@@ -48,11 +48,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
             }
 
 
-#if DEBUG
-            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
-#endif
-
             var scene = MainSceneView.Scene;
             var sceneView = MainSceneView.SceneView;
 

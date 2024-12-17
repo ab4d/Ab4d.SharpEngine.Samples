@@ -68,14 +68,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             _sharpEngineSceneView = new SharpEngineSceneView(PresentationTypes.SharedTexture); // SharedTexture is also the default presentation type so we could also create the SharpEngineSceneView without that parameter
 
-#if DEBUG
-            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-            _sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
+            // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
+            //_sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
-#endif
 
             // In case when VulkanDevice cannot be created, show an error message
             // If this is not handled by the user, then SharpEngineSceneView will show its own error message
