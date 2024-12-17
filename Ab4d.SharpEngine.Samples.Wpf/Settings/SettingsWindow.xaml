@@ -1,0 +1,59 @@
+﻿<Window x:Class="Ab4d.SharpEngine.Samples.Wpf.Settings.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:common="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Common"
+        mc:Ignorable="d"
+        Title="Settings" 
+        WindowStartupLocation="CenterOwner"
+        MinWidth="200" MinHeight="200" SizeToContent="WidthAndHeight">
+
+    <Grid Margin="20 10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Graphics Settings" FontSize="18" />
+
+        <Grid Grid.Row="1" Margin="0 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="16"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Name="GpuDevicesTextBlock" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="GPU device:" Margin="0 2 5 5" VerticalAlignment="Center" />
+            <StackPanel Name="AdapterStackPanel" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Orientation="Vertical" Margin="0 0 0 15"/>
+            <common:InfoControl x:Name="GpuDevicesInfoControl" Grid.Row="0" Grid.Column="2" Margin="3 2 0 0" InfoWidth="500" Visibility="Collapsed" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Multi-sampling (MSAA):" Margin="0 0 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="MultisamplingComboBox" Grid.Row="2" Grid.Column="1" Margin="0 0 0 2"/>
+            <common:InfoControl x:Name="MultisamplingInfoControl" Grid.Row="2" Grid.Column="2" Margin="3 0 0 0" InfoWidth="500" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Super-sampling (SSAA):" Margin="0 2 5 2" VerticalAlignment="Center" />
+            <ComboBox Name="SuperSamplingComboBox" Grid.Row="3" Grid.Column="1" Margin="0 2 0 2" />
+            <common:InfoControl x:Name="SuperSamplingInfoControl" Grid.Row="3" Grid.Column="2" Margin="3 2 0 0" InfoWidth="500" />
+
+            <TextBlock Name="DefaultInfoTextBlock" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 5 0 2" TextWrapping="Wrap" />
+            
+            <TextBlock Name="ErrorTextBlock" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 15 0 2" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed" />
+        </Grid>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Height="25" Margin="0 15 0 0">
+            <Button Name="CancelButton" IsCancel="True" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
+            <Button Name="OkButton" IsDefault="True" Content="OK" Margin="10 0 0 0" Width="80" Click="OkButton_OnClick" />
+        </StackPanel>
+    </Grid>
+</Window>

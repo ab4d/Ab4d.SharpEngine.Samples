@@ -24,6 +24,7 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
+using Ab4d.SharpEngine.Samples.Wpf.Settings;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
 using Ab4d.Vulkan;
@@ -36,12 +37,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "StandardModels.TrapezoidModelNodeSample";
+        //private string? _startupPage = "Advanced.MultiSceneNodesSample";
         private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
         private bool _isSceneViewInitializedSubscribed;
+        private bool _isSceneViewSizeChangedSubscribed;
 
         private CommonWpfSamplePage? _commonWpfSamplePage;
         private CommonTitlePage? _commonTitlePage;
@@ -260,6 +262,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                     _isSceneViewInitializedSubscribed = false;
                 }
                 
+                if (_isSceneViewSizeChangedSubscribed)
+                {
+                    _currentSharpEngineSceneView.ViewSizeChanged -= OnSceneViewOnViewSizeChanged;
+                    _isSceneViewSizeChangedSubscribed = false;
+                }
+                
                 if (_isPresentationTypeChangedSubscribed)
                 {
                     _currentSharpEngineSceneView.PresentationTypeChanged -= OnPresentationTypeChanged;
@@ -275,6 +283,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         private void UpdateGraphicsCardInfo()
         {
             var sharpEngineSceneView = WpfSamplesContext.Current.CurrentSharpEngineSceneView;
+            
+            if (sharpEngineSceneView != null && !_isSceneViewSizeChangedSubscribed)
+            {
+                sharpEngineSceneView.ViewSizeChanged += OnSceneViewOnViewSizeChanged;
+                _isSceneViewSizeChangedSubscribed = true;
+            }
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
@@ -286,6 +300,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 CloseDiagnosticsWindow();
 
                 SelectedGraphicInfoTextBlock.Text = null;
+                ViewSizeInfoTextBlock.Text = null;
                 UsedGpuTextBlock.Visibility = Visibility.Hidden;
 
                 if (sharpEngineSceneView != null)
@@ -295,27 +310,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                         sharpEngineSceneView.SceneViewInitialized += OnSceneViewInitialized;
                         _isSceneViewInitializedSubscribed = true;
                     }
-
+                    
                     _currentSharpEngineSceneView = sharpEngineSceneView; 
                 }
 
                 return;
             }
 
-            if (sharpEngineSceneView.GpuDevice != null)
-            {
-                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName + $" ({sharpEngineSceneView.PresentationType.ToString()})";
-                SelectedGraphicInfoTextBlock.ToolTip = null;
-
-                UsedGpuTextBlock.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SelectedGraphicInfoTextBlock.Text = "";
-                SelectedGraphicInfoTextBlock.ToolTip = null;
-
-                UsedGpuTextBlock.Visibility = Visibility.Hidden;
-            }
+            UpdateSelectedGraphicInfo(sharpEngineSceneView);
+            UpdateViewSizeInfo(sharpEngineSceneView);
+            ViewSizeInfoTextBlock.ToolTip = null;
 
             if (!_isPresentationTypeChangedSubscribed)
             {
@@ -338,14 +342,71 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
         }
 
+        private void UpdateSelectedGraphicInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName;
+                UsedGpuTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SelectedGraphicInfoTextBlock.Text = "";
+                UsedGpuTextBlock.Visibility = Visibility.Hidden;
+            }
+
+            SelectedGraphicInfoTextBlock.ToolTip = null;
+        }
+        
+        private void UpdateViewSizeInfo(ISharpEngineSceneView sharpEngineSceneView)
+        {
+            if (sharpEngineSceneView.GpuDevice != null)
+            {
+                var sceneView = sharpEngineSceneView.SceneView;
+
+                string viewInfo;
+                if (sceneView.BackBuffersInitialized)
+                {
+                    viewInfo = $"{sceneView.Width} x {sceneView.Height}";
+
+                    if (sceneView.MultisampleCount > 1)
+                        viewInfo += $" {sceneView.MultisampleCount}xMSAA";
+
+                    var supersamplingCount = sceneView.SupersamplingCount; // number of pixels used for one final pixel
+                    if (supersamplingCount > 1)
+                        viewInfo += string.Format(" {0:0.#}xSSAA", supersamplingCount);
+
+                    viewInfo += $" ({sharpEngineSceneView.PresentationType})";
+                }
+                else
+                {
+                    viewInfo = "";
+                }
+
+                ViewSizeInfoTextBlock.Text = viewInfo;
+            }
+            else
+            {
+                ViewSizeInfoTextBlock.Text = "";
+            }
+        }
+
+        private void OnSceneViewOnViewSizeChanged(object sender, ViewSizeChangedEventArgs e)
+        {
+            var sharpEngineSceneView = WpfSamplesContext.Current.CurrentSharpEngineSceneView;
+
+            if (sharpEngineSceneView != null)
+                UpdateViewSizeInfo(sharpEngineSceneView);
+        }
+
         private void OnPresentationTypeChanged(object? sender, string? reason)
         {
             UpdateGraphicsCardInfo();
 
             if (reason != null)
-                SelectedGraphicInfoTextBlock.ToolTip = reason;
+                ViewSizeInfoTextBlock.ToolTip = reason;
             else
-                SelectedGraphicInfoTextBlock.ToolTip = null;
+                ViewSizeInfoTextBlock.ToolTip = null;
         }
 
         private void OnSceneViewInitialized(object? sender, EventArgs e)
@@ -360,9 +421,34 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         }
         
 
+        private void GraphicsSettingsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenSettingsWindow();
+        }
+        
         private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenDiagnosticsWindow();
+        }
+
+        private void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow();
+            settingsWindow.Owner = this;
+            settingsWindow.ShowDialog();
+
+            if (settingsWindow.IsChanged)
+            {
+                if (_currentSharpEngineSceneView != null)
+                {
+                    _currentSharpEngineSceneView.SceneView.Resize(newMultisampleCount: GlobalSharpEngineSettings.MultisampleCount,
+                                                                  newSupersamplingCount: GlobalSharpEngineSettings.SupersamplingCount,
+                                                                  renderNextFrameAfterResize: false);
+
+                    // We need to call RenderScene on SharpEngineSceneView and not only on SceneView, otherwise in SharedTexture mode, the shared texture is not updated.
+                    _currentSharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
+                }
+            }
         }
 
         private void EnableDiagnosticsButton()
