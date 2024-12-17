@@ -42,10 +42,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
             }
 
 
-#if DEBUG
-            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
-#endif
+            // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
+            //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             var scene = MainSceneView.Scene;
             var sceneView = MainSceneView.SceneView;

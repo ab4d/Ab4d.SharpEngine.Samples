@@ -91,11 +91,8 @@ public class IntroductionUserControl : UserControl
         };
 
 
-
-#if DEBUG
-        // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-        MainSceneView.CreateOptions.EnableStandardValidation = true; // Set to false to load Vulkan faster
-#endif
+        // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
+        //MainSceneView.CreateOptions.EnableStandardValidation = true; 
 
         // Logging was already enabled in SamplesWindow constructor
         //Utilities.Log.LogLevel = LogLevels.Warn;
