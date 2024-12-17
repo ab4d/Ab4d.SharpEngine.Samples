@@ -12,10 +12,10 @@
     <Grid Margin="20 10" RowDefinitions="Auto, Auto, *, Auto">
         <TextBlock Grid.Row="0" Text="Graphics Settings" FontSize="18" />
 
-        <Grid Grid.Row="1" Margin="0 10" ColumnDefinitions="140, 60, 16" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+        <Grid Grid.Row="1" Margin="0 10" ColumnDefinitions="140, 60" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
 
             <TextBlock Name="GpuDevicesTextBlock" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Text="GPU device:" Margin="0 2 5 5" VerticalAlignment="Center" />
-            <StackPanel Name="AdapterStackPanel" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Orientation="Vertical" Margin="0 0 0 15"/>
+            <StackPanel Name="AdapterStackPanel" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Vertical" Margin="0 0 0 15"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Multi-sampling (MSAA):" Margin="0 0 5 2" VerticalAlignment="Center" />
             <ComboBox Name="MultisamplingComboBox" Grid.Row="2" Grid.Column="1" Margin="0 0 0 2"/>
@@ -23,9 +23,9 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Super-sampling (SSAA):" Margin="0 2 5 2" VerticalAlignment="Center" />
             <ComboBox Name="SuperSamplingComboBox" Grid.Row="3" Grid.Column="1" Margin="0 2 0 2" />
 
-            <TextBlock Name="DefaultInfoTextBlock" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 5 0 2" TextWrapping="Wrap" />
+            <TextBlock Name="DefaultInfoTextBlock" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 5 0 2" TextWrapping="Wrap" />
             
-            <TextBlock Name="ErrorTextBlock" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 15 0 2" Foreground="Red" TextWrapping="Wrap" IsVisible="False" />
+            <TextBlock Name="ErrorTextBlock" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 15 0 2" Foreground="Red" TextWrapping="Wrap" IsVisible="False" />
         </Grid>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Height="25" Margin="0 15 0 0">

@@ -558,7 +558,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             UpdateSelectedGraphicInfo(sharpEngineSceneView);
             UpdateViewSizeInfo(sharpEngineSceneView);
 
-            ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+            ToolTip.SetTip(ViewSizeInfoTextBlock, null);
 
 
             if (!_isPresentationTypeChangedSubscribed)
@@ -637,9 +637,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             UpdateGraphicsCardInfo();
 
             if (reason != null)
-                ToolTip.SetTip(SelectedGraphicInfoTextBlock, reason);
+                ToolTip.SetTip(ViewSizeInfoTextBlock, reason);
             else
-                ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
+                ToolTip.SetTip(ViewSizeInfoTextBlock, null);
         }
 
         private void OnSceneViewInitialized(object? sender, EventArgs e)
