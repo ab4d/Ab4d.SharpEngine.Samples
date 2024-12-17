@@ -94,6 +94,10 @@ public class IntroductionUserControl : UserControl
         // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
         //MainSceneView.CreateOptions.EnableStandardValidation = true; 
 
+        // Use 4xMSAA (multi-sample anti-aliasing) and no SSAA (super-sampling anti-aliasing)
+        MainSceneView.MultisampleCount = 4;
+        MainSceneView.SupersamplingCount = 1;
+
         // Logging was already enabled in SamplesWindow constructor
         //Utilities.Log.LogLevel = LogLevels.Warn;
         //Utilities.Log.IsLoggingToDebugOutput = true;
