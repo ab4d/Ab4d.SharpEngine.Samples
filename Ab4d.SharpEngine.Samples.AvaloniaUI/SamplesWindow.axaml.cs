@@ -587,6 +587,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (sharpEngineSceneView.GpuDevice != null)
             {
                 SelectedGraphicInfoTextBlock.Text = sharpEngineSceneView.GpuDevice.GpuName;
+                UsedGpuTextBlock.Text = "Used graphics card:";
                 UsedGpuTextBlock.IsVisible = true;
             }
             else
