@@ -62,6 +62,7 @@ Because PointerCameraController does not handle pointer or mouse events until po
 
 When 0 (by default), then rotation, movement or quick zoom are started immediately when the correct pointer buttons and keyboard modifiers are pressed (no pointer or mouse movement needed).");
 
+            MainSceneView.SupersamplingCount = 1;
 
             SetupPointerCameraController();
             CreateTestScene();
