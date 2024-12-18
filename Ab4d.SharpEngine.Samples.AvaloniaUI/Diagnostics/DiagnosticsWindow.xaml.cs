@@ -189,6 +189,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             }
 
             UpdateEnabledMenuItems();
+            CheckForCaptureSupport();
+        }
+
+        private void CheckForCaptureSupport()
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+            var isCaptureFrameAvailable = SharpEngineSceneView.SceneView.IsCaptureFrameAvailable();
+
+            if (isCaptureFrameAvailable)
+                CaptureButton.IsVisible = true;
         }
 
         private void SetupUpdateStatisticsTimer(double milliseconds)
@@ -486,16 +498,16 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             }
         }
         
-        private void CaptureInRenderDocMenuItem_OnClick(object sender, RoutedEventArgs args)
+        private void CaptureButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (SharpEngineSceneView == null || !SharpEngineSceneView.SceneView.BackBuffersInitialized)
                 return;
 
-            bool isRenderDocAvailable = SharpEngineSceneView.SceneView.CaptureNextFrameInRenderDoc();
+            bool isRenderDocAvailable = SharpEngineSceneView.SceneView.CaptureNextFrame();
 
             if (!isRenderDocAvailable)
             {
-                //MessageBox.Show("Start the application from RenderDoc to be able to capture frames.");
+                System.Diagnostics.Debug.WriteLine("Start the application from RenderDoc to be able to capture a frame.");
                 return;
             }
 

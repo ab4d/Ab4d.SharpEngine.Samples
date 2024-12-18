@@ -11,7 +11,12 @@
 
         <TextBlock Name="SharpEngineInfoTextBlock" Grid.Column="0" Text="Ab4d.SharpEngine v0.0.0 (debug)" FontWeight="Bold" Margin="10 7 0 2" VerticalAlignment="Top" HorizontalAlignment="Left"/>
 
-        <Menu Name="ActionsMenu" Margin="0 2 5 2" VerticalAlignment="Top"  HorizontalAlignment="Right">
+        <Button Name="CaptureButton" VerticalAlignment="Top" HorizontalAlignment="Right" Padding="0" Margin="0 4 40 0" IsVisible="False" Click="CaptureButton_OnClick"
+                ToolTip.Tip="Capture frame in RenderDoc (to show this button the application must be started from RenderDoc)">
+            <Image Source="../Resources/photo_icon.png" Width="20" Height="20"></Image>
+        </Button>
+
+      <Menu Name="ActionsMenu" Margin="0 2 5 2" VerticalAlignment="Top" HorizontalAlignment="Right">
             <MenuItem Name="ActionsRootMenuItem" Padding="6 2" Background="White" >
                 <MenuItem.Header>
                     <Canvas Width="18" Height="15" Background="Transparent" Margin="2">
@@ -44,7 +49,6 @@
 
                 <Separator />
                 <MenuItem Name="StartStopCameraRotationMenuItem" Header="Toggle camera rotation" Click="StartStopCameraRotationMenuItem_OnClick"/>
-                <MenuItem Name="CaptureInRenderDocMenuItem" Header="Capture next frame in RenderDoc" Click="CaptureInRenderDocMenuItem_OnClick"/>
 
                 <Separator />
                 <CheckBox Name="AlwaysOnTopCheckBox" Content="Always on top" IsCheckedChanged="AlwaysOnTopCheckBoxChanged" />

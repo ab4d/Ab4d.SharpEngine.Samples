@@ -181,6 +181,20 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             }
 
             UpdateEnabledMenuItems();
+            CheckForCaptureSupport();
+        }
+
+        private void CheckForCaptureSupport()
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+            var isCaptureFrameAvailable = SharpEngineSceneView.SceneView.IsCaptureFrameAvailable();
+
+            if (isCaptureFrameAvailable)
+            {
+                CaptureButton.Visibility = Visibility.Visible;
+            }
         }
 
         private void SetupUpdateStatisticsTimer(double milliseconds)
@@ -495,13 +509,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
                 // pass
             }
         }
-
-        private void CaptureInRenderDocMenuItem_OnClick(object sender, RoutedEventArgs args)
+        
+        private void CaptureButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (SharpEngineSceneView == null || !SharpEngineSceneView.SceneView.BackBuffersInitialized)
                 return;
 
-            bool isRenderDocAvailable = SharpEngineSceneView.SceneView.CaptureNextFrameInRenderDoc();
+            bool isRenderDocAvailable = SharpEngineSceneView.SceneView.CaptureNextFrame();
 
             if (!isRenderDocAvailable)
             {

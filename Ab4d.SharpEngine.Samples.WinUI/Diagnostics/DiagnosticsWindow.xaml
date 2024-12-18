@@ -15,6 +15,10 @@
 
         <TextBlock Name="SharpEngineInfoTextBlock" Grid.Row="0" Text="Ab4d.SharpEngine v0.0.0 (debug)" FontWeight="Bold" VerticalAlignment="Center" Margin="10 2 37 2"/>
 
+        <Button Name="CaptureButton" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="0" Margin="0 0 45 0" Visibility="Collapsed" Click="CaptureButton_OnClick">
+            <Image Source="../Assets/photo_icon.png" Width="20" Height="20"></Image>
+        </Button>
+
         <Canvas Name="MenuCanvas" Width="18" Height="15" Background="Transparent"  Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0 0 10 2"
                 Tapped="UIElement_OnTapped">
             <Rectangle Canvas.Top="0" Height="3" Width="18" Fill="#444" />
@@ -45,7 +49,6 @@
 
                     <MenuFlyoutSeparator />
                     <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Click="StartStopCameraRotationMenuItem_OnTapped" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
-                    <MenuFlyoutItem Name="CaptureInRenderDocMenuItem" Text="Capture next frame in RenderDoc" Margin="0 -2" Click="CaptureInRenderDocMenuItem_OnTapped" Tapped="CaptureInRenderDocMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator Name="FullLoggingSeparator" />
                     <ToggleMenuFlyoutItem Name="FullLoggingCheckBox" Text="Full Logging" Click="FullLoggingCheckBox_OnClick" />
