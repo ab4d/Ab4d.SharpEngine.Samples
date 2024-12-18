@@ -62,7 +62,15 @@ Because PointerCameraController does not handle pointer or mouse events until po
 
 When 0 (by default), then rotation, movement or quick zoom are started immediately when the correct pointer buttons and keyboard modifiers are pressed (no pointer or mouse movement needed).");
 
-            MainSceneView.SupersamplingCount = 1;
+            // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
+            // Otherwise, the default values will be used:
+            // MSAA: 4x for fast desktop device; 1x otherwise
+            // SSAA: 4x for dedicated desktop devices; 2x for integrated devices; 1x otherwise
+            if (GlobalSharpEngineSettings.MultisampleCount > 0)
+                MainSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
+            
+            if (GlobalSharpEngineSettings.SupersamplingCount > 0)
+                MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
             SetupPointerCameraController();
             CreateTestScene();
