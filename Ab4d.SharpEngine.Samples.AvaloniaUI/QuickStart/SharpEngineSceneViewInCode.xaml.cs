@@ -64,7 +64,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             // SSAA: 4x for dedicated desktop devices; 2x for integrated devices; 1x otherwise
             if (GlobalSharpEngineSettings.MultisampleCount > 0)
                 _sharpEngineSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
-            
+
             if (GlobalSharpEngineSettings.SupersamplingCount > 0)
                 _sharpEngineSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
