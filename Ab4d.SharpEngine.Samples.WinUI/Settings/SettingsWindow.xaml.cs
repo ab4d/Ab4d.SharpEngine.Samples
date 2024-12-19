@@ -66,6 +66,9 @@ Examples:
                 }
             }
 
+            if (vulkanInstance == null)
+                return;
+
             // Enumerate all graphics cards on the system
             var devicesCount = vulkanInstance.AllPhysicalDeviceDetails.Length;
             for (var i = 0; i < devicesCount; i++)
