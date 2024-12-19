@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Xml;
 using Ab4d.SharpEngine;
 using Ab4d.SharpEngine.AvaloniaUI;
@@ -704,7 +705,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             return foundDViewportView;
         }
 
-        private async void OpenSettingsWindow()
+        private async Task OpenSettingsWindow()
         {
             var settingsWindow = new SettingsWindow();
             await settingsWindow.ShowDialog(this);
