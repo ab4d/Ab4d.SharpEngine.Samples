@@ -3,6 +3,7 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
+using Ab4d.Vulkan;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
@@ -24,6 +25,108 @@ public class SharpEngineSceneView : SKCanvasView
 
     public Scene Scene { get; private set; }
     public SceneView SceneView { get; private set; }
+
+
+    private int _multisampleCount = 1;
+    private bool _isMultisampleCountManuallyChanged;
+
+    /// <summary>
+    /// MultisampleCount defines the multi-sampling count (MSAA).
+    /// See remarks for more info.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// MultisampleCount defines the multi-sampling count (MSAA).
+    /// </para>
+    /// <para>
+    /// When set before the SceneView is initialized it is used to initialize the SceneView.
+    /// </para>
+    /// <para>
+    /// After initializing the SceneView, the MultisampleCount gets the actually used multi-sampling count.
+    /// Default value before initialization is 1 (no MSAA).
+    /// </para>
+    /// <para>
+    /// If this value is not manually set by the user, then during initialization the <see cref="GetDefaultMultiSampleCount"/> method is called to set the
+    /// multi-sampling count for the used GPU device (by default MSAA is set to 4 for fast desktop devices, for other devices it is set to 1).
+    /// </para>
+    /// <para>
+    /// Changing this value after the SceneView is initialized will call SceneView.Resize method with the new multi-sampling count.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="SupersamplingCount"/>
+    public int MultisampleCount
+    {
+        get => SceneView.IsInitialized ? SceneView.MultisampleCount : _multisampleCount;
+        set
+        {
+            _isMultisampleCountManuallyChanged = true;
+            
+            if (_multisampleCount == value)
+                return;
+
+            _multisampleCount = value;
+
+            if (SceneView.IsInitialized)
+                SceneView.Resize(newMultisampleCount: value, renderNextFrameAfterResize: false);
+        }
+    }
+
+
+    private float _supersamplingCount = 1;
+    private bool _isSupersamplingCountManuallyChanged;
+
+    /// <summary>
+    /// SupersamplingCount defines the super-sampling count (SSAA) - how many more pixels are rendered for each final pixel.
+    /// See remarks for more info.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// SupersamplingCount defines the super-sampling count (SSAA) - how many more pixels are rendered for each final pixel.
+    /// </para>
+    /// <para>
+    /// When SSAA is more than 1, then the rendering is done on a scaled texture that has SupersamplingCount-times more pixels that the final texture
+    /// (width and height are scaled by the <see cref="SceneView.SupersamplingFactor"/> and set to <see cref="SharpEngine.SceneView.RenderWidth"/> and <see cref="SharpEngine.SceneView.RenderHeight"/>)
+    /// At the end of the rendering this super-scaled texture is down-sampled into the texture with the final size (defined by <see cref="SceneView.Width"/> and <see cref="SceneView.Height"/>).
+    /// </para>
+    /// <para>
+    /// Valid values are from 1 (no super-sampling) to 64 and are limited by the max texture size that is supported by the GPU device.
+    /// </para>
+    /// <para>
+    /// Value 4 means that width and height are multiplied by 2 and this produces a texture with 4 times as many pixels.
+    /// Value 2 means that width and height are multiplied by 1.41 (sqrt(2) = 1.41) and this produces a texture with 2 times as many pixels.
+    /// </para>
+    /// <para>
+    /// After initializing the SceneView, the SupersamplingCount gets the actually used super-sampling count.
+    /// </para>
+    /// <para>
+    /// If this value is not manually set by the user, then during initialization the <see cref="GetDefaultSuperSamplingCount"/> method is called to set the
+    /// super-sampling count for the used GPU device (by default SSAA is set to 4 for dedicated desktop devices, for integrated desktop devices is 2, for mobile and low-end devices the default value is 1.
+    /// </para>
+    /// <para>
+    /// Changing this value after the SceneView is initialized will call SceneView.Resize method with the new super-sampling count.
+    /// </para>
+    /// <para>
+    /// Because super-sampling can significantly influence the rendering performance, it is highly recommended that the user of the application can manually adjust this setting.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="MultisampleCount"/>
+    public float SupersamplingCount
+    {
+        get => SceneView.IsInitialized ? SceneView.SupersamplingCount : _supersamplingCount;
+        set
+        {
+            _isSupersamplingCountManuallyChanged = true;
+            
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (_supersamplingCount == value)
+                return;
+
+            _supersamplingCount = value;
+
+            if (SceneView.IsInitialized)
+                SceneView.Resize(newSupersamplingCount: value, renderNextFrameAfterResize: false);
+        }
+    }
 
 
     #region Events
@@ -138,8 +241,11 @@ public class SharpEngineSceneView : SKCanvasView
             }
         }
 
+        if (GpuDevice == null)
+            return; // Try later
+
         // Set GpuDevice to Scene
-        if (GpuDevice != null && Scene.GpuDevice == null)
+        if (Scene.GpuDevice == null)
         {
             try
             {
@@ -156,8 +262,7 @@ public class SharpEngineSceneView : SKCanvasView
         }
 
         // We waited until we also initialize Scene before calling OnGpuDeviceCreated
-        if (isGpuDeviceCreated && GpuDevice != null)
-            OnGpuDeviceCreated(GpuDevice);
+        OnGpuDeviceCreated(GpuDevice);
 
 
         int width, height;
@@ -172,9 +277,26 @@ public class SharpEngineSceneView : SKCanvasView
             height = (int)this.Height;
         }
 
-        SceneView.Initialize(width, height);
+        if (width > 0 && height > 0)
+        {
+            try
+            {
+                int multisampleCount = _isMultisampleCountManuallyChanged ? _multisampleCount
+                                                                          : GetDefaultMultiSampleCount(GpuDevice.PhysicalDeviceDetails);
 
-        OnSceneViewInitialized();
+                float supersamplingCount = _isSupersamplingCountManuallyChanged ? _supersamplingCount
+                                                                                : GetDefaultSuperSamplingCount(GpuDevice.PhysicalDeviceDetails);
+
+                SceneView.Initialize(width, height, 1, 1, multisampleCount, supersamplingCount);
+
+                OnSceneViewInitialized();
+            }
+            catch (Exception ex)
+            {
+                Log.Error?.Write(LogArea, Id, "Error initializing SceneView: " + ex.Message, ex);
+                return;
+            }
+        }
     }
 
     // when throwException is true, then exception is thrown when VulkanDevice, Scene or SceneView cannot be created
@@ -228,6 +350,70 @@ public class SharpEngineSceneView : SKCanvasView
     {
         if (GpuDevice != null)
             throw new InvalidOperationException("Cannot initialize SharpEngineSceneView again. Initialize method was probably automatically called after the SharpEngineSceneView was loaded or resized. To manually initialize SharpEngineSceneView call Initialize method before the SharpEngineSceneView is added to the parent control.");
+    }
+
+        /// <summary>
+    /// Returns the default multi-sampling count for the specified GPU device.
+    /// This method return 4 for DiscreteGpu and IntegratedGpu and 1 for others.
+    /// The method can be overriden to provide custom multi-sampling count based on the used device.
+    /// This method is called only when the multi-sampling is not set when calling Initialize method.
+    /// </summary>
+    /// <param name="physicalDeviceDetails">PhysicalDeviceDetails of the VulkanDevice</param>
+    /// <returns>default multi-sample count</returns>
+    public virtual int GetDefaultMultiSampleCount(PhysicalDeviceDetails physicalDeviceDetails)
+    {
+        var deviceType = physicalDeviceDetails.DeviceProperties.DeviceType;
+
+        if (deviceType == PhysicalDeviceType.DiscreteGpu || deviceType == PhysicalDeviceType.IntegratedGpu)
+            return 4;
+        
+        // Other: software, virtual gpu-s... => disable MSSA and SSAA
+        return 1;
+    }
+    
+    /// <summary>
+    /// Returns the default super-sampling count for the specified GPU device.
+    /// This method return 4 for DiscreteGpu, 2 for non-mobile IntegratedGpu and 1 for others also macOS and iOS.
+    /// The method can be overriden to provide custom multi-sampling count based on the used device.
+    /// This method is called only when the super-sampling is not set when calling Initialize method.
+    /// </summary>
+    /// <param name="physicalDeviceDetails">PhysicalDeviceDetails of the VulkanDevice</param>
+    /// <returns>default super-sampling count</returns>
+    public virtual float GetDefaultSuperSamplingCount(PhysicalDeviceDetails physicalDeviceDetails)
+    {
+        // Default SSAA values:
+        // DiscreteGpu: 4
+        // Non-mobile device with IntegratedGpu from Amd or Intel: 2
+        // Mobile and IntegratedGpu from others: 1
+        // Other (software, virtual GPU): 1
+
+        if (OperatingSystem.IsMacOS() || OperatingSystem.IsIOS())
+        {
+            // MoltenVK that is used on macOS and iOS does not support geometry shader or thick lines,
+            // so should not use SSAA as this would reduce visibility of 1px thick lines that are the only supported lines.
+            return 1;
+        }
+
+        // We also check DpiScale. If it is very high, then we do not need super-sampling
+        var deviceType = physicalDeviceDetails.DeviceProperties.DeviceType;
+        
+
+        if (deviceType == PhysicalDeviceType.DiscreteGpu)
+            return 4;
+
+        if (deviceType == PhysicalDeviceType.IntegratedGpu)
+        {
+            var vendorId = physicalDeviceDetails.DeviceProperties.VendorID;
+
+            if (!physicalDeviceDetails.IsMobilePlatform && 
+                (vendorId == VendorIds.Amd || vendorId == VendorIds.Intel)) // || vendorId == VendorIds.Apple)) // No SSAA for Apple because it does not support GeometryShader and wide-lines - only 1px line
+            {
+                return 2;
+            }
+        }
+
+        // Other: Mobile devices and software renderer, virtual gpu-s... => disable MSSA and SSAA
+        return 1;
     }
 
     private void CanvasViewOnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
