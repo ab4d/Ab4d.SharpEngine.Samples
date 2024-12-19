@@ -1,0 +1,5 @@
+To open the Uno platform sample, open the Ab4d.SharpEngine.Samples.UnoPlatform.sln solution
+from the Ab4d.SharpEngine.Samples.UnoPlatform folder.
+
+This solution cannot be in the root folder as other solutions, because it 
+uses the centralized .Net project configuration that is required to use Uno.Sdk.
