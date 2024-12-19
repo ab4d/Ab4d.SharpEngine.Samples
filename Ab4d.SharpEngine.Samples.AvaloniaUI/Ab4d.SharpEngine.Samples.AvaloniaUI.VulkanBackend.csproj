@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Version>2.1.9118-beta2</Version>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.1.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.1.3" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.1.3" />
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.3" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
@@ -42,10 +42,11 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
     <AvaloniaXaml Include="Diagnostics\DiagnosticsWindow.xaml" />
-    <AvaloniaXaml Include="Diagnostics\LogMessagesWindow.xaml" />    
+    <AvaloniaXaml Include="Diagnostics\LogMessagesWindow.xaml" />
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInCode.xaml" />
     <AvaloniaXaml Include="QuickStart\SharpEngineSceneViewInXaml.xaml" />
     <AvaloniaXaml Include="QuickStart\AntiAliasingSample.xaml" />
+    <AvaloniaXaml Include="Settings\SettingsWindow.xaml" />
     <AvaloniaXaml Include="Titles\IntroductionPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaXaml>
@@ -54,7 +55,7 @@
   <ItemGroup>
     <Compile Update="TestVulkanInteropWindow.axaml.cs">
       <DependentUpon>TestVulkanInteropWindow.axaml</DependentUpon>
-    </Compile> 
+    </Compile>
     <Compile Update="SamplesWindow.axaml.cs">
       <DependentUpon>SamplesWindow.axaml</DependentUpon>
     </Compile>
@@ -64,25 +65,18 @@
     <EmbeddedResource Include="Titles\QuickStartTitle.md" />
   </ItemGroup>
 
-
-  <ItemGroup>
-    <Folder Include="Resources\BitmapFonts\" />
-    <Folder Include="Resources\HeightMaps\" />
-    <Folder Include="Resources\Models\" />
-    <Folder Include="Resources\Textures\" />
-    <Folder Include="Resources\PointClouds\" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
     <None Remove="CameraControllers\PointerCameraControllerSample.xaml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
-    <None Remove="Diagnostics\LogMessagesWindow.xaml" />    
+    <None Remove="Diagnostics\LogMessagesWindow.xaml" />
     <None Remove="Samples.xml" />
     <None Remove="Titles\IntroductionPage.xaml" />
     <None Remove="Titles\QuickStartTitle.md" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\CadImporter-for-SharpEngine.png" Link="Resources\CadImporter-for-SharpEngine.png" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\CadImporter-for-SharpEngine.png" Link="Resources\CadImporter-for-SharpEngine.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -106,6 +100,13 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="Settings\SettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
 </Project>
