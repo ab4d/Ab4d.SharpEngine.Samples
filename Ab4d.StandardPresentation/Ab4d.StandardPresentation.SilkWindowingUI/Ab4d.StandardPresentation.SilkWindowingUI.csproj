@@ -12,7 +12,7 @@
     <PackageReference Include="Silk.NET.Windowing" Version="2.21.0" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-	  <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
+	  <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9118-beta2" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	  <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />

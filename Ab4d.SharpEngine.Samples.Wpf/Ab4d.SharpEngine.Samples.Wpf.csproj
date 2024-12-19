@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Wpf</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Wpf</RootNamespace>
-    <Version>2.1.9028-beta1</Version>
+    <Version>2.1.9118-beta2</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -19,9 +19,9 @@
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9028-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="2.1.9028-beta1" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.1.9028-beta1" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="2.1.9118-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="2.1.9118-beta2" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.1.9118-beta2" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
