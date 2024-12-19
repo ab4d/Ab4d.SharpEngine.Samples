@@ -457,7 +457,7 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
     
     /// <summary>
     /// Returns the default super-sampling count for the specified GPU device.
-    /// This method return 4 for DiscreteGpu, 2 for non-mobile IntegratedGpu and 1 for others.
+    /// This method return 4 for DiscreteGpu, 2 for non-mobile IntegratedGpu and 1 for others also macOS and iOS.
     /// The method can be overriden to provide custom multi-sampling count based on the used device.
     /// This method is called only when the super-sampling is not set when calling Initialize method.
     /// </summary>
@@ -467,9 +467,16 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
     {
         // Default SSAA values:
         // DiscreteGpu: 4
-        // Non-mobile device with IntegratedGpu from Amd, Intel or Apple: 2
+        // Non-mobile device with IntegratedGpu from Amd or Intel: 2
         // Mobile and IntegratedGpu from others: 1
         // Other (software, virtual GPU): 1
+
+        if (OperatingSystem.IsMacOS() || OperatingSystem.IsIOS())
+        {
+            // MoltenVK that is used on macOS and iOS does not support geometry shader or thick lines,
+            // so should not use SSAA as this would reduce visibility of 1px thick lines that are the only supported lines.
+            return 1;
+        }
 
         // We also check DpiScale. If it is very high, then we do not need super-sampling
         var deviceType = physicalDeviceDetails.DeviceProperties.DeviceType;
