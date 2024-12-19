@@ -200,7 +200,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.QuickStart
                 Text = "Error creating VulkanDevice:\r\n" + ex.Message,
                 Foreground = new SolidColorBrush(Colors.Red),
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap
             };
 
             RootGrid.Children.Add(errorTextBlock);
