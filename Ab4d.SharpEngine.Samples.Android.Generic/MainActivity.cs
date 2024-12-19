@@ -30,6 +30,9 @@ using Silk.NET.Windowing;
 using Silk.NET.Windowing.Sdl.Android;
 
 
+// This sample demonstrates only how to integrate Ab4d.SharpEngine into an Android app.
+// See samples for WinUI, Wpf, Avalonia or WinForms for more features of the engine
+
 // This Android sample is using a third-party Silk.Net libraries
 // to create SDL or GLFW based Activity and View that is then used to show the 3D scene by SharpEngine.
 //
@@ -325,6 +328,15 @@ namespace AndroidDemo
 
             // Add demo objects to _scene
             allObjectsTestScene.CreateTestScene();
+
+            if (_targetPositionCamera != null)
+            {
+                _targetPositionCamera.Heading = -40;
+                _targetPositionCamera.Attitude = -25;
+                _targetPositionCamera.Distance = 1500;
+                _targetPositionCamera.ViewWidth = 1500;
+                _targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+            }
         }
 
         [MemberNotNull(nameof(_androidBitmapIO))]
