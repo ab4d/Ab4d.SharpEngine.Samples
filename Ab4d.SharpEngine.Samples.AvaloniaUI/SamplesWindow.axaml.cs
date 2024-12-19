@@ -528,6 +528,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _isSceneViewSizeChangedSubscribed = true;
             }
 
+            // If we are not using Vulkan backend on windows, then show info icon with tooltip about that.
+            // Vulkan backend can be also used on Linux, but only on X11 (how to check if we are running X11?)
+            VulkanBackendInfoImage.IsVisible = (sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
+                                                !avaloniaSharpEngineSceneView.IsVulkanBackend &&
+                                                OperatingSystem.IsWindows());
+
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
                 DisableDiagnosticsButton();
