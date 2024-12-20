@@ -223,7 +223,7 @@ internal class Program
         _sceneView.Initialize(_vulkanSurfaceProvider,
                               dpiScaleX: dpiScaleX,
                               dpiScaleY: dpiScaleY,
-                              multisampleCount: 1,
+                              multisampleCount: 4,
                               supersamplingCount: 1,
                               fallbackWidth: (_window!.FramebufferSize.X > 0) ? _window!.FramebufferSize.X : 800,   // fallback width and height is used in case when the surface does not provide a valid size (for example in Wayland)
                               fallbackHeight: (_window!.FramebufferSize.Y > 0) ? _window!.FramebufferSize.Y : 600);
