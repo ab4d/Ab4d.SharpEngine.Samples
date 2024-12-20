@@ -270,19 +270,13 @@ public class BitmapTextSample : CommonSample
                 RecreateText();
             }
 
-            var (view, _) = targetPositionCamera.GetCameraMatrices();
 
+            var invertedView = targetPositionCamera.GetInvertedViewMatrix();
+            
             // Remove offset so we get only camera rotation
-            view.M41 = 0;
-            view.M42 = 0;
-            view.M43 = 0;
-
-            // Inverse the rotation so after applying the actual camera rotation the total rotation will be zero
-            var inverseExists = Matrix4x4.Invert(view, out view);
-
-            // In the next version (2.1) it will be possible to use:
-            //var invertedView = targetPositionCamera.GetInvertedViewMatrix();
-
+            invertedView.M41 = 0;
+            invertedView.M42 = 0;
+            invertedView.M43 = 0;
 
             if (_textNode.Transform is not MatrixTransform matrixTransform)
             {
@@ -292,11 +286,11 @@ public class BitmapTextSample : CommonSample
 
             if (_fixScreenSize)
             {
-                matrixTransform.SetMatrix(Matrix4x4.CreateScale(scaleX, scaleY, 1) * view);
+                matrixTransform.SetMatrix(Matrix4x4.CreateScale(scaleX, scaleY, 1) * invertedView);
             }
             else // only _fixScreenSize
             {
-                matrixTransform.SetMatrix(view);
+                matrixTransform.SetMatrix(invertedView);
             }
         }
     }
