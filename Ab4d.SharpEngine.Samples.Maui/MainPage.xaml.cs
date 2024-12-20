@@ -51,6 +51,18 @@ public partial class MainPage : ContentPage
         if (!isSupported)
             return;
 
+
+        // Uncomment the following two lines to change the default anti-aliasing settings.
+        // By default, multi-sampling count (MSAA) is set to 4 for DiscreteGpu and IntegratedGpu and 1 for others (see SharpEngineSceneView.GetDefaultMultiSampleCount method).
+        // By default, super-sampling count (SSAA) is set to This method return 4 for DiscreteGpu, 2 for non-mobile IntegratedGpu and 1 for others (see SharpEngineSceneView.GetDefaultSuperSamplingCount method).
+        //_sharpEngineSceneView.MultisampleCount = 1;
+        //_sharpEngineSceneView.SupersamplingCount = 1;
+
+        // Uncomment the following two lines to enable logging of warnings and errors
+        //Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+        //Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+
+
         _sharpEngineSceneView.GpuDeviceCreationFailed += delegate(object sender, DeviceCreateFailedEventArgs args)
         {
             InfoLabel.Text = args.Exception.Message;
