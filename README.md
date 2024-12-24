@@ -20,6 +20,9 @@ The following features are supported by the current version:
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
 
+Ab4d.SharpEngine is a **commercial library**. To use the library in your projects, you need to get a trial license from [ab4d.com/trial](https://www.ab4d.com/trial) or purchase a commercial license from [purchase web page](https://www.ab4d.com/Purchase.aspx). With a commercial license, you also get priority email support and other benefits (feature requests, etc.).
+
+NOTE: The next version of the library (v2.1) will provide a free license for non-commercial open-source projects.
 
 ### Platforms and UI frameworks:
 
