@@ -1,0 +1,18 @@
+﻿<Page
+    x:Class="Ab4d.SharpEngine.Samples.UnoPlatform.SharedTextureTestPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Ab4d.SharpEngine.Samples.UnoPlatform"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:skia="http://uno.ui/skia"
+    xmlns:not_skia="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="skia">
+
+    <Grid>
+        <skia:Grid>
+            <Grid Name="TestGrid"></Grid>
+        </skia:Grid>
+        <not_skia:TextBlock Text="This sample is only supported on skia." />
+    </Grid>
+</Page>
