@@ -88,7 +88,7 @@
         </Button>
 
           <Image Name="VulkanBackendInfoImage" Source="Resources/yellow-light-buld-icon.png" Width="20" Height="20" VerticalAlignment="Center" Margin="15 0 0 0" IsVisible="False"
-                 ToolTip.Tip="It is recommended to use Avalonia's Vulkan backend.&#x0a;&#x0a;This will render the whole app by Vulkan and will&#x0a;provide better sharing of Ab4d.SharpEngine and Avalonia UI.&#x0a;&#x0a;To use Vulkan backend open the Ab4d.SharpEngine.Samples.AvaloniaUI.VulkanBackend solution&#x0a;or add VULKAN_BACKEND compiler constant (see Program.cs for its usage)."/>
+                 ToolTip.Tip="It is recommended to use Avalonia's Vulkan backend.&#x0a;&#x0a;This will render the whole app by Vulkan and will&#x0a;provide better sharing of Ab4d.SharpEngine and Avalonia UI.&#x0a;&#x0a;To use Vulkan backend open the Ab4d.SharpEngine.Samples.AvaloniaUI.VulkanBackend solution&#x0a;or add VULKAN_BACKEND compiler constant to the existing project file (see Program.cs for its usage)."/>
 
       </StackPanel>
 
