@@ -270,8 +270,8 @@ public abstract class CommonSample
         {
             if (_uiProvider != null)
             {
-                _errorMessagePanel = _uiProvider.CreateStackPanel(PositionTypes.Center, addBorder: false, isSemiTransparent: true);
-                _errorMessageLabel = _uiProvider.CreateLabel(errorMessage).SetColor(Colors.Red);
+                _errorMessagePanel = _uiProvider.CreateStackPanel(PositionTypes.Center, addBorder: true, isSemiTransparent: true);
+                _errorMessageLabel = _uiProvider.CreateLabel(errorMessage, maxWidth: 600).SetColor(Colors.Red).SetStyle("bold");
                 _uiProvider.SetCurrentPanel(null);
             }
         }
