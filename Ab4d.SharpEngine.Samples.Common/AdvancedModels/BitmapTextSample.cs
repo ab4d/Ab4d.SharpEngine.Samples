@@ -138,8 +138,6 @@ public class BitmapTextSample : CommonSample
 
         _rootTextNode.Clear();
 
-        _textToShow = "";
-
         _textNode = _bitmapTextCreator.CreateTextNode(text: _textToShow,
                                                       position: new Vector3(0, 0, 0),
                                                       positionType: PositionTypes.Center,
