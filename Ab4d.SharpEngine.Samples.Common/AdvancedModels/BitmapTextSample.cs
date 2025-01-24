@@ -39,9 +39,9 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class BitmapTextSample : CommonSample
 {
     public override string Title => "Bitmap Text";
-
-    private string _textToShow = "Demo bitmap text\nwith some special characters:\n{}@äöčšž";
     public override string Subtitle => "SharpEngine can render text by using BitmapTextCreator that can render bitmap fonts.";
+    
+    private string _textToShow = "Demo bitmap text\nwith some special characters:\n{}@äöčšž";
 
     private int _bitmapTextCreatorIndex = 0;
     
@@ -137,6 +137,8 @@ public class BitmapTextSample : CommonSample
         }
 
         _rootTextNode.Clear();
+
+        _textToShow = "";
 
         _textNode = _bitmapTextCreator.CreateTextNode(text: _textToShow,
                                                       position: new Vector3(0, 0, 0),
