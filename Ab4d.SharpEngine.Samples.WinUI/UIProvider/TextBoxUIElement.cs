@@ -25,6 +25,10 @@ public class TextBoxUIElement : WinUIElement
         if (height > 0)
             _textBox.Height = height;
 
+        if (height > 0 || (initialText != null && initialText.Contains('\n'))) // is multiline?
+            _textBox.AcceptsReturn = true;
+
+
         if (textChangedAction != null)
         {
             _textChangedAction = textChangedAction;

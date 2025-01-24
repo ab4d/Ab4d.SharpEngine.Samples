@@ -14,15 +14,25 @@ public class TextBoxUIElement : WpfUIElement
     {
         _textBox = new TextBox()
         {
-            Text = initialText,
+            Text = initialText ?? "",
             FontSize = wpfUIProvider.FontSize,
         };
 
         if (width > 0)
+        {
             _textBox.Width = width;
+            _textBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+        }
 
         if (height > 0)
             _textBox.Height = height;
+
+        if (height > 0 || (initialText != null && initialText.Contains('\n'))) // is multiline?
+        { 
+            _textBox.AcceptsReturn = true;
+            _textBox.AcceptsTab = true;
+            _textBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+        }
 
         if (textChangedAction != null)
         {

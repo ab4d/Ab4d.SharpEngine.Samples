@@ -17,7 +17,14 @@ public class TextBoxUIElement : WinFormsUIElement
             Font = winFormsUIProvider.Font,
         };
 
-        _textBox.Multiline = height > 0 || (initialText != null && initialText.Contains('\n'));
+        bool isMultiline = height > 0 || (initialText != null && initialText.Contains('\n'));
+        _textBox.Multiline = isMultiline;
+
+        if (isMultiline)
+        {
+            _textBox.AcceptsReturn = true;
+            _textBox.AcceptsTab = true;
+        }
 
         Size textSize;
         if (!string.IsNullOrEmpty(initialText))
