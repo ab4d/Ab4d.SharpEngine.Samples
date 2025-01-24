@@ -25,6 +25,8 @@ public class VectorTextSample : CommonSample
     
     private string[]? _allFontFiles;
 
+    private Vector3 _textPosition = new Vector3(0, 0, 0);
+    private TextPositionTypes _selectedPositionType = TextPositionTypes.Baseline;
     private Vector3 _textDirection = new Vector3(1, 0, 0);
     private Vector3 _upDirection = new Vector3(0, 1, 0);
 
@@ -38,30 +40,25 @@ public class VectorTextSample : CommonSample
 
     private SceneNode? _textNode;
     private GroupNode? _rootTextNode;
-    
+    private RectangleNode? _textBoundingRectangleNode;
+    private WireCrossNode? _textPositionCrossNode;
+
     private bool _alignWithCamera;
     private bool _fixScreenSize;
     
     private VectorFontFactory? _currentVectorFontFactory;
 
     private Dictionary<string, VectorFontFactory> _allVectorFontFactories = new ();
+    
+
 
     public VectorTextSample(ICommonSamplesContext context)
         : base(context)
     {
         _selectedFontFileName = "Roboto-Black.ttf";
+        _textToShow = CreateAllCharsText(from: 33, to: 127, lineLength: 16); // ASCII chars from 33 - 127
 
         ShowCameraAxisPanel = true;
-    }
-
-    /// <inheritdoc />
-    protected override void OnDisposed()
-    {
-        // Reset position of CameraAxisPanel, if it was changed in the OnCreateUI
-        if (CameraAxisPanel != null)
-            CameraAxisPanel.Position = new Vector2(10, 10);
-
-        base.OnDisposed();
     }
 
     private void LoadFont(string fontFileName, bool recreateText = false)
@@ -109,10 +106,6 @@ public class VectorTextSample : CommonSample
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
 
-
-        
-        _textToShow = GetSelectedText(0); // ASCII chars (1)
-
         RecreateText();
 
         
@@ -134,8 +127,13 @@ public class VectorTextSample : CommonSample
         scene.RootNode.Add(wireGridNode);
 
 
+        _textPositionCrossNode = new WireCrossNode(_textPosition, lineColor: Colors.Red, lineThickness: 3, lineLength: 30);
+        scene.RootNode.Add(_textPositionCrossNode);
+
+
         if (targetPositionCamera != null)
         {
+            targetPositionCamera.TargetPosition = new Vector3(250, -140, 0);
             targetPositionCamera.Heading = 50;
             targetPositionCamera.Attitude = -5;
             targetPositionCamera.Distance = 1200;
@@ -156,9 +154,11 @@ public class VectorTextSample : CommonSample
 
         _rootTextNode.Clear();
 
-        var textMesh = _currentVectorFontFactory.CreateTextMesh(text: _textToShow,
-                                                                position: new Vector3(0, 0, 0),
-                                                                positionType: PositionTypes.Center,
+        var textPosition = new Vector3(0, 0, 0);
+
+        var textMesh = _currentVectorFontFactory.CreateTextMesh(_textToShow,
+                                                                textPosition,
+                                                                _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
                                                                 textDirection: _textDirection,
                                                                 upDirection: _upDirection,
                                                                 fontSize: _fontSize,
@@ -175,12 +175,19 @@ public class VectorTextSample : CommonSample
             _rootTextNode.Add(meshModelNode);
         }
 
-        //// Gets the size of the text
-        //_textSize = _bitmapTextCreator.GetTextSize(text: _textToShow, fontSize: _fontSize, maxWidth: 0, fontStretch: 1);
+        // Get the size of the text
+        _textSize = _currentVectorFontFactory.GetTextSize(_textToShow, _fontSize);
+        
+        _textSizeLabel?.UpdateValue();
 
-        //_textSizeLabel?.UpdateValue();
+        // Get the bounding rectangle of the text
+        (Vector3 topLeftPosition, Vector2 textSize) = _currentVectorFontFactory.GetBoundingRectangle(_textToShow, textPosition, _selectedPositionType, _textDirection, _upDirection, _fontSize);
 
-        //UpdateBitmapTextTransformation();
+        _textBoundingRectangleNode = new RectangleNode(topLeftPosition, PositionTypes.TopLeft, textSize, _textDirection, _upDirection, Colors.Black, lineThickness: 1, "TextBoundingRectangle");
+        _rootTextNode.Add(_textBoundingRectangleNode);
+
+
+        UpdateBitmapTextTransformation();
     }
     
     private void UpdateBitmapTextTransformation()
@@ -295,41 +302,7 @@ public class VectorTextSample : CommonSample
             }
         }
     }
-
-    private string GetSelectedText(int selectedIndex)
-    {
-        string selectedText;
-
-        switch (selectedIndex)
-        {
-            case 0:  // ASCII chars from 32 - 128
-                selectedText = CreateAllCharsText(from: 32, to: 128, lineLength: 16);
-                break;
-                
-            case 1:  // ASCII chars from 128 - 255
-                selectedText = CreateAllCharsText(from: 128, to: 255, lineLength: 16);
-                break;
-                
-            case 2:  // AB4D
-                selectedText = "AB4D";
-                break;
-                
-            case 3:  // Symbol chars
-                selectedText = "⇦⇧⇨⇩↯";
-                break;
-                
-            case 4:  // Chinese chars
-                selectedText = "太極拳";
-                break;
-
-            default:
-                selectedText = "";
-                break;
-        }
-
-        return selectedText;
-    }
-
+    
     private string CreateAllCharsText(int from = 32, int to = 128, int lineLength = 16)
     {
         string text = "";
@@ -404,24 +377,54 @@ public class VectorTextSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateComboBox(new string[]
+        ui.CreateTextBox(width: 220, height: 115, 
+            initialText: _textToShow,
+            textChangedAction: (newText) =>
             {
-                "ASCII chars (1)", 
-                "ASCII chars (2)", 
-                "AB4D", 
-                "Symbol chars", 
-                "Chinese chars"
-            },
-            (selectedIndex, selectedText) =>
-            {
-                _textToShow = GetSelectedText(selectedIndex);
+                _textToShow = newText;
                 RecreateText();
-            },
-            selectedItemIndex: 0,
-            width: 150,
-            keyText: "Text: (?):Symbols and Chines chars are supported only with some fonts");
+            });
+
 
         ui.AddSeparator();
+
+        //ui.CreateKeyValueLabel("Position:", () => "(0, 0, 0)", keyTextWidth: 80).SetColor(Colors.Red);
+
+        ui.CreateCheckBox("Show Position: (0, 0, 0)", 
+            true, 
+            isChecked =>
+            {
+                if (_textPositionCrossNode != null)
+                    _textPositionCrossNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            }).SetColor(Colors.Red);
+
+
+        var allPositionTypesInSample = new TextPositionTypes[]
+        {
+            TextPositionTypes.Baseline, // TextPositionTypes adds Baseline to the position types defined in the PositionTypes enum
+
+            TextPositionTypes.TopLeft,
+            TextPositionTypes.Top,
+            TextPositionTypes.TopRight,
+            
+            TextPositionTypes.Left,
+            TextPositionTypes.Center,
+            TextPositionTypes.Right,
+            
+            TextPositionTypes.BottomLeft,
+            TextPositionTypes.Bottom,
+            TextPositionTypes.BottomRight
+        };
+
+        ui.CreateComboBox(allPositionTypesInSample.Select(
+            p => p.ToString()).ToArray(), 
+            (selectedIndex, selectedText) =>
+            {
+                _selectedPositionType = allPositionTypesInSample[selectedIndex];
+                RecreateText();
+            }, 
+            0, 130, "PositionType:", 0);
+
 
 
         var fontSizes = new int[] { 8, 10, 20, 30, 40, 50, 100, 200 };
@@ -464,6 +467,16 @@ public class VectorTextSample : CommonSample
 
         _textSizeLabel = ui.CreateKeyValueLabel("Text world size: ", () => $"{_textSize.X:F0} x {_textSize.Y:F0}");
         
+        ui.CreateCheckBox("Show bounding rectangle", 
+            true, 
+            isChecked =>
+            {
+                if (_textBoundingRectangleNode != null)
+                    _textBoundingRectangleNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            });
+
+        
+
         ui.AddSeparator();
         ui.CreateLabel("See comments in code for more info").SetStyle("italic");
 
