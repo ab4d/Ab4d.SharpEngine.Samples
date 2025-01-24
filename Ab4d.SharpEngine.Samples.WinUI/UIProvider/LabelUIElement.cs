@@ -16,7 +16,7 @@ public class LabelUIElement : WinUIElement
 
     private string? _styleString;
 
-    public LabelUIElement(WinUIProvider winUIProvider, string text, bool isHeader, float width = 0, float height = 0)
+    public LabelUIElement(WinUIProvider winUIProvider, string text, bool isHeader, float width = 0, float height = 0, float maxWidth = 0)
         : base(winUIProvider)
     {
         var (textToShow, toolTip) = winUIProvider.ParseTextAndToolTip(text);
@@ -31,6 +31,9 @@ public class LabelUIElement : WinUIElement
 
         if (width > 0)
             _textBlock.Width = width;
+
+        if (maxWidth > 0)
+            _textBlock.MaxWidth = maxWidth;
 
         if (height > 0)
             _textBlock.Height = height;
