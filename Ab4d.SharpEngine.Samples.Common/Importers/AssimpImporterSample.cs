@@ -46,6 +46,16 @@ public class AssimpImporterSample : CommonSample
         : base(context)
     {
     }
+    
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        // Reset position of CameraAxisPanel, if it was changed in the OnCreateUI
+        if (CameraAxisPanel != null)
+            CameraAxisPanel.Position = new Vector2(10, 10);
+
+        base.OnDisposed();
+    }
 
     protected override void OnCreateScene(Scene scene)
     {
