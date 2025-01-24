@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
@@ -29,28 +30,29 @@ public class VectorTextSample : CommonSample
     private TextPositionTypes _selectedPositionType = TextPositionTypes.Baseline;
     private Vector3 _textDirection = new Vector3(1, 0, 0);
     private Vector3 _upDirection = new Vector3(0, 1, 0);
+    private float _lineHeight = 1.0f;
+    private int _bezierCurveSegmentsCount = 8;
 
     private float _fontSize = 50;
-    private bool _isSolidColorMaterial = true;
-
+    
     private Vector2 _textSize;
 
+    private Material? _textMaterial;
+    private StandardMesh? _textMesh;
+    private MeshModelNode? _textMeshModelNode;
+
     private ICommonSampleUIElement? _textSizeLabel;
+    private ICommonSampleUIElement? _meshInfoLabel;
     private ICommonSampleUIElement? _textBoxElement;
 
-    private SceneNode? _textNode;
     private GroupNode? _rootTextNode;
     private RectangleNode? _textBoundingRectangleNode;
     private WireCrossNode? _textPositionCrossNode;
 
-    private bool _alignWithCamera;
-    private bool _fixScreenSize;
-    
     private VectorFontFactory? _currentVectorFontFactory;
 
     private Dictionary<string, VectorFontFactory> _allVectorFontFactories = new ();
     
-
 
     public VectorTextSample(ICommonSamplesContext context)
         : base(context)
@@ -66,7 +68,12 @@ public class VectorTextSample : CommonSample
         var fontName = Path.GetFileNameWithoutExtension(fontFileName); // remove ".ttf"
         
         if (_allVectorFontFactories.TryGetValue(fontName, out _currentVectorFontFactory))
+        {
+            if (recreateText)
+                RecreateText();
+
             return;
+        }
 
 
         if (!System.IO.Path.IsPathRooted(fontFileName))
@@ -106,27 +113,11 @@ public class VectorTextSample : CommonSample
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
 
+        _textMaterial = new SolidColorMaterial(Colors.Orange);
+
         RecreateText();
 
         
-        // Add WireGridNode so we can see the effect when text is aligned to camera or when fixed screen size is used
-        var wireGridNode = new WireGridNode()
-        {
-            CenterPosition = new Vector3(0, -150, 0),
-            Size = new Vector2(800, 400),
-            WidthDirection = new Vector3(1, 0, 0),
-            HeightDirection = new Vector3(0, 0, 1),
-            WidthCellsCount = 8,
-            HeightCellsCount = 4,
-            IsClosed = true,
-            MajorLineColor = Colors.Gray,
-            MinorLineColor = Colors.Gray,
-            MajorLineThickness = 1
-        };
-
-        scene.RootNode.Add(wireGridNode);
-
-
         _textPositionCrossNode = new WireCrossNode(_textPosition, lineColor: Colors.Red, lineThickness: 3, lineLength: 30);
         scene.RootNode.Add(_textPositionCrossNode);
 
@@ -137,11 +128,6 @@ public class VectorTextSample : CommonSample
             targetPositionCamera.Heading = 50;
             targetPositionCamera.Attitude = -5;
             targetPositionCamera.Distance = 1200;
-
-            targetPositionCamera.CameraChanged += (sender, args) =>
-            {
-                UpdateBitmapTextTransformation();
-            };
         }
 
         ShowCameraAxisPanel = true;
@@ -156,151 +142,46 @@ public class VectorTextSample : CommonSample
 
         var textPosition = new Vector3(0, 0, 0);
 
-        var textMesh = _currentVectorFontFactory.CreateTextMesh(_textToShow,
-                                                                textPosition,
-                                                                _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
-                                                                textDirection: _textDirection,
-                                                                upDirection: _upDirection,
-                                                                fontSize: _fontSize,
-                                                                textColor: Colors.Orange,
-                                                                isSolidColorMaterial: _isSolidColorMaterial);
+        _currentVectorFontFactory.LineHeight = _lineHeight;
 
-        if (textMesh != null)
+        // BezierCurveSegmentsCount specified how many segments (individual straight lines) each bezier curve from the character glyph is converted.
+        // Smaller values produce smaller meshes or less outline positions (are faster to render),
+        // bigger values produce more accurate fonts but are slower to render.
+        _currentVectorFontFactory.BezierCurveSegmentsCount = _bezierCurveSegmentsCount;
+
+        // You can also set SpaceSize and TabSize (set to default values in the commented code below):
+        //_currentVectorFontFactory.SpaceSize = 0.333f;
+        //_currentVectorFontFactory.TabSize = 4;
+
+
+        _textMesh = _currentVectorFontFactory.CreateTextMesh(_textToShow,
+                                                             textPosition,
+                                                             _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
+                                                             textDirection: _textDirection,
+                                                             upDirection: _upDirection,
+                                                             fontSize: _fontSize);
+
+        if (_textMesh != null)
         {
-            var meshModelNode = new MeshModelNode(textMesh, StandardMaterials.Orange)
+            _textMeshModelNode = new MeshModelNode(_textMesh, _textMaterial)
             {
-                BackMaterial = StandardMaterials.Red
+                BackMaterial = _textMaterial
             };
 
-            _rootTextNode.Add(meshModelNode);
+            _rootTextNode.Add(_textMeshModelNode);
         }
 
         // Get the size of the text
         _textSize = _currentVectorFontFactory.GetTextSize(_textToShow, _fontSize);
         
         _textSizeLabel?.UpdateValue();
+        _meshInfoLabel?.UpdateValue(); 
 
         // Get the bounding rectangle of the text
         (Vector3 topLeftPosition, Vector2 textSize) = _currentVectorFontFactory.GetBoundingRectangle(_textToShow, textPosition, _selectedPositionType, _textDirection, _upDirection, _fontSize);
 
         _textBoundingRectangleNode = new RectangleNode(topLeftPosition, PositionTypes.TopLeft, textSize, _textDirection, _upDirection, Colors.Black, lineThickness: 1, "TextBoundingRectangle");
         _rootTextNode.Add(_textBoundingRectangleNode);
-
-
-        UpdateBitmapTextTransformation();
-    }
-    
-    private void UpdateBitmapTextTransformation()
-    {
-        if (targetPositionCamera == null || SceneView == null || _textNode == null)
-            return;
-
-        if (!_fixScreenSize && !_alignWithCamera)
-        {
-            _textNode.Transform = null;
-            return;
-        }
-
-
-        var desiredScreenSize = new Vector2(300, 77); // preserve aspect ratio of original world size: 685 x 177
-
-        // If we want to specify the screen size in device independent units, then we need to scale by DPI scale.
-        // If we want to set the size in pixels, the comment the following line.
-        desiredScreenSize *= new Vector2(SceneView.DpiScaleX, SceneView.DpiScaleY);
-
-        
-        float scaleX, scaleY;
-
-        if (_fixScreenSize)
-        {
-            if (targetPositionCamera.ProjectionType == ProjectionTypes.Orthographic)
-            {
-                scaleX = (desiredScreenSize.X / SceneView.Width) / _textSize.X;
-                scaleY = (desiredScreenSize.Y / SceneView.Height) / _textSize.Y;
-            }
-            else
-            {
-                // Get lookDirectionDistance
-                // If we look directly at the text, then we could use: lookDirectionDistance = textPosition - cameraPosition,
-                // but when we look at some other direction, then we need to use the following code that
-                // gets the distance to the text in the look direction:
-                var textPosition = _textNode.WorldBoundingBox.GetCenterPosition();
-                var cameraPosition = targetPositionCamera.GetCameraPosition();
-
-                var distanceVector = textPosition - cameraPosition;
-
-                var lookDirection = Vector3.Normalize(targetPositionCamera.GetLookDirection());
-
-                // To get look direction distance we project the distanceVector to the look direction vector
-                var lookDirectionDistance = Vector3.Dot(distanceVector, lookDirection);
-
-                var worldSize = Utilities.CameraUtils.GetPerspectiveWorldSize(desiredScreenSize, lookDirectionDistance, targetPositionCamera.FieldOfView, new Vector2(SceneView.Width, SceneView.Height));
-
-
-                scaleX = worldSize.X / _textSize.X;
-                scaleY = worldSize.Y / _textSize.Y;
-            }
-
-            if (!_alignWithCamera)
-            {
-                if (_textNode.Transform is not ScaleTransform scaleTransform)
-                {
-                    scaleTransform = new ScaleTransform();
-                    _textNode.Transform = scaleTransform;
-                }
-
-                scaleTransform.ScaleX = scaleX;
-                scaleTransform.ScaleY = scaleY;
-
-                return;
-            }
-            // else - this will be handled below
-        }
-        else
-        {
-            scaleX = 1;
-            scaleY = 1;
-        }
-
-
-        if (_alignWithCamera)
-        {
-            // To align the text with camera, we first need to generate the text
-            // so that its textDirection is set to (1, 0, 0) and upDirection is set to (0, 1, 0).
-            // This will orient the text with the camera when Heading is 0 and Attitude is 0.
-            // After that, we can align the text with the camera by simply negating the camera's 
-            // rotation that is defined by view matrix.
-
-            if (_textDirection != new Vector3(1, 0, 0) || _upDirection != new Vector3(0, 1, 0))
-            {
-                _textDirection = new Vector3(1, 0, 0);
-                _upDirection = new Vector3(0, 1, 0);
-                RecreateText();
-            }
-
-
-            var invertedView = targetPositionCamera.GetInvertedViewMatrix();
-            
-            // Remove offset so we get only camera rotation
-            invertedView.M41 = 0;
-            invertedView.M42 = 0;
-            invertedView.M43 = 0;
-
-            if (_textNode.Transform is not MatrixTransform matrixTransform)
-            {
-                matrixTransform = new MatrixTransform();
-                _textNode.Transform = matrixTransform;
-            }
-
-            if (_fixScreenSize)
-            {
-                matrixTransform.SetMatrix(Matrix4x4.CreateScale(scaleX, scaleY, 1) * invertedView);
-            }
-            else // only _fixScreenSize
-            {
-                matrixTransform.SetMatrix(invertedView);
-            }
-        }
     }
     
     private string CreateAllCharsText(int from = 32, int to = 128, int lineLength = 16)
@@ -315,65 +196,56 @@ public class VectorTextSample : CommonSample
 
         return text;
     }
-    
-    private void CollectAvailableFonts()
+
+    private string[] CollectAvailableFonts()
     {
-        if (_allFontFiles != null)
-            return;
-
-        var localFontFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/");
-        var fontsFiles = Directory.GetFiles(localFontFolder, "*.ttf", SearchOption.TopDirectoryOnly).ToList();
-
-        string? systemFontsFolder = null;
-        string[]? systemFontNames = null;
-
-        if (OperatingSystem.IsWindows())
+        if (_allFontFiles == null)
         {
-            systemFontsFolder = @"C:\Windows\Fonts\";
+            var localFontFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/");
+            var fontsFiles = Directory.GetFiles(localFontFolder, "*.ttf", SearchOption.TopDirectoryOnly).ToList();
 
-            // We need to define a list of only selected fonts because if we would try to select from all
-            // fonts, then for many font files we would get access denied error
-            systemFontNames = new string[] { "arial", "arialuni", "cour", "OpenSans-Regular", "times", "webdings" };
+            // Commented reading system fonts because on Windows all font files have access denied
+            //if (OperatingSystem.IsWindows())
+            //{
+            //    var systemFontsFolder = @"C:\Windows\Fonts\";
+            //    if (System.IO.Directory.Exists(systemFontsFolder))
+            //    {
+            //        var allSystemFontFiles = Directory.GetFiles(systemFontsFolder, "*.ttf", SearchOption.TopDirectoryOnly);
+            //        fontsFiles.AddRange(allSystemFontFiles);
+            //    }
+            //}
+
+            _allFontFiles = fontsFiles.ToArray();
         }
 
-        if (systemFontsFolder != null && 
-            systemFontNames != null &&
-            System.IO.Directory.Exists(systemFontsFolder))
-        {
-            var allSystemFontFiles = Directory.GetFiles(systemFontsFolder, "*.ttf", SearchOption.TopDirectoryOnly);
-
-            foreach (var oneFontFile in allSystemFontFiles)
-            {
-                var name = Path.GetFileNameWithoutExtension(oneFontFile).ToLower();
-                if (systemFontNames.Contains(name))
-                    fontsFiles.Add(oneFontFile);
-            }
-        }
-
-        _allFontFiles = fontsFiles.ToArray();
-
-        _allFontFiles = Directory.GetFiles(@"C:\FontsCopy", "*.ttf", SearchOption.TopDirectoryOnly); 
+        return _allFontFiles;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
-        CollectAvailableFonts();
-
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateLabel("Font:", isHeader: true);
+        // Try to register for file drag-and-drop
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => LoadFont(fileName, recreateText: true));
 
 
-        var fontNames = _allFontFiles.Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
+        //ui.CreateLabel("Font:", isHeader: true);
 
-        ui.CreateComboBox(
+        var allFontFiles = CollectAvailableFonts();
+        var fontNames = allFontFiles.Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
+
+        ui.CreateRadioButtons(
             fontNames,
             (selectedIndex, selectedText) =>
             {
-                _selectedFontFileName = _allFontFiles[selectedIndex];
+                _selectedFontFileName = allFontFiles[selectedIndex];
                 LoadFont(_selectedFontFileName, recreateText: true);
             },
             selectedItemIndex: 0);
+
+        if (isDragAndDropSupported)
+            ui.CreateLabel("or drag & drop .ttf file to load it").SetStyle("italic");
+
 
         ui.AddSeparator();
 
@@ -388,9 +260,7 @@ public class VectorTextSample : CommonSample
 
         ui.AddSeparator();
 
-        //ui.CreateKeyValueLabel("Position:", () => "(0, 0, 0)", keyTextWidth: 80).SetColor(Colors.Red);
-
-        ui.CreateCheckBox("Show Position: (0, 0, 0)", 
+        ui.CreateCheckBox("Position: (0, 0, 0)", 
             true, 
             isChecked =>
             {
@@ -425,7 +295,8 @@ public class VectorTextSample : CommonSample
             }, 
             0, 130, "PositionType:", 0);
 
-
+        ui.CreateLabel("TextDirection: (1, 0, 0)");
+        ui.CreateLabel("UpDirection: (0, 1, 0)");
 
         var fontSizes = new int[] { 8, 10, 20, 30, 40, 50, 100, 200 };
         ui.CreateComboBox(fontSizes.Select(f => f.ToString()).ToArray(), 
@@ -437,36 +308,44 @@ public class VectorTextSample : CommonSample
             width: 80, 
             keyText: "Font size:");
 
-        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights; when unchecked then rotate tha camera so the text is at steep angle and see that text is shaded based on the angle to the CameraLight.", 
-            _isSolidColorMaterial, 
-            isChecked =>
+
+        ui.AddSeparator();
+
+        ui.CreateSlider(0.8f, 2, () => _lineHeight, 
+            newValue =>
             {
-                _isSolidColorMaterial = isChecked;
+                _lineHeight = newValue;
                 RecreateText();
-            });
+            }, width: 90, 
+            keyText: "LineHeight:", 
+            formatShownValueFunc: lineHeight => $"{lineHeight:F1} em");
+
+        ui.CreateLabel("BezierCurveSegmentsCount: (?):Specifies into how many segments (individual straight lines)\neach bezier curve from the character glyph is converted.\nSmaller values produce smaller meshes or less outline positions (are faster to render),\nbigger values produce more accurate fonts but are slower to render.\nSee 'Text mesh info' below to see the number of triangles used to define the text.");
+        ui.CreateSlider(1, 12, () => _bezierCurveSegmentsCount, 
+            newValue =>
+            {
+                if (_bezierCurveSegmentsCount != (int)newValue)
+                {
+                    _bezierCurveSegmentsCount = (int)newValue;
+                    RecreateText();
+                }
+            }, width: 200, 
+            formatShownValueFunc: newValue => $"{newValue:F0}");
+
 
         ui.AddSeparator();
 
-        ui.CreateCheckBox("Align with camera", 
-            _alignWithCamera, 
-            isChecked =>
-            {
-                _alignWithCamera = isChecked;
-                UpdateBitmapTextTransformation();
-            });
         
-        ui.CreateCheckBox("Fix to screen size 300 x 77", 
-            _fixScreenSize, 
-            isChecked =>
-            {
-                _fixScreenSize = isChecked;
-                UpdateBitmapTextTransformation();
-            });
+        _meshInfoLabel = ui.CreateKeyValueLabel("Text mesh info: ", () =>
+        {
+            if (_textMesh == null)
+                return "";
 
-        ui.AddSeparator();
+            return $"{(_textMesh.IndexCount / 3):#,##0} triangles";
+        });
 
         _textSizeLabel = ui.CreateKeyValueLabel("Text world size: ", () => $"{_textSize.X:F0} x {_textSize.Y:F0}");
-        
+                
         ui.CreateCheckBox("Show bounding rectangle", 
             true, 
             isChecked =>
@@ -475,14 +354,28 @@ public class VectorTextSample : CommonSample
                     _textBoundingRectangleNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
             });
 
-        
 
         ui.AddSeparator();
-        ui.CreateLabel("See comments in code for more info").SetStyle("italic");
 
+        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights;\nwhen unchecked then rotate tha camera so the text is at steep angle and\nsee that text is shaded based on the angle to the CameraLight.", 
+            true, 
+            isChecked =>
+            {
+                if (isChecked)
+                    _textMaterial = new SolidColorMaterial(Colors.Orange);
+                else
+                    _textMaterial = StandardMaterials.Orange;
 
-        // Try to register for file drag-and-drop
-        bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => LoadFont(fileName, recreateText: true));
+                if (_textMeshModelNode != null)
+                {
+                    _textMeshModelNode.Material = _textMaterial;
+                    _textMeshModelNode.BackMaterial = _textMaterial;
+                }
+                RecreateText();
+            });
+
+        ui.AddSeparator();
+
 
         if (isDragAndDropSupported)
         {
