@@ -373,7 +373,7 @@ public class BitmapTextSample : CommonSample
             width: 80, 
             keyText: "Font size:");
 
-        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights; when unchecked then rotate tha camera so the text is at steep angle and see that text is shaded based on the angle to the CameraLight.", 
+        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights;\nwhen unchecked then rotate tha camera so the text is at steep angle and\nsee that text is shaded based on the angle to the CameraLight.", 
             _isSolidColorMaterial, 
             isChecked =>
             {
