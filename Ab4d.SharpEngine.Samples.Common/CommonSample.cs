@@ -132,6 +132,15 @@ public abstract class CommonSample
         return cameraAxisPanel;
     }
 
+    private void ResetCameraAxisPanel()
+    {
+        if (CameraAxisPanel != null)
+        {
+            CameraAxisPanel.Position = new Vector2(10, 10);
+            CameraAxisPanel.Alignment = PositionTypes.BottomLeft;
+        }
+    }
+
     protected virtual void OnSceneViewInitialized(SceneView sceneView)
     {
     }
@@ -229,6 +238,8 @@ public abstract class CommonSample
 
         UnsubscribeSceneUpdating();
         SceneView?.RemoveAllSpriteBatches();
+
+        ResetCameraAxisPanel(); // Reset position of CameraAxisPanel - it may be changed, for example in AssimpImporterSample when FileLoad panel is shown in bottom left
 
         IsDisposed = true;
         OnDisposed();
