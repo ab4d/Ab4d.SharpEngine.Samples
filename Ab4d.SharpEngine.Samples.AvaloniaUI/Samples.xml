@@ -80,7 +80,8 @@
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
-  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/> 
+  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
+  <Sample Location="AdvancedModels.VectorTextSample" Title="Vector text from TTF"/>
   <Sample Location="AdvancedModels.BitmapTextSample" Title="Bitmap text"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
 
