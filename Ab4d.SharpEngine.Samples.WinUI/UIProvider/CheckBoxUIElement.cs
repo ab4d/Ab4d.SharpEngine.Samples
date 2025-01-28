@@ -47,6 +47,33 @@ public class CheckBoxUIElement : WinUIElement
 
     protected override void OnSetColor(Color wpfColor)
     {
-        _checkBox.Foreground = new SolidColorBrush(wpfColor);
+        // The following does not work in WinUI !!!
+        //_checkBox.Foreground = new SolidColorBrush(wpfColor);
+
+        // A workaround from (https://github.com/microsoft/microsoft-ui-xaml/issues/9236)
+        // was to find child TextBlock, but this also does not work!!!
+        //var tb = FindChildElement<TextBlock>(_checkBox);
+        //tb.Foreground = new SolidColorBrush(wpfColor);
     }
+
+    //ChildType? FindChildElement<ChildType>(Microsoft.UI.Xaml.DependencyObject tree) where ChildType : Microsoft.UI.Xaml.DependencyObject
+    //{
+    //    for (int i = 0; i < Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(tree); i++)
+    //    {
+    //        Microsoft.UI.Xaml.DependencyObject child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(tree, i);
+    //        if (child != null && child is ChildType)
+    //        {
+    //            return child as ChildType;
+    //        }
+    //        else
+    //        {
+    //            ChildType childInSubtree = FindChildElement<ChildType>(child);
+    //            if (childInSubtree != null)
+    //            {
+    //                return childInSubtree;
+    //            }
+    //        }
+    //    }
+    //    return null;
+    //}
 }
