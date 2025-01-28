@@ -25,24 +25,28 @@ public class VectorTextSample : CommonSample
     private string _textToShow;
     
     private string[]? _allFontFiles;
+    
+    
+    private bool _showSolidTextMesh = true;
+    private bool _showTextOutlines = false;
+    private bool _showIndividualCharacterMeshes = false;
+    private bool _isSolidColorMaterial = true;
+    private bool _showBoundingRectangle = true;
 
     private Vector3 _textPosition = new Vector3(0, 0, 0);
     private TextPositionTypes _selectedPositionType = TextPositionTypes.Baseline;
     private Vector3 _textDirection = new Vector3(1, 0, 0);
     private Vector3 _upDirection = new Vector3(0, 1, 0);
     private float _lineHeight = 1.0f;
+    private float _charSpacing = 0f;
+    private float _fontStretch = 1.0f;
     private int _bezierCurveSegmentsCount = 8;
 
     private float _fontSize = 50;
     
-    private Vector2 _textSize;
+    private string? _textInfoString;
 
-    private Material? _textMaterial;
-    private StandardMesh? _textMesh;
-    private MeshModelNode? _textMeshModelNode;
-
-    private ICommonSampleUIElement? _textSizeLabel;
-    private ICommonSampleUIElement? _meshInfoLabel;
+    private ICommonSampleUIElement? _infoLabel;
     private ICommonSampleUIElement? _textBoxElement;
 
     private GroupNode? _rootTextNode;
@@ -58,7 +62,7 @@ public class VectorTextSample : CommonSample
         : base(context)
     {
         _selectedFontFileName = "Roboto-Black.ttf";
-        _textToShow = CreateAllCharsText(from: 33, to: 127, lineLength: 16); // ASCII chars from 33 - 127
+        _textToShow = CreateAllCharsText(from: 33, to: 126, lineLength: 16); // ASCII chars from 33 - 126
 
         ShowCameraAxisPanel = true;
     }
@@ -113,8 +117,6 @@ public class VectorTextSample : CommonSample
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
 
-        _textMaterial = new SolidColorMaterial(Colors.Orange);
-
         RecreateText();
 
         
@@ -124,7 +126,7 @@ public class VectorTextSample : CommonSample
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.TargetPosition = new Vector3(250, -140, 0);
+            targetPositionCamera.TargetPosition = new Vector3(300, -140, 0);
             targetPositionCamera.Heading = 50;
             targetPositionCamera.Attitude = -5;
             targetPositionCamera.Distance = 1200;
@@ -143,6 +145,8 @@ public class VectorTextSample : CommonSample
         var textPosition = new Vector3(0, 0, 0);
 
         _currentVectorFontFactory.LineHeight = _lineHeight;
+        _currentVectorFontFactory.CharSpacing = _charSpacing;
+        _currentVectorFontFactory.FontStretch = _fontStretch;
 
         // BezierCurveSegmentsCount specified how many segments (individual straight lines) each bezier curve from the character glyph is converted.
         // Smaller values produce smaller meshes or less outline positions (are faster to render),
@@ -154,33 +158,126 @@ public class VectorTextSample : CommonSample
         //_currentVectorFontFactory.TabSize = 4;
 
 
-        _textMesh = _currentVectorFontFactory.CreateTextMesh(_textToShow,
-                                                             textPosition,
-                                                             _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
-                                                             textDirection: _textDirection,
-                                                             upDirection: _upDirection,
-                                                             fontSize: _fontSize);
+        _textInfoString = "";
 
-        if (_textMesh != null)
+        if (_showSolidTextMesh)
         {
-            _textMeshModelNode = new MeshModelNode(_textMesh, _textMaterial)
+            if (!_showIndividualCharacterMeshes)
             {
-                BackMaterial = _textMaterial
-            };
+                // Create a single text mesh for the whole text
+                // This is the most common use case for showing text
+                var textMesh = _currentVectorFontFactory.CreateTextMesh(_textToShow,
+                                                                        textPosition,
+                                                                        _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
+                                                                        textDirection: _textDirection,
+                                                                        upDirection: _upDirection,
+                                                                        fontSize: _fontSize);
 
-            _rootTextNode.Add(_textMeshModelNode);
+                if (textMesh != null)
+                {
+                    Material usedMaterial = _isSolidColorMaterial ? new SolidColorMaterial(Colors.Orange) : StandardMaterials.Orange;
+
+                    var textMeshModelNode = new MeshModelNode(textMesh, usedMaterial)
+                    {
+                        BackMaterial = usedMaterial // Make text visible from both sides
+                    };
+
+                    _rootTextNode.Add(textMeshModelNode);
+
+                    _textInfoString = $"Text mesh: {textMesh.TrianglesCount:#,##0} triangles";
+                }
+            }
+            else
+            {
+                // Generate individual meshes and MeshModelNode for each character
+                List<(int, char, StandardMesh)> individualMeshes = _currentVectorFontFactory.CreateIndividualTextMeshes(_textToShow,
+                                                                                                                        textPosition,
+                                                                                                                        _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
+                                                                                                                        textDirection: _textDirection,
+                                                                                                                        upDirection: _upDirection,
+                                                                                                                        fontSize: _fontSize);
+
+                var colorHue = 0;
+                int trianglesCount = 0;
+
+                foreach (var (charIndex, character, mesh) in individualMeshes)
+                {
+                    var color = Color3.FromHsl(colorHue);
+                    colorHue += 33;
+
+                    Material usedMaterial = _isSolidColorMaterial ? new SolidColorMaterial(color) : new StandardMaterial(color);
+
+                    var textMeshModelNode = new MeshModelNode(mesh, usedMaterial, name: $"Mesh_{character}")
+                    {
+                        BackMaterial = usedMaterial // Make text visible from both sides
+                    };
+
+                    _rootTextNode.Add(textMeshModelNode);
+
+                    trianglesCount += mesh.TrianglesCount;
+                }
+
+                _textInfoString = $"{individualMeshes.Count} text meshes: {trianglesCount:#,##0} triangles";
+            }
+        }
+        else
+        {
+            _textInfoString = "Text mesh: /";
         }
 
-        // Get the size of the text
-        _textSize = _currentVectorFontFactory.GetTextSize(_textToShow, _fontSize);
-        
-        _textSizeLabel?.UpdateValue();
-        _meshInfoLabel?.UpdateValue(); 
+
+        if (_showTextOutlines)
+        {
+            var textOutlines = _currentVectorFontFactory.CreateTextOutlinePositions(_textToShow,
+                                                                                    textPosition,
+                                                                                    _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
+                                                                                    textDirection: _textDirection,
+                                                                                    upDirection: _upDirection,
+                                                                                    fontSize: _fontSize);
+
+            // To get original character outline 2D positions, use the following code:
+            //List<(int, char, Vector2[])> individualTextOutlinePositions = _currentVectorFontFactory.CreateIndividualTextOutlinePositions(_textToShow, _fontSize);
+
+            var textOutlinesGroupNode = new GroupNode("TextOutlinesGroup");
+
+            int totalPositionsCount = 0;
+
+            for (var i = 0; i < textOutlines.Length; i++)
+            {
+                Vector3[] outlinePositions = textOutlines[i];
+                var multiLineNode = new MultiLineNode(outlinePositions, isLineStrip: true)
+                {
+                    LineColor = Colors.Black,
+                    LineThickness = 1
+                };
+
+                textOutlinesGroupNode.Add(multiLineNode);
+
+                totalPositionsCount += outlinePositions.Length;
+            }
+
+            _rootTextNode.Add(textOutlinesGroupNode);
+
+            _textInfoString += $"\nOutline positions: {totalPositionsCount:#,##0}";
+        }
+        else
+        {
+            _textInfoString += "\nOutline positions: /";
+        }
+
+
+        // Update the text info label
+        _infoLabel?.UpdateValue(); 
+
 
         // Get the bounding rectangle of the text
         (Vector3 topLeftPosition, Vector2 textSize) = _currentVectorFontFactory.GetBoundingRectangle(_textToShow, textPosition, _selectedPositionType, _textDirection, _upDirection, _fontSize);
 
+        // We can also get only the text size:
+        //var textSize = _currentVectorFontFactory.GetTextSize(_textToShow, _fontSize);
+
         _textBoundingRectangleNode = new RectangleNode(topLeftPosition, PositionTypes.TopLeft, textSize, _textDirection, _upDirection, Colors.Black, lineThickness: 1, "TextBoundingRectangle");
+        _textBoundingRectangleNode.Visibility = _showBoundingRectangle ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
         _rootTextNode.Add(_textBoundingRectangleNode);
     }
     
@@ -204,7 +301,7 @@ public class VectorTextSample : CommonSample
             var localFontFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/");
             var fontsFiles = Directory.GetFiles(localFontFolder, "*.ttf", SearchOption.TopDirectoryOnly).ToList();
 
-            // Commented reading system fonts because on Windows all font files have access denied
+            // Commented reading system fonts because on Windows all font files have denied access
             //if (OperatingSystem.IsWindows())
             //{
             //    var systemFontsFolder = @"C:\Windows\Fonts\";
@@ -229,8 +326,6 @@ public class VectorTextSample : CommonSample
         bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => LoadFont(fileName, recreateText: true));
 
 
-        //ui.CreateLabel("Font:", isHeader: true);
-
         var allFontFiles = CollectAvailableFonts();
         var fontNames = allFontFiles.Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
 
@@ -249,7 +344,7 @@ public class VectorTextSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateTextBox(width: 220, height: 115, 
+        ui.CreateTextBox(width: 240, height: 123, 
             initialText: _textToShow,
             textChangedAction: (newText) =>
             {
@@ -259,6 +354,46 @@ public class VectorTextSample : CommonSample
 
 
         ui.AddSeparator();
+
+
+        ui.CreateCheckBox(text: "Show solid text mesh", _showSolidTextMesh, isChecked =>
+        {
+            _showSolidTextMesh = isChecked;
+            RecreateText();
+        });
+        
+        ui.CreateCheckBox(text: "Show text outlines", _showTextOutlines, isChecked =>
+        {
+            _showTextOutlines = isChecked;
+            RecreateText();
+        });
+
+        ui.CreateCheckBox("Show bounding rectangle", 
+            _showBoundingRectangle, 
+            isChecked =>
+            {
+                if (_textBoundingRectangleNode != null)
+                    _textBoundingRectangleNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+
+                _showBoundingRectangle = isChecked;
+            });
+
+        ui.CreateCheckBox(text: "Create individual characters (?):When unchecked, then a single StandardMesh is created from the whole text.\nWhen checked, then StandardMeshes are created for each character.\nThis way each character can have its own MeshModelNode and material.", _showIndividualCharacterMeshes, isChecked =>
+        {
+            _showIndividualCharacterMeshes = isChecked;
+            RecreateText();
+        });
+                
+        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights;\nwhen unchecked then rotate tha camera so the text is at steep angle and\nsee that text is shaded based on the angle to the CameraLight.", 
+            _isSolidColorMaterial, 
+            isChecked =>
+            {
+                _isSolidColorMaterial = isChecked;
+                RecreateText();
+            });
+
+        ui.AddSeparator();
+
 
         ui.CreateCheckBox("Position: (0, 0, 0)", 
             true, 
@@ -318,9 +453,30 @@ public class VectorTextSample : CommonSample
                 RecreateText();
             }, width: 90, 
             keyText: "LineHeight:", 
+            keyTextWidth: 80,
             formatShownValueFunc: lineHeight => $"{lineHeight:F1} em");
+        
+        ui.CreateSlider(-0.2f, 0.2f, () => _charSpacing, 
+            newValue =>
+            {
+                _charSpacing = newValue;
+                RecreateText();
+            }, width: 90, 
+            keyText: "CharSpacing:", 
+            keyTextWidth: 80,
+            formatShownValueFunc: charSpacing => $"{charSpacing:F2} em");
+        
+        ui.CreateSlider(0.5f, 2f, () => _fontStretch, 
+            newValue =>
+            {
+                _fontStretch = newValue;
+                RecreateText();
+            }, width: 90, 
+            keyText: "FontStretch:", 
+            keyTextWidth: 80,
+            formatShownValueFunc: fontStretch => $"{(fontStretch*100):F0}%");
 
-        ui.CreateLabel("BezierCurveSegmentsCount: (?):Specifies into how many segments (individual straight lines)\neach bezier curve from the character glyph is converted.\nSmaller values produce smaller meshes or less outline positions (are faster to render),\nbigger values produce more accurate fonts but are slower to render.\nSee 'Text mesh info' below to see the number of triangles used to define the text.");
+        ui.CreateLabel("BezierCurveSegmentsCount: (?):Specifies into how many segments (individual straight lines)\neach bezier curve from the character glyph is converted.\nSmaller values produce smaller meshes or less outline positions (are faster to render),\nbigger values produce more accurate fonts but are slower to render.\nSee 'Text mesh info' below to see the number of triangles used to define the text.\nZoom the camera to be very close to the text to see the difference on the curved parts.");
         ui.CreateSlider(1, 12, () => _bezierCurveSegmentsCount, 
             newValue =>
             {
@@ -335,46 +491,7 @@ public class VectorTextSample : CommonSample
 
         ui.AddSeparator();
 
-        
-        _meshInfoLabel = ui.CreateKeyValueLabel("Text mesh info: ", () =>
-        {
-            if (_textMesh == null)
-                return "";
-
-            return $"{(_textMesh.IndexCount / 3):#,##0} triangles";
-        });
-
-        _textSizeLabel = ui.CreateKeyValueLabel("Text world size: ", () => $"{_textSize.X:F0} x {_textSize.Y:F0}");
-                
-        ui.CreateCheckBox("Show bounding rectangle", 
-            true, 
-            isChecked =>
-            {
-                if (_textBoundingRectangleNode != null)
-                    _textBoundingRectangleNode.Visibility = isChecked ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
-            });
-
-
-        ui.AddSeparator();
-
-        ui.CreateCheckBox("IsSolidColorMaterial (?):When checked (by default) then text is rendered with a solid color regardless of lights;\nwhen unchecked then rotate tha camera so the text is at steep angle and\nsee that text is shaded based on the angle to the CameraLight.", 
-            true, 
-            isChecked =>
-            {
-                if (isChecked)
-                    _textMaterial = new SolidColorMaterial(Colors.Orange);
-                else
-                    _textMaterial = StandardMaterials.Orange;
-
-                if (_textMeshModelNode != null)
-                {
-                    _textMeshModelNode.Material = _textMaterial;
-                    _textMeshModelNode.BackMaterial = _textMaterial;
-                }
-                RecreateText();
-            });
-
-        ui.AddSeparator();
+        _infoLabel = ui.CreateKeyValueLabel("", () => _textInfoString ?? "");
 
 
         if (isDragAndDropSupported)
