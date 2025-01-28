@@ -234,9 +234,9 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
         CurrentPanel = panel as WinFormsUIPanel;
     }
 
-    public ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0, float height = 0)
+    public ICommonSampleUIElement CreateLabel(string text, bool isHeader = false, float width = 0, float height = 0, float maxWidth = 0)
     {
-        var newElement = new LabelUIElement(this, text, isHeader, width, height);
+        var newElement = new LabelUIElement(this, text, isHeader, width, height, maxWidth);
         AddToCurrentPanel(newElement);
 
         return newElement;

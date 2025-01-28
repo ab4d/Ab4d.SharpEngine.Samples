@@ -9,7 +9,7 @@ public class LabelUIElement : WinFormsUIElement
 
     private string? _styleString;
 
-    public LabelUIElement(WinFormsUIProvider winFormsUIProvider, string text, bool isHeader, float width = 0, float height = 0)
+    public LabelUIElement(WinFormsUIProvider winFormsUIProvider, string text, bool isHeader, float width = 0, float height = 0, float maxWidth = 0)
         : base(winFormsUIProvider)
     {
         var (textToShow, toolTip) = winFormsUIProvider.ParseTextAndToolTip(text);
