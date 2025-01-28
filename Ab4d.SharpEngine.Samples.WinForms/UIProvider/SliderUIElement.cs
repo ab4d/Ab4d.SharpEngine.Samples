@@ -17,6 +17,8 @@ public class SliderUIElement : WinFormsUIElement
 
     private TrackBar _trackBar;
 
+    private float _valueScale;
+
     public override bool IsUpdateSupported => true;
 
     public SliderUIElement(WinFormsUIProvider winFormsUIProvider,
@@ -37,6 +39,19 @@ public class SliderUIElement : WinFormsUIElement
         _formatShownValueFunc = formatShownValueFunc;
 
         var (keyTextToShow, toolTip) = winFormsUIProvider.ParseTextAndToolTip(keyText);
+
+        if (maxValue - minValue < 5)
+        {
+            // WinForms slider supports only integer values so for small values, we need to multiply that by 100
+            // Then in the _trackBar.ValueChanged we will divide the slider value by _valueScale
+            _valueScale = 100;
+            minValue *= 100;
+            maxValue *= 100;
+        }
+        else
+        {
+            _valueScale = 1; // No scale
+        }
 
         _trackBar = new TrackBar()
         {
@@ -60,7 +75,7 @@ public class SliderUIElement : WinFormsUIElement
 
         _trackBar.ValueChanged += (sender, args) =>
         {
-            _setValueAction?.Invoke((float)_trackBar.Value);
+            _setValueAction?.Invoke((float)(_trackBar.Value / _valueScale));
             UpdateShownValue();
         };
 
@@ -105,7 +120,7 @@ public class SliderUIElement : WinFormsUIElement
             {
                 _valueLabel = new Label()
                 {
-                    Text = formatShownValueFunc((float)_trackBar.Value),
+                    Text = formatShownValueFunc((float)_trackBar.Value / _valueScale),
                     Margin = new Padding(2, 3, 0, 0),
                     //VerticalAlignment = VerticalAlignment.Center,
                     //HorizontalAlignment = HorizontalAlignment.Left,
@@ -116,7 +131,7 @@ public class SliderUIElement : WinFormsUIElement
                 if (shownValueWidth > 0)
                     _valueLabel.Width = (int)shownValueWidth;
                 else if (shownValueWidth == 0)
-                    _valueLabel.Width = MeasureShownValueTextBlock(minValue, maxValue);
+                    _valueLabel.Width = MeasureShownValueTextBlock(minValue / _valueScale, maxValue / _valueScale);
                 // else: when less then zero, then do not set the width
 
                 _flowLayoutPanel.Controls.Add(_valueLabel);
@@ -132,7 +147,7 @@ public class SliderUIElement : WinFormsUIElement
 
     public sealed override void UpdateValue()
     {
-        float newValue = _getValueFunc();
+        float newValue = _getValueFunc() * _valueScale;
 
         _trackBar.Value = Math.Min(_trackBar.Maximum, Math.Max(_trackBar.Minimum, (int)newValue)); // It is not allowed to set Value outsize of Min - Max
 
@@ -160,7 +175,7 @@ public class SliderUIElement : WinFormsUIElement
     private void UpdateShownValue()
     {
         if (_valueLabel != null && _formatShownValueFunc != null)
-            _valueLabel.Text = _formatShownValueFunc((float)_trackBar.Value);
+            _valueLabel.Text = _formatShownValueFunc((float)_trackBar.Value / _valueScale);
     }
 
     private int MeasureShownValueTextBlock(float minValue, float maxValue)
