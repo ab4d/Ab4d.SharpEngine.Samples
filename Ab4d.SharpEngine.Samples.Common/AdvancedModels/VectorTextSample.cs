@@ -92,6 +92,9 @@ public class VectorTextSample : CommonSample
         try
         {
             TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
+
+            // You can also use the async version of LoadFontFile method that read the font file in a background thread:
+            //await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
         }
         catch (Exception ex)
         {
