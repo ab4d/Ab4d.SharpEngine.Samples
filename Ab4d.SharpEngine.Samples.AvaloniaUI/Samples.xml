@@ -116,6 +116,7 @@
 
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
   <Sample Location="Advanced.MultiSceneNodesSample" Title="Multi SceneNodes" />
+  <Sample Location="Advanced.AsyncUploadSample" Title="Async upload" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Multi-touch" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
