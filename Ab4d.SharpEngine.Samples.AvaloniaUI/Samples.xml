@@ -122,5 +122,6 @@
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
+  <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
 
 </Samples>
