@@ -75,10 +75,6 @@ public class BitmapTextSample : CommonSample
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
 
-        RecreateBitmapTextCreator();
-
-        RecreateText();
-
         
         // Add WireGridNode so we can see the effect when text is aligned to camera or when fixed screen size is used
         var wireGridNode = new WireGridNode()
@@ -111,6 +107,10 @@ public class BitmapTextSample : CommonSample
         }
 
         ShowCameraAxisPanel = true;
+
+
+        // Call async method from sync context:
+        _ = RecreateBitmapTextCreatorAsync(RecreateText);
     }
 
     protected override void OnDisposed()
@@ -131,9 +131,9 @@ public class BitmapTextSample : CommonSample
 
         if (_bitmapTextCreator == null)
         {
-            RecreateBitmapTextCreator();
-            if (_bitmapTextCreator == null)
-                return;
+            // Call async method from sync context:
+            _ = RecreateBitmapTextCreatorAsync(RecreateText);
+            return;
         }
 
         _rootTextNode.Clear();
@@ -158,7 +158,7 @@ public class BitmapTextSample : CommonSample
         UpdateBitmapTextTransformation();
     }
 
-    private void RecreateBitmapTextCreator()
+    private async Task RecreateBitmapTextCreatorAsync(Action? recreateTextAction)
     {
         if (Scene == null || Scene.GpuDevice == null)
             return;
@@ -171,15 +171,21 @@ public class BitmapTextSample : CommonSample
 
         if (_bitmapTextCreatorIndex == 0)
         {
-            _bitmapTextCreator = BitmapTextCreator.GetDefaultBitmapTextCreator(Scene);
+            _bitmapTextCreator = await BitmapTextCreator.GetDefaultBitmapTextCreatorAsync(Scene);
         }
         else
         {
             string bitmapFontFileName = _fontFiles[_bitmapTextCreatorIndex];
 
-            var bitmapFont = new BitmapFont(bitmapFontFileName);
-            _bitmapTextCreator = new BitmapTextCreator(Scene, bitmapFont, BitmapIO);
+            var bitmapFont = await BitmapFont.CreateAsync(bitmapFontFileName);
+            _bitmapTextCreator = await BitmapTextCreator.CreateAsync(Scene, bitmapFont, BitmapIO);
+            
+            //var bitmapFont = new BitmapFont(bitmapFontFileName);
+            //_bitmapTextCreator = new BitmapTextCreator(Scene, bitmapFont, BitmapIO);
         }
+
+        if (_bitmapTextCreator != null)
+            recreateTextAction?.Invoke();
     }
     
     private void UpdateBitmapTextTransformation()
@@ -355,8 +361,8 @@ public class BitmapTextSample : CommonSample
         ui.CreateRadioButtons(_fontDescriptions.ToArray(), (selectedIndex, selectedText) =>
             {
                 _bitmapTextCreatorIndex = selectedIndex;
-                RecreateBitmapTextCreator();
-                RecreateText();
+                // Call async method from sync context:
+                _ = RecreateBitmapTextCreatorAsync(RecreateText);
             },
             selectedItemIndex: 0);
 
