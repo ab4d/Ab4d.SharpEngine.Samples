@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
@@ -122,17 +123,12 @@ public class AsyncUploadSample : CommonSample
             modelNode.Material = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
 
 
-            //// If you want to continue executing the method and provide only a simple code that uses the result, use the following:
-            //var createTextureTask = TextureLoader.CreateTextureAsync(_textureFileName, Scene, useSceneCache: false);
-            //_ = createTextureTask.ContinueWith(task =>
-            //{
-            //    if (task.IsCompletedSuccessfully)
-            //        modelNode.Material = new StandardMaterial(task.Result, name: "LazyLoadedGpuImageMaterial");
-            //    else
-            //        modelNode.Material = StandardMaterials.Red;
-            //}, TaskScheduler.FromCurrentSynchronizationContext()); // Call on UI thread because modelNode must not be updated on background thread
-            //
-            //_ = Task.Run(async () => await createTextureTask);
+            // If you want to continue executing the method and provide only a simple code that uses the created GpuImage, use the following:
+            //TextureLoader.CreateTextureAsync(_textureFileName, 
+            //                                 Scene, 
+            //                                 textureCreatedCallback: createdGpuImage => modelNode.Material = new StandardMaterial(createdGpuImage, name: "LazyLoadedGpuImageMaterial"), 
+            //                                 useSceneCache: false,
+            //                                 textureCreationFailedCallback: exception => modelNode.Material = StandardMaterials.Red);
         }
         catch
         {
