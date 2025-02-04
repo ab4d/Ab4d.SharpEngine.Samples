@@ -119,8 +119,20 @@ public class AsyncUploadSample : CommonSample
 
             _disposables.Add(gpuImage);
 
-            var standardMaterial = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
-            modelNode.Material = standardMaterial;
+            modelNode.Material = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
+
+
+            //// If you want to continue executing the method and provide only a simple code that uses the result, use the following:
+            //var createTextureTask = TextureLoader.CreateTextureAsync(_textureFileName, Scene, useSceneCache: false);
+            //_ = createTextureTask.ContinueWith(task =>
+            //{
+            //    if (task.IsCompletedSuccessfully)
+            //        modelNode.Material = new StandardMaterial(task.Result, name: "LazyLoadedGpuImageMaterial");
+            //    else
+            //        modelNode.Material = StandardMaterials.Red;
+            //}, TaskScheduler.FromCurrentSynchronizationContext()); // Call on UI thread because modelNode must not be updated on background thread
+            //
+            //_ = Task.Run(async () => await createTextureTask);
         }
         catch
         {
@@ -151,8 +163,7 @@ public class AsyncUploadSample : CommonSample
 
             _disposables.Add(gpuImage);
 
-            var standardMaterial = new StandardMaterial(gpuImage, name: "GpuImageMaterial");
-            modelNode.Material = standardMaterial;
+            modelNode.Material = new StandardMaterial(gpuImage, name: "GpuImageMaterial");
         }
         catch
         {
