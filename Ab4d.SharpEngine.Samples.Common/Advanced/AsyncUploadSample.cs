@@ -19,7 +19,7 @@ public class AsyncUploadSample : CommonSample
     private MeshModelNode? _meshModelNode1;
     private MeshModelNode? _meshModelNode2;
 
-    private readonly DisposeList _disposables = new();
+    //private readonly DisposeList _disposables = new();
     private readonly string _textureFileName;
 
     private bool _isUploadDelayed = true;
@@ -33,7 +33,7 @@ public class AsyncUploadSample : CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
-        _disposables.Dispose();
+        //_disposables.Dispose();
         base.OnDisposed();
     }
 
@@ -104,30 +104,50 @@ public class AsyncUploadSample : CommonSample
 
         try
         {
-            GpuImage gpuImage;
+            StandardMaterial textureMaterial;
 
-            if (_isUploadDelayed)
+            if (!_isUploadDelayed)
             {
-                await using var fileStream = System.IO.File.OpenRead(_textureFileName);
-                await using var slowStream = new SlowStream(fileStream, delayMilliseconds: 2);
-                gpuImage = await TextureLoader.CreateTextureAsync(slowStream, _textureFileName, Scene, useSceneCache: false);
+                // The easiest way to load texture in the background thread is to use the StandardMaterial,
+                // set the file name and loadInBackground to true.
+                // We can also set the initialDiffuseColor - this will show the material as gray until the texture is loaded.
+                textureMaterial = new StandardMaterial(_textureFileName, 
+                                                       initialDiffuseColor: Colors.Gray, 
+                                                       loadInBackground: true, 
+                                                       name: "LazyLoadedGpuImageMaterial");
+
+                // We could also manually load the texture by using TextureLoader
+                // var gpuImage = await TextureLoader.CreateTextureAsync(_textureFileName, Scene, useSceneCache: false);
+                // textureMaterial = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
+
+                // If you want to continue executing the method and provide only a simple code that uses the created GpuImage, use the following:
+                //TextureLoader.CreateTextureAsync(_textureFileName, 
+                //                                 Scene, 
+                //                                 textureCreatedCallback: createdGpuImage => modelNode.Material = new StandardMaterial(createdGpuImage, name: "LazyLoadedGpuImageMaterial"), 
+                //                                 useSceneCache: false,
+                //                                 textureCreationFailedCallback: exception => modelNode.Material = StandardMaterials.Red);
             }
             else
             {
-                gpuImage = await TextureLoader.CreateTextureAsync(_textureFileName, Scene, useSceneCache: false);
+                // Use SlowStream that adds delay to reading the stream
+                await using var fileStream = System.IO.File.OpenRead(_textureFileName);
+                await using var slowStream = new SlowStream(fileStream, delayMilliseconds: 2); // 2 ms delay is added to each stream.Read call
+
+                // We cannot use stream in the StandardMaterial constructor, because in this case the reading
+                // of the stream would happen after the stream is already closed.
+                //textureMaterial = new StandardMaterial(slowStream,
+                //                                       _textureFileName,
+                //                                       initialDiffuseColor: Colors.Gray,
+                //                                       loadInBackground: true,
+                //                                       name: "LazyLoadedGpuImageMaterial");
+
+                // So we need to manually load the texture by using TextureLoader
+                var gpuImage = await TextureLoader.CreateTextureAsync(slowStream, _textureFileName, Scene, useSceneCache: false);
+
+                textureMaterial = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
             }
 
-            _disposables.Add(gpuImage);
-
-            modelNode.Material = new StandardMaterial(gpuImage, name: "LazyLoadedGpuImageMaterial");
-
-
-            // If you want to continue executing the method and provide only a simple code that uses the created GpuImage, use the following:
-            //TextureLoader.CreateTextureAsync(_textureFileName, 
-            //                                 Scene, 
-            //                                 textureCreatedCallback: createdGpuImage => modelNode.Material = new StandardMaterial(createdGpuImage, name: "LazyLoadedGpuImageMaterial"), 
-            //                                 useSceneCache: false,
-            //                                 textureCreationFailedCallback: exception => modelNode.Material = StandardMaterials.Red);
+            modelNode.Material = textureMaterial;
         }
         catch
         {
@@ -142,23 +162,34 @@ public class AsyncUploadSample : CommonSample
 
         try
         {
-            GpuImage gpuImage;
-
-            if (_isUploadDelayed)
+            if (!_isUploadDelayed)
             {
-                // Use SlowStream that adds delay to reading the stream
-                using var fileStream = System.IO.File.OpenRead(_textureFileName);
-                using var slowStream = new SlowStream(fileStream, delayMilliseconds: 2);
-                gpuImage = TextureLoader.CreateTexture(slowStream, _textureFileName, Scene, useSceneCache: false);
+                var textureMaterial = new StandardMaterial(_textureFileName, name: "GpuImageMaterial");
+                
+                // We could also manually load the texture by using TextureLoader
+                // var gpuImage = TextureLoader.CreateTexture(_textureFileName, Scene, useSceneCache: false);
+                // textureMaterial = new StandardMaterial(gpuImage, name: "GpuImageMaterial");
+
+                modelNode.Material = textureMaterial;
             }
             else
             {
-                gpuImage = TextureLoader.CreateTexture(_textureFileName, Scene, useSceneCache: false);
+                // Use SlowStream that adds delay to reading the stream
+                using var fileStream = System.IO.File.OpenRead(_textureFileName);
+                using var slowStream = new SlowStream(fileStream, delayMilliseconds: 2); // 2 ms delay is added to each stream.Read call
+
+                var textureMaterial = new StandardMaterial(slowStream, _textureFileName, name: "GpuImageMaterial");
+                
+                // We must set the textureMaterial to modelNode inside this else block.
+                // In the setter, the OnInitializeSceneResources method is called and there the loading of the stream happens.
+                // If we would set the Material outside this block, then the stream would be already closed.
+                // In this case we can use the TextureLoader.CreateTexture as shown in the commented code below.
+                modelNode.Material = textureMaterial;
+
+                // We could also manually load the texture by using TextureLoader
+                // var gpuImage = TextureLoader.CreateTexture(slowStream, _textureFileName, Scene, useSceneCache: false);
+                // modelNode.Material = new StandardMaterial(gpuImage, name: "GpuImageMaterial");
             }
-
-            _disposables.Add(gpuImage);
-
-            modelNode.Material = new StandardMaterial(gpuImage, name: "GpuImageMaterial");
         }
         catch
         {
@@ -179,6 +210,7 @@ public class AsyncUploadSample : CommonSample
             if (_isUploadDelayed)
                 System.Threading.Thread.Sleep(500);
 
+            // Create sphere mesh with 300 segments: 90,601 positions and 59,800 triangles
             newSphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: 50, segments: 300, "NewSphereMesh");
         });
 
@@ -192,8 +224,8 @@ public class AsyncUploadSample : CommonSample
         var newVertexBuffer = await gpuDevice.CreateBufferAsync(vertices,        BufferUsageFlags.VertexBuffer, name: "LazyCreateVertexBuffer");
         var newIndexBuffer  = await gpuDevice.CreateBufferAsync(triangleIndices, BufferUsageFlags.IndexBuffer,  name: "LazyCreateIndexBuffer");
 
-        _disposables.Add(newVertexBuffer);
-        _disposables.Add(newIndexBuffer);
+        //_disposables.Add(newVertexBuffer);
+        //_disposables.Add(newIndexBuffer);
 
         // We could also create a new GpuBuffer manually by using the GpuBuffer constructor and then call:
         //await newVertexBuffer.WriteToBufferAsync(vertices); // NOTE: The size of GpuBuffer must be big enough for the vertices
@@ -238,7 +270,7 @@ public class AsyncUploadSample : CommonSample
         if (_isUploadDelayed)
             System.Threading.Thread.Sleep(500);
 
-        // Create a complex sphere mesh
+        // Create sphere mesh with 300 segments: 90,601 positions and 59,800 triangles
         var newSphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: 50, segments: 300, "NewSphereMesh");
 
         var gpuDevice = Scene.GpuDevice;
@@ -248,8 +280,8 @@ public class AsyncUploadSample : CommonSample
         var newVertexBuffer = gpuDevice.CreateBuffer(vertices,        usage: BufferUsageFlags.VertexBuffer, name: "VertexBuffer");
         var newIndexBuffer  = gpuDevice.CreateBuffer(triangleIndices, usage: BufferUsageFlags.IndexBuffer,  name: "IndexBuffer");
 
-        _disposables.Add(newVertexBuffer);
-        _disposables.Add(newIndexBuffer);
+        //_disposables.Add(newVertexBuffer);
+        //_disposables.Add(newIndexBuffer);
 
         // Set custom vertex and index buffer to MeshModelNode
         // See additional comments in CreateMeshAsync
