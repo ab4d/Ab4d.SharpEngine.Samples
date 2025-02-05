@@ -235,77 +235,6 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             _scene.RootNode.Add(texturedMaterialGroup);
 
 
-            // Add textured sample when we support reading texture files
-            if (_bitmapIO != null && _bitmapIO.IsFileFormatImportSupported("jpg") && _bitmapIO.IsFileFormatImportSupported("png"))
-            {
-                var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
-                {
-                    //Material = TextureLoader.CreateTextureMaterial(@"drawable\uvchecker.png", _bitmapIO, gpuDevice, generateMipMaps: false),
-                    //Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Resource.Drawable.uvchecker, _bitmapIO, gpuDevice, generateMipMaps: false),
-                    Material = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice, generateMipMaps: false),
-                };
-
-                texturedMaterialGroup.Add(geometryModel7);
-
-
-                // Use AndroidTextureLoader to load texture from Andorid's resources (image files added to Resources/Drawable folder and with build action set to AndroidResource)
-                var textureMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
-
-                // We could also read textures that are compiled with EmbeddedResources
-                // This require that FileStreamResolver is setup on the AndroidBitmapIO (see MainActivity.ChangeTestScene method)
-                //var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, gpuDevice);
-
-                var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
-                {
-                    Material = textureMaterial,
-                };
-
-                texturedMaterialGroup.Add(geometryModel8);
-
-
-                var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
-                {
-                    Material = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)) // Set color filter to green color only
-                    {
-                        DiffuseTexture = textureMaterial.DiffuseTexture
-                    },
-                };
-
-                texturedMaterialGroup.Add(geometryModel9);
-
-
-                var treePlaneMaterial = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable2Id, _bitmapIO, gpuDevice);
-
-                for (int i = 0; i < 5; i++)
-                {
-                    StandardMaterial usedMaterial;
-
-                    if (i < 2)
-                    {
-                        usedMaterial = treePlaneMaterial;
-                    }
-                    else
-                    {
-                        usedMaterial = (StandardMaterial)treePlaneMaterial.Clone($"TreeTexture_{i}");
-                        usedMaterial.AlphaClipThreshold = 0.2f * (i - 1);
-                    }
-
-                    var treePlane = new PlaneModelNode($"TreePlane_{i}")
-                    {
-                        Position = new Vector3(-400 + i * 50, 20, 350),
-                        Size = new Vector2(100, 150),
-                        Normal = new Vector3(1, 0, 0),
-                        HeightDirection = new Vector3(0, 1, 0),
-                        Material = usedMaterial
-                    };
-
-                    treePlane.BackMaterial = treePlane.Material;
-
-                    _scene.RootNode.Add(treePlane);
-                }
-            }
-
-
             // TEST crating custom texture
             var customTexture = CreateCustomTexture(gpuDevice, 256, 128, alphaValue: 1);
 
@@ -399,56 +328,26 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
 
             // 
-            // SolidColorEffect with texture
+            // Custom SolidColorEffect with texture
             //
-            if (_bitmapIO != null)
+
+            // First check if this custom effect was already created before
+            SolidColorEffect? customSolidColorEffect = _scene.EffectsManager.Get<SolidColorEffect>("CustomSolidColorEffect");
+
+            if (customSolidColorEffect == null)
             {
-                // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
-                var solidColorMaterial2 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
-                solidColorMaterial2.Effect = solidColorEffect;
+                // ... if not, then create the effect now
+                (customSolidColorEffect, var customSolidColorEffectDisposeToken) = _scene.EffectsManager.CreateNew<SolidColorEffect>("CustomSolidColorEffect");
 
-                var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
-                {
-                    Material = solidColorMaterial2,
-                };
-
-                _scene.RootNode.Add(solidColorModel2);
-
-
-                // 
-                // Custom SolidColorEffect with texture
-                //
-
-                // First check if this custom effect was already created before
-                SolidColorEffect? customSolidColorEffect = _scene.EffectsManager.Get<SolidColorEffect>("CustomSolidColorEffect");
-
-                if (customSolidColorEffect == null)
-                {
-                    // ... if not, then create the effect now
-                    (customSolidColorEffect, var customSolidColorEffectDisposeToken) = _scene.EffectsManager.CreateNew<SolidColorEffect>("CustomSolidColorEffect");
-
-                    // Because we have manually created a new instance of an Effect, we are the owners of that effect and therefore we are responsible
-                    // for the lifecylce of that object. The created Effect does not have a Dispose method, so another "user" of the Effect cannot
-                    // dispose it (and ruin our part of the code). So to dispose the Effect we also get a DisposeToken that can be used to dispose the Effect.
-                    // We store that DisposeToken to our _disposables list
-                    _disposables.Add(customSolidColorEffectDisposeToken);
-                }
-
-
-                customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
-
-                // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
-                var solidColorMaterial3 = AndroidTextureLoader.CreateTextureMaterial(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
-                solidColorMaterial3.Effect = customSolidColorEffect;
-
-                var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
-                {
-                    Material = solidColorMaterial3,
-                    CustomRenderingLayer = _scene.TransparentRenderingLayer // when setting OverrideAlpha to a value less than 1 you may also need to set CustomRenderingLayer TransparentRenderingLayer for the objects to be used in transparency sorting.
-                };
-
-                _scene.RootNode.Add(solidColorModel3);
+                // Because we have manually created a new instance of an Effect, we are the owners of that effect and therefore we are responsible
+                // for the lifecylce of that object. The created Effect does not have a Dispose method, so another "user" of the Effect cannot
+                // dispose it (and ruin our part of the code). So to dispose the Effect we also get a DisposeToken that can be used to dispose the Effect.
+                // We store that DisposeToken to our _disposables list
+                _disposables.Add(customSolidColorEffectDisposeToken);
             }
+
+
+            customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
 
             // BoxModel3D
@@ -648,140 +547,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                 _scene.RootNode.Add(line);
             }
 
-
-            var text1Position = new Vector3(-400, 150, 100);
-
-            var wireCross3D = new WireCrossNode(text1Position, Colors.Red);
-            _scene.RootNode.Add(wireCross3D);
-
-
-            //
-            // Show text
-            //
-
-            // Text in SharpEngine is rendered by using bitmap fonts.
-            // Bitmap font is defined by one or more textures with rendered characters and font data that define where on the texture the character is.
-
-            // GetDefaultBitmapTextCreator gets the the BitmapTextCreator with the default bitmap font that is build into the Ab4d.SharpEngine.
-            // The bitmap font is created from Roboto font (Google's Open Font) with size of character set to 64 pixels (see roboto_64 in the Resources\BitmapFonts)
-            var normalBitmapTextCreator = BitmapTextCreator.GetDefaultBitmapTextCreator(_scene);
-
-
-            // Create text node
-            // Usually this is a GeometryModel3D, but in case when bitmap font uses
-            // multiple pages (textures) to define font, then a GroupNode is returned 
-            // with multiple GeometryModel3D (each with its own texture)
-            var textNode1 = normalBitmapTextCreator.CreateTextNode(text: "Text node\r\nwith default font",
-                                                                   position: text1Position,
-                                                                   positionType: PositionTypes.BottomLeft,
-                                                                   textDirection: new Vector3(1, 0, 0),
-                                                                   upDirection: new Vector3(0, 1, 0),
-                                                                   fontSize: 50,
-                                                                   textColor: Colors.Blue,
-                                                                   isSolidColorMaterial: false);
-
-            _scene.RootNode.Add(textNode1);
-
-            // Font is render with "Latin", "Latin-1 Supplement" and "Latin Extended-A" characters and defines many special characters.
-            string textWithSpecialChars = "with special chars:\r\n@*?${}@\r\nüůűščžŠČŽ";
-            var textNode2 = normalBitmapTextCreator.CreateTextNode(text: textWithSpecialChars,
-                                                                   position: text1Position,
-                                                                   positionType: PositionTypes.TopLeft,
-                                                                   textDirection: new Vector3(0, 0, -1),
-                                                                   upDirection: new Vector3(0, 1, 0),
-                                                                   fontSize: 30,
-                                                                   textColor: Colors.SkyBlue,
-                                                                   isSolidColorMaterial: false);
-
-            _scene.RootNode.Add(textNode2);
-
-            // Measure text size
-            var textSize = normalBitmapTextCreator.GetTextSize(textWithSpecialChars, fontSize: 30);
-
-
-            // Calculate the end position of the text
-            // This is done by moving the start position (text1Position) for textDirection from textNode2 multiplied by textSize.X and upDirection multiplied by textSize.Y
-            var endTextPosition = text1Position + new Vector3(0, 0, -1) * textSize.X // textNode2.textDirection * textSize.X
-                                                - new Vector3(0, 1, 0) * textSize.Y; // textNode2.upDirection * textSize.Y
-
-            var wireCross2 = new WireCrossNode(endTextPosition, Colors.Green, lineLength: 40, lineThickness: 2); // lineLength is 50 by default; lineThickness is 1 by default
-            _scene.RootNode.Add(wireCross2);
-
-
-            //if (_bitmapIO != null)
-            //{
-            //    // Use a custom font (ArialBlack or RobotoBlack)
-            //    //
-            //    // Bitmap fonts in this sample are generated by "Bitmap font generator" from https://www.angelcode.com/products/bmfont/
-            //    // See remarks for BitmapTextCreator.cs file for more info: https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Utilities_BitmapTextCreator.htm
-            //    //
-            //    // fnt and png files are copied to output folder into "Resources\BitmapFonts\" folder.
-            //    //
-            //    // Note that custom fonts use characters that are rendered to 128 pixels and are better quality than the build-in font that use 64 pixels.
-            //    // This can be see if you zoom to text.
-            //    string fontPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\");
-
-            //    // On Windows we are allowed to use Arial font; on other systems use use Roboto font (Google's Open Font)
-            //    bool useArialFont = OperatingSystem.IsWindows();
-
-            //    string fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
-
-            //    var blackBitmapFont = CreateBitmapFont(fontFileName, _bitmapIO);
-
-            //    if (blackBitmapFont != null)
-            //    {
-            //        var blackBitmapTextCreator = new BitmapTextCreator(_scene, blackBitmapFont, _bitmapIO)
-            //        {
-            //            CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
-            //        };
-
-            //        _disposables.Add(blackBitmapTextCreator);
-
-            //        var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
-            //                                                              position: text1Position - new Vector3(0, textSize.Y + 20, 0),
-            //                                                              positionType: PositionTypes.TopLeft,
-            //                                                              textDirection: new Vector3(1, 0, 0),
-            //                                                              upDirection: new Vector3(0, 1, 0),
-            //                                                              fontSize: 50,
-            //                                                              textColor: Colors.Orange,
-            //                                                              isSolidColorMaterial: false);
-
-            //        _scene.RootNode.Add(textNode3);
-            //    }
-
-
-            //    // It is possible to generate bitmap font with outline (using "Outlined text with alpha" preset in Bitmap font generator)
-            //    // Note that outline is always black; we can set the color of the font.
-            //    // Also set isSolidColorMaterial to true. This render the font with the specified color regardless of the lights and text angle.
-            //    // To see the difference in color compare this text with the ArialBlack text (defined above)
-            //    fontFileName = fontPath + (useArialFont ? "arial_black_with_outline_128.fnt" : "roboto_black_with_outline_128.fnt");
-
-            //    var blackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, _bitmapIO);
-
-            //    if (blackWithOutlineBitmapFont != null)
-            //    {
-            //        var blackWithOutlineBitmapTextCreator = new BitmapTextCreator(_scene, blackWithOutlineBitmapFont, _bitmapIO)
-            //        {
-            //            AdditionalLineSpace = -20, // Decrease default line space
-            //            CacheFontGpuImages = false // Do not cache the font bitmaps for black_with_outline font version (this will also dispose the font bitmaps when this sample is not shown any more)
-            //        };
-
-            //        _disposables.Add(blackWithOutlineBitmapTextCreator);
-
-            //        var textNode4 = blackWithOutlineBitmapTextCreator.CreateTextNode(text: "Text with outline and\r\nSolidColorMaterial",
-            //                                                                         position: text1Position - new Vector3(0, textSize.Y - 20, 0),
-            //                                                                         positionType: PositionTypes.TopRight,
-            //                                                                         textDirection: new Vector3(1, 0, 0),
-            //                                                                         upDirection: new Vector3(0, 1, 0),
-            //                                                                         fontSize: 40,
-            //                                                                         textColor: Colors.Orange,
-            //                                                                         isSolidColorMaterial: true); // Using solid color material
-
-            //        _scene.RootNode.Add(textNode4);
-            //    }
-            //}
-
-
+            
             // Add InstancedMeshNode that can show many instances of the same mesh (sphere in this sample).
             // The color, position, size and orientation of each instance is defined by instancesData.
             var sphereMesh = Meshes.MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 2, segments: 30);
@@ -807,12 +573,264 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
             _scene.RootNode.Add(_additionalObjectsGroup);
+
+
+            // Start running async task from sync context and continue execution in this method
+            _ = CreateBitmapTextNodesAsync(_scene);
+            _ = CreateSceneNodesWithTexturesAsync(gpuDevice, _scene, texturedMaterialGroup, customSolidColorEffect);
+
             
             AnimateModels();
 
 #if ADVANCED_TIME_MEASUREMENT
             System.Diagnostics.Debug.WriteLine($"OnCreateScene METHOD TIME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
 #endif
+        }
+
+        private async Task CreateSceneNodesWithTexturesAsync(VulkanDevice gpuDevice, Scene scene, GroupNode texturedMaterialGroup, SolidColorEffect customSolidColorEffect)
+        {
+            if (_bitmapIO == null || !_bitmapIO.IsFileFormatImportSupported("png"))
+                return;
+
+
+            // We can await until the texture is loaded:
+            //var textureMaterial1 = await AndroidTextureLoader.CreateTextureMaterialAsync(_androidResources, Drawable1Id, _bitmapIO, gpuDevice, generateMipMaps: false);
+
+            // But instead we use CreateTextureMaterialAsync that takes initialDiffuseColor as the first parameter.
+            // This immediately returns a StandardMaterial with DiffuseColor set to the initialDiffuseColor.
+            // Also, the texture starts loading in the background. When it is loaded, the StandardMaterial is updated
+            // by setting the DiffuseTexture to the loaded texture.
+            var textureMaterial1 = AndroidTextureLoader.CreateTextureMaterialAsync(initialDiffuseColor: Colors.Gray, _androidResources, Drawable1Id, _bitmapIO, gpuDevice, generateMipMaps: false);
+
+            var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
+            {
+                Material = textureMaterial1
+            };
+
+            texturedMaterialGroup.Add(geometryModel7);
+
+
+            // Use AndroidTextureLoader to load texture from Andorid's resources (image files added to Resources/Drawable folder and with build action set to AndroidResource)
+            var textureMaterial2 = await AndroidTextureLoader.CreateTextureMaterialAsync(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
+
+            // We could also read textures that are compiled with EmbeddedResources
+            // This require that FileStreamResolver is setup on the AndroidBitmapIO (see MainActivity.ChangeTestScene method)
+            //var textureMaterial = TextureLoader.CreateTextureMaterial(@"Resources\uvchecker.png", _bitmapIO, gpuDevice);
+
+            var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
+            {
+                Material = textureMaterial2,
+            };
+
+            texturedMaterialGroup.Add(geometryModel8);
+
+
+            var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
+            {
+                Material = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)) // Set color filter to green color only
+                {
+                    DiffuseTexture = textureMaterial2.DiffuseTexture
+                },
+            };
+
+            texturedMaterialGroup.Add(geometryModel9);
+
+
+            var treePlaneMaterial = await AndroidTextureLoader.CreateTextureMaterialAsync(_androidResources, Drawable2Id, _bitmapIO, gpuDevice);
+
+            for (int i = 0; i < 5; i++)
+            {
+                StandardMaterial usedMaterial;
+
+                if (i < 2)
+                {
+                    usedMaterial = treePlaneMaterial;
+                }
+                else
+                {
+                    usedMaterial = (StandardMaterial)treePlaneMaterial.Clone($"TreeTexture_{i}");
+                    usedMaterial.AlphaClipThreshold = 0.2f * (i - 1);
+                }
+
+                var treePlane = new PlaneModelNode($"TreePlane_{i}")
+                {
+                    Position = new Vector3(-400 + i * 50, 20, 350),
+                    Size = new Vector2(100, 150),
+                    Normal = new Vector3(1, 0, 0),
+                    HeightDirection = new Vector3(0, 1, 0),
+                    Material = usedMaterial
+                };
+
+                treePlane.BackMaterial = treePlane.Material;
+
+                scene.RootNode.Add(treePlane);
+            }
+
+
+            // 
+            // SolidColorEffect with texture
+            //
+
+            // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
+            var solidColorMaterial2 = await AndroidTextureLoader.CreateTextureMaterialAsync(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
+            
+            var solidColorEffect = _scene.EffectsManager.GetDefault<SolidColorEffect>();
+            solidColorMaterial2.Effect = solidColorEffect;
+
+            var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
+            {
+                Material = solidColorMaterial2,
+            };
+
+            scene.RootNode.Add(solidColorModel2);
+
+
+            // We can read the same texture again because by default AndroidTextureLoader caches the created GpuImages objects
+            var solidColorMaterial3 = await AndroidTextureLoader.CreateTextureMaterialAsync(_androidResources, Drawable1Id, _bitmapIO, gpuDevice);
+            solidColorMaterial3.Effect = customSolidColorEffect;
+
+            var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
+            {
+                Material = solidColorMaterial3,
+                CustomRenderingLayer = _scene.TransparentRenderingLayer // when setting OverrideAlpha to a value less than 1 you may also need to set CustomRenderingLayer TransparentRenderingLayer for the objects to be used in transparency sorting.
+            };
+
+            _scene.RootNode.Add(solidColorModel3);
+        }
+
+        private async Task CreateBitmapTextNodesAsync(Scene scene)
+        {
+            var text1Position = new Vector3(-400, 150, 100);
+
+            var wireCross3D = new WireCrossNode(text1Position, Colors.Red);
+            scene.RootNode.Add(wireCross3D);
+
+
+            //
+            // Show text
+            //
+
+            // Text in SharpEngine is rendered by using bitmap fonts.
+            // Bitmap font is defined by one or more textures with rendered characters and font data that define where on the texture the character is.
+
+            // GetDefaultBitmapTextCreator gets the the BitmapTextCreator with the default bitmap font that is build into the Ab4d.SharpEngine.
+            // The bitmap font is created from Roboto font (Google's Open Font) with size of character set to 64 pixels (see roboto_64 in the Resources\BitmapFonts)
+            var normalBitmapTextCreator = await BitmapTextCreator.GetDefaultBitmapTextCreatorAsync(scene);
+
+
+            // Create text node
+            // Usually this is a GeometryModel3D, but in case when bitmap font uses
+            // multiple pages (textures) to define font, then a GroupNode is returned 
+            // with multiple GeometryModel3D (each with its own texture)
+            var textNode1 = normalBitmapTextCreator.CreateTextNode(text: "Text node\r\nwith default font",
+                                                                   position: text1Position,
+                                                                   positionType: PositionTypes.BottomLeft,
+                                                                   textDirection: new Vector3(1, 0, 0),
+                                                                   upDirection: new Vector3(0, 1, 0),
+                                                                   fontSize: 50,
+                                                                   textColor: Colors.Blue,
+                                                                   isSolidColorMaterial: false);
+
+            scene.RootNode.Add(textNode1);
+
+            // Font is render with "Latin", "Latin-1 Supplement" and "Latin Extended-A" characters and defines many special characters.
+            string textWithSpecialChars = "with special chars:\r\n@*?${}@\r\nüůűščžŠČŽ";
+            var textNode2 = normalBitmapTextCreator.CreateTextNode(text: textWithSpecialChars,
+                                                                   position: text1Position,
+                                                                   positionType: PositionTypes.TopLeft,
+                                                                   textDirection: new Vector3(0, 0, -1),
+                                                                   upDirection: new Vector3(0, 1, 0),
+                                                                   fontSize: 30,
+                                                                   textColor: Colors.SkyBlue,
+                                                                   isSolidColorMaterial: false);
+
+            _scene.RootNode.Add(textNode2);
+
+            // Measure text size
+            var textSize = normalBitmapTextCreator.GetTextSize(textWithSpecialChars, fontSize: 30);
+
+
+            // Calculate the end position of the text
+            // This is done by moving the start position (text1Position) for textDirection from textNode2 multiplied by textSize.X and upDirection multiplied by textSize.Y
+            var endTextPosition = text1Position + new Vector3(0, 0, -1) * textSize.X // textNode2.textDirection * textSize.X
+                                                - new Vector3(0, 1, 0) * textSize.Y; // textNode2.upDirection * textSize.Y
+
+            var wireCross2 = new WireCrossNode(endTextPosition, Colors.Green, lineLength: 40, lineThickness: 2); // lineLength is 50 by default; lineThickness is 1 by default
+            scene.RootNode.Add(wireCross2);
+
+
+            //if (_bitmapIO != null)
+            //{
+            //    // Use a custom font (ArialBlack or RobotoBlack)
+            //    //
+            //    // Bitmap fonts in this sample are generated by "Bitmap font generator" from https://www.angelcode.com/products/bmfont/
+            //    // See remarks for BitmapTextCreator.cs file for more info: https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Utilities_BitmapTextCreator.htm
+            //    //
+            //    // fnt and png files are copied to output folder into "Resources\BitmapFonts\" folder.
+            //    //
+            //    // Note that custom fonts use characters that are rendered to 128 pixels and are better quality than the build-in font that use 64 pixels.
+            //    // This can be see if you zoom to text.
+            //    string fontPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\");
+
+            //    // On Windows we are allowed to use Arial font; on other systems use use Roboto font (Google's Open Font)
+            //    bool useArialFont = OperatingSystem.IsWindows();
+
+            //    string fontFileName = fontPath + (useArialFont ? "arial_black_128.fnt" : "roboto_black_128.fnt");
+
+            //    var blackBitmapFont = await CreateBitmapFontAsync(fontFileName, _bitmapIO);
+
+            //    if (blackBitmapFont != null)
+            //    {
+            //        var blackBitmapTextCreator = await BitmapTextCreator.CreateAsync(_scene, blackBitmapFont, _bitmapIO)
+            //        {
+            //            CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
+            //        };
+
+            //        _disposables.Add(blackBitmapTextCreator);
+
+            //        var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
+            //                                                              position: text1Position - new Vector3(0, textSize.Y + 20, 0),
+            //                                                              positionType: PositionTypes.TopLeft,
+            //                                                              textDirection: new Vector3(1, 0, 0),
+            //                                                              upDirection: new Vector3(0, 1, 0),
+            //                                                              fontSize: 50,
+            //                                                              textColor: Colors.Orange,
+            //                                                              isSolidColorMaterial: false);
+
+            //        scene.RootNode.Add(textNode3);
+            //    }
+
+
+            //    // It is possible to generate bitmap font with outline (using "Outlined text with alpha" preset in Bitmap font generator)
+            //    // Note that outline is always black; we can set the color of the font.
+            //    // Also set isSolidColorMaterial to true. This render the font with the specified color regardless of the lights and text angle.
+            //    // To see the difference in color compare this text with the ArialBlack text (defined above)
+            //    fontFileName = fontPath + (useArialFont ? "arial_black_with_outline_128.fnt" : "roboto_black_with_outline_128.fnt");
+
+            //    var blackWithOutlineBitmapFont = await CreateBitmapFontAsync(fontFileName, _bitmapIO);
+
+            //    if (blackWithOutlineBitmapFont != null)
+            //    {
+            //        var blackWithOutlineBitmapTextCreator = await BitmapTextCreator.CreateAsync(_scene, blackWithOutlineBitmapFont, _bitmapIO)
+            //        {
+            //            AdditionalLineSpace = -20, // Decrease default line space
+            //            CacheFontGpuImages = false // Do not cache the font bitmaps for black_with_outline font version (this will also dispose the font bitmaps when this sample is not shown any more)
+            //        };
+
+            //        _disposables.Add(blackWithOutlineBitmapTextCreator);
+
+            //        var textNode4 = blackWithOutlineBitmapTextCreator.CreateTextNode(text: "Text with outline and\r\nSolidColorMaterial",
+            //                                                                         position: text1Position - new Vector3(0, textSize.Y - 20, 0),
+            //                                                                         positionType: PositionTypes.TopRight,
+            //                                                                         textDirection: new Vector3(1, 0, 0),
+            //                                                                         upDirection: new Vector3(0, 1, 0),
+            //                                                                         fontSize: 40,
+            //                                                                         textColor: Colors.Orange,
+            //                                                                         isSolidColorMaterial: true); // Using solid color material
+
+            //        scene.RootNode.Add(textNode4);
+            //    }
+            //}
         }
 
         public void AnimateModels()
@@ -913,7 +931,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             return gpuImage;
         }
 
-        private static BitmapFont? CreateBitmapFont(string fontFileName, IBitmapIO bitmapIO)
+        private static async Task<BitmapFont?> CreateBitmapFontAsync(string fontFileName, IBitmapIO bitmapIO)
         {
             string? usedFileName = null;
             Stream? fileStream = null;
@@ -947,12 +965,12 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 if (fileStream != null)
                 {
-                    arialBitmapFont = new BitmapFont(fileStream); // load from stream
+                    arialBitmapFont = await BitmapFont.CreateAsync(fileStream); // load from stream
                     fileStream.Close();
                 }
                 else if (usedFileName != null)
                 {
-                    arialBitmapFont = new BitmapFont(usedFileName);
+                    arialBitmapFont = await BitmapFont.CreateAsync(usedFileName);
                 }
             }
 
