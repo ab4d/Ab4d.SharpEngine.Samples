@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Threading.Tasks;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
@@ -190,8 +189,8 @@ public class AsyncUploadSample : CommonSample
         var vertices = newSphereMesh.Vertices!;
         var triangleIndices = newSphereMesh.TriangleIndices!;
 
-        var newVertexBuffer = await gpuDevice.CreateGpuBufferAsync(vertices,        BufferUsageFlags.VertexBuffer, name: "LazyCreateVertexBuffer");
-        var newIndexBuffer  = await gpuDevice.CreateGpuBufferAsync(triangleIndices, BufferUsageFlags.IndexBuffer,  name: "LazyCreateIndexBuffer");
+        var newVertexBuffer = await gpuDevice.CreateBufferAsync(vertices,        BufferUsageFlags.VertexBuffer, name: "LazyCreateVertexBuffer");
+        var newIndexBuffer  = await gpuDevice.CreateBufferAsync(triangleIndices, BufferUsageFlags.IndexBuffer,  name: "LazyCreateIndexBuffer");
 
         _disposables.Add(newVertexBuffer);
         _disposables.Add(newIndexBuffer);
