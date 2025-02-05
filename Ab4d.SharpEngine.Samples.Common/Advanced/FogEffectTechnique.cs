@@ -109,7 +109,7 @@ public class FogEffectTechnique : EffectTechnique
     {
         // Set default values
         InputAssemblyState        = CommonStatesManager.TriangleListInputAssemblyState;
-        RasterizationState        = CommonStatesManager.CullCounterClockwise;
+        RasterizationState        = CommonStatesManager.CullClockwise;
         ColorBlendAttachmentState = CommonStatesManager.OpaqueAttachmentState;
         DepthStencilState         = CommonStatesManager.DepthReadWrite;
 

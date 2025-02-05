@@ -231,13 +231,13 @@ public class FogEffect : Effect
 
         bool hasTransparency = false;
 
-        bool isFrontCounterClockwise = (renderingItem.Flags & RenderingItemFlags.IsBackFaceMaterial) != 0;
+        bool isFrontClockwise = (renderingItem.Flags & RenderingItemFlags.IsBackFaceMaterial) != 0;
         if (!renderingContext.Scene.IsRightHandedCoordinateSystem)
-            isFrontCounterClockwise = !isFrontCounterClockwise;
+            isFrontClockwise = !isFrontClockwise;
 
         // Different Vulkan Pipeline objects are required for different values of hasTransparency, isFrontCounterClockwise
         // The GetEffectTechnique gets or creates the required EffectTechnique.
-        var effectTechnique = GetEffectTechnique(hasTransparency, isFrontCounterClockwise, renderingContext, out var techniqueIndex);
+        var effectTechnique = GetEffectTechnique(hasTransparency, isFrontClockwise, renderingContext, out var techniqueIndex);
 
         if (effectTechnique != null && effectTechnique.Pipeline.IsNull())
             effectTechnique.CreatePipeline(renderingContext, PipelineCreateFlags.AllowDerivatives, effectTechnique.Name);
@@ -274,7 +274,7 @@ public class FogEffect : Effect
             stateSortValue = (uint)(this.Id << 8);
         }
 
-        if (isFrontCounterClockwise) // is back material
+        if (isFrontClockwise) // is back material
             stateSortValue -= (uint)techniqueIndex; // make stateSortValue for back material smaller so back materials are rendered before front materials
         else
             stateSortValue += (uint)techniqueIndex;
@@ -323,7 +323,7 @@ public class FogEffect : Effect
                 ShaderStages                                = _pipelineShaderStages,
                 PipelineLayout                              = _pipelineLayout,
                 ColorBlendAttachmentState                   = CommonStatesManager.OpaqueAttachmentState,
-                RasterizationState                          = CommonStatesManager.CullCounterClockwise,
+                RasterizationState                          = CommonStatesManager.CullClockwise,
                 UseNegativeMaterialIndexForBackFaceMaterial = true
             };
 
@@ -335,7 +335,7 @@ public class FogEffect : Effect
         _standardTechnique.PipelineLayout = _pipelineLayout;
     }
 
-    private FogEffectTechnique? GetEffectTechnique(bool hasTransparency, bool isFrontCounterClockwise, RenderingContext renderingContext, out int techniqueIndex)
+    private FogEffectTechnique? GetEffectTechnique(bool hasTransparency, bool isFrontClockwise, RenderingContext renderingContext, out int techniqueIndex)
     {
         if (_vertexBufferDescription == null)
         {
@@ -351,7 +351,7 @@ public class FogEffect : Effect
         EnsureStandardTechniqueWithPipeline(renderingContext);
 
 
-        techniqueIndex = GetEffectTechniqueIndex(hasTransparency, isFrontCounterClockwise);
+        techniqueIndex = GetEffectTechniqueIndex(hasTransparency, isFrontClockwise);
         var effectTechnique = _effectTechniques[techniqueIndex];
         
         if (effectTechnique == null)
@@ -363,7 +363,7 @@ public class FogEffect : Effect
             else
             {
                 string techniqueName = (hasTransparency ? "Transparent" : "") +
-                                       (isFrontCounterClockwise ? "FrontCounterClockwise" : "") +
+                                       (isFrontClockwise ? "FrontClockwise" : "") +
                                        "Technique";
 
                 Log.Trace?.Write(LogArea, Id, "Creating EffectTechnique: FogEffect-{0} (index: {1})", techniqueName, techniqueIndex);
@@ -384,8 +384,8 @@ public class FogEffect : Effect
                     //    effectTechnique.ColorBlendAttachmentState = CommonStatesManager.NonPremultipliedAlphaBlendAttachmentState;
                 }
                 
-                if (isFrontCounterClockwise)
-                    effectTechnique.RasterizationState = CommonStatesManager.CullClockwise;
+                if (isFrontClockwise)
+                    effectTechnique.RasterizationState = CommonStatesManager.CullCounterClockwise;
 
                 _effectTechniques[techniqueIndex] = effectTechnique;
             }
