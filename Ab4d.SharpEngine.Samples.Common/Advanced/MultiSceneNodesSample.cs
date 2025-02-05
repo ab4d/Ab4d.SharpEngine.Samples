@@ -6,17 +6,13 @@ using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
 using System.Numerics;
-using System.Security.Cryptography;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -104,10 +100,6 @@ public class MultiSceneNodesSample : CommonSample
         SceneView.SceneRendered -= SceneViewOnSceneRendered;
 
         System.Diagnostics.Debug.WriteLine($"TIME TO FIRST FRAME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
-        System.Diagnostics.Debug.WriteLine($"BufferStagingTicks: {SceneView.GpuDevice.BufferStagingTimeMs} ms");
-        System.Diagnostics.Debug.WriteLine($"ImageStagingTime: {SceneView.GpuDevice.ImageStagingTimeMs} ms");
-        System.Diagnostics.Debug.WriteLine($"TextureLoader.LoadBitmapTimeMs: {TextureLoader.LoadBitmapTimeMs} ms");
-        System.Diagnostics.Debug.WriteLine($"TextureLoader.CreateGpuImageTimeMs: {TextureLoader.CreateGpuImageTimeMs} ms");
         System.Diagnostics.Debug.WriteLine($"loadBitmapFontsTime: {_loadBitmapFontsTime} ms");
     }
 #endif
@@ -240,19 +232,35 @@ public class MultiSceneNodesSample : CommonSample
             if (gpuDevice != null)
             {
                 // Manually load texture with TextureLoader (this way we can set generateMipMaps to false)
-                var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", gpuDevice, BitmapIO, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
-                _disposables.Add(textureWithoutMipMaps);
 
                 var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
                 {
-                    Material = new StandardMaterial(textureWithoutMipMaps)
+                    Material = StandardMaterials.Gray
                 };
+
+                // Use async method to load texture in background thread and when loaded set that to Material:
+                TextureLoader.CreateTextureAsync(
+                    @"Resources\Textures\10x10-texture.png", gpuDevice, 
+                    textureCreatedCallback: createdGpuImage => geometryModel7.Material = new StandardMaterial(createdGpuImage),
+                    generateMipMaps: false, useGpuDeviceCache: false);
+
+                // We could also use await, but this would wait with executing the code in this method until the texture is loaded
+                //var gpuImage = await TextureLoader.CreateTextureAsync(@"Resources\Textures\10x10-texture.png", gpuDevice, generateMipMaps: false, useGpuDeviceCache: false);
+
+                // Sync code:
+                //var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", gpuDevice, BitmapIO, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
+                //_disposables.Add(textureWithoutMipMaps);
+
+                //var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
+                //{
+                //    Material = new StandardMaterial(textureWithoutMipMaps)
+                //};
 
                 texturedMaterialGroup.Add(geometryModel7);
             }
 
             // The most simple way to create texture is to set file name to StandardMaterial constructor (this can also lazy load the texture if currently GpuDevice is not yet set)
-            var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO);
+            var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
             var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
             {
                 Material = textureMaterial,
@@ -261,20 +269,29 @@ public class MultiSceneNodesSample : CommonSample
             texturedMaterialGroup.Add(geometryModel8);
 
 
+            var greenMaskTextureMaterial = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)); // Set color filter to green color only
+
             var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
             {
-                Material = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)) // Set color filter to green color only
-                {
-                    DiffuseTexture = textureMaterial.DiffuseTexture
-                },
+                Material = greenMaskTextureMaterial
             };
 
             texturedMaterialGroup.Add(geometryModel9);
 
 
+            TextureLoader.CreateTextureAsync(
+                @"Resources\Textures\uvchecker2.jpg", gpuDevice,
+                textureCreatedCallback: createdGpuImage =>
+                {
+                    textureMaterial.DiffuseTexture = createdGpuImage;
+                    greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
+                },
+                bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
+
+
             var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
             {
-                Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO),
+                Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true),
             };
 
             texturedMaterialGroup.Add(geometryModel10);
@@ -302,7 +319,7 @@ public class MultiSceneNodesSample : CommonSample
         }
 
 
-        var treePlaneMaterial = new StandardMaterial(@"Resources\Textures\TreeTexture.png", BitmapIO);
+        var treePlaneMaterial = new StandardMaterial(@"Resources\Textures\TreeTexture.png", BitmapIO, initialDiffuseColor: Colors.Transparent, loadInBackground: true);
 
         for (int i = 0; i < 5; i++)
         {
@@ -422,7 +439,7 @@ public class MultiSceneNodesSample : CommonSample
         // 
         // SolidColorMaterial with texture
         //
-        var solidColorMaterial2 = new SolidColorMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO);
+        var solidColorMaterial2 = new SolidColorMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
         var solidColorModel2 = new BoxModelNode(centerPosition: new Vector3(120, 0, -280), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
         {
             Material = solidColorMaterial2,
@@ -453,7 +470,7 @@ public class MultiSceneNodesSample : CommonSample
 
         customSolidColorEffect.OverrideColor = new Color4(0.3f, 1f, 0.3f, 0.5f);
 
-        var solidColorMaterial3 = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO);
+        var solidColorMaterial3 = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
         solidColorMaterial3.Effect = customSolidColorEffect;
 
         var solidColorModel3 = new BoxModelNode(centerPosition: new Vector3(120, 0, -200), size: new Vector3(80, 80, 60), "SolidColorModel-withTexture")
@@ -660,23 +677,58 @@ public class MultiSceneNodesSample : CommonSample
         }
 
 
-        
+        //
+        // Show text
+        //
+
+        // Start running async task from sync context and continue execution in this method
+        _ = CreateBitmapTextNodesAsync(scene);
+
+
+        // Add InstancedMeshNode that can show many instances of the same mesh (sphere in this sample).
+        // The color, position, size and orientation of each instance is defined by instancesData.
+        var sphereMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 2, segments: 30);
+
+        var instancedMeshNode = new InstancedMeshNode("InstancedMeshNode");
+        instancedMeshNode.Mesh = sphereMesh;
+
+        var instancesData = CreateInstancesData(center: new Vector3(150, 0, 100),
+                                                                    size: new Vector3(100, 40, 100),
+                                                                    modelScaleFactor: 1,
+                                                                    xCount: 10, yCount: 4, zCount: 10,
+                                                                    useTransparency: false);
+
+        instancedMeshNode.SetInstancesData(instancesData);
+
+        scene.RootNode.Add(instancedMeshNode);
+
+
+
+        // ********** Setup lights group that shows models for lights **********
+        _lightsGroup = new GroupNode("LightGroup");
+        scene.RootNode.Add(_lightsGroup);
+
+        _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
+        scene.RootNode.Add(_additionalObjectsGroup);
+
+#if ADVANCED_TIME_MEASUREMENT
+        System.Diagnostics.Debug.WriteLine($"OnCreateScene METHOD TIME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
+#endif
+    }
+
+    private async Task CreateBitmapTextNodesAsync(Scene scene)
+    {
         var text1Position = new Vector3(-400, 150, 100);
 
         var wireCross3D = new WireCrossNode(text1Position, Colors.Red);
         scene.RootNode.Add(wireCross3D);
-        
-        
-        //
-        // Show text
-        //
 
         // Text in SharpEngine is rendered by using bitmap fonts.
         // Bitmap font is defined by one or more textures with rendered characters and font data that define where on the texture the character is.
 
         // GetDefaultBitmapTextCreator gets the BitmapTextCreator with the default bitmap font that is build into the Ab4d.SharpEngine.
         // The bitmap font is created from Roboto font (Google's Open Font) with size of character set to 64 pixels (see roboto_64 in the Resources\BitmapFonts)
-        var normalBitmapTextCreator = BitmapTextCreator.GetDefaultBitmapTextCreator(scene);
+        var normalBitmapTextCreator = await BitmapTextCreator.GetDefaultBitmapTextCreatorAsync(scene);
 
 
         // Create text node
@@ -739,14 +791,11 @@ public class MultiSceneNodesSample : CommonSample
         //var blackBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
         if (scene.GpuDevice != null)
         {
-            var blackBitmapFont = CreateBitmapFont(fontFileName, scene.GpuDevice.DefaultBitmapIO);
+            var blackBitmapFont = await CreateBitmapFontAsync(fontFileName, scene.GpuDevice.DefaultBitmapIO);
 
             if (blackBitmapFont != null)
             {
-                var blackBitmapTextCreator = new BitmapTextCreator(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO)
-                {
-                    CacheFontGpuImages = false // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
-                };
+                var blackBitmapTextCreator = await BitmapTextCreator.CreateAsync(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO, cacheFontGpuImages: false); // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
 
                 _disposables.Add(blackBitmapTextCreator);
 
@@ -770,7 +819,8 @@ public class MultiSceneNodesSample : CommonSample
         // To see the difference in color compare this text with the ArialBlack text (defined above)
         fontFileName = fontPath + (useArialFont ? "arial_black_with_outline_128.fnt" : "roboto_black_with_outline_128.fnt");
 
-        var blackWithOutlineBitmapFont = CreateBitmapFont(fontFileName, BitmapIO);
+        var blackWithOutlineBitmapFont = await CreateBitmapFontAsync(fontFileName, BitmapIO);
+
 
         if (blackWithOutlineBitmapFont != null && scene.GpuDevice != null)
         {
@@ -793,37 +843,6 @@ public class MultiSceneNodesSample : CommonSample
 
             scene.RootNode.Add(textNode4);
         }
-
-
-        // Add InstancedMeshNode that can show many instances of the same mesh (sphere in this sample).
-        // The color, position, size and orientation of each instance is defined by instancesData.
-        var sphereMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 2, segments: 30);
-
-        var instancedMeshNode = new InstancedMeshNode("InstancedMeshNode");
-        instancedMeshNode.Mesh = sphereMesh;
-
-        var instancesData = CreateInstancesData(center: new Vector3(150, 0, 100),
-                                                                    size: new Vector3(100, 40, 100),
-                                                                    modelScaleFactor: 1,
-                                                                    xCount: 10, yCount: 4, zCount: 10,
-                                                                    useTransparency: false);
-
-        instancedMeshNode.SetInstancesData(instancesData);
-
-        scene.RootNode.Add(instancedMeshNode);
-
-
-
-        // ********** Setup lights group that shows models for lights **********
-        _lightsGroup = new GroupNode("LightGroup");
-        scene.RootNode.Add(_lightsGroup);
-
-        _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
-        scene.RootNode.Add(_additionalObjectsGroup);
-
-#if ADVANCED_TIME_MEASUREMENT
-        System.Diagnostics.Debug.WriteLine($"OnCreateScene METHOD TIME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
-#endif
     }
 
     protected override void OnCreateLights(Scene scene)
@@ -942,7 +961,7 @@ public class MultiSceneNodesSample : CommonSample
         return gpuImage;
     }
 
-    private static BitmapFont? CreateBitmapFont(string fontFileName, IBitmapIO bitmapIO)
+    private static async Task<BitmapFont?> CreateBitmapFontAsync(string fontFileName, IBitmapIO bitmapIO)
     {
         string? usedFileName = null;
         Stream? fileStream = null;
@@ -976,12 +995,12 @@ public class MultiSceneNodesSample : CommonSample
         {
             if (fileStream != null)
             {
-                arialBitmapFont = new BitmapFont(fileStream); // load from stream
+                arialBitmapFont = await BitmapFont.CreateAsync(fileStream); // load from stream
                 fileStream.Close();
             }
             else if (usedFileName != null)
             {
-                arialBitmapFont = new BitmapFont(usedFileName);
+                arialBitmapFont = await BitmapFont.CreateAsync(usedFileName);
             }
         }
 
