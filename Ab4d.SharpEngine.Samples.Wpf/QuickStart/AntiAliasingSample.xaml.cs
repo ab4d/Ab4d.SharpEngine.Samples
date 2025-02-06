@@ -378,7 +378,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 {
                     targetPositionCamera.Heading = 0;
                     targetPositionCamera.Attitude = 0;
-                    targetPositionCamera.ViewWidth = 400;
+                    targetPositionCamera.Distance = 420;
+                    targetPositionCamera.ViewWidth = 420;
+                    targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
                 }
             }
         }
