@@ -1,0 +1,31 @@
+﻿<Page x:Class="Ab4d.SharpEngine.Samples.Wpf.Advanced.MultipleSceneViewsSample"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Ab4d.SharpEngine.Samples.Wpf.Advanced"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="MultipleSceneViewsSample">
+
+    <Grid Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TextBlock Text="Using child DXViewportView objects to render the same 3D scene" 
+                       FontWeight="Bold" FontSize="16" Foreground="#333" Margin="10 0 0 3" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+            <Button Name="ChangeSceneButton" Content="Change scene" Margin="0 0 0 3" HorizontalAlignment="Right" VerticalAlignment="Center" IsDefault="True" Padding="10 3"
+                    Click="ChangeSceneButton_OnClick" />
+
+            <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="1" Fill="Black" SnapsToDevicePixels="True" />
+        </Grid>
+
+        <Grid Name="ViewsGrid" Grid.Row="1">
+            <!-- This content is filled from code -->
+        </Grid>
+    </Grid>
+</Page>
