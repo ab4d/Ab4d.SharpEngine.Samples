@@ -162,8 +162,8 @@ public class HitTestingWithIdBitmapSample : CommonSample
             int idBitmapX = (int)(pointerPosition.X * SceneView.DpiScaleX);
             int idBitmapY = (int)(pointerPosition.Y * SceneView.DpiScaleY);
 
-            if (idBitmapX < 0 || idBitmapX > _rawRenderedBitmap.Width ||
-                idBitmapY < 0 || idBitmapY > _rawRenderedBitmap.Height)
+            if (idBitmapX < 0 || idBitmapX >= _rawRenderedBitmap.Width ||
+                idBitmapY < 0 || idBitmapY >= _rawRenderedBitmap.Height)
             {
                 _lastPixelColor = 0; // no object hit
             }
@@ -209,7 +209,6 @@ public class HitTestingWithIdBitmapSample : CommonSample
     {
         if (Scene == null || SceneView == null)
             return;
-
 
         _renderStopwatch.Restart();
 
