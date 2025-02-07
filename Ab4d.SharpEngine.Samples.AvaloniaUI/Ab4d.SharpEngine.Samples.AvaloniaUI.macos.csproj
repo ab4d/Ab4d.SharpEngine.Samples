@@ -44,6 +44,7 @@
 
   <ItemGroup>
     <AvaloniaXaml Include="Advanced\AvaloniaMultiTouchSample.xaml" />
+    <AvaloniaXaml Include="Advanced\MultipleSceneViewsSample.xaml" />
     <AvaloniaXaml Include="CameraControllers\PointerCameraControllerSample.xaml" />
     <AvaloniaXaml Include="Common\MessageBox.xaml">
       <SubType>Designer</SubType>
@@ -78,6 +79,7 @@
 
   <ItemGroup>
     <None Remove="Advanced\AvaloniaMultiTouchSample.xaml" />
+	<None Remove="Advanced\MultipleSceneViewsSample.xaml" />    
     <None Remove="CameraControllers\MouseCameraControllerSample.xaml" />
     <None Remove="CameraControllers\PointerCameraControllerSample.xaml" />
     <None Remove="Diagnostics\DiagnosticsWindow.xaml" />
