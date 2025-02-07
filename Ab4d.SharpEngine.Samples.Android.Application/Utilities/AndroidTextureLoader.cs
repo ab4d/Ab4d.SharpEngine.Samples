@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;

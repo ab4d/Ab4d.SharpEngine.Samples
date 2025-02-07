@@ -91,7 +91,7 @@
   <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter"/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
   <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
-  <Sample Location="Titles.CadImporterInfo.md" Title="CAD files importer"/>
+  <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer"/>
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
