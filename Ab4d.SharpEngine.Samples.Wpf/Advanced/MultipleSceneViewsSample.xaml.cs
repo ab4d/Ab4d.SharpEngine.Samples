@@ -65,17 +65,26 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
         
         private void InitializeMainScene()
         {
-            Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
-            Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+            //Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+            //Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true;
+
+            //
+            // Create VulkanDevice
+            //
 
             var engineCreateOptions = new EngineCreateOptions(enableStandardValidation: true);
-            engineCreateOptions.RequiredDeviceExtensionNames.Add("VK_KHR_external_memory_win32");
+
+            // Add Vulkan extension names that are required for using SharedTexture in SharpEngineSceneView
+            engineCreateOptions.RequiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNamesForSharedTexture);
 
             _gpuDevice = VulkanDevice.Create(engineCreateOptions);
 
             if (_gpuDevice == null)
                 return; // Cannot create VulkanDevice
 
+            //
+            // Create Scene
+            //
 
             _mainScene = new Scene(_gpuDevice, "SharedScene");
 
