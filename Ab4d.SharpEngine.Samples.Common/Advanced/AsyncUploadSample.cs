@@ -369,5 +369,8 @@ public class AsyncUploadSample : CommonSample
         ui.AddSeparator();
 
         ui.CreateCheckBox("Simulate long upload (?):When checked then a delay is added when creating the mesh to simulate a complex mesh upload.", _isUploadDelayed, isChecked => _isUploadDelayed = isChecked);
+
+        if (Scene != null && Scene.GpuDevice != null && Scene.GpuDevice.BackgroundGraphicsQueue.IsNull() && Scene.GpuDevice.BackgroundTransferQueue.IsNull())
+            ui.CreateLabel("Async upload is not supported!").SetColor(Colors.Red);
     }
 }
