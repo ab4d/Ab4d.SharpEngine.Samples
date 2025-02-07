@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
