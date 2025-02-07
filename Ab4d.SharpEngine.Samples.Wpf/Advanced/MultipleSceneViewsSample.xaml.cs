@@ -1,29 +1,28 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ab4d.SharpEngine.Effects;
+using Ab4d.SharpEngine.OverlayPanels;
+using Ab4d.SharpEngine.RenderingLayers;
+using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.SharpEngine.Wpf;
-using Ab4d.SharpEngine.glTF.Schema;
-using Ab4d.SharpEngine.Samples.Common;
-using Colors = Ab4d.SharpEngine.Common.Colors;
+using TranslateTransform = Ab4d.SharpEngine.Transformations.TranslateTransform;
+
+// This sample demonstrates how to show one Scene objects with different SharpEngineSceneView objects.
+// This creates new SceneView objects for each SharpEngineSceneView objects.
+//
+// Know issues:
+// - Transparency sorting works only on the first SharpEngineSceneView objects.
+//   This means that when rendering semi-transparent objects, they will be correctly shown (sorted) only by the first SharpEngineSceneView.
+//   Other SharpEngineSceneView objects may not correctly show the objects behind semi-transparent objects.
+
 
 namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
 {
@@ -37,12 +36,31 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
         private VulkanDevice? _gpuDevice;
         private Scene? _mainScene;
 
+        private GroupNode? _testScene;
+        private TranslateTransform? _manTransform;
+
+        private WireframeRenderingEffectTechnique? _wireframeRenderingColorLinesEffectTechnique;
+        private WireframeRenderingEffectTechnique? _wireframeRenderingBlackLinesEffectTechnique;
+        private RenderingLayer? _customRenderingLayer;
+
+        private enum RenderingTypes
+        {
+            Standard,
+            WireframeColored,
+            WireframeBlack,
+            FilerByRenderingQueue,
+            FilterByObjects
+        }
+
+        private readonly string[] RenderingTypeStrings = new string[] {"Standard", "Wirefame (colored lines)", "Wirefame (black lines)", "Filer by RenderingQueue", "Filter by object name"};
+
+
         public MultipleSceneViewsSample()
         {
             InitializeComponent();
 
             InitializeMainScene();
-            CreateSceneViews(columnsCount: 2, rowsCount: 1);
+            CreateSceneViews();
         }
         
         private void InitializeMainScene()
@@ -61,11 +79,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
 
             _mainScene = new Scene(_gpuDevice, "SharedScene");
 
-            CreateSceneObjects(_mainScene);
+            CreateTestScene(_mainScene);
 
             this.Unloaded += (sender, args) =>
             {
                 ViewsGrid.Children.Clear();
+
+                _wireframeRenderingColorLinesEffectTechnique?.Dispose();
+                _wireframeRenderingBlackLinesEffectTechnique?.Dispose();
 
                 foreach (var sharpEngineSceneView in _sceneViews)
                     sharpEngineSceneView.Dispose();
@@ -76,130 +97,218 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
             };
         }
 
-        private void CreateSceneViews(int columnsCount, int rowsCount)
+        private void CreateSceneViews()
         {
             if (_mainScene == null)
                 return;
 
-            for (int i = 0; i < columnsCount; i++)
-                ViewsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+            for (int columnIndex = 0; columnIndex < 2; columnIndex++)
+                ViewsGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(columnIndex == 0 ? 2 : 1, GridUnitType.Star) }); // make first row twice as wide as second row
 
-            for (int i = 0; i < rowsCount; i++)
+            for (int rowIndex = 0; rowIndex < 2; rowIndex++)
                 ViewsGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
 
-            if (columnsCount > 1)
-            {
-                for (int i = 0; i < columnsCount - 1; i++)
-                {
-                    var verticalGridSplitter = new GridSplitter()
-                    {
-                        HorizontalAlignment = HorizontalAlignment.Right,
-                        VerticalAlignment = VerticalAlignment.Stretch,
-                        Width = 2,
-                        Background = Brushes.Gray,
-                    };
-
-                    Grid.SetColumn(verticalGridSplitter, i);
-
-                    if (rowsCount > 1)
-                    {
-                        Grid.SetRow(verticalGridSplitter, 0);
-                        Grid.SetRowSpan(verticalGridSplitter, rowsCount);
-                    }
-
-                    ViewsGrid.Children.Add(verticalGridSplitter);
-                }
-            }
-
-            if (rowsCount > 1)
-            {
-                for (int i = 0; i < rowsCount - 1; i++)
-                {
-                    var horizontalGridSplitter = new GridSplitter()
-                    {
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        Height = 2,
-                        Background = Brushes.Gray,
-                    };
-
-                    Grid.SetRow(horizontalGridSplitter, i);
-
-                    if (columnsCount > 1)
-                    {
-                        Grid.SetColumn(horizontalGridSplitter, 0);
-                        Grid.SetColumnSpan(horizontalGridSplitter, columnsCount);
-                    }
-
-                    ViewsGrid.Children.Add(horizontalGridSplitter);
-                }
-            }
-
-            // Add SharpEngineSceneView objects
-            int usedColumnsCount = columnsCount > 1 ? columnsCount : 1;
-            int usedRowsCount    = rowsCount > 1 ? rowsCount : 1;
-
-
-            //int index = 1; // This is used to create different RenderingTypes; start with wireframe
-
             
-            var initialCameraSettings = new (float heading, float attitude)[]
+            var initialCameraSettings = new (float heading, float attitude, float distance, RenderingTypes renderingType)[]
                 {
-                    (30, -30),
-                    (0, 0),
-                    (0, -90),
-                    (90, 0)
+                    (30, -30, 600, RenderingTypes.Standard),
+                    (0,  -90, 800, RenderingTypes.WireframeBlack),
+                    (30, -30, 600, RenderingTypes.Standard),     // this cell is skipped
+                    (0,    0, 600, RenderingTypes.WireframeColored),
                 };
 
-            for (int i = 0; i < usedRowsCount; i++)
+            for (int rowIndex = 0; rowIndex < 2; rowIndex++)
             {
-                for (int j = 0; j < usedColumnsCount; j++)
+                for (int columnIndex = 0; columnIndex < 2; columnIndex++)
                 {
-                    var sharpEngineSceneView = new SharpEngineSceneView(_mainScene, $"SceneView_{i + 1}_{j + 1}");
+                    if (columnIndex == 0 && rowIndex == 1)
+                        continue; // The left SharpEngineSceneView has RowSpan set to 2 so skip this cell
 
-                    var (cameraHeading, cameraAttitude) = initialCameraSettings[(i * usedColumnsCount + j) % initialCameraSettings.Length];
+                    var sharpEngineSceneView = new SharpEngineSceneView(_mainScene, $"SceneView_{rowIndex + 1}_{columnIndex + 1}");
 
-                    SetupPointerCameraController(sharpEngineSceneView, cameraHeading, cameraAttitude);
+                    var (cameraHeading, cameraAttitude, distance, renderingType) = initialCameraSettings[(rowIndex * 2 + columnIndex) % initialCameraSettings.Length];
 
-                    if (i == 0 && j == 0)
-                        ((TargetPositionCamera)sharpEngineSceneView.SceneView.Camera).ShowCameraLight = ShowCameraLightType.Always;
+                    SetupPointerCameraController(sharpEngineSceneView, cameraHeading, cameraAttitude, distance);
 
-                    if (i == 1 && j == 0)
-                    {
-                        var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(sharpEngineSceneView.Scene, "CustomWireframeRenderingEffectTechnique")
-                        {
-                            UseLineColorFromDiffuseColor = true,
+                    if (renderingType != RenderingTypes.Standard)
+                        SetSpecialRenderingType(sharpEngineSceneView, renderingType);
 
-                            LineColor = Color4.Black,
-                            LineThickness = 1,
 
-                            // Use default values:
-                            DepthBias = 0,
-                            LinePattern = 0,
-                            LinePatternScale = 1,
-                            LinePatternOffset = 0,
-                        };
+                    Grid.SetColumn(sharpEngineSceneView, columnIndex);
+                    Grid.SetRow(sharpEngineSceneView, rowIndex);
 
-                        sharpEngineSceneView.SceneView.DefaultRenderObjectsRenderingStep!.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
-                    }
+                    // Left column uses both rows
+                    if (columnIndex == 0 && rowIndex == 0) 
+                        Grid.SetRowSpan(sharpEngineSceneView, 2);
 
-                    Grid.SetColumn(sharpEngineSceneView, j);
-                    Grid.SetRow(sharpEngineSceneView, i);
-                    ViewsGrid.Children.Insert(0, sharpEngineSceneView); // Insert before GridSplitters
+                    ViewsGrid.Children.Add(sharpEngineSceneView);
 
                     _sceneViews.Add(sharpEngineSceneView);
+
+
+                    var comboBox = new ComboBox()
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        VerticalAlignment   = VerticalAlignment.Top,
+                        Margin              = new Thickness(0, 3, 5, 0)
+                    };
+
+                    comboBox.ItemsSource   = RenderingTypeStrings;
+                    comboBox.SelectedIndex = (int)renderingType;
+
+                    comboBox.SelectionChanged += delegate(object sender, SelectionChangedEventArgs args)
+                    {
+                        var newRenderingType = (RenderingTypes)comboBox.SelectedIndex;
+                        SetSpecialRenderingType(sharpEngineSceneView, newRenderingType);
+                    };
+
+                    Grid.SetColumn(comboBox, columnIndex);
+                    Grid.SetRow(comboBox, rowIndex);
+                    ViewsGrid.Children.Add(comboBox);
+
+
+                    // Add Title and "Change scene" button to the left cell
+                    if (columnIndex == 0 && rowIndex == 0)
+                    {
+                        var titleTextBlock = new TextBlock()
+                        {
+                            Text = "Rendering the same Scene with different SharpEngineSceneView objects",
+                            FontWeight = FontWeights.Bold,
+                            FontSize = 16,
+                            Foreground = new SolidColorBrush(Color.FromRgb(50, 50, 50)),
+                            Margin = new Thickness(10),
+                            HorizontalAlignment = HorizontalAlignment.Left,
+                            VerticalAlignment = VerticalAlignment.Top,
+                        };
+
+                        Grid.SetColumn(titleTextBlock, 0);
+                        Grid.SetRow(titleTextBlock, 0);
+                        ViewsGrid.Children.Add(titleTextBlock);
+
+
+                        var button = new Button()
+                        {
+                            Content = "Change scene",
+                            Padding = new Thickness(10, 3, 10, 3),
+                            Margin = new Thickness(10),
+                            HorizontalAlignment = HorizontalAlignment.Right,
+                            VerticalAlignment = VerticalAlignment.Bottom,
+                        };
+
+                        button.Click += (sender, args) =>
+                        {
+                            if (_manTransform != null)
+                                _manTransform.Z -= 2;
+                        };
+                    
+                        Grid.SetColumn(button, 0);
+                        Grid.SetRow(button, 1);
+                        ViewsGrid.Children.Add(button);
+                    }
                 }
             }
+
+            
+            var verticalGridSplitter = new GridSplitter()
+            {
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Width = 2,
+                Background = Brushes.Gray,
+            };
+
+            Grid.SetColumn(verticalGridSplitter, 0);
+            Grid.SetRow(verticalGridSplitter, 0);
+            Grid.SetRowSpan(verticalGridSplitter, 2);
+
+            ViewsGrid.Children.Add(verticalGridSplitter);
+    
+
+            var horizontalGridSplitter = new GridSplitter()
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Height = 2,
+                Background = Brushes.Gray,
+            };
+
+            Grid.SetColumn(horizontalGridSplitter, 1);
+            Grid.SetRow(horizontalGridSplitter, 0);
+
+            ViewsGrid.Children.Add(horizontalGridSplitter);
         }
-                
-        private void SetupPointerCameraController(SharpEngineSceneView sharpEngineSceneView, float cameraHeading, float cameraAttitude)
+
+        private void SetSpecialRenderingType(SharpEngineSceneView sharpEngineSceneView, RenderingTypes renderingType)
+        {
+            // Reset settings to default:
+            var renderObjectsRenderingStep = sharpEngineSceneView.SceneView.DefaultRenderObjectsRenderingStep!;
+
+            renderObjectsRenderingStep.OverrideEffectTechnique = null;
+            renderObjectsRenderingStep.FilterObjectsFunction = null;
+            renderObjectsRenderingStep.FilterRenderingLayersFunction = null;
+
+
+            switch (renderingType)
+            {
+                case RenderingTypes.Standard:
+                    // Everything already reset
+                    break;
+
+                case RenderingTypes.WireframeColored:
+                case RenderingTypes.WireframeBlack:
+                    // Override effect to render all objects as wireframes
+                    renderObjectsRenderingStep.OverrideEffectTechnique = renderingType == RenderingTypes.WireframeColored ?
+                        _wireframeRenderingColorLinesEffectTechnique ??= CreateWireframeRenderingEffectTechnique(sharpEngineSceneView.Scene, useLineColorFromDiffuseColor: true) : 
+                        _wireframeRenderingBlackLinesEffectTechnique ??= CreateWireframeRenderingEffectTechnique(sharpEngineSceneView.Scene, useLineColorFromDiffuseColor: false);
+                    break;
+
+                case RenderingTypes.FilerByRenderingQueue:
+                    // Render only objects in the _customRenderingLayer (we manually set CustomRenderingLayer in CreateTestScene)
+                    // Note that this is much faster than using FilterObjectsFunction, because this check is called only
+                    // for each RenderingLayer and not for each object.
+                    renderObjectsRenderingStep.FilterRenderingLayersFunction = renderingLayer => ReferenceEquals(renderingLayer, _customRenderingLayer);
+                    break;
+
+                case RenderingTypes.FilterByObjects:
+                    // Render only objects whose name start by "Sphere" or "Cylinder" (trees).
+                    // Note that this is much slower than using FilterRenderingLayersFunction because FilterObjectsFunction is called for each object.
+                    renderObjectsRenderingStep.FilterObjectsFunction = renderingItem =>
+                    {
+                        string? sceneNodeName = renderingItem.ParentSceneNode?.Name ?? null;
+                        if (sceneNodeName != null)
+                            return sceneNodeName.StartsWith("Sphere") || sceneNodeName.StartsWith("Cylinder");
+                        return false;
+                    };
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(renderingType), renderingType, null);
+            }
+        }
+
+        private WireframeRenderingEffectTechnique CreateWireframeRenderingEffectTechnique(Scene scene, bool useLineColorFromDiffuseColor) =>
+            new WireframeRenderingEffectTechnique(scene, "CustomWireframeRenderingEffectTechnique")
+            {
+                UseLineColorFromDiffuseColor = useLineColorFromDiffuseColor,
+
+                LineColor = Color4.Black,
+                LineThickness = 1,
+
+                // Use default values:
+                DepthBias = 0,
+                LinePattern = 0,
+                LinePatternScale = 1,
+                LinePatternOffset = 0,
+            };
+
+        private void SetupPointerCameraController(SharpEngineSceneView sharpEngineSceneView, float cameraHeading, float cameraAttitude, float distance)
         {
             // Define the camera
             var camera = new TargetPositionCamera()
             {
                 Heading = cameraHeading,
                 Attitude = cameraAttitude,
-                Distance = 600,
+                Distance = distance,
                 TargetPosition = new Vector3(0, 0, 0),
                 ShowCameraLight = ShowCameraLightType.Never // If there are no other light in the Scene, then add a camera light that illuminates the scene from the camera's position
             };
@@ -217,56 +326,42 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
                 RotateAroundPointerPosition = false,
                 ZoomMode = CameraZoomMode.ViewCenter,
             };
+
+            _ = new CameraAxisPanel(sharpEngineSceneView.SceneView, alignment: PositionTypes.BottomLeft);
         }
 
-        private void CreateSceneObjects(Scene scene)
+        private void CreateTestScene(Scene scene)
         {
-            //// The 3D objects in SharpEngine are defined in a hierarchical collection of SceneNode objects
-            //// that are added to the Scene.RootNode object.
-            //// The SceneNode object are defined in the Ab4d.SharpEngine.SceneNodes namespace.
+            _testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
+            scene.RootNode.Add(_testScene);
 
-            for (int i = 0; i < 5; i++)
-            {
-                var boxModel = new BoxModelNode(centerPosition: new Vector3(i * 100, 0, 0),
-                                                size: new Vector3(80, 40, 60),
-                                                name: "Gold BoxModel")
-                {
-                    Material = StandardMaterials.Gold.SetOpacity(0.3f),
-                    //Material = new StandardMaterial(Colors.Gold),
-                    //Material = new StandardMaterial(diffuseColor: new Color3(1f, 0.84313726f, 0f))
-                };
-
-                scene.RootNode.Add(boxModel);
-            }
-
-            //var testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
-            //scene.RootNode.Add(testScene);
+            // To see the hierarchy of read objects call testScene.DumpHierarchy() in Visual Studio Immediate Window
 
 
-            //// Add lights
-            //_directionalLight = new Ab4d.SharpEngine.Lights.DirectionalLight(new Vector3(-1, -0.3f, 0));
-            _directionalLight = new Ab4d.SharpEngine.Lights.DirectionalLight(new Vector3(0.3f, -1f, 0));
-            scene.Lights.Add(_directionalLight);
+            // Create a custom RenderingLayer and move "Box01", "House" and "Roof" to that rendering layer.
+            // This is used to demonstrate rendering only objects from selected RenderingLayer - see SetSpecialRenderingType method.
+            
+            _customRenderingLayer = new RenderingLayer("CustomRenderingQueue");
+            scene.AddRenderingLayerAfter(_customRenderingLayer, scene.StandardGeometryRenderingLayer!);
 
-            //scene.Lights.Add(new Ab4d.SharpEngine.Lights.PointLight(new Vector3(500, 200, 100), range: 10000));
+            _testScene.GetChild<MeshModelNode>("Box01")!.CustomRenderingLayer = _customRenderingLayer;
+            _testScene.GetChild<MeshModelNode>("House")!.CustomRenderingLayer = _customRenderingLayer;
+            _testScene.GetChild<MeshModelNode>("Roof")!.CustomRenderingLayer = _customRenderingLayer;
 
+
+            // To demonstrate changing the scene, we add TranslateTransform to all Man objects.
+            // This transformation is than changed when user clicks on "Change scene" button.
+
+            _manTransform = new TranslateTransform();
+            _testScene.ForEachChild<MeshModelNode>("Man*", meshModelNode => meshModelNode.Transform = _manTransform);
+
+
+            // Add DirectionalLight
+            var directionalLight = new Ab4d.SharpEngine.Lights.DirectionalLight(new Vector3(1, -0.4f, -0.2f));
+            scene.Lights.Add(directionalLight);
 
             // Set ambient light (illuminates the objects from all directions)
-            //scene.SetAmbientLight(intensity: 0.3f);
-        }
-
-        Lights.DirectionalLight _directionalLight;
-
-        private void ChangeSceneButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            //var boxModelNode = new BoxModelNode(new Vector3(0, _mainScene.RootNode.Count * 40, 0), new Vector3(50, 20, 50), material: StandardMaterials.Green);
-            //_mainScene.RootNode.Add(boxModelNode);
-
-            //_directionalLight.Color = Colors.Red;
-            if (_directionalLight != null)
-                _directionalLight.Direction = new Vector3(_directionalLight.Direction.Z, _directionalLight.Direction.Y, _directionalLight.Direction.X);
-
-            //_mainScene.SetAmbientLight(intensity: _mainScene.GetAmbientLightIntensity() + 0.2f);
+            scene.SetAmbientLight(intensity: 0.3f);
         }
     }
 }

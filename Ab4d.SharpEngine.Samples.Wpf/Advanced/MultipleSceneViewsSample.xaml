@@ -8,24 +8,7 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MultipleSceneViewsSample">
 
-    <Grid Name="RootGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0">
-            <TextBlock Text="Using child DXViewportView objects to render the same 3D scene" 
-                       FontWeight="Bold" FontSize="16" Foreground="#333" Margin="10 0 0 3" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-
-            <Button Name="ChangeSceneButton" Content="Change scene" Margin="0 0 0 3" HorizontalAlignment="Right" VerticalAlignment="Center" IsDefault="True" Padding="10 3"
-                    Click="ChangeSceneButton_OnClick" />
-
-            <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="1" Fill="Black" SnapsToDevicePixels="True" />
-        </Grid>
-
-        <Grid Name="ViewsGrid" Grid.Row="1">
-            <!-- This content is filled from code -->
-        </Grid>
+    <Grid Name="ViewsGrid">
+        <!-- This content is filled from code -->
     </Grid>
 </Page>
