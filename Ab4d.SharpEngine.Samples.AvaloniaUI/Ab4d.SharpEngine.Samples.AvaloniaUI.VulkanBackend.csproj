@@ -97,6 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\TrueTypeFonts\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\TrueTypeFonts\" /> 
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\HeightMaps\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
