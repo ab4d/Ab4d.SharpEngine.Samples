@@ -532,6 +532,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             // Vulkan backend can be also used on Linux, but only on X11 (how to check if we are running X11?)
             VulkanBackendInfoImage.IsVisible = (sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
                                                 !avaloniaSharpEngineSceneView.IsVulkanBackend &&
+                                               avaloniaSharpEngineSceneView.PresentationType == PresentationTypes.SharedTexture &&
                                                 OperatingSystem.IsWindows());
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
