@@ -528,10 +528,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _isSceneViewSizeChangedSubscribed = true;
             }
 
+            // The following line is commented because Vulkan backend is not stable enough to be promoted:
             // If we are not using Vulkan backend then show info icon with tooltip about that.
-            VulkanBackendInfoImage.IsVisible = sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
-                                               !avaloniaSharpEngineSceneView.IsVulkanBackend &&
-                                               avaloniaSharpEngineSceneView.PresentationType == PresentationTypes.SharedTexture;
+            //VulkanBackendInfoImage.IsVisible = sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
+            //                                   !avaloniaSharpEngineSceneView.IsVulkanBackend &&
+            //                                   avaloniaSharpEngineSceneView.PresentationType == PresentationTypes.SharedTexture;
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {
