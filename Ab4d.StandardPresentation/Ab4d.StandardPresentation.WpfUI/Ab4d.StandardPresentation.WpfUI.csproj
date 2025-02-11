@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-	  <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9169-rc1" />
+	  <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9173-rc2" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	  <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
