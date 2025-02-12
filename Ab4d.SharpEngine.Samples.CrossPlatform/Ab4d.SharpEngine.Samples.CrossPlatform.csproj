@@ -46,7 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Resources\*" />
     <Folder Include="Resources\BitmapFonts\" />
+    <Folder Include="Resources\Models\" />
+    <Folder Include="Resources\Textures\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,30 +64,30 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\BitmapFonts\roboto_black_with_outline_128_0.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\10x10-texture.png" Link="Resources\10x10-texture.png">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\10x10-texture.png" Link="Resources\Textures\10x10-texture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3_readme.txt" Link="Resources\dragon_vrip_res3_readme.txt">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3_readme.txt" Link="Resources\Models\dragon_vrip_res3_readme.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\TreeTexture.png">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\TreeTexture.png" Link="Resources\Textures\TreeTexture.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\uvchecker.png">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker.png" Link="Resources\Textures\uvchecker.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker2.jpg" Link="Resources\uvchecker2.jpg">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\uvchecker2.jpg" Link="Resources\Textures\uvchecker2.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj" Link="Resources\dragon_vrip_res3.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj.mtl" Link="Resources\dragon_vrip_res3.obj.mtl" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.mtl" Link="Resources\robotarm.mtl" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.obj" Link="Resources\robotarm.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\teapot-hires.obj" Link="Resources\teapot-hires.obj" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\Teapot.obj" Link="Resources\Teapot.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj" Link="Resources\Models\dragon_vrip_res3.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\dragon_vrip_res3.obj.mtl" Link="Resources\Models\dragon_vrip_res3.obj.mtl" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.mtl" Link="Resources\Models\robotarm.mtl" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\robotarm.obj" Link="Resources\Models\robotarm.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\teapot-hires.obj" Link="Resources\Models\teapot-hires.obj" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\Teapot.obj" Link="Resources\Models\Teapot.obj" />
   </ItemGroup>
 
   <ItemGroup>
