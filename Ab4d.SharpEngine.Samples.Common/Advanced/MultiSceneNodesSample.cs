@@ -279,22 +279,25 @@ public class MultiSceneNodesSample : CommonSample
             texturedMaterialGroup.Add(geometryModel9);
 
 
-            TextureLoader.CreateTextureAsync(
-                @"Resources\Textures\uvchecker2.jpg", gpuDevice,
-                textureCreatedCallback: createdGpuImage =>
-                {
-                    textureMaterial.DiffuseTexture = createdGpuImage;
-                    greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
-                },
-                bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
-
-
-            var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
+            if (gpuDevice != null)
             {
-                Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true),
-            };
+                TextureLoader.CreateTextureAsync(
+                    @"Resources\Textures\uvchecker2.jpg", gpuDevice,
+                    textureCreatedCallback: createdGpuImage =>
+                    {
+                        textureMaterial.DiffuseTexture = createdGpuImage;
+                        greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
+                    },
+                    bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
 
-            texturedMaterialGroup.Add(geometryModel10);
+
+                var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
+                {
+                    Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true),
+                };
+
+                texturedMaterialGroup.Add(geometryModel10);
+            }
         }
 
         // TEST crating custom texture
