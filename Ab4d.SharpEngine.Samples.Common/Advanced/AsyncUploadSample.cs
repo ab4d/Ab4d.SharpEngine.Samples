@@ -221,8 +221,8 @@ public class AsyncUploadSample : CommonSample
         var vertices = newSphereMesh.Vertices!;
         var triangleIndices = newSphereMesh.TriangleIndices!;
 
-        var newVertexBuffer = await gpuDevice.CreateBufferAsync(vertices,        BufferUsageFlags.VertexBuffer, name: "LazyCreateVertexBuffer");
-        var newIndexBuffer  = await gpuDevice.CreateBufferAsync(triangleIndices, BufferUsageFlags.IndexBuffer,  name: "LazyCreateIndexBuffer");
+        var newVertexBuffer = await gpuDevice.CreateBufferAsync(vertices,        BufferUsageFlags.VertexBuffer, name: "LazyCreatedVertexBuffer");
+        var newIndexBuffer  = await gpuDevice.CreateBufferAsync(triangleIndices, BufferUsageFlags.IndexBuffer,  name: "LazyCreatedIndexBuffer");
 
         //_disposables.Add(newVertexBuffer);
         //_disposables.Add(newIndexBuffer);
