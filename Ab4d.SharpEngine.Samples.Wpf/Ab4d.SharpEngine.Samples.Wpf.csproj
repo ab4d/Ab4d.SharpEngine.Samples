@@ -5,7 +5,7 @@
     <RootNamespace>Ab4d.SharpEngine.Samples.Wpf</RootNamespace>
     <Version>3.0.9173-rc2</Version>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
