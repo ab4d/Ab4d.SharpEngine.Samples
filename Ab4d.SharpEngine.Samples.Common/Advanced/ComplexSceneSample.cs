@@ -16,9 +16,9 @@ using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
-public class MultiSceneNodesSample : CommonSample
+public class ComplexSceneSample : CommonSample
 {
-    public override string Title => "Multiple SceneNodes";
+    public override string Title => "Complex scene sample";
     public override string? Subtitle => "";
 
     private bool _isAnimatingScene = true;
@@ -56,7 +56,7 @@ public class MultiSceneNodesSample : CommonSample
     private static double _loadBitmapFontsTime;
 #endif
 
-    public MultiSceneNodesSample(ICommonSamplesContext context)
+    public ComplexSceneSample(ICommonSamplesContext context)
         : base(context)
     {
         _disposables = new DisposeList();
