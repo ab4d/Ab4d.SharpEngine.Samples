@@ -18,7 +18,6 @@ using Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
 using Ab4d.Vulkan;
-using Colors = Ab4d.SharpEngine.Common.Colors;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.Common
 {
@@ -66,24 +65,18 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             if (GlobalSharpEngineSettings.SupersamplingCount > 0)
                 MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
-            MainSceneView.MultisampleCount = 4;
-            MainSceneView.SupersamplingCount = 1;
-
-            MainSceneView.BackgroundColor = System.Windows.Media.Colors.Aqua;
-
-            MainSceneView.CreateOptions.EnableBackgroundResourceUpload = true;
 
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
-            MainSceneView.CreateOptions.EnableStandardValidation = true;
+            //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
-            Utilities.Log.LogLevel = LogLevels.Warn;
-            Utilities.Log.IsLoggingToDebugOutput = true;
+            //Utilities.Log.LogLevel = LogLevels.Warn;
+            //Utilities.Log.IsLoggingToDebugOutput = true;
 
             // To use Vulkan line rasterizer, uncomment the following lines:
-            MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;
-            MainSceneView.CreateOptions.EnableVulkanStippleLineRasterization = true;
-            MainSceneView.Scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangularSmooth;
+            //MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;
+            //MainSceneView.CreateOptions.EnableVulkanStippleLineRasterization = true;
+            //MainSceneView.Scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangular;
 
             // To test the OverlayTexture presentation type (has the best performance, but does not allow rendering any WPF controls over the 3D graphics),
             // uncomment the following code:
