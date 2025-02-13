@@ -201,7 +201,7 @@ public class FogEffectTechnique : EffectTechnique
             throw new SharpEngineException("VertexInputStatePtr must be set in CreatePipeline");
 
 
-        if (!parentPipeline.IsNull())
+        if (parentPipeline.IsNotNull())
             flags |= PipelineCreateFlags.Derivative;
 
 
@@ -375,7 +375,7 @@ public class FogEffectTechnique : EffectTechnique
             return;
 
         var pipeline = Pipeline;
-        if (!pipeline.IsNull())
+        if (pipeline.IsNotNull())
         {
             // The pipeline may still be used so we need to dispose it after rendering is complete
             this.Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(pipeline.Handle, typeof(Pipeline));
@@ -488,7 +488,7 @@ public class FogEffectTechnique : EffectTechnique
             {
                 buffer = additionalVertexBuffers[j];
 
-                if (!buffer.IsNull())
+                if (buffer.IsNotNull())
                 {
                     ulong offsets = 0;
                     vk.CmdBindVertexBuffers(commandBuffer, (uint)(1 + j), 1, &buffer, &offsets);
@@ -503,7 +503,7 @@ public class FogEffectTechnique : EffectTechnique
         {
             renderingContext.CurrentIndexBuffer = indexBuffer;
 
-            if (!indexBuffer.IsNull())
+            if (indexBuffer.IsNotNull())
             {
                 vk.CmdBindIndexBuffer(commandBuffer, indexBuffer, 0, renderingItem.IndexBufferType);
                 indexBufferChangesCount = 1;
@@ -622,7 +622,7 @@ public class FogEffectTechnique : EffectTechnique
         // Draw
         if (renderingItem.CustomRenderAction != null)
             renderingItem.CustomRenderAction(renderingContext, commandBuffer, renderingItem);
-        else if (!indexBuffer.IsNull())
+        else if (indexBuffer.IsNotNull())
             vk.CmdDrawIndexed(commandBuffer, indexCount, instanceCount, renderingItem.FirstIndex, renderingItem.VertexOffset, renderingItem.FirstInstance);
         else
             vk.CmdDraw(commandBuffer, vertexCount, instanceCount, (uint)renderingItem.VertexOffset, renderingItem.FirstInstance);

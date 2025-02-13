@@ -563,7 +563,7 @@ public class ImGuiRenderingStep : RenderingStep
             _matricesBuffers = null;
         }
 
-        if (!_matricesDescriptorPool.IsNull())
+        if (_matricesDescriptorPool.IsNotNull())
         {
             gpuDevice.Vk.DestroyDescriptorPool(device, _matricesDescriptorPool, null);
             _matricesDescriptorPool = DescriptorPool.Null;
@@ -571,7 +571,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         _matricesDescriptorSets = null;
 
-        if (!_matricesDescriptorSetLayout.IsNull())
+        if (_matricesDescriptorSetLayout.IsNotNull())
         {
             gpuDevice.Vk.DestroyDescriptorSetLayout(device, _matricesDescriptorSetLayout, null);
             _matricesDescriptorSetLayout = DescriptorSetLayout.Null;
@@ -588,7 +588,7 @@ public class ImGuiRenderingStep : RenderingStep
             _fontTextureImage = null;
         }
 
-        if (!_fontTextureDescriptorPool.IsNull())
+        if (_fontTextureDescriptorPool.IsNotNull())
         {
             gpuDevice.Vk.DestroyDescriptorPool(device, _fontTextureDescriptorPool, null);
             _fontTextureDescriptorPool = DescriptorPool.Null;
@@ -596,7 +596,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         _fontTextureDescriptorSets = null;
 
-        if (!_fontTextureDescriptorSetLayout.IsNull())
+        if (_fontTextureDescriptorSetLayout.IsNotNull())
         {
             gpuDevice.Vk.DestroyDescriptorSetLayout(device, _fontTextureDescriptorSetLayout, null);
             _fontTextureDescriptorSetLayout = DescriptorSetLayout.Null;
@@ -612,13 +612,13 @@ public class ImGuiRenderingStep : RenderingStep
 
             if (gpuDevice != null)
             {
-                if (!_pipelineLayout.IsNull())
+                if (_pipelineLayout.IsNotNull())
                 {
                     gpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipelineLayout.Handle, typeof(PipelineLayout));
                     _pipelineLayout = PipelineLayout.Null;
                 }
 
-                if (!_pipeline.IsNull())
+                if (_pipeline.IsNotNull())
                 {
                     gpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipeline.Handle, typeof(Pipeline));
                     _pipeline = Pipeline.Null;

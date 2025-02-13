@@ -312,7 +312,7 @@ public class FogEffect : Effect
 
     private void EnsureStandardTechniqueWithPipeline(RenderingContext renderingContext)
     {
-        if ((_standardTechnique != null && !_standardTechnique.Pipeline.IsNull()) || _vertexBufferDescription == null)
+        if ((_standardTechnique != null && _standardTechnique.Pipeline.IsNotNull()) || _vertexBufferDescription == null)
             return; // Exist early if _standardTechnique is already created
 
         if (_standardTechnique == null)
@@ -510,7 +510,7 @@ public class FogEffect : Effect
                 _pipelineShaderStages = null;
             }
             
-            if (!_pipelineLayout.IsNull())
+            if (_pipelineLayout.IsNotNull())
             {
                 // We must not immediately dispose the resources, because they may be currently used if frames are rendered in the background.
                 // To solve that call the DisposeVulkanResourceOnMainThreadAfterFrameRendered that will wait until the current frame is rendered,
@@ -519,7 +519,7 @@ public class FogEffect : Effect
                 _pipelineLayout = PipelineLayout.Null;
             }
 
-            if (!_fogMaterialsDescriptorSetLayout.IsNull())
+            if (_fogMaterialsDescriptorSetLayout.IsNotNull())
             {
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_fogMaterialsDescriptorSetLayout.Handle, typeof(DescriptorSetLayout));
                 _fogMaterialsDescriptorSetLayout = DescriptorSetLayout.Null;
