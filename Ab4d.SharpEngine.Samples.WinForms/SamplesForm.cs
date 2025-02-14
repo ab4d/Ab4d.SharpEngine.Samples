@@ -213,7 +213,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                                    "</body></html>";
 
                     // It is not possible to show local image in WebView2, so we need to replace the local file name with http address:
-                    markdownHtml = markdownHtml.Replace("img src=\"Resources/CadImporter-for-SharpEngine.png", "img height='400px' src=\"https://www.ab4d.com/Images/CadImporter/CadImporter_0_1.png");
+                    markdownHtml = markdownHtml.Replace("img src=\"Resources/", "img height='400px' src=\"https://www.ab4d.com/Images/CadImporter/");
 
                     _titleWebView ??= new WebView2()
                     {

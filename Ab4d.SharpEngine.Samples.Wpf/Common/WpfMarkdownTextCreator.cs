@@ -166,10 +166,15 @@ public class WpfMarkdownTextCreator : MarkdownTextCreator<TextBlock>
 
         AddCurrentTextToInline();
 
-        source = FileUtils.FixDirectorySeparator(source);
+        string fileSource = FileUtils.FixDirectorySeparator(source);
 
-        if (!System.IO.Path.IsPathRooted(source))
-            source = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, source);
+        if (!System.IO.Path.IsPathRooted(fileSource))
+            fileSource = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileSource);
+
+        if (System.IO.File.Exists(fileSource))
+            source = fileSource;
+        else
+            source = "pack://application:,,,/" + source;
 
         var bitmapImage = new BitmapImage(new Uri(source, UriKind.Absolute));
         var image = new Image();

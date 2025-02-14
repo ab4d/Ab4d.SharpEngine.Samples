@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Wpf</AssemblyName>
@@ -35,12 +35,14 @@
 
   <ItemGroup>
     <None Remove="Samples.xml" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\CadImporter-for-SharpEngine.png" Link="Resources\CadImporter-for-SharpEngine.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,14 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
-    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Resource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\*" LinkBase="Resources\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\TrueTypeFonts\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\TrueTypeFonts\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\arial*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\readme.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BitmapFonts\" />
@@ -64,6 +59,12 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
