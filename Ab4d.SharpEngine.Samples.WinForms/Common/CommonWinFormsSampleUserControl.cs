@@ -30,6 +30,7 @@ public class CommonWinFormsSampleUserControl : UserControl
     public Label TitleLabel;
     public Label SubtitleLabel;
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CommonSample? CurrentCommonSample
     {
         get => _currentCommonSample;
