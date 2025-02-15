@@ -136,7 +136,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms.QuickStart
             mainSceneView.Dock = DockStyle.Fill;
             mainSceneView.Location = new Point(0, 0);
             mainSceneView.Name = "mainSceneView";
-            mainSceneView.PreferredMultiSampleCount = 4;
+            mainSceneView.MultisampleCount = 4;
             mainSceneView.PresentationType = PresentationTypes.SharedTexture;
             mainSceneView.Size = new Size(997, 499);
             mainSceneView.StopRenderingWhenHidden = true;

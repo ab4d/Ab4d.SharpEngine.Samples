@@ -630,7 +630,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms.CameraControllers
             mainSceneView.Dock = DockStyle.Fill;
             mainSceneView.Location = new Point(0, 0);
             mainSceneView.Name = "mainSceneView";
-            mainSceneView.PreferredMultiSampleCount = 4;
+            mainSceneView.MultisampleCount = 4;
             mainSceneView.PresentationType = PresentationTypes.SharedTexture;
             mainSceneView.Size = new Size(398, 772);
             mainSceneView.StopRenderingWhenHidden = true;
