@@ -19,6 +19,8 @@ public class KeyValueLabelUIElement : AvaloniaUIElement
 
     private TextBlock? _keyValueTextBlock;
 
+    private string? _styleString;
+
     public override bool IsUpdateSupported => true;
 
     public KeyValueLabelUIElement(AvaloniaUIProvider avaloniaUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
@@ -118,5 +120,40 @@ public class KeyValueLabelUIElement : AvaloniaUIElement
 
         if (_valueTextBlock != null)
             _valueTextBlock.Foreground = new SolidColorBrush(avaloniaColor);
+
+        if (_keyValueTextBlock != null)
+            _keyValueTextBlock.Foreground = new SolidColorBrush(avaloniaColor);
+    }
+
+    public override string? GetStyle() => _styleString;
+
+    public override ICommonSampleUIElement SetStyle(string style)
+    {
+        _styleString = style;
+
+        var fontWeight = style.Contains("bold", StringComparison.OrdinalIgnoreCase) ? FontWeight.Bold : FontWeight.Normal;
+
+        if (_keyTextBlock != null)
+            _keyTextBlock.FontWeight = fontWeight;
+
+        if (_valueTextBlock != null)
+            _valueTextBlock.FontWeight = fontWeight;
+        
+        if (_keyValueTextBlock != null)
+            _keyValueTextBlock.FontWeight = fontWeight;
+
+        if (style.Contains("italic"))
+        {
+            if (_keyTextBlock != null)
+                _keyTextBlock.FontStyle = FontStyle.Italic;
+
+            if (_valueTextBlock != null)
+                _valueTextBlock.FontStyle = FontStyle.Italic;
+
+            if (_keyValueTextBlock != null)
+                _keyValueTextBlock.FontStyle = FontStyle.Italic;
+        }
+
+        return this;
     }
 }

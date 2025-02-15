@@ -15,6 +15,8 @@ public class KeyValueLabelUIElement : WinFormsUIElement
 
     private Label? _keyValueLabel;
 
+    private string? _styleString;
+
     public override bool IsUpdateSupported => true;
 
     public KeyValueLabelUIElement(WinFormsUIProvider winFormsUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
@@ -130,5 +132,36 @@ public class KeyValueLabelUIElement : WinFormsUIElement
 
         if (_valueLabel != null)
             _valueLabel.ForeColor = winFormsColor;
+        
+        if (_keyValueLabel != null)
+            _keyValueLabel.ForeColor = winFormsColor;
+    }
+
+    public override string? GetStyle() => _styleString;
+
+    public override ICommonSampleUIElement SetStyle(string style)
+    {
+        _styleString = style;
+
+        Font? font;
+        if (style.Contains("italic"))
+        {
+            font = winFormsUIProvider.ItalicFont;
+        }
+        else
+        {
+            font = style.Contains("bold", StringComparison.OrdinalIgnoreCase) ? winFormsUIProvider.BoldFont : winFormsUIProvider.Font;
+        }
+
+        if (_keyLabel != null)
+            _keyLabel.Font = font;
+
+        if (_valueLabel != null)
+            _valueLabel.Font = font;
+
+        if (_keyValueLabel != null)
+            _keyValueLabel.Font = font;
+
+        return this;
     }
 }

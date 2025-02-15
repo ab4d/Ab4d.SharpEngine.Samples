@@ -17,6 +17,8 @@ public class KeyValueLabelUIElement : WpfUIElement
 
     private TextBlock? _keyValueTextBlock;
 
+    private string? _styleString;
+
     public override bool IsUpdateSupported => true;
 
     public KeyValueLabelUIElement(WpfUIProvider wpfUIProvider, string? keyText, Func<string> getValueTextFunc, double keyTextWidth)
@@ -115,5 +117,40 @@ public class KeyValueLabelUIElement : WpfUIElement
 
         if (_valueTextBlock != null)
             _valueTextBlock.Foreground = new SolidColorBrush(wpfColor);
+        
+        if (_keyValueTextBlock != null)
+            _keyValueTextBlock.Foreground = new SolidColorBrush(wpfColor);
+    }
+
+    public override string? GetStyle() => _styleString;
+
+    public override ICommonSampleUIElement SetStyle(string style)
+    {
+        _styleString = style;
+
+        var fontWeight = style.Contains("bold", StringComparison.OrdinalIgnoreCase) ? FontWeights.Bold : FontWeights.Normal;
+
+        if (_keyTextBlock != null)
+            _keyTextBlock.FontWeight = fontWeight;
+
+        if (_valueTextBlock != null)
+            _valueTextBlock.FontWeight = fontWeight;
+        
+        if (_keyValueTextBlock != null)
+            _keyValueTextBlock.FontWeight = fontWeight;
+
+        if (style.Contains("italic"))
+        {
+            if (_keyTextBlock != null)
+                _keyTextBlock.FontStyle = FontStyles.Italic;
+
+            if (_valueTextBlock != null)
+                _valueTextBlock.FontStyle = FontStyles.Italic;
+
+            if (_keyValueTextBlock != null)
+                _keyValueTextBlock.FontStyle = FontStyles.Italic;
+        }
+
+        return this;
     }
 }
