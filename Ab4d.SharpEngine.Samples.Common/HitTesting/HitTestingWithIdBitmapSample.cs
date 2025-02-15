@@ -461,7 +461,7 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
         ui.AddSeparator();
         ui.CreateLabel("Object Name:");
-        _objectNameLabel = ui.CreateKeyValueLabel("", () => $"{_lastObjectName}");
+        _objectNameLabel = ui.CreateKeyValueLabel("", () => $"{_lastObjectName}").SetStyle("bold");
 
         ui.AddSeparator();
         
