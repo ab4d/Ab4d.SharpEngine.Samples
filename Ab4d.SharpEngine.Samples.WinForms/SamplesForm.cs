@@ -97,13 +97,11 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             if (_headerItemFont == null)
                 _headerItemFont = new Font(samplesListView.Font, FontStyle.Bold);
 
-            ListViewGroup? currentListViewGroup = null;
-
             foreach (XmlNode xmlNode in xmlNodeList)
             {
                 try
                 {
-                    var listBoxItem = CreateListBoxItem(xmlNode, ref currentListViewGroup);
+                    var listBoxItem = CreateListBoxItem(xmlNode);
 
                     if (listBoxItem != null)
                         samplesListView.Items.Add(listBoxItem);
@@ -115,7 +113,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             }
         }
 
-        private ListViewItem? CreateListBoxItem(XmlNode xmlNode, ref ListViewGroup? currentListViewGroup)
+        private ListViewItem? CreateListBoxItem(XmlNode xmlNode)
         {
             if (xmlNode.Attributes == null)
                 return null;
@@ -125,6 +123,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             string? location = null;
             string? title = null;
+            bool isNew = false;
+            bool isUpdated = false;
+            string? updateInfo = null;
 
             foreach (XmlAttribute attribute in xmlNode.Attributes)
             {
@@ -145,6 +146,18 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                     case "istitle":
                         isTitle = true;
                         break;
+                    
+                    case "isnew":
+                        isNew = true;
+                        break;
+                    
+                    case "isupdated":
+                        isUpdated = true;
+                        break;
+                    
+                    case "updateinfo":
+                        updateInfo = attribute.Value.Replace("\\n", "\n");
+                        break;
                 }
             }
 
@@ -156,6 +169,21 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             if (!isTitle)
                 title = "  " + title;
 
+            string? tooltip = null;
+            
+            if (isNew)
+            {
+                title += "  (NEW)";
+                tooltip = "New sample in this version";
+            }
+
+            if (isUpdated)
+            {
+                title += "  (UP)";
+                tooltip = updateInfo ?? "Updated sample";
+            }
+
+
             var listBoxItem = new ListViewItem(title)
             {
                 Tag = location,
@@ -163,6 +191,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             if (isTitle)
                 listBoxItem.Font = _headerItemFont;
+
+            if (tooltip != null)
+                listBoxItem.ToolTipText = tooltip;
 
             if (_startupPage != null && _startupPage == location)
                 listBoxItem.Selected = true;

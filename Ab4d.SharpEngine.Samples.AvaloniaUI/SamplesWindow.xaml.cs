@@ -58,6 +58,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
 
         private TextBlock? _errorTextBlock;
+        private Bitmap? _newBitmap;
+        private Bitmap? _updatedBitmap;
 
         public SamplesWindow()
         {
@@ -164,6 +166,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             bool isSeparator = false;
             bool isTitle = false;
+            bool isNew = false;
+            bool isUpdated = false;
+            string? updateInfo = null;
 
             string? location = null;
             string? title = null;
@@ -186,6 +191,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     
                     case "istitle":
                         isTitle = true;
+                        break;
+                    
+                    case "isnew":
+                        isNew = true;
+                        break;
+                    
+                    case "isupdated":
+                        isUpdated = true;
+                        break;
+                    
+                    case "updateinfo":
+                        updateInfo = attribute.Value.Replace("\\n", "\n");
                         break;
                 }
             }
@@ -230,6 +247,40 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             textBlock.Margin = new Thickness(isTitle ? 4 : 10, topMargin, 0, bottomMargin);
             
             stackPanel.Children.Add(textBlock);
+
+            if (isNew)
+            {
+                _newBitmap ??= new Bitmap(AssetLoader.Open(new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/Resources/new_icon.png")));
+                var newImage = new Image()
+                {
+                    Source = _newBitmap,
+                    Width = 19,
+                    Height = 9,
+                    Margin = new Thickness(5, 3, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                ToolTip.SetTip(newImage, "New sample in this version");
+
+                stackPanel.Children.Add(newImage);
+            }
+
+            if (isUpdated)
+            {
+                _updatedBitmap ??= new Bitmap(AssetLoader.Open(new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/Resources/updated_icon.png")));
+                var updatedImage = new Image()
+                {
+                    Source = _updatedBitmap,
+                    Width = 13,
+                    Height = 9,
+                    Margin = new Thickness(5, 3, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                ToolTip.SetTip(updatedImage, updateInfo ?? "Updated sample");
+
+                stackPanel.Children.Add(updatedImage);
+            }
 
             var listBoxItem = new ListBoxItem()
             {

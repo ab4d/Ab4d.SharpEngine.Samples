@@ -50,7 +50,7 @@
             panel1.Dock = DockStyle.Left;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(294, 853);
+            panel1.Size = new Size(311, 853);
             panel1.TabIndex = 0;
             // 
             // samplesListView
@@ -59,7 +59,8 @@
             samplesListView.Location = new Point(0, 175);
             samplesListView.MultiSelect = false;
             samplesListView.Name = "samplesListView";
-            samplesListView.Size = new Size(294, 678);
+            samplesListView.ShowItemToolTips = true;
+            samplesListView.Size = new Size(311, 678);
             samplesListView.TabIndex = 0;
             samplesListView.UseCompatibleStateImageBehavior = false;
             samplesListView.View = View.Details;
@@ -76,7 +77,7 @@
             panel3.Dock = DockStyle.Top;
             panel3.Location = new Point(0, 0);
             panel3.Name = "panel3";
-            panel3.Size = new Size(294, 175);
+            panel3.Size = new Size(311, 175);
             panel3.TabIndex = 0;
             // 
             // diagnosticsButton
@@ -131,9 +132,9 @@
             // samplePanel
             // 
             samplePanel.Dock = DockStyle.Fill;
-            samplePanel.Location = new Point(294, 0);
+            samplePanel.Location = new Point(311, 0);
             samplePanel.Name = "samplePanel";
-            samplePanel.Size = new Size(1288, 853);
+            samplePanel.Size = new Size(1271, 853);
             samplePanel.TabIndex = 1;
             // 
             // SamplesForm

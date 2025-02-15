@@ -5,7 +5,7 @@
         x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.SamplesWindow"
         xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
         mc:Ignorable="d"
-        Width="1300" Height="720"
+        Width="1350" Height="720"
         Icon="Resources/sharp-engine-logo.ico"
         Title="Ab4d.SharpEngine samples with AvaloniaUI">
 
@@ -52,7 +52,7 @@
 
     </Window.Resources>
 
-    <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}" ColumnDefinitions="270, *">
+    <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}" ColumnDefinitions="280, *">
 
     <!-- LEFT SIDE: -->
 

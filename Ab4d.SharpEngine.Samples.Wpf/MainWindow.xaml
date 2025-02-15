@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Ab4d.SharpEngine Samples for WPF"
         Icon="Resources/sharp-engine-logo.ico"
-        Width="1300" Height="720">
+        Width="1350" Height="720">
     <Window.Resources>
 
         <SolidColorBrush x:Key="BackgroundBrush">#333</SolidColorBrush>
@@ -23,7 +23,7 @@
                            Text="{Binding XPath=@Title}" 
                            ToolTip="{Binding XPath=@Location}" ToolTipService.InitialShowDelay="500" ToolTipService.BetweenShowDelay="500" />
                 <Image Name="NewIconImage" Source="Resources/new_icon.png" Width="19" Height="9" Margin="5 3 0 0" Visibility="Collapsed" VerticalAlignment="Center" SnapsToDevicePixels="True"
-                       ToolTip="New sample"/>
+                       ToolTip="New sample in this version"/>
                 <Image Name="UpdatedIconImage" Source="Resources/updated_icon.png" Width="13" Height="9" Margin="5 3 0 0" Visibility="Collapsed" VerticalAlignment="Center" SnapsToDevicePixels="True"
                        ToolTip="{Binding XPath=@UpdateInfo}"/>
             </StackPanel>
@@ -84,7 +84,7 @@
 
     <Grid Name="RootGrid" Background="{StaticResource BackgroundBrush}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 

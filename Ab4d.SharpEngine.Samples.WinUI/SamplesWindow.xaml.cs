@@ -71,6 +71,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private BitmapImage? _disabledDiagnosticsImage;
         private BitmapImage? _diagnosticsImage;
 
+        private BitmapImage? _newBitmap;
+        private BitmapImage? _updatedBitmap;
+
         private DiagnosticsWindow? _diagnosticsWindow;
         private bool _automaticallyOpenDiagnosticsWindow;
         private Windows.Graphics.PointInt32 _diagnosticsWindowPosition;
@@ -169,6 +172,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
             bool isSeparator = false;
             bool isTitle = false;
+            bool isNew = false;
+            bool isUpdated = false;
+            string? updateInfo = null;
 
             string? location = null;
             string? title = null;
@@ -191,6 +197,18 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
                     case "istitle":
                         isTitle = true;
+                        break;
+                    
+                    case "isnew":
+                        isNew = true;
+                        break;
+                    
+                    case "isupdated":
+                        isUpdated = true;
+                        break;
+                    
+                    case "updateinfo":
+                        updateInfo = attribute.Value.Replace("\\n", "\n");
                         break;
                 }
             }
@@ -235,6 +253,42 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             textBlock.Margin = new Thickness(isTitle ? 4 : 10, topMargin, 0, bottomMargin);
 
             stackPanel.Children.Add(textBlock);
+
+
+            if (isNew)
+            {
+                _newBitmap ??= new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\new_icon.png")));
+                var newImage = new Image()
+                {
+                    Source = _newBitmap,
+                    Width = 19,
+                    Height = 9,
+                    Margin = new Thickness(5, 3, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                ToolTipService.SetToolTip(newImage, "New sample in this version");
+
+                stackPanel.Children.Add(newImage);
+            }
+
+            if (isUpdated)
+            {
+                _updatedBitmap ??= new BitmapImage(new Uri(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Assets\updated_icon.png")));
+                var updatedImage = new Image()
+                {
+                    Source = _updatedBitmap,
+                    Width = 13,
+                    Height = 9,
+                    Margin = new Thickness(5, 3, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                ToolTipService.SetToolTip(updatedImage, updateInfo ?? "Updated sample");
+
+                stackPanel.Children.Add(updatedImage);
+            }
+
 
             var listBoxItem = new ListBoxItem()
             {
