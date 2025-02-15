@@ -64,7 +64,7 @@ public abstract class RectangularSelectionSample : CommonSample
 
     private static int _idToColorMultiplier = 1; // If you want to see the ID Bitmap with bigger color differences, change this value to 8 or similar
 
-    private bool _useObjectIdBitmap = false;
+    private bool _useObjectIdBitmap = true;
     private bool _dumpObjectUnderPointer = true;
 
    
@@ -870,7 +870,7 @@ Disadvantages:
                 RestoreOriginalMaterials();
                 _useObjectIdBitmap = selectedIndex == 1;
             },
-            selectedItemIndex: 0);
+            selectedItemIndex: _useObjectIdBitmap ? 1 : 0);
 
 
         ui.AddSeparator();
