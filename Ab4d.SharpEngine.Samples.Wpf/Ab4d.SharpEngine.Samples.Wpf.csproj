@@ -34,8 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Samples.xml" />
-    <Content Include="Samples.xml">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Samples.xml" Link="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

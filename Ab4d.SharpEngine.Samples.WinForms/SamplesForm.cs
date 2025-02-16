@@ -20,8 +20,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 {
     public partial class SamplesForm : Form
     {
-        private string? _startupPage = "Titles.IntroductionUserControl";        
-        //private string? _startupPage = null;
+        //private string? _startupPage = "Advanced.ComplexSceneSample";        
+        private string? _startupPage = null;
 
         private Font? _headerItemFont;
 
@@ -79,17 +79,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
         private void LoadSamples()
         {
-            var xmlDcoument = new XmlDocument();
-            xmlDcoument.Load(@"Samples.xml");
-
-            if (xmlDcoument.DocumentElement == null)
-                throw new Exception("Cannot load Samples.xml");
-
-            var xmlNodeList = xmlDcoument.DocumentElement.SelectNodes("/Samples/Sample");
-
-            if (xmlNodeList == null || xmlNodeList.Count == 0)
-                throw new Exception("No samples in Samples.xml");
-
+            var samplesXmlNodList = CommonSample.LoadSamples("Samples.xml", 
+                                                             uiFramework: "WinForms", 
+                                                             errorMessage => MessageBox.Show(errorMessage));
 
             samplesListView.Columns.Add(new ColumnHeader() { Width = samplesListView.Width - 4 - SystemInformation.VerticalScrollBarWidth });
             samplesListView.HeaderStyle = ColumnHeaderStyle.None;
@@ -97,7 +89,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             if (_headerItemFont == null)
                 _headerItemFont = new Font(samplesListView.Font, FontStyle.Bold);
 
-            foreach (XmlNode xmlNode in xmlNodeList)
+            foreach (XmlNode xmlNode in samplesXmlNodList)
             {
                 try
                 {
@@ -111,6 +103,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                     Debug.WriteLine("Error parsing sample xml for " + xmlNode.OuterXml);
                 }
             }
+
+            if (_startupPage == null)
+                samplesListView.SelectedIndices.Add(0);
         }
 
         private ListViewItem? CreateListBoxItem(XmlNode xmlNode)
@@ -209,9 +204,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                 return;
             }
 
-            var location = selectedListViewItem.Tag as string;
+            var sampleLocation = selectedListViewItem.Tag as string;
 
-            if (location == null || location == _currentSampleLocationText) 
+            if (sampleLocation == null || sampleLocation == _currentSampleLocationText) 
                 return;
 
 
@@ -230,9 +225,9 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                 _currentCommonSample = null;
             }
 
-            if (location.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
-                var markdownText = GetMarkdownText(location);
+                var markdownText = GetMarkdownText(sampleLocation);
                     
                 if (markdownText != null)
                 {
@@ -262,96 +257,38 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             if (_currentSampleControl == null)
             {
-                // Try to create common sample type from page attribute
-                var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.WinForms.{location}, Ab4d.SharpEngine.Samples.WinForms", throwOnError: false);
+                var createdSample = CommonSample.CreateSampleObject(uiFramework: "WinForms", sampleLocation, WinFormsSamplesContext.Current, errorMessage => MessageBox.Show(errorMessage));
 
-                if (sampleType == null)
-                    sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{location}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
-
-                if (sampleType != null)
+                if (createdSample is CommonSample createdCommonSample)
                 {
-                    var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
-
-                    // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
-                    ConstructorInfo? selectedConstructorInfo = null;
-                    bool isCommonSampleType = false;
-
-                    foreach (var constructorInfo in constructors)
+                    if (_commonWinFormsSampleUserControl == null)
                     {
-                        var parameterInfos = constructorInfo.GetParameters();
-
-                        // First try to get constructor that takes ICommonSamplesContext
-                        if (parameterInfos.Any(p => p.ParameterType == typeof(ICommonSamplesContext)))
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = true;
-                            break;
-                        }
-
-                        // ... else use constructor without any parameters
-                        if (selectedConstructorInfo == null && parameterInfos.Length == 0)
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = false;
-                        }
+                        _commonWinFormsSampleUserControl = new CommonWinFormsSampleUserControl();
+                        _commonWinFormsSampleUserControl.Dock = DockStyle.Fill;
                     }
 
-                    if (selectedConstructorInfo == null)
-                    {
-                        _currentSampleLocationText = null;
-                        MessageBox.Show("No constructor without parameters or with ICommonSamplesContext found for the sample:" + Environment.NewLine + location);
-                        return;
-                    }
+                    // Set CurrentSharpEngineSceneView before the _commonWinFormsSampleUserControl is loaded
+                    WinFormsSamplesContext.Current.RegisterCurrentSharpEngineSceneView(_commonWinFormsSampleUserControl.MainSceneView);
 
-                    if (isCommonSampleType)
-                    {
-                        // Create a common sample control (calling constructor that takes ICommonSamplesContext as parameter)
+                    this.SuspendLayout();
+                    _commonWinFormsSampleUserControl.CurrentCommonSample = createdCommonSample;
+                    this.ResumeLayout();
 
-                        var commonSamplesContext = WinFormsSamplesContext.Current;
+                    _currentSampleControl = _commonWinFormsSampleUserControl;
 
-                        //var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
-                        var commonSample = selectedConstructorInfo.Invoke(new object?[] { commonSamplesContext }) as CommonSample;
-
-                        if (_commonWinFormsSampleUserControl == null)
-                        {
-                            _commonWinFormsSampleUserControl = new CommonWinFormsSampleUserControl();
-                            _commonWinFormsSampleUserControl.Dock = DockStyle.Fill;
-                        }
-
-                        // Set CurrentSharpEngineSceneView before the _commonWinFormsSampleUserControl is loaded
-                        WinFormsSamplesContext.Current.RegisterCurrentSharpEngineSceneView(_commonWinFormsSampleUserControl.MainSceneView);
-
-                        this.SuspendLayout();
-                        _commonWinFormsSampleUserControl.CurrentCommonSample = commonSample;
-                        this.ResumeLayout();
-
-                        _currentSampleControl = _commonWinFormsSampleUserControl;
-
-                        _currentCommonSample = commonSample;
-                    }
-                    else
-                    {
-                        // Create sample control (calling constructor without parameters)
-                        _currentSampleControl = selectedConstructorInfo.Invoke(null) as UserControl;
-                        
-                        if (_currentSampleControl != null)
-                            _currentSampleControl.Dock = DockStyle.Fill;
-
-                        _currentCommonSample = null;
-                    }
+                    _currentCommonSample = createdCommonSample;
+                }
+                else if (createdSample is UserControl createdControl)
+                {
+                    createdControl.Dock = DockStyle.Fill;
+                    _currentSampleControl = createdControl;
+                    _currentCommonSample = null;
                 }
                 else
                 {
                     _currentSampleControl = null;
                     _currentCommonSample = null;
                 }
-            }
-
-            if (_currentSampleControl == null)
-            {
-                _currentSampleLocationText = null;
-                MessageBox.Show("Sample not found: " + Environment.NewLine + location);
-                return;
             }
 
             // Set WinFormsSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
@@ -372,7 +309,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                 samplePanel.Controls.Add(_currentSampleControl);
             }
 
-            _currentSampleLocationText = location;
+            _currentSampleLocationText = sampleLocation;
         }
 
         // Searches the logical controls tree and returns the first instance of SharpEngineSceneView if found
@@ -444,14 +381,6 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             return null;
         }
-
-        //private SharpEngineSceneView? FindSharpEngineSceneView(ControlCollection controls)
-        //{
-
-
-        //    return null;
-        //}
-
 
         private void OnCurrentSharpEngineSceneViewChanged(object? sender, EventArgs e)
         {

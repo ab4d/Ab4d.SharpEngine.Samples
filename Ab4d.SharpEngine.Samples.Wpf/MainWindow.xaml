@@ -135,12 +135,13 @@
             <ListBox Name="SampleList" Grid.Row="7" 
                      Margin="0 15 0 5" Padding="0 0 0 0"
 	                 SelectedIndex="0"
-                     ItemsSource="{Binding Source={StaticResource SamplesXml}, XPath=Samples/Sample}"
                      ItemTemplate="{StaticResource SamplesTemplate}"    
                      ItemContainerStyle="{StaticResource SimpleListBoxItem}" 
                      Background="{StaticResource BackgroundBrush}"
                      BorderThickness="1"
                      BorderBrush="{StaticResource BackgroundBrush}" />
+
+            <!--ItemsSource="{Binding Source={StaticResource SamplesXml}, XPath=Samples/Sample}"-->
 
         </Grid>
 

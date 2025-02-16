@@ -121,22 +121,10 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         {
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
 
-            var xmlDcoument = new XmlDocument();
-            xmlDcoument.Load(fileName);
-
-            if (xmlDcoument.DocumentElement == null)
-                throw new Exception("Cannot load Samples.xml");
-
-            var xmlNodeList = xmlDcoument.DocumentElement.SelectNodes("/Samples/Sample");
-
-            if (xmlNodeList == null || xmlNodeList.Count == 0)
-                throw new Exception("No samples in Samples.xml");
-
-
-            //var listBoxItems = new List<ListBoxItem>();
+            var samplesXmlNodList = CommonSample.LoadSamples(fileName, uiFramework: "WinUI", errorMessage => ShowError(errorMessage));
 
             int selectedIndex = 0;
-            foreach (XmlNode xmlNode in xmlNodeList)
+            foreach (XmlNode xmlNode in samplesXmlNodList)
             {
                 try
                 {
@@ -309,9 +297,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not ListBoxItem listBoxItem)
                 return;
 
-            var location = listBoxItem.Tag as string;
+            var sampleLocation = listBoxItem.Tag as string;
 
-            if (location == null)
+            if (sampleLocation == null)
                 return;
 
 
@@ -323,9 +311,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 _currentCommonSample = null;
             }
 
-            if (location.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
-                var markdownText = GetMarkdownText(location);
+                var markdownText = GetMarkdownText(sampleLocation);
 
                 if (markdownText != null)
                 {
@@ -335,86 +323,35 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                     _currentSampleControl = _commonTitlePage;
                     _currentCommonSample = null;
                 }
+                else
+                {
+                    _currentSampleControl = null;
+                }
             }
 
             if (_currentSampleControl == null)
             {
-                // Try to create common sample type from page attribute
-                var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.WinUI.{location}, Ab4d.SharpEngine.Samples.WinUI", throwOnError: false);
+                var createdSample = CommonSample.CreateSampleObject(uiFramework: "WinUI", sampleLocation, WinUISamplesContext.Current, errorMessage => ShowError(errorMessage));
 
-                if (sampleType == null)
-                    sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{location}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
-
-                if (sampleType != null)
+                if (createdSample is CommonSample createdCommonSample)
                 {
-                    var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    _commonWinUISampleUserControl ??= new CommonWinUISampleUserControl();
 
-                    // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
-                    ConstructorInfo? selectedConstructorInfo = null;
-                    bool isCommonSampleType = false;
+                    _commonWinUISampleUserControl.CurrentCommonSample = createdCommonSample;
 
-                    foreach (var constructorInfo in constructors)
-                    {
-                        var parameterInfos = constructorInfo.GetParameters();
-
-                        // First try to get constructor that takes ICommonSamplesContext
-                        if (parameterInfos.Any(p => p.ParameterType == typeof(ICommonSamplesContext)))
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = true;
-                            break;
-                        }
-
-                        // ... else use constructor without any parameters
-                        if (selectedConstructorInfo == null && parameterInfos.Length == 0)
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = false;
-                        }
-                    }
-
-                    if (selectedConstructorInfo == null)
-                    {
-                        ShowError("No constructor without parameters or with ICommonSamplesContext found for the sample:" + Environment.NewLine + location);
-                        return;
-                    }
-
-                    if (isCommonSampleType)
-                    {
-                        // Create a common sample control (calling constructor that takes ICommonSamplesContext as parameter)
-
-                        var commonSamplesContext = WinUISamplesContext.Current;
-
-                        //var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
-                        var commonSample = selectedConstructorInfo.Invoke(new object?[] { commonSamplesContext }) as CommonSample;
-
-                        _commonWinUISampleUserControl ??= new CommonWinUISampleUserControl();
-
-                        _commonWinUISampleUserControl.CurrentCommonSample = commonSample;
-
-                        _currentSampleControl = _commonWinUISampleUserControl;
-
-                        _currentCommonSample = commonSample;
-                    }
-                    else
-                    {
-                        // Create sample control (calling constructor without parameters)
-                        _currentSampleControl = selectedConstructorInfo.Invoke(null) as Control;
-                        _currentCommonSample = null;
-                    }
+                    _currentSampleControl = _commonWinUISampleUserControl;
+                    _currentCommonSample = createdCommonSample;
+                }
+                else if (createdSample is Control createdControl)
+                {
+                    _currentSampleControl = createdControl;
+                    _currentCommonSample = null;
                 }
                 else
                 {
                     _currentSampleControl = null;
                     _currentCommonSample = null;
                 }
-            }
-
-
-            if (_currentSampleControl == null)
-            {
-                ShowError("Sample not found: " + Environment.NewLine + location);
-                return;
             }
 
             // Set WinUISamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
@@ -429,7 +366,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                 WinUISamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             }
 
-            RightSideBorder.Child = _currentSampleControl;
+            if (_currentSampleControl != null || RightSideBorder.Child != _errorTextBlock) // Do not overwrite _errorTextBlock with null when sample is not found
+                RightSideBorder.Child = _currentSampleControl;
         }
 
         private string? GetMarkdownText(string location)

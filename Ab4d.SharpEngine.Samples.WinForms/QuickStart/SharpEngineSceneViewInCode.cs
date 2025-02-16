@@ -16,7 +16,7 @@ using Ab4d.SharpEngine.WinForms;
 
 namespace Ab4d.SharpEngine.Samples.WinForms.QuickStart
 {
-    public partial class SharpEngineSceneViewControl : UserControl
+    public partial class SharpEngineSceneViewInCode : UserControl
     {
         private GroupNode? _groupNode;
         
@@ -26,7 +26,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms.QuickStart
 
         private int _newObjectsCounter;
 
-        public SharpEngineSceneViewControl()
+        public SharpEngineSceneViewInCode()
         {
             InitializeComponent();
 

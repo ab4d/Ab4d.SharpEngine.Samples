@@ -32,7 +32,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
     public partial class SamplesWindow : Window
     {
-        //private string? _startupPage = "AdvancedModels.MultiMaterialModelNodeSample";
+        //private string? _startupPage = "Advanced.ComplexSceneSample";
         private string? _startupPage = null;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
@@ -115,22 +115,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (Avalonia.Controls.Design.IsDesignMode)
                 return;
 
-            var xmlDcoument = new XmlDocument();
-            xmlDcoument.Load(@"Samples.xml");
-
-            if (xmlDcoument.DocumentElement == null)
-                throw new Exception("Cannot load Samples.xml");
-
-            var xmlNodeList = xmlDcoument.DocumentElement.SelectNodes("/Samples/Sample");
-
-            if (xmlNodeList == null || xmlNodeList.Count == 0)
-                throw new Exception("No samples in Samples.xml");
-
+            var samplesXmlNodList = CommonSample.LoadSamples("Samples.xml", 
+                                                             uiFramework: "AvaloniaUI", 
+                                                             errorMessage => ShowError(errorMessage));
 
             var listBoxItems = new List<ListBoxItem>();
 
             int selectedIndex = 0;
-            foreach (XmlNode xmlNode in xmlNodeList)
+            foreach (XmlNode xmlNode in samplesXmlNodList)
             {
                 try
                 {
@@ -319,9 +311,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not ListBoxItem listBoxItem)
                 return;
 
-            var location = listBoxItem.Tag as string;
+            var sampleLocation = listBoxItem.Tag as string;
 
-            if (location == null) 
+            if (sampleLocation == null) 
                 return;
 
 
@@ -333,9 +325,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _currentCommonSample = null;
             }
 
-            if (location.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+            if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
-                var markdownText = GetMarkdownText(location);
+                var markdownText = GetMarkdownText(sampleLocation);
 
                 if (markdownText != null)
                 {
@@ -349,69 +341,22 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             if (_currentSampleControl == null)
             {
-                // Try to create common sample type from page attribute
-                var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.AvaloniaUI.{location}, Ab4d.SharpEngine.Samples.AvaloniaUI", throwOnError: false);
+                var createdSample = CommonSample.CreateSampleObject(uiFramework: "Avalonia", sampleLocation, AvaloniaSamplesContext.Current, errorMessage => ShowError(errorMessage));
 
-                if (sampleType == null)
-                    sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{location}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
-
-                if (sampleType != null)
+                if (createdSample is CommonSample createdCommonSample)
                 {
-                    var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+                    _commonAvaloniaSampleUserControl ??= new CommonAvaloniaSampleUserControl();
 
-                    // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
-                    ConstructorInfo? selectedConstructorInfo = null;
-                    bool isCommonSampleType = false;
+                    _commonAvaloniaSampleUserControl.CurrentCommonSample = createdCommonSample;
 
-                    foreach (var constructorInfo in constructors)
-                    {
-                        var parameterInfos = constructorInfo.GetParameters();
+                    _currentSampleControl = _commonAvaloniaSampleUserControl;
 
-                        // First try to get constructor that takes ICommonSamplesContext
-                        if (parameterInfos.Any(p => p.ParameterType == typeof(ICommonSamplesContext)))
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = true;
-                            break;
-                        }
-
-                        // ... else use constructor without any parameters
-                        if (selectedConstructorInfo == null && parameterInfos.Length == 0)
-                        {
-                            selectedConstructorInfo = constructorInfo;
-                            isCommonSampleType = false;
-                        }
-                    }
-
-                    if (selectedConstructorInfo == null)
-                    {
-                        ShowError("No constructor without parameters or with ICommonSamplesContext found for the sample:" + Environment.NewLine + location);
-                        return;
-                    }
-
-                    if (isCommonSampleType)
-                    {
-                        // Create a common sample control (calling constructor that takes ICommonSamplesContext as parameter)
-
-                        var commonSamplesContext = AvaloniaSamplesContext.Current;
-
-                        //var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
-                        var commonSample = selectedConstructorInfo.Invoke(new object?[] { commonSamplesContext }) as CommonSample;
-
-                        _commonAvaloniaSampleUserControl ??= new CommonAvaloniaSampleUserControl();
-
-                        _commonAvaloniaSampleUserControl.CurrentCommonSample = commonSample;
-
-                        _currentSampleControl = _commonAvaloniaSampleUserControl;
-
-                        _currentCommonSample = commonSample;
-                    }
-                    else
-                    {
-                        // Create sample control (calling constructor without parameters)
-                        _currentSampleControl = selectedConstructorInfo.Invoke(null) as Control;
-                        _currentCommonSample = null;
-                    }
+                    _currentCommonSample = createdCommonSample;
+                }
+                else if (createdSample is Control createdControl)
+                {
+                    _currentSampleControl = createdControl;
+                    _currentCommonSample = null;
                 }
                 else
                 {
@@ -422,7 +367,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             if (_currentSampleControl == null)
             {
-                ShowError("Sample not found: " + Environment.NewLine + location);
+                ShowError("Sample not found: " + Environment.NewLine + sampleLocation);
                 return;
             }
 
@@ -440,6 +385,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             SelectedSampleContentControl.Content = _currentSampleControl;
         }
+
 
         private string? GetMarkdownText(string location)
         {

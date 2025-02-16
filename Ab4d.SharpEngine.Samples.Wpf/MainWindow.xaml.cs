@@ -37,7 +37,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "Advanced.MultiSceneNodesSample";
+        //private string? _startupPage = "Advanced.ComplexSceneSample";
         private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
@@ -103,6 +103,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             WpfSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
 
+            this.Loaded += delegate(object? sender, RoutedEventArgs args)
+            {
+                LoadSamples();
+            };
 
             this.Unloaded += (sender, args) => CloseDiagnosticsWindow();
 
@@ -139,6 +143,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             };
         }
 
+        private void LoadSamples()
+        {
+            if (DesignerProperties.GetIsInDesignMode(this))
+                return;
+
+            SampleList.ItemsSource = CommonSample.LoadSamples("Samples.xml", 
+                                                              uiFramework: "Wpf", 
+                                                              errorMessage => MessageBox.Show(errorMessage, "", MessageBoxButton.OK, MessageBoxImage.Exclamation));
+        }
+
         private void ShowSelectedSample(SelectionChangedEventArgs args)
         {
             if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not XmlElement xmlElement)
@@ -150,20 +164,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _currentCommonSample = null;
             }
 
-            var locationAttribute = xmlElement.GetAttribute("Location");
+            var sampleLocation = xmlElement.GetAttribute("Location");
 
-            if (locationAttribute.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
+            if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
-                ContentFrame.Source = new Uri(locationAttribute, UriKind.Relative);
-
-                _currentSampleXaml   = locationAttribute;
-                _currentCommonSample = null;
-                return;
-            }
-            
-            if (locationAttribute.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
-            {
-                var markdownText = GetMarkdownText(locationAttribute);
+                var markdownText = GetMarkdownText(sampleLocation);
 
                 if (markdownText != null)
                 {
@@ -172,43 +177,38 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
                     ContentFrame.Navigate(_commonTitlePage);
 
-                    _currentSampleXaml = locationAttribute;
+                    _currentSampleXaml = sampleLocation;
                     _currentCommonSample = null;
                     return;
                 }
             }
 
-            // Try to create common sample type from page attribute
 
-            var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Wpf.{locationAttribute}, Ab4d.SharpEngine.Samples.Wpf", throwOnError: false);
+            var createdSample = CommonSample.CreateSampleObject(uiFramework: "Wpf", sampleLocation, WpfSamplesContext.Current, errorMessage => MessageBox.Show(errorMessage, "", MessageBoxButton.OK, MessageBoxImage.Exclamation));
 
-            if (sampleType == null)
-                sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{locationAttribute}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
-
-            if (sampleType != null)
+            if (createdSample is CommonSample createdCommonSample)
             {
-                var commonSamplesContext = WpfSamplesContext.Current;
-                var commonSample = Activator.CreateInstance(sampleType, new object?[] { commonSamplesContext }) as CommonSample;
-
                 if (_commonWpfSamplePage == null)
                 {
                     _commonWpfSamplePage = new CommonWpfSamplePage();
                     WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(_commonWpfSamplePage.MainSceneView);
                 }
-                
-                if (_currentSampleXaml != null || ContentFrame.Content == null)
-                {
+
+                if (_currentCommonSample == null)
                     ContentFrame.Navigate(_commonWpfSamplePage);
-                    _currentSampleXaml = null;
-                }
 
-                _commonWpfSamplePage.CurrentCommonSample = commonSample;
-
-                _currentCommonSample = commonSample;
+                _commonWpfSamplePage.CurrentCommonSample = createdCommonSample;
+                _currentCommonSample = createdCommonSample;
+            }
+            else if (createdSample is FrameworkElement createdFrameworkElement)
+            {
+                ContentFrame.Navigate(createdFrameworkElement);
+                _currentCommonSample = null;
             }
             else
             {
-                MessageBox.Show("Cannot find: " + locationAttribute, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                _currentSampleXaml = null;
+                _currentCommonSample = null;
             }
         }
         

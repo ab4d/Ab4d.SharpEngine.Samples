@@ -2,7 +2,7 @@
 
 namespace Ab4d.SharpEngine.Samples.WinForms.QuickStart
 {
-    partial class SharpEngineSceneViewControl
+    partial class SharpEngineSceneViewInCode
     {
         /// <summary> 
         /// Required designer variable.

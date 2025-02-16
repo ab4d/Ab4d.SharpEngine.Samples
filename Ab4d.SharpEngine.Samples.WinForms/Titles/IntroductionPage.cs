@@ -7,7 +7,7 @@ using Ab4d.SharpEngine.WinForms;
 
 namespace Ab4d.SharpEngine.Samples.WinForms.Titles;
 
-public class IntroductionUserControl : UserControl
+public class IntroductionPage : UserControl
 {
     private bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
     private bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only Avalonia objects will be shown)
@@ -20,7 +20,7 @@ public class IntroductionUserControl : UserControl
     private Panel _infoPanel;
     private Panel _sceneViewPanel;
 
-    public IntroductionUserControl()
+    public IntroductionPage()
     {
         this.SuspendLayout();
 

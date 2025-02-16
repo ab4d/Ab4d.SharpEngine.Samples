@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Numerics;
+using System.Reflection;
+using System.Xml;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
@@ -79,6 +81,141 @@ public abstract class CommonSample
     {
         this.context = context;
     }
+
+    public static List<XmlNode> LoadSamples(string samplesXmlFilePath, string uiFramework, Action<string>? showErrorAction)
+    {
+        var filteredXmlNodeList = new List<XmlNode>();
+
+        var xmlDcoument = new XmlDocument();
+        xmlDcoument.Load(samplesXmlFilePath);
+
+        if (xmlDcoument.DocumentElement == null)
+        {
+            showErrorAction?.Invoke("Cannot load Samples.xml");
+            return filteredXmlNodeList;
+        }
+
+
+        var xmlNodeList = xmlDcoument.DocumentElement.SelectNodes("/Samples/Sample");
+
+        if (xmlNodeList == null || xmlNodeList.Count == 0)
+        {
+            showErrorAction?.Invoke("No samples in Samples.xml");
+            return filteredXmlNodeList;
+        }
+        
+
+        foreach (XmlNode xmlNode in xmlNodeList)
+        {
+            if (xmlNode.Attributes != null)
+            {
+                var conditionAttribute = xmlNode.Attributes["Condition"];
+
+                if (conditionAttribute != null)
+                {
+                    var AllConditionsText = conditionAttribute.Value;
+
+                    var allConditions = AllConditionsText.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                    bool isIncluded = false;
+                    bool isSkipped = false;
+
+                    foreach (var oneCondition in allConditions)
+                    {
+                        if (!oneCondition.StartsWith("Is", StringComparison.OrdinalIgnoreCase))
+                            throw new Exception("Invalid Condition in Samples.xml: " + oneCondition);
+
+                        bool negateCondition = oneCondition.Contains("Not", StringComparison.OrdinalIgnoreCase);
+                        int uiFrameworkPosition = negateCondition ? 5 : 2; // Skip "IsNot" or "Is"
+
+                        string uiFrameworkInCondition = oneCondition.Substring(uiFrameworkPosition);
+
+                        if (negateCondition)
+                        {
+                            if (uiFramework == uiFrameworkInCondition)
+                                isSkipped = true; // for example, skip Wpf if condition is IsNotWpf
+                        }
+                        else
+                        {
+                            if (uiFramework == uiFrameworkInCondition)
+                                isIncluded = true; // for example, only include this sample when condition IsWpf and uiFramework is Wpf
+                        }
+                    }
+
+                    if (isSkipped || !isIncluded)
+                        continue;
+                }
+            }
+
+            filteredXmlNodeList.Add(xmlNode);
+        }
+
+        return filteredXmlNodeList;
+    }
+
+    public static object? CreateSampleObject(string uiFramework, string sampleLocation, object commonSamplesContext, Action<string>? showErrorAction)
+    {
+        sampleLocation = sampleLocation.Replace("{uiFramework}", uiFramework);
+
+        string assemblyName = uiFramework;
+        if (assemblyName == "Avalonia")
+            assemblyName += "UI"; // Assembly name has AvaloniaUI and not just Avalonia
+
+        // Try to create common sample type from page attribute
+        var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.{assemblyName}.{sampleLocation}, Ab4d.SharpEngine.Samples.{assemblyName}", throwOnError: false);
+
+        if (sampleType == null)
+            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+
+        if (sampleType == null)
+        {
+            showErrorAction?.Invoke("Sample not found: " + Environment.NewLine + sampleLocation);
+            return null;
+        }
+
+        var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+
+        // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
+        ConstructorInfo? selectedConstructorInfo = null;
+        bool isCommonSampleType = false;
+
+        foreach (var constructorInfo in constructors)
+        {
+            var parameterInfos = constructorInfo.GetParameters();
+
+            // First try to get constructor that takes ICommonSamplesContext
+            if (parameterInfos.Any(p => p.ParameterType == typeof(ICommonSamplesContext)))
+            {
+                selectedConstructorInfo = constructorInfo;
+                isCommonSampleType = true;
+                break;
+            }
+
+            // ... else use constructor without any parameters
+            if (selectedConstructorInfo == null && parameterInfos.Length == 0)
+            {
+                selectedConstructorInfo = constructorInfo;
+                isCommonSampleType = false;
+            }
+        }
+
+        if (selectedConstructorInfo == null)
+        {
+            showErrorAction?.Invoke("No constructor without parameters or with ICommonSamplesContext found for the sample:" + Environment.NewLine + sampleLocation);
+            return null;
+        }
+
+
+        object createdSample;
+
+        if (isCommonSampleType)
+            createdSample = selectedConstructorInfo.Invoke(new object?[] { commonSamplesContext });
+        else
+            createdSample = selectedConstructorInfo.Invoke(null); // Create sample control (calling constructor without parameters)
+
+        return createdSample;
+    }
+
 
     public void InitializeSharpEngineView(ISharpEngineSceneView sharpEngineView)
     {

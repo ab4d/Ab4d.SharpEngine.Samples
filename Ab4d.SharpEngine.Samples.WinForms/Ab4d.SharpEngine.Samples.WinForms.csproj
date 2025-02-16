@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.WinForms</AssemblyName>
@@ -35,9 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Samples.xml" />
     <None Remove="Titles\RenderFormSample.md" />
-    <Content Include="Samples.xml">
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Samples.xml" Link="Samples.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
