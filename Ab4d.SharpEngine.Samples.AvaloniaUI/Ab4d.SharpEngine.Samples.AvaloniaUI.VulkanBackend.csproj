@@ -50,7 +50,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Samples.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Samples.xml" Link="Samples.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
