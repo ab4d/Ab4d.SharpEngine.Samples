@@ -134,6 +134,8 @@ public abstract class CommonSample
                         {
                             if (uiFramework == uiFrameworkInCondition)
                                 isSkipped = true; // for example, skip Wpf if condition is IsNotWpf
+                            else
+                                isIncluded = true; // for example, when IsNotWinForms then include that sample for Wpf
                         }
                         else
                         {
