@@ -46,7 +46,8 @@ public class SharpEngineLogoAnimation : IDisposable
     public SharpEngineLogoAnimation(Scene scene, IBitmapIO? bitmapIO = null)
     {
         // Create PlaneModelNode that will show the logo bitmap
-        _logoTextureMaterial = new StandardMaterial(LogoImageResourceName, bitmapIO);
+        string logoFileName = AppDomain.CurrentDomain.BaseDirectory + LogoImageResourceName;
+        _logoTextureMaterial = new StandardMaterial(logoFileName, bitmapIO);
         _logoTextureMaterial.Opacity = 0; // hidden at start
 
         _logoPlaneModel = new PlaneModelNode()
