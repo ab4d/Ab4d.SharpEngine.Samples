@@ -421,8 +421,8 @@ public class FogEffectTechnique : EffectTechnique
             if (PipelineLayout != renderingContext.CurrentPipelineLayout)
             {
                 // When PipelineLayout is changed, then all push constants are undefined and need to be set again
-                renderingContext.CurrentMatrixIndex = -1;
-                renderingContext.CurrentMaterialIndex = -1;
+                renderingContext.CurrentMatrixIndex   = int.MinValue;
+                renderingContext.CurrentMaterialIndex = int.MinValue; // do not set to -1, because negative material index values are used to invert normal direction
 
                 renderingContext.CurrentPipelineLayout = PipelineLayout;
             }
