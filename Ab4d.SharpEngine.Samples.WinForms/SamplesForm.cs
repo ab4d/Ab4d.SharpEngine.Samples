@@ -20,8 +20,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 {
     public partial class SamplesForm : Form
     {
-        //private string? _startupPage = "Advanced.ComplexSceneSample";        
-        private string? _startupPage = null;
+        private string? _startupPage = "StandardModels.TorusKnotModelNodeSample";        
+        //private string? _startupPage = null;
 
         private Font? _headerItemFont;
 
@@ -55,7 +55,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             // By default, enable logging of warnings and errors.
             // In case of problems please send the log text with the description of the problem to AB4D company
-            Utilities.Log.LogLevel = LogLevels.Warn;
+            Utilities.Log.LogLevel = LogLevels.All;
             Utilities.Log.IsLoggingToDebugOutput = true;
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
@@ -79,7 +79,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
         private void LoadSamples()
         {
-            var samplesXmlNodList = CommonSample.LoadSamples("Samples.xml", 
+            string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
+            var samplesXmlNodList = CommonSample.LoadSamples(fileName, 
                                                              uiFramework: "WinForms", 
                                                              errorMessage => MessageBox.Show(errorMessage));
 

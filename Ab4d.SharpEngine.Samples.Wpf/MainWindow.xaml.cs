@@ -148,7 +148,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            SampleList.ItemsSource = CommonSample.LoadSamples("Samples.xml", 
+            string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
+            SampleList.ItemsSource = CommonSample.LoadSamples(fileName, 
                                                               uiFramework: "Wpf", 
                                                               errorMessage => MessageBox.Show(errorMessage, "", MessageBoxButton.OK, MessageBoxImage.Exclamation));
         }

@@ -120,7 +120,6 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private void LoadSamples()
         {
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
-
             var samplesXmlNodList = CommonSample.LoadSamples(fileName, uiFramework: "WinUI", errorMessage => ShowError(errorMessage));
 
             int selectedIndex = 0;

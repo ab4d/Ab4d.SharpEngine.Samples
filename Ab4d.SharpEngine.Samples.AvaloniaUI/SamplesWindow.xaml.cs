@@ -115,7 +115,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (Avalonia.Controls.Design.IsDesignMode)
                 return;
 
-            var samplesXmlNodList = CommonSample.LoadSamples("Samples.xml", uiFramework: "Avalonia", errorMessage => ShowError(errorMessage));
+            string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
+            var samplesXmlNodList = CommonSample.LoadSamples(fileName, uiFramework: "Avalonia", errorMessage => ShowError(errorMessage));
 
             var listBoxItems = new List<ListBoxItem>();
 
