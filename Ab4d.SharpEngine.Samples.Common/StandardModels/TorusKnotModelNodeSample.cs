@@ -15,7 +15,7 @@ public class TorusKnotModelNodeSample : StandardModelsSampleBase
     private float _radius1 = 50;
     private float _radius2 = 20;
     private float _radius3 = 10;
-    private int _uSegmentsCount = 100;
+    private int _uSegmentsCount = 200;
     private int _vSegmentsCount = 30;
     
     private ICommonSampleUIElement? _qSlider;
