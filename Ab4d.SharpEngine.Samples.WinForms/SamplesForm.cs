@@ -55,7 +55,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             // By default, enable logging of warnings and errors.
             // In case of problems please send the log text with the description of the problem to AB4D company
-            Utilities.Log.LogLevel = LogLevels.All;
+            Utilities.Log.LogLevel = LogLevels.Warn;
             Utilities.Log.IsLoggingToDebugOutput = true;
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
