@@ -84,8 +84,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
                 // Start with going to first frame
                 _sharpEngineLogoAnimation.GotoFirstFrame();
 
-                // Now wait until Application is Idle and then start the animation
-                Dispatcher.UIThread.Post(() => _sharpEngineLogoAnimation.StartAnimation(), DispatcherPriority.Background);
+                if (sceneView.IsLicenseLogoShown)
+                {
+                    sceneView.OnLicenseLogoRemoved = () => _sharpEngineLogoAnimation.StartAnimation();
+                }
+                else
+                {
+                    // Now wait until Application is Idle and then start the animation
+                    Dispatcher.UIThread.Post(() => _sharpEngineLogoAnimation.StartAnimation(), DispatcherPriority.Background);
+                }
             }
             else
             {
