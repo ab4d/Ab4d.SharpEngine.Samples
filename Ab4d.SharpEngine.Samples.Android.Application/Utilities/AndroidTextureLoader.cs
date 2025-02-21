@@ -47,6 +47,7 @@ public class AndroidTextureLoader
                                          bool cacheGpuTexture = false)
     {
         ArgumentNullException.ThrowIfNull(resources);
+        ArgumentNullException.ThrowIfNull(bitmapIO);
 
         GpuImage? gpuImage;
         string? imageName = $"android_drawable_{drawableId}";
