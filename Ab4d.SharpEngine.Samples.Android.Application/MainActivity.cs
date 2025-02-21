@@ -264,11 +264,6 @@ namespace AndroidApp1
                 // We will recreated them when the app is resumed
                 DisposeSceneView();
             }
-            else
-            {
-                // In all other cases when the OnTrimMemory is called, we dispose all SharpEngine resources (in real app you many preserve more resources based on level).
-                // Here we should save the state of the 3D scene so it could be recreated.
-                SaveAppState();
 
             base.OnTrimMemory(level);
         }
