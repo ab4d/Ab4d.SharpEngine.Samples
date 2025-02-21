@@ -270,11 +270,6 @@ namespace AndroidApp1
                 // Here we should save the state of the 3D scene so it could be recreated.
                 SaveAppState();
 
-                // We can simulate that by first putting the app in background and then execute:
-                // adb shell am send-trim-memory com.ab4d.SharpEngineApp1 MODERATE
-                DisposeSharpEngine();
-            }
-
             base.OnTrimMemory(level);
         }
 
