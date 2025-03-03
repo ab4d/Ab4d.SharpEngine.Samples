@@ -139,6 +139,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             _groupNode = new GroupNode("GroupNode");
             _groupNode.Transform = new StandardTransform(translateX: 50, translateZ: 30);
             MainSceneView.Scene.RootNode.Add(_groupNode);
+
+            MainSceneView.Scene.IsTransparencySortingEnabled = false;
             
             for (int i = 1; i <= 8; i++)
             {
@@ -147,7 +149,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                     Position = new Vector3(-240 + i * 40, 5, 50),
                     PositionType = PositionTypes.Bottom,
                     Size = new Vector3(30, 20, 50),
-                    Material = new StandardMaterial(new Color3(1f, i * 0.0625f + 0.5f, i * 0.125f)), // orange to white
+                    Material = new StandardMaterial(new Color3(1f, i * 0.0625f + 0.5f, i * 0.125f), opacity: 0.5f), // orange to white
                     UseSharedBoxMesh = false
                 };
 
