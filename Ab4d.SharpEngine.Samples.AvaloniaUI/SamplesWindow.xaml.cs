@@ -290,9 +290,16 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
-        private async Task GraphicsSettingsButton_OnClick(object? sender, RoutedEventArgs e)
+        private async void GraphicsSettingsButton_OnClick(object? sender, RoutedEventArgs e)
         {
-            await OpenSettingsWindow();
+            try
+            {
+                await OpenSettingsWindow();
+            }
+            catch
+            {
+                // pass
+            }
         }
         
         private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
