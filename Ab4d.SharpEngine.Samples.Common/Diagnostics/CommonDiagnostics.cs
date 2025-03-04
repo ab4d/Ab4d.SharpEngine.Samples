@@ -1027,6 +1027,19 @@ PipelineChangesCount: {8:#,##0}",
         var cameraInfoDumpString = SharpEngineSceneView.SceneView.GetCameraInfo(showMatrices: true);
         return cameraInfoDumpString;
     }
+    
+    public void SaveRenderedSceneToDesktop()
+    {
+        if (SharpEngineSceneView == null || SharpEngineSceneView.GpuDevice == null)
+            return;
+
+        var renderedRawImageData = SharpEngineSceneView.SceneView.RenderToRawImageData(renderNewFrame: false);
+
+        var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        var fileName = System.IO.Path.Combine(folder, "SharpEngineRenderedBitmap.png");
+
+        SharpEngineSceneView.GpuDevice.DefaultBitmapIO.SaveBitmap(renderedRawImageData, fileName);
+    }
 
     public string GetFullSceneDumpString()
     {

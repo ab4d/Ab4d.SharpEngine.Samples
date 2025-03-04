@@ -336,6 +336,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
                 }
             }
         }
+        
+        private void RenderToBitmapMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            _commonDiagnostics.SaveRenderedSceneToDesktop();
+        }
 
         private void ShowFullSceneDumpMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
