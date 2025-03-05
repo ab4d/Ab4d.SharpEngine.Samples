@@ -109,5 +109,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
 
             _gesturesCameraController.RotateCameraWithScrollGesture = RotateWithScrollCheckBox.IsChecked ?? false;
         }
+
+        private void RotateWithPinchCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            if (_gesturesCameraController == null)
+                return;
+
+            _gesturesCameraController.RotateWithPinchGesture = RotateWithPinchCheckBox.IsChecked ?? false;
+        }
     }
 }

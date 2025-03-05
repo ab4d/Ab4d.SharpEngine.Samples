@@ -29,6 +29,7 @@
                 <CheckBox Name="PinchGestureCheckBox" Content="Pinch gesture" IsChecked="True" Margin="0 2 0 2" IsCheckedChanged="PinchGestureCheckBox_OnIsCheckedChanged"></CheckBox>
                 <CheckBox Name="ScrollGestureCheckBox" Content="Scroll gesture" IsChecked="True" Margin="0 2 0 2" IsCheckedChanged="ScrollGestureCheckBox_OnIsCheckedChanged"></CheckBox>
                 <CheckBox Name="RotateWithScrollCheckBox" Content="Rotate with scroll gesture" IsChecked="False" Margin="0 2 0 2" IsCheckedChanged="RotateWithScrollCheckBox_OnIsCheckedChanged"></CheckBox>
+                <CheckBox Name="RotateWithPinchCheckBox" Content="Rotate with pinch (two fingers)" IsChecked="False" Margin="0 2 0 2" IsCheckedChanged="RotateWithPinchCheckBox_OnIsCheckedChanged"></CheckBox>
             </StackPanel>
         </Border>
 
