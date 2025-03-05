@@ -44,7 +44,6 @@ The following features are supported by the current version:
 **Android:**
   - Using AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library).
   - Using SurfaceView in C# Android Application
-  - Using SDL (using third-party Silk.Net library)
   - MAUI
   
 **macOS:**
@@ -72,7 +71,7 @@ Online help:
 
 ### System requirements to run the samples:
 - NET 6.0+
-- NET 8.0 is required to use MAUI
+- NET 8.0+ is required to use MAUI
 
 
 ### System requirements to open the sample projects:
@@ -155,12 +154,6 @@ The following Visual Studio solutions are available:
   SDL and GLFW are used to get platform-independent ways to create windows and views.
   The 3D scene here is shown in the whole window area.
   This project can work on Windows and Linux.
-  
-- **Ab4d.SharpEngine.Samples.Android.Generic**\
-  This solution is similar to Ab4d.SharpEngine.Samples.CrossPlatform because it also uses Silk.Net library.
-  To work on Android the code to initialize SharpEngine and define the 3D scene can be the same
-  as for other platforms, but there needs to be some special startup code to create the Android Activity.
-  The 3D scene here is shown in the whole window area.
 
 - **Ab4d.SharpEngine.Samples.Android.Application**\
   This solution uses an Android.Application project template for .Net 6.
