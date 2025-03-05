@@ -1,38 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System;
 using Ab4d.SharpEngine.Common;
+using Microsoft.UI.Xaml;
+using Ab4d.SharpEngine.WinUI;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Ab4d.SharpEngine.Samples.Common;
-using Ab4d.SharpEngine.Samples.Wpf.UIProvider;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Wpf;
-using Ab4d.Vulkan;
-using Colors = Ab4d.SharpEngine.Common.Colors;
+using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
+using Colors = Microsoft.UI.Colors;
 
-namespace Ab4d.SharpEngine.Samples.Wpf.Common
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+
+namespace Ab4d.SharpEngine.Samples.WinUI
 {
     /// <summary>
-    /// Interaction logic for CommonWpfSamplePage.xaml
+    /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public partial class CommonWpfSamplePage : Page
+    public sealed partial class CommonWinUISampleUserControl : UserControl
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private PointerCameraController? _pointerCameraController;
         private InputEventsManager _inputEventsManager;
 
-        private WpfUIProvider _wpfUiProvider;
+        private WinUIProvider _wpfUiProvider;
+
+        private bool _isLoaded;
 
         public CommonSample? CurrentCommonSample
         {
@@ -41,21 +35,23 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             {
                 _currentCommonSample = value;
 
-                if (this.IsLoaded)
+                if (_isLoaded)
                     InitializeCommonSample();
             }
         }
+        
+        public SharpEngineSceneView MainSharpEngineSceneView => MainSceneView;
 
-        public CommonWpfSamplePage()
+        public CommonWinUISampleUserControl()
         {
-            InitializeComponent();
+            InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
 
-            _wpfUiProvider = new WpfUIProvider(RootGrid, mouseEventsSource: MainSceneView);
+            _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
-            
+
             // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
             // Otherwise, the default values will be used:
             // MSAA: 4x for fast desktop device; 1x otherwise
@@ -66,24 +62,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             if (GlobalSharpEngineSettings.SupersamplingCount > 0)
                 MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
+
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
-
-            // To use Vulkan line rasterizer, uncomment the following lines:
-            //MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;
-            //MainSceneView.CreateOptions.EnableVulkanStippleLineRasterization = true;
-            //MainSceneView.Scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangular;
-
-            // To test the OverlayTexture presentation type (has the best performance, but does not allow rendering any WPF controls over the 3D graphics),
-            // uncomment the following code:
-            //MainSceneView.PresentationType = PresentationTypes.OverlayTexture;
-            //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
-
-            //MainSceneView.MultisampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
@@ -100,7 +85,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
         private void ResetSample()
         {
-            TitleTextBlock.Text    = null;
+            TitleTextBlock.Text = null;
             SubtitleTextBlock.Text = null;
 
             // Remove all lights (new sample will set setup their own lights)
@@ -115,7 +100,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             // We also set runSceneCleanup to true so the Scene.Cleanup method is also called to release free empty memory blocks.
             // Note that we must not dispose the RootNode without disposing the Scene.
             MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
-            
+
             MainSceneView.Visibility = Visibility.Collapsed;
 
             _lastInitializedSample = null;
@@ -123,7 +108,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
         private void InitializeCommonSample()
         {
-            if (_lastInitializedSample == _currentCommonSample)
+            if (_lastInitializedSample == _currentCommonSample) 
                 return; // already initialized
 
             ResetSample();
@@ -132,13 +117,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 return;
             
             _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
-
             _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_wpfUiProvider);
 
             // Set Title and Subtitle after initializing UI, because they can be changed there
-            TitleTextBlock.Text    = _currentCommonSample.Title;
+            TitleTextBlock.Text = _currentCommonSample.Title;
             SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
@@ -148,13 +132,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
 
             // Show MainSceneView - this will also render the scene
             MainSceneView.Visibility = Visibility.Visible;
-            
+
             _lastInitializedSample = _currentCommonSample;
         }
 
         private void MainSceneViewOnGpuDeviceCreated(object sender, GpuDeviceCreatedEventArgs e)
         {
-            
+
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -168,12 +152,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
-        }
 
+            _isLoaded = true;
+        }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            ResetSample();
+            _isLoaded = false;
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)
@@ -181,7 +166,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Common
             var errorTextBlock = new TextBlock()
             {
                 Text = "Error creating VulkanDevice:\r\n" + ex.Message,
-                Foreground = Brushes.Red,
+                Foreground = new SolidColorBrush(Colors.Red),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap

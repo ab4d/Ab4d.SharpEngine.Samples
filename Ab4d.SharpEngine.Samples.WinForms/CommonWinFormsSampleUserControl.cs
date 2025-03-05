@@ -13,7 +13,7 @@ using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.WinForms.UIProvider;
 using Ab4d.SharpEngine.WinForms;
 
-namespace Ab4d.SharpEngine.Samples.WinForms.Common;
+namespace Ab4d.SharpEngine.Samples.WinForms;
 
 public class CommonWinFormsSampleUserControl : UserControl
 {
@@ -50,7 +50,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         TitleLabel.AutoSize = true;
         TitleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         TitleLabel.Location = new Point(10, 10);
-        this.Controls.Add(TitleLabel);
+        Controls.Add(TitleLabel);
 
 
         SubtitleLabel = new Label();
@@ -58,7 +58,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         SubtitleLabel.AutoSize = true;
         SubtitleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         SubtitleLabel.Location = new Point(13, 43);
-        this.Controls.Add(SubtitleLabel);
+        Controls.Add(SubtitleLabel);
 
 
         // IMPORTANT:
@@ -74,7 +74,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         //Utilities.Log.LogLevel = LogLevels.Warn;
         //Utilities.Log.IsLoggingToDebugOutput = true;
 
-        this.Controls.Add(MainSceneView);
+        Controls.Add(MainSceneView);
 
 
         _winFormsUIProvider = new WinFormsUIProvider(this, MainSceneView);
@@ -92,9 +92,9 @@ public class CommonWinFormsSampleUserControl : UserControl
         _inputEventsManager = new InputEventsManager(MainSceneView);
 
 
-        this.SizeChanged += OnSizeChanged;
+        SizeChanged += OnSizeChanged;
 
-        this.HandleDestroyed += OnHandleDestroyed;
+        HandleDestroyed += OnHandleDestroyed;
     }
 
     private void OnHandleDestroyed(object? sender, EventArgs e)
@@ -124,8 +124,8 @@ public class CommonWinFormsSampleUserControl : UserControl
 
     private void OnSizeChanged(object? sender, EventArgs e)
     {
-        TitleLabel.MaximumSize = new Size(this.ClientSize.Width - 10, this.ClientSize.Height);
-        SubtitleLabel.MaximumSize = new Size(this.ClientSize.Width - 10, this.ClientSize.Height);
+        TitleLabel.MaximumSize = new Size(ClientSize.Width - 10, ClientSize.Height);
+        SubtitleLabel.MaximumSize = new Size(ClientSize.Width - 10, ClientSize.Height);
     }
 
     private void ResetSample()
@@ -133,16 +133,16 @@ public class CommonWinFormsSampleUserControl : UserControl
         TitleLabel.Text = null;
         SubtitleLabel.Text = null;
 
-        this.SuspendLayout();
+        SuspendLayout();
 
-        for (var i = this.Controls.Count - 1; i >= 0; i--)
+        for (var i = Controls.Count - 1; i >= 0; i--)
         {
-            var oneControl = this.Controls[i];
+            var oneControl = Controls[i];
             if (oneControl != MainSceneView && oneControl != TitleLabel && oneControl != SubtitleLabel)
-                this.Controls.RemoveAt(i);
+                Controls.RemoveAt(i);
         }
 
-        this.ResumeLayout();
+        ResumeLayout();
 
 
         MainSceneView.Scene.RootNode.Clear();
@@ -170,7 +170,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         SuspendDrawing(this);
         _currentCommonSample.CreateUI(_winFormsUIProvider);
         ResumeDrawing(this);
-        
+
         // Set Title and Subtitle after initializing UI, because they can be changed there
         TitleLabel.Text = _currentCommonSample.Title;
         SubtitleLabel.Text = _currentCommonSample.Subtitle;
@@ -195,18 +195,18 @@ public class CommonWinFormsSampleUserControl : UserControl
     // I was not able to use SuspendLayout and ResumeLayout to nicely re-render the controls for new sample.
     // Then I found the solution here: https://stackoverflow.com/questions/487661/how-do-i-suspend-painting-for-a-control-and-its-children
     // If you have a nicer solution without PInvoice, please provide a PR.
-    
-    [DllImport("user32.dll")]
-    public static extern int SendMessage(IntPtr hWnd, Int32 wMsg, bool wParam, Int32 lParam);
 
-    private const int WM_SETREDRAW = 11; 
-    
-    public static void SuspendDrawing( Control parent )
+    [DllImport("user32.dll")]
+    public static extern int SendMessage(nint hWnd, int wMsg, bool wParam, int lParam);
+
+    private const int WM_SETREDRAW = 11;
+
+    public static void SuspendDrawing(Control parent)
     {
         SendMessage(parent.Handle, WM_SETREDRAW, false, 0);
     }
 
-    public static void ResumeDrawing( Control parent )
+    public static void ResumeDrawing(Control parent)
     {
         SendMessage(parent.Handle, WM_SETREDRAW, true, 0);
         parent.Refresh();

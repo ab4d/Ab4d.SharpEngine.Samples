@@ -1,23 +1,38 @@
-using Ab4d.SharpEngine.AvaloniaUI;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using System;
-using Avalonia.Layout;
-using Avalonia.Media;
+using Ab4d.SharpEngine.Samples.Wpf.UIProvider;
+using Ab4d.SharpEngine.Utilities;
+using Ab4d.SharpEngine.Wpf;
+using Ab4d.Vulkan;
+using Colors = Ab4d.SharpEngine.Common.Colors;
 
-namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
+namespace Ab4d.SharpEngine.Samples.Wpf
 {
-    public partial class CommonAvaloniaSampleUserControl : UserControl
+    /// <summary>
+    /// Interaction logic for CommonWpfSamplePage.xaml
+    /// </summary>
+    public partial class CommonWpfSamplePage : Page
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private PointerCameraController? _pointerCameraController;
         private InputEventsManager _inputEventsManager;
 
-        private AvaloniaUIProvider _avaloniaUiProvider;
+        private WpfUIProvider _wpfUiProvider;
 
         public CommonSample? CurrentCommonSample
         {
@@ -31,16 +46,16 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             }
         }
 
-        public CommonAvaloniaSampleUserControl()
+        public CommonWpfSamplePage()
         {
             InitializeComponent();
 
-            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid, pointerEventsSource: RootBorder);
+            _wpfUiProvider = new WpfUIProvider(RootGrid, mouseEventsSource: MainSceneView);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
 
-
+            
             // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
             // Otherwise, the default values will be used:
             // MSAA: 4x for fast desktop device; 1x otherwise
@@ -51,7 +66,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             if (GlobalSharpEngineSettings.SupersamplingCount > 0)
                 MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
-
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             //MainSceneView.CreateOptions.EnableStandardValidation = true;
 
@@ -59,13 +73,17 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
 
-            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
-            
+            // To use Vulkan line rasterizer, uncomment the following lines:
+            //MainSceneView.CreateOptions.EnableVulkanLineRasterization = true;
+            //MainSceneView.CreateOptions.EnableVulkanStippleLineRasterization = true;
+            //MainSceneView.Scene.LineRasterizationMode = LineRasterizationModes.VulkanRectangular;
 
-            // Because we are rendering a background Border with a gradient, we can subscribe mouse events to that element.
-            // In this case we can slightly improve performance when SharedTexture is by setting the IsHitTestVisible to false.
-            // This prevents rendering a transparent background in SharpEngineSceneView control (this is required to enable mouse events on the control when SharedTexture is used).
-            MainSceneView.IsHitTestVisible = false;
+            // To test the OverlayTexture presentation type (has the best performance, but does not allow rendering any WPF controls over the 3D graphics),
+            // uncomment the following code:
+            //MainSceneView.PresentationType = PresentationTypes.OverlayTexture;
+            //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
+
+            //MainSceneView.MultisampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
 
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
@@ -77,13 +95,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
 
-
-            _inputEventsManager = new InputEventsManager(MainSceneView, RootBorder);
+            _inputEventsManager = new InputEventsManager(MainSceneView);
         }
 
         private void ResetSample()
         {
-            TitleTextBlock.Text = null;
+            TitleTextBlock.Text    = null;
             SubtitleTextBlock.Text = null;
 
             // Remove all lights (new sample will set setup their own lights)
@@ -98,8 +115,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
             // We also set runSceneCleanup to true so the Scene.Cleanup method is also called to release free empty memory blocks.
             // Note that we must not dispose the RootNode without disposing the Scene.
             MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
-
-            MainSceneView.IsVisible = false;
+            
+            MainSceneView.Visibility = Visibility.Collapsed;
 
             _lastInitializedSample = null;
         }
@@ -113,51 +130,50 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Common
 
             if (_currentCommonSample == null)
                 return;
+            
+            _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
 
-            _currentCommonSample.InitializeScene(MainSceneView.Scene);
-            _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
             _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
-            _currentCommonSample.CreateUI(_avaloniaUiProvider);
+            _currentCommonSample.CreateUI(_wpfUiProvider);
 
             // Set Title and Subtitle after initializing UI, because they can be changed there
-            TitleTextBlock.Text = _currentCommonSample.Title;
+            TitleTextBlock.Text    = _currentCommonSample.Title;
             SubtitleTextBlock.Text = _currentCommonSample.Subtitle;
 
             //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
 
             if (_pointerCameraController != null)
                 _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
-            
-            // Show MainSceneView - this will also render the scene
-            MainSceneView.IsVisible = true;
 
+            // Show MainSceneView - this will also render the scene
+            MainSceneView.Visibility = Visibility.Visible;
+            
             _lastInitializedSample = _currentCommonSample;
         }
 
         private void MainSceneViewOnGpuDeviceCreated(object sender, GpuDeviceCreatedEventArgs e)
         {
-
+            
         }
 
-        private void OnLoaded(object? sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
             InitializeCommonSample();
 
             if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
-                // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
-                // we need to set a custom eventsSourceElement when creating the PointerCameraController
-                _pointerCameraController ??= new PointerCameraController(MainSceneView, eventsSourceElement: RootBorder);
+                _pointerCameraController = new PointerCameraController(MainSceneView);
 
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
         }
 
-        private void OnUnloaded(object? sender, RoutedEventArgs e)
-        {
 
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            ResetSample();
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)

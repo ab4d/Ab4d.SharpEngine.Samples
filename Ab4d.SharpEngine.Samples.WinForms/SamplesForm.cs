@@ -20,8 +20,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 {
     public partial class SamplesForm : Form
     {
-        private string? _startupPage = "StandardModels.TorusKnotModelNodeSample";        
-        //private string? _startupPage = null;
+        //private string? _startupPage = "StandardModels.TorusKnotModelNodeSample";        
+        private string? _startupPage = null;
 
         private Font? _headerItemFont;
 

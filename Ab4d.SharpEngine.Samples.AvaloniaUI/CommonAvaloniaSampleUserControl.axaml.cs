@@ -1,32 +1,23 @@
-using System;
+using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
-using Microsoft.UI.Xaml;
-using Ab4d.SharpEngine.WinUI;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
-using Ab4d.SharpEngine.Samples.WinUI.UIProvider;
-using Colors = Microsoft.UI.Colors;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using System;
+using Avalonia.Layout;
+using Avalonia.Media;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
-
-namespace Ab4d.SharpEngine.Samples.WinUI.Common
+namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class CommonWinUISampleUserControl : UserControl
+    public partial class CommonAvaloniaSampleUserControl : UserControl
     {
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private PointerCameraController? _pointerCameraController;
         private InputEventsManager _inputEventsManager;
 
-        private WinUIProvider _wpfUiProvider;
-
-        private bool _isLoaded;
+        private AvaloniaUIProvider _avaloniaUiProvider;
 
         public CommonSample? CurrentCommonSample
         {
@@ -35,18 +26,16 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             {
                 _currentCommonSample = value;
 
-                if (_isLoaded)
+                if (this.IsLoaded)
                     InitializeCommonSample();
             }
         }
-        
-        public SharpEngineSceneView MainSharpEngineSceneView => MainSceneView;
 
-        public CommonWinUISampleUserControl()
+        public CommonAvaloniaSampleUserControl()
         {
-            InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
+            InitializeComponent();
 
-            _wpfUiProvider = new WinUIProvider(RootGrid, MainSceneView);
+            _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid, pointerEventsSource: RootBorder);
 
             this.Loaded += OnLoaded;
             this.Unloaded += OnUnloaded;
@@ -70,6 +59,14 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;
 
+            //MainSceneView.PreferredMultiSampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
+            
+
+            // Because we are rendering a background Border with a gradient, we can subscribe mouse events to that element.
+            // In this case we can slightly improve performance when SharedTexture is by setting the IsHitTestVisible to false.
+            // This prevents rendering a transparent background in SharpEngineSceneView control (this is required to enable mouse events on the control when SharedTexture is used).
+            MainSceneView.IsHitTestVisible = false;
+
             MainSceneView.GpuDeviceCreated += MainSceneViewOnGpuDeviceCreated;
 
             // In case when VulkanDevice cannot be created, show an error message
@@ -80,7 +77,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
                 args.IsHandled = true;                       // Prevent showing error by SharpEngineSceneView
             };
 
-            _inputEventsManager = new InputEventsManager(MainSceneView);
+
+            _inputEventsManager = new InputEventsManager(MainSceneView, RootBorder);
         }
 
         private void ResetSample()
@@ -101,25 +99,26 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             // Note that we must not dispose the RootNode without disposing the Scene.
             MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
 
-            MainSceneView.Visibility = Visibility.Collapsed;
+            MainSceneView.IsVisible = false;
 
             _lastInitializedSample = null;
         }
 
         private void InitializeCommonSample()
         {
-            if (_lastInitializedSample == _currentCommonSample) 
+            if (_lastInitializedSample == _currentCommonSample)
                 return; // already initialized
 
             ResetSample();
 
             if (_currentCommonSample == null)
                 return;
-            
-            _currentCommonSample.InitializeSharpEngineView(MainSceneView); // This will call InitializeScene and InitializeSceneView
+
+            _currentCommonSample.InitializeScene(MainSceneView.Scene);
+            _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
             _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
-            _currentCommonSample.CreateUI(_wpfUiProvider);
+            _currentCommonSample.CreateUI(_avaloniaUiProvider);
 
             // Set Title and Subtitle after initializing UI, because they can be changed there
             TitleTextBlock.Text = _currentCommonSample.Title;
@@ -129,9 +128,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
             if (_pointerCameraController != null)
                 _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
-
+            
             // Show MainSceneView - this will also render the scene
-            MainSceneView.Visibility = Visibility.Visible;
+            MainSceneView.IsVisible = true;
 
             _lastInitializedSample = _currentCommonSample;
         }
@@ -141,24 +140,24 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
 
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object? sender, RoutedEventArgs e)
         {
             InitializeCommonSample();
 
             if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
-                _pointerCameraController = new PointerCameraController(MainSceneView);
+                // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
+                // we need to set a custom eventsSourceElement when creating the PointerCameraController
+                _pointerCameraController ??= new PointerCameraController(MainSceneView, eventsSourceElement: RootBorder);
 
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
-
-            _isLoaded = true;
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e)
+        private void OnUnloaded(object? sender, RoutedEventArgs e)
         {
-            _isLoaded = false;
+
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)
@@ -166,7 +165,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Common
             var errorTextBlock = new TextBlock()
             {
                 Text = "Error creating VulkanDevice:\r\n" + ex.Message,
-                Foreground = new SolidColorBrush(Colors.Red),
+                Foreground = Brushes.Red,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap

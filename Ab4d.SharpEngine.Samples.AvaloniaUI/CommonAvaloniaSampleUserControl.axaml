@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sharpEngine="clr-namespace:Ab4d.SharpEngine.AvaloniaUI;assembly=Ab4d.SharpEngine.AvaloniaUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Common.CommonAvaloniaSampleUserControl">
+             x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.CommonAvaloniaSampleUserControl">
     <Grid Name="RootGrid">
         <Border Name="RootBorder" Background="{StaticResource CommonSamplePageGradient}">
             <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
