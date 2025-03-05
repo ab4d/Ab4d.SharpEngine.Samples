@@ -5,5 +5,5 @@
     <string name="button_change_scene_text">Change scene</string>
     <string name="button_start_camera_rotation">Start camera rotation</string>
     <string name="button_stop_camera_rotation">Stop camera rotation</string>
-    <string name="sample_info_text">This sample demonstrates only how to integrate Ab4d.SharpEngine into an Android app.\nSee samples for WinUI, Wpf, Avalonia or WinForms for more features of the engine.</string>
+    <string name="sample_info_text">This sample demonstrates only how to integrate Ab4d.SharpEngine into an Android app.\nSee samples for Avalonia, Wpf, WinUI or WinForms for more features of the engine.</string>
 </resources>
