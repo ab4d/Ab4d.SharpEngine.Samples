@@ -63,7 +63,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
 
         private void CreateTestScene()
         {
-            var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(0, 0, 0), 
+            var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(0, -1, 0), 
                                                     size: new Vector2(400, 300), 
                                                     normal: new Vector3(0, 1, 0), 
                                                     heightDirection: new Vector3(0, 0, -1), 

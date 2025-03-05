@@ -124,5 +124,6 @@
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" IsNew="True" Title="Custom Overlay Panel" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" IsNew="True" Title="CustomCamera in RenderingLayer" />
+  <Sample Location="Advanced.AvaloniaMultiTouchSample" IsNew="True" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />
 
 </Samples>
