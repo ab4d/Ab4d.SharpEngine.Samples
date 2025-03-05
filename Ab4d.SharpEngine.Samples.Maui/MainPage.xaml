@@ -10,7 +10,7 @@
             <Button x:Name="ChangeColorButton" Text="Change hash color" Clicked="OnChangeColorButtonClicked" Margin="3"/>
         </StackLayout>
 
-        <Label Text="This sample demonstrates only how to integrate Ab4d.SharpEngine into a MAUI app.&#x0a;See samples for WinUI, Wpf, Avalonia or WinForms for more features of the engine."
+        <Label Text="This sample demonstrates only how to integrate Ab4d.SharpEngine into a MAUI app.&#x0a;See samples for Avalonia, Wpf, WinUI or WinForms for more features of the engine."
                FontSize="15" BackgroundColor="#AAFFFFFF" HorizontalOptions="Start" VerticalOptions="End" LineBreakMode="WordWrap" InputTransparent="True" Margin="10" />
     </Grid>
 
