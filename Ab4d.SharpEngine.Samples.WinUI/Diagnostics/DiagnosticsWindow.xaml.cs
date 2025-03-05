@@ -318,6 +318,11 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
             }
         }
         
+        private void RenderToBitmapMenuItem_OnTapped(object sender, RoutedEventArgs e)
+        {
+            _commonDiagnostics.SaveRenderedSceneToDesktop();
+        }
+        
         private void ShowFullSceneDumpMenuItem_OnTapped(object sender, RoutedEventArgs e)
         {
             if (SharpEngineSceneView == null)

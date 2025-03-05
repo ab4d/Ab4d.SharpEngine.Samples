@@ -38,6 +38,7 @@
                     <MenuFlyoutItem Name="DumpEngineSettingsMenuItem" Text="Dump engine settings" Margin="0 -2" Click="DumpEngineSettingsMenuItem_OnClick" Tapped="DumpEngineSettingsMenuItem_OnClick"/>
                     <MenuFlyoutItem Name="DumpSystemInfoMenuItem" Text="Dump System info" Margin="0 -2" Click="DumpSystemInfoMenuItem_OnTapped" Tapped="DumpSystemInfoMenuItem_OnTapped"/>
                     <MenuFlyoutItem Name="ExportToGltfMenuItem" Text="Export Scene to glTF (on Desktop)" Margin="0 -2" Click="ExportToGltfMenuItem_OnTapped" Tapped="ExportToGltfMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="RenderToBitmapMenuItem" Text="Save rendered scene to Desktop" Margin="0 -2" Click="RenderToBitmapMenuItem_OnTapped" Tapped="RenderToBitmapMenuItem_OnTapped"/>
                     <MenuFlyoutItem Name="ShowFullSceneDumpMenuItem" Text="Get full scene dump" Margin="0 -2" Click="ShowFullSceneDumpMenuItem_OnTapped" Tapped="ShowFullSceneDumpMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator />

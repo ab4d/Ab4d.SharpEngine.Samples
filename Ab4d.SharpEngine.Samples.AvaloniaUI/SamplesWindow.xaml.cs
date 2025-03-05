@@ -290,9 +290,16 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             System.Diagnostics.Process.Start(new ProcessStartInfo("https://www.ab4d.com") { UseShellExecute = true });
         }
 
-        private void GraphicsSettingsButton_OnClick(object? sender, RoutedEventArgs e)
+        private async void GraphicsSettingsButton_OnClick(object? sender, RoutedEventArgs e)
         {
-            OpenSettingsWindow();
+            try
+            {
+                await OpenSettingsWindow();
+            }
+            catch
+            {
+                // pass
+            }
         }
         
         private void DiagnosticsButton_OnClick(object? sender, RoutedEventArgs e)
@@ -524,11 +531,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _isSceneViewSizeChangedSubscribed = true;
             }
 
-            // The following line is commented because Vulkan backend is not stable enough to be promoted:
             // If we are not using Vulkan backend then show info icon with tooltip about that.
-            //VulkanBackendInfoImage.IsVisible = sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
-            //                                   !avaloniaSharpEngineSceneView.IsVulkanBackend &&
-            //                                   avaloniaSharpEngineSceneView.PresentationType == PresentationTypes.SharedTexture;
+            VulkanBackendInfoImage.IsVisible = sharpEngineSceneView is SharpEngineSceneView avaloniaSharpEngineSceneView && // IsVulkanBackend property is available only on SharpEngineSceneView from AvaloniaUI and not in the generic ISharpEngineSceneView
+                                               !avaloniaSharpEngineSceneView.IsVulkanBackend &&
+                                               avaloniaSharpEngineSceneView.PresentationType == PresentationTypes.SharedTexture;
 
             if (sharpEngineSceneView == null || !sharpEngineSceneView.SceneView.BackBuffersInitialized)
             {

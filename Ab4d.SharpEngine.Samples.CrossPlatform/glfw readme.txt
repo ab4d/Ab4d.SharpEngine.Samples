@@ -1,1 +1,0 @@
-﻿On windows the glfw3.dll needs to be renamed to glfw.dll so that its names is the same as on other systems (this name is also used in DllImport attributes)

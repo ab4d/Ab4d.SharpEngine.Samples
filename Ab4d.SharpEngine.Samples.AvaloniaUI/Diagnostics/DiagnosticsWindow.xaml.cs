@@ -354,6 +354,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
         }
         
+        private void RenderToBitmapMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            _commonDiagnostics.SaveRenderedSceneToDesktop();
+        }
+        
         private void DumpCameraDetailsMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             ShowInfoText(_commonDiagnostics.GetCameraDetailsDumpString());
