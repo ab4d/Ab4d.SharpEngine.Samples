@@ -141,7 +141,7 @@ public class FogEffectTechnique : EffectTechnique
                                    PipelineCreateFlags flags,
                                    string? pipelineName)
     {
-        return CreatePipeline(renderingContext.SceneView.RenderPass,
+        return CreatePipeline(renderingContext.CurrentRenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
                               renderingContext.SceneView.UsedMultiSampleCountFlags,
@@ -172,7 +172,7 @@ public class FogEffectTechnique : EffectTechnique
         if (parentPipeline.IsNull())
             throw new SharpEngineException("CreateDerivativePipeline called without parentPipeline set");
 
-        return CreatePipeline(renderingContext.SceneView.RenderPass,
+        return CreatePipeline(renderingContext.CurrentRenderPass,
                               renderingContext.Width,
                               renderingContext.Height,
                               renderingContext.SceneView.UsedMultiSampleCountFlags,

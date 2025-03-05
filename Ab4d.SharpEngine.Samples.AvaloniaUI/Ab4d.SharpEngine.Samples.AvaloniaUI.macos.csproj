@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.11" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.11" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.11" />
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="2.0.8956" />
+    <PackageReference Include="Avalonia" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.5" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9195-rc4" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.0.9195-rc4" />
   </ItemGroup>
 
   <ItemGroup>

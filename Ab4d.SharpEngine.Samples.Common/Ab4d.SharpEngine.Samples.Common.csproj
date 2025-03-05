@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="2.0.8956" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9195-rc4" />
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="2.0.8956" />
-    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="2.0.9060" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.0.9195-rc4" />
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="3.0.9195-rc4" />
   </ItemGroup>
 
   <ItemGroup>
