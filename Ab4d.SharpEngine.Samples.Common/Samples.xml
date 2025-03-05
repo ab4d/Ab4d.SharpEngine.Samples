@@ -42,7 +42,7 @@
   <Sample Location="Lights.LightsSample" Title="Lights"/>
   
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added code comments that describe how to load the texture in the background."/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
 

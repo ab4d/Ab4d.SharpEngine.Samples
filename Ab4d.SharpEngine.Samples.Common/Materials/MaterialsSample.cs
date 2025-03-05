@@ -5,6 +5,7 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
@@ -159,6 +160,28 @@ public class MaterialsSample : CommonSample
         //// Because of this, the DiffuseColor is automatically set to white color (from Black color).
         //// If you want to multiply all the colors by some color (set the color mask), you can change the DiffuseColor:
         //material3.DiffuseColor = Colors.Red;
+
+
+        //
+        // Background / async texture loading:
+        //
+
+        // We can also load the texture in the background (set loadInBackground to true).
+        // The initialDiffuseColor parameter sets the initial color that is replaced with the texture when the texture is loaded.
+        //var material3 = new StandardMaterial(textureFileName, this.BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true, name: "10x10-texture.png"); 
+
+        // We can also await by using TextureLoader.CreateTextureAsync:
+        //var gpuImage = await TextureLoader.CreateTextureAsync(textureFileName, scene, this.BitmapIO);
+        //var material3 = new StandardMaterial(gpuImage);
+
+        // We can also use a callback action to set the loaded texture to the created material
+        //var material3 = new StandardMaterial(Colors.Gray); // Initially set the color to Gray
+        //TextureLoader.CreateTextureAsync(textureFileName, scene, gpuImage =>
+        //{
+        //    material3.DiffuseTexture = gpuImage;   // Set the texture
+        //    material3.DiffuseColor = Colors.White; // Set the color mask to white
+        //}, this.BitmapIO);
+
 
         var modelNode3 = new MeshModelNode(_sphereMesh, material3, "TextureMaterialModel")
         {
