@@ -157,6 +157,26 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             SetupPointerCameraController(sharpEngineSceneView);
             CreateTestScene(sharpEngineSceneView.Scene, _lineThickness);
 
+            if (supersamplingCount > 1 && 
+                gpuDevice != null &&
+                !gpuDevice.PhysicalDeviceDetails.PossibleFeatures.GeometryShader && 
+                !gpuDevice.PhysicalDeviceDetails.PossibleFeatures.WideLines)
+            {
+                var warningTextBlock = new TextBlock()
+                {
+                    Text = "Wide lines are not supported so using SSAA will dim the 1 pixel wide lines",
+                    Foreground = Brushes.Red,
+                    FontWeight = FontWeights.Bold,
+                    Margin = new Thickness(0, 5, 0, 5),
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+
+                Grid.SetColumn(warningTextBlock, columnIndex);
+                Grid.SetRow(warningTextBlock, rowIndex);
+                RootGrid.Children.Add(warningTextBlock);
+            }
+
             return sharpEngineSceneView;
         }
 
