@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 17.0.7.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.SilkNet.Glfw", "Ab4d.SharpEngine.Samples.SilkNet\Ab4d.SharpEngine.Samples.SilkNet.Glfw.csproj", "{A7496B36-893C-4209-90A0-828F1F076257}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7496B36-893C-4209-90A0-828F1F076257}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7496B36-893C-4209-90A0-828F1F076257}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7496B36-893C-4209-90A0-828F1F076257}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7496B36-893C-4209-90A0-828F1F076257}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CBB952DD-B849-40FE-BB94-B5D3D4B622FF}
+	EndGlobalSection
+EndGlobal
