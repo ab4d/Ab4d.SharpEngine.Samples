@@ -24,6 +24,11 @@ The following features are supported by the current version:
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
 
 
+Ab4d.SharpEngine library is a **commercial library** but it is also **free for non-commercial open-source projects**.
+
+The commercial license can be purchase from [purchase web page](https://www.ab4d.com/Purchase.aspx). With a commercial license, you also get priority email support and other benefits (feature requests, online support on your projects with sharing screen, etc.).
+To get a trial license for your own projects (not needed for the sample projects in this repo) or to apply for the free open-source lincese, see the [ab4d.com/trial](https://www.ab4d.com/trial).
+
 ### Platforms and UI frameworks:
 
 **Windows:**
