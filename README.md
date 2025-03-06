@@ -11,11 +11,14 @@ Vulkan is a high performance graphics and cross-platform API that is similar to 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
 - Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
+- Render line caps (arrows, etc.), line with pattern, poly-lines with mitter or bevel connections, hidden lines
 - Object instancing (InstancedMeshNode)
 - Cameras: TargetPositionCamera, FirstPersonCamera, FreeCamera, MatrixCamera
 - Camera controllers with rotate around mouse position, zoom to position and other advanced functions
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
+- Improved visual quality with super-sampling and multi-sampling
+- Render vector and bitmap text
 - ReaderObj to read 3D models from obj files
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
@@ -52,7 +55,7 @@ The following features are supported by the current version:
    
 **iOS:**
   - AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library). Requires MoltenVK library - see Building for macOS and iOS below.
-  - Using MAUI - requires .Net 8 and MoltenVK library - see "Building for macOS and iOS" below.
+  - Using MAUI - requires MoltenVK library - see "Building for macOS and iOS" below.
 
 
 Online help:
@@ -78,24 +81,6 @@ Online help:
 - Visual Studio 2022 on Windows (VS 2019 does not support .Net 6)
 - Rider from JetBrains on Windows, Linux and macOS
 - Visual Studio Code on Windows, Linux and macOS
-
-
-### Notice:
-Ab4d.SharpEngine.glTF library use source code from glTF2Loader with PR from ZingBallyhoo (https://github.com/KhronosGroup/glTF-CSharp-Loader/pull/51).
-glTF2Loader library is publushed under the following MIT license:
-
-This license is for the C# reference loader, not the rest of the repository.
-
-Copyright (c) 2015, Matthew and Xueru McMullan All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 
 ## Sample solutions
@@ -231,10 +216,8 @@ In my opinion, if you already have a complex application that is built by using 
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.5+.
 
 Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
-The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v2.0; this is not the full list):
-- Supersampling
+The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v3.0; this is not the full list):
 - Effects: PhysicallyBasedRendering, XRay, multi-map material, environment map and face color effect
-- Rendering 3D lines with arrows (currently arrow is created by additional lines that define the arrow)
 - Shadows
 - Post-processing
 
@@ -325,3 +308,20 @@ See https://www.ab4d.com/SharpEngine-history.aspx.
 
 - Add support for WebGPU (or WebGL) with Blazor WebAssembly so the engine can work in a web browser. 
   This technology is currently not yet ready to provide good support for complex applications such as 3D rendering engine.
+
+
+### Notice:
+Ab4d.SharpEngine.glTF library use source code from glTF2Loader with PR from ZingBallyhoo (https://github.com/KhronosGroup/glTF-CSharp-Loader/pull/51).
+glTF2Loader library is publushed under the following MIT license:
+
+This license is for the C# reference loader, not the rest of the repository.
+
+Copyright (c) 2015, Matthew and Xueru McMullan All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
