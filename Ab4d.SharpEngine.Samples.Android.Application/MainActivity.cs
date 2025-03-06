@@ -8,10 +8,10 @@ using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using System.Numerics;
+using _Microsoft.Android.Resource.Designer;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Android.Application;
 using Ab4d.SharpEngine.Samples.TestScenes;
 using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
@@ -22,6 +22,7 @@ using Android.Content.Res;
 using Android.Graphics;
 using Android.Views;
 using Activity = Android.App.Activity;
+using Resource = Ab4d.SharpEngine.Samples.Android.Application.Resource;
 
 // This sample demonstrates only how to integrate Ab4d.SharpEngine into an Android app.
 // See samples for WinUI, Wpf, Avalonia or WinForms for more features of the engine
@@ -332,8 +333,8 @@ namespace AndroidApp1
             EnsureAndroidBitmapIO();
 
             _allObjectsTestScene = new AllObjectsTestScene(_scene, _sceneView, _androidBitmapIO, this.Resources);
-            _allObjectsTestScene.Drawable1Id = Resource.Drawable.uvchecker;
-            _allObjectsTestScene.Drawable2Id = Resource.Drawable.TreeTexture;
+            _allObjectsTestScene.Drawable1Id = ResourceConstant.Drawable.uvchecker;
+            _allObjectsTestScene.Drawable2Id = ResourceConstant.Drawable.TreeTexture;
 
 
             // Add demo objects to _scene
