@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.WinForms</AssemblyName>
@@ -21,8 +21,8 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9175-rc3" />
-    <PackageReference Include="Ab4d.SharpEngine.WinForms" Version="3.0.9175-rc3" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9196" />
+    <PackageReference Include="Ab4d.SharpEngine.WinForms" Version="3.0.9196" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />

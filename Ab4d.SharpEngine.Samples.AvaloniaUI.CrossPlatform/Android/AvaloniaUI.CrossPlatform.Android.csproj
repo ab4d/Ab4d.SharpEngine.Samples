@@ -4,13 +4,13 @@
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android</RootNamespace>  
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0-android</TargetFramework>
-    <SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion> <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features do not work so it is recommended to use Vulkan 1.1 -->
     <Nullable>enable</Nullable>
-    <ApplicationId>com.CompanyName.Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</ApplicationId>
+    <ApplicationId>com.ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <AndroidPackageFormat>apk</AndroidPackageFormat>
-    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <!--<AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>-->
   </PropertyGroup>
 
   <ItemGroup>
