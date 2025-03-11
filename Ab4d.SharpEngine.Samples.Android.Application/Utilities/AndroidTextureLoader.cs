@@ -28,9 +28,10 @@ public class AndroidTextureLoader
                                                          CommonSamplerTypes samplerType = CommonSamplerTypes.Wrap,
                                                          bool generateMipMaps = true,
                                                          bool isDeviceLocal = true,
-                                                         float alphaClipThreshold = 0)
+                                                         float alphaClipThreshold = 0,
+                                                         string? name = null)
     {
-        var gpuTexture = CreateTexture(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, isDeviceLocal);
+        var gpuTexture = CreateTexture(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, isDeviceLocal, name);
         var materialWithTexture = new StandardMaterial(gpuTexture, samplerType, name: gpuTexture.Name);
 
         if (alphaClipThreshold > 0)
@@ -44,7 +45,8 @@ public class AndroidTextureLoader
                                          AndroidBitmapIO bitmapIO,
                                          VulkanDevice gpuDevice,
                                          bool generateMipMaps = true,
-                                         bool cacheGpuTexture = false)
+                                         bool cacheGpuTexture = false,
+                                         string? name = null)
     {
         ArgumentNullException.ThrowIfNull(resources);
         ArgumentNullException.ThrowIfNull(bitmapIO);
@@ -95,7 +97,8 @@ public class AndroidTextureLoader
                                                               CommonSamplerTypes samplerType = CommonSamplerTypes.Wrap,
                                                               bool generateMipMaps = true,
                                                               bool isDeviceLocal = true,
-                                                              float alphaClipThreshold = 0)
+                                                              float alphaClipThreshold = 0,
+                                                              string? name = null)
     {
         // Create StandardMaterial with initialDiffuseColor
         string? imageName = $"android_drawable_{drawableId}";
@@ -103,7 +106,7 @@ public class AndroidTextureLoader
 
         // Start running async task from sync context and continue execution in this method
         // When the texture is loaded, the material will be automatically updated
-        _ = LoadTextureAsync(resources, drawableId, material, bitmapIO, gpuDevice, samplerType, generateMipMaps, isDeviceLocal, alphaClipThreshold);
+        _ = LoadTextureAsync(resources, drawableId, material, bitmapIO, gpuDevice, samplerType, generateMipMaps, isDeviceLocal, alphaClipThreshold, name);
 
         return material;
     }
@@ -115,9 +118,10 @@ public class AndroidTextureLoader
                                                                           CommonSamplerTypes samplerType = CommonSamplerTypes.Wrap,
                                                                           bool generateMipMaps = true,
                                                                           bool isDeviceLocal = true,
-                                                                          float alphaClipThreshold = 0)
+                                                                          float alphaClipThreshold = 0,
+                                                                          string? name = null)
     {
-        var gpuTexture = await CreateTextureAsync(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, isDeviceLocal);
+        var gpuTexture = await CreateTextureAsync(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, isDeviceLocal, name);
 
         var materialWithTexture = new StandardMaterial(gpuTexture, samplerType, name: gpuTexture.Name);
 
@@ -127,21 +131,22 @@ public class AndroidTextureLoader
         return materialWithTexture;
     }
 
-    private static async Task LoadTextureAsync(Resources resources,
-                                               int drawableId,
-                                               StandardMaterial material,
-                                               AndroidBitmapIO bitmapIO,
-                                               VulkanDevice gpuDevice,
-                                               CommonSamplerTypes samplerType,
-                                               bool generateMipMaps,
-                                               bool isDeviceLocal,
-                                               float alphaClipThreshold)
+    public static async Task LoadTextureAsync(Resources resources,
+                                              int drawableId,
+                                              StandardMaterialBase material,
+                                              AndroidBitmapIO bitmapIO,
+                                              VulkanDevice gpuDevice,
+                                              CommonSamplerTypes samplerType = CommonSamplerTypes.Wrap,
+                                              bool generateMipMaps = true,
+                                              bool isDeviceLocal = true,
+                                              float alphaClipThreshold = 0,
+                                              string? name = null)
     {
-        var gpuTexture = await CreateTextureAsync(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, isDeviceLocal);
+        var gpuTexture = await CreateTextureAsync(resources, drawableId, bitmapIO, gpuDevice, generateMipMaps, cacheGpuTexture: isDeviceLocal, name);
 
         material.DiffuseTexture = gpuTexture;
         material.DiffuseTextureSamplerType = samplerType;
-        material.DiffuseColor = Colors.White;
+        material.DiffuseColor = Colors.White; // no texture filter color
         material.Opacity = 1;
 
         if (alphaClipThreshold > 0)
@@ -153,12 +158,13 @@ public class AndroidTextureLoader
                                                           AndroidBitmapIO bitmapIO,
                                                           VulkanDevice gpuDevice,
                                                           bool generateMipMaps = true,
-                                                          bool cacheGpuTexture = false)
+                                                          bool cacheGpuTexture = false,
+                                                          string? name = null)
     {
         ArgumentNullException.ThrowIfNull(resources);
 
         GpuImage? gpuImage;
-        string? imageName = $"android_drawable_{drawableId}";
+        string? imageName = name ?? $"android_drawable_{drawableId}";
 
         if (cacheGpuTexture)
             gpuImage = gpuDevice.GetCachedObject<GpuImage?>(imageName);
