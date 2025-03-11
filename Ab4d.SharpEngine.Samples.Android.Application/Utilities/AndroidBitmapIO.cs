@@ -179,6 +179,18 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             if (androidBitmap == null || androidBitmap.Width == 0 || androidBitmap.Height == 0)
                 return RawImageData.Empty;
 
+            //  // The following also did not worK:
+            //  int byteArrayLength = androidBitmap.Width * androidBitmap.Height * 4;
+            //  var byteBuffer = new byte[byteArrayLength];
+            //
+            //  var bitmapBuffer = Java.Nio.ByteBuffer.Wrap(byteBuffer);
+            //  androidBitmap.CopyPixelsToBuffer(bitmapBuffer); // byteBuffer still contains only 0 values
+            //
+            //  // The following also did not worK:
+            // var bitmapBuffer = Java.Nio.ByteBuffer.Allocate(byteArrayLength);
+            // androidBitmap.CopyPixelsToBuffer(bitmapBuffer);
+            // // Ok, now how to get byte array from bitmapBuffer?
+            
             int intArrayLength = androidBitmap.Width * androidBitmap.Height;
             var bitmapInts = new int[intArrayLength];
             
@@ -192,7 +204,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             //var imageBytes = new byte[androidBitmap.Width * 4 * androidBitmap.Height];
             //var imageInts = Unsafe.As<byte[], int[]>(ref imageBytes);
             //
-            // MemoryMarshal.Cast creates a Span<byte> that also cannot be used to create RawImageData (this will be improved in the future)
+            // MemoryMarshal.Cast creates a Span<byte> that also cannot be used to create RawImageData (we cannot use Span for BG task)
             //var imageInts = MemoryMarshal.Cast<byte, int>(imageBytes);
 
             int byteArrayLength = intArrayLength * 4;
