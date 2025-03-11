@@ -97,6 +97,24 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             return ConvertAndroidBitmapToRawImageData(androidBitmap);
         }
 
+        public Bitmap? LoadAndroidBitmap(Resources resources, int drawableId, BitmapFactory.Options? options = null)
+        {
+            if (options == null)
+            {
+                options = new BitmapFactory.Options();
+                //{
+                //    InPremultiplied = true, // this is also a default (see https://developer.android.com/reference/android/graphics/BitmapFactory.Options)
+                //    InPreferredColorSpace = ColorSpace.Get(ColorSpace.Named.LinearSrgb!)
+                //};
+
+                if (PreventAndroidBitmapScale)
+                    options.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
+            }
+
+            var androidBitmap = BitmapFactory.DecodeResource(resources, drawableId, options);
+            return androidBitmap;
+        }
+
         public Bitmap? LoadAndroidBitmap(string fileName)
         {
             if (fileName == null)
