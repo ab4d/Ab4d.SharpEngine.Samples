@@ -27,6 +27,12 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         /// <inheritdoc/>
         public bool ConvertToSupportedFormat { get; set; } = true;
 
+        /// <summary>
+        /// When true (by default), then the inScaled option in the call to BitmapFactory.DecodeResource is set to false.
+        /// This prevents Android from scaling the bitmap based on screen pixel density.
+        /// </summary>
+        public bool PreventAndroidBitmapScale { get; set; } = true;
+
 
         /// <inheritdoc />
         public Func<string, string?>? FileNotFoundResolver { get; set; }
@@ -67,7 +73,11 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         /// <inheritdoc />
         public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
         {
-            var androidBitmap = BitmapFactory.DecodeStream(fileStream);
+            var options = new BitmapFactory.Options();
+            if (PreventAndroidBitmapScale)
+                options.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
+
+            var androidBitmap = BitmapFactory.DecodeStream(fileStream, null, options);
             return ConvertAndroidBitmapToRawImageData(androidBitmap);
         }
 
@@ -80,6 +90,9 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                 //    InPremultiplied = true, // this is also a default (see https://developer.android.com/reference/android/graphics/BitmapFactory.Options)
                 //    InPreferredColorSpace = ColorSpace.Get(ColorSpace.Named.LinearSrgb!)
                 //};
+
+                if (PreventAndroidBitmapScale)
+                    options.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
             }
 
             var androidBitmap = BitmapFactory.DecodeResource(resources, drawableId, options);
@@ -93,6 +106,10 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
             // Use backslash on Windows and slash in other OS
             fileName = FileUtils.FixDirectorySeparator(fileName);
+
+            var decodeFileOptions = new BitmapFactory.Options();
+            if (PreventAndroidBitmapScale)
+                decodeFileOptions.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
 
             if (!System.IO.File.Exists(fileName))
             {
@@ -125,7 +142,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
                     if (fileStream != null)
                     {
-                        var bitmapFromStream = BitmapFactory.DecodeStream(fileStream);
+                        var bitmapFromStream = BitmapFactory.DecodeStream(fileStream, null, decodeFileOptions);
                         fileStream.Close();
 
                         return bitmapFromStream;
@@ -136,7 +153,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                     throw new FileNotFoundException("File not found: " + fileName, fileName); // Throw exception here because System.Drawing.Bitmap throws "Parameter invalid" exception when file does not exist (?!)
             }
 
-            var skBitmap = BitmapFactory.DecodeFile(fileName);
+            var skBitmap = BitmapFactory.DecodeFile(fileName, decodeFileOptions);
 
             return skBitmap;
         }
