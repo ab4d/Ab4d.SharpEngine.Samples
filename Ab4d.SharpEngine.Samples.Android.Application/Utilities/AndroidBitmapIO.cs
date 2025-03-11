@@ -22,8 +22,6 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         // https://developer.android.com/guide/topics/media/media-formats#core
         private static readonly string[] SupportedLoadFileExtensions = { "png", "jpg", "gif", "bmp", "webp", "heic", "heif" };
 
-        private int[]? _tempBitmapInts;
-
         /// <inheritdoc/>
         public bool ConvertToSupportedFormat { get; set; } = true;
 
@@ -164,19 +162,8 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                 return RawImageData.Empty;
 
             int intArrayLength = androidBitmap.Width * androidBitmap.Height;
-
-            // Try to reuse the bitmapInts
-            int[] bitmapInts;
-            if (_tempBitmapInts != null && _tempBitmapInts.Length > intArrayLength)
-            {
-                bitmapInts = _tempBitmapInts;
-            }
-            else
-            {
-                bitmapInts = new int[intArrayLength];
-                _tempBitmapInts = bitmapInts;
-            }
-
+            var bitmapInts = new int[intArrayLength];
+            
             androidBitmap.GetPixels(bitmapInts, 0, androidBitmap.Width, 0, 0, androidBitmap.Width, androidBitmap.Height);
 
             // UH UH:
