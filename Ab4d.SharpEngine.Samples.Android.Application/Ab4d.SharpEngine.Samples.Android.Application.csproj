@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Android.Application</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Android.Application</RootNamespace>    
     <TargetFramework>net9.0-android</TargetFramework>
-    <Version>3.0.9196</Version>
+    <Version>3.0.9208</Version>
     <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion> <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features do not work so it is recommended to use Vulkan 1.1 -->
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -26,9 +26,9 @@
     <EmbeddedResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9196" />
-  </ItemGroup>
+  <!--<ItemGroup>
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9208" />
+  </ItemGroup>-->
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
   </ItemGroup>

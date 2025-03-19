@@ -21,9 +21,9 @@
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
    </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9196" />
-    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="3.0.9196" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.0.9196" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9208" />
+    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="3.0.9208" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.0.9208" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
