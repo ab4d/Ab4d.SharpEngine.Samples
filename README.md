@@ -139,7 +139,7 @@ The following Visual Studio solutions are available:
   The SharpEngineSceneView provides a WinForms Control that is very easy to use and can 
   compose the 3D scene with other UI Controls (for example, showing buttons on top of the 3D scene).
   
-- **Ab4d.SharpEngine.Samples.CrossPlatform**\
+- **Ab4d.SharpEngine.Samples.SilkNet.Sdl / .SilkNet.Glfw**\
   This sample uses a third-party Silk.Net library that provides support for SDL and GLFW.
   SDL and GLFW are used to get platform-independent ways to create windows and views.
   The 3D scene here is shown in the whole window area.
