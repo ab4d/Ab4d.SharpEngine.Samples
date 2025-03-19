@@ -11,7 +11,7 @@ using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
-public class FogEffect : Effect
+public class FogEffect : Effect, IEffectConstructor<FogEffect>
 {
     private static readonly string LogArea = typeof(FogEffect).FullName!;
 
