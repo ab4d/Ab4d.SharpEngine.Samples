@@ -39,6 +39,25 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         _rotationCenterWireCross = new WireCrossNode(position: new Vector3(0, 0, 0), lineColor: Color3.Black, lineLength: 40, lineThickness: 4, "RotationCenterWireCross") { Visibility = SceneNodeVisibility.Hidden };
         scene.RootNode.Add(_rotationCenterWireCross);
     }
+    
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        // Reset special settings so other samples will not use that after leaving this sample
+        if (Scene != null)
+        {
+            if (Scene.BackgroundRenderingLayer != null)
+                Scene.BackgroundRenderingLayer.ClearDepthStencilBufferAfterRendering = false;
+
+            if (Scene.OverlayRenderingLayer != null)
+                Scene.OverlayRenderingLayer.ClearDepthStencilBufferBeforeRendering = false;
+
+            Scene.DefaultHitTestOptions.BackgroundRenderingLayer = null;
+            Scene.DefaultHitTestOptions.OverlayRenderingLayer = null;
+        }
+
+        base.OnDisposed();
+    }
 
     /// <inheritdoc />
     protected override void OnSceneViewInitialized(SceneView sceneView)
