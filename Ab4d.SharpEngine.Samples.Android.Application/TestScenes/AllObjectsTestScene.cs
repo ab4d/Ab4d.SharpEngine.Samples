@@ -112,7 +112,6 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
             // Because this is a complex scene, it takes some time to load all textures and show the scene.
             // Therefore we first show only the plane node with axis and after that is shows load all other nodes.
-            // This will be further optimized in the future (with background loading).
             _sceneView.SceneRendered += delegate (object? sender, EventArgs args)
             {
                 CreateTestScene2();
