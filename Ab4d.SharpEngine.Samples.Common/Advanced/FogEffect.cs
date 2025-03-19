@@ -190,33 +190,15 @@ public class FogEffect : Effect
 
     public override void DisposeMaterial(Material material)
     {
-        // TODO;
-        //lock (this) // lock access because this may be modified from another thread when DisposeMaterial is called from destructor
-        //{
-        //    var materialBlockIndex = material.MaterialBlockIndex;
-        //    var materialIndex = material.MaterialIndex;
+        lock (this) // lock access because this may be modified from another thread when DisposeMaterial is called from destructor
+        {
+            EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
+            _materialsDataBlockPool.FreeMaterialMemoryBlocks(material);
 
-        //    EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
-        //    var materialsData = _materialsDataBlockPool.GetMemoryBlockOrDefault(material.MaterialBlockIndex, material.MaterialIndex);
-            
-        //    if (materialIndex >= 0 && materialsData != null) 
-        //    {
-        //        // Free memory block in main thread and when the current frame is rendered
-        //        if (Scene.GpuDevice != null)
-        //        {
-        //            Scene.GpuDevice.FreeMemoryBlockOnMainThreadAfterFrameRendered(materialsData.MemoryBlock, materialIndex);
-        //            Scene.NotifyChange(SceneDirtyFlags.MaterialDisposed);
-        //        }
-        //        else
-        //        {
-        //            materialsData.MemoryBlock.FreeIndex(materialIndex);
-        //        }
+            this.Scene.NotifyChange(SceneDirtyFlags.MaterialDisposed);
+        }
 
-        //        material.SetMaterialBlock(-1, -1); // Set MaterialBlockIndex and MaterialIndex to -1
-        //    }
-        //}
-
-        //Log.Trace?.Write(LogArea, Id, "Material disposed id: {0} (name: {1})", material.Id, material.Name ?? "");
+        Log.Trace?.Write(LogArea, Id, "Material disposed id: {0} (name: {1})", material.Id, material.Name ?? "");
     }
 
     public override void ApplyRenderingItemMaterial(RenderingItem renderingItem, Material material, RenderingContext renderingContext)
