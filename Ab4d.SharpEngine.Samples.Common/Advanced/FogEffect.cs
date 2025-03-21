@@ -11,7 +11,10 @@ using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
-public class FogEffect : Effect, IEffectConstructor<FogEffect>
+public class FogEffect : Effect
+#if NET7_0_OR_GREATER     
+    , IEffectConstructor<FogEffect> // interface with static method is required for native AOT compilation of EffectManager class
+#endif
 {
     private static readonly string LogArea = typeof(FogEffect).FullName!;
 
