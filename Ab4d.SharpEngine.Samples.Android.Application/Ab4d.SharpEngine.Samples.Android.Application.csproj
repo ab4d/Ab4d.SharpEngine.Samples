@@ -26,9 +26,9 @@
     <EmbeddedResource Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BitmapFonts\roboto_black_with_outline_128_0.png" Link="Resources\raw\BitmapFonts\roboto_black_with_outline_128_0.png" />
   </ItemGroup>
 
-  <!--<ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
     <PackageReference Include="Ab4d.SharpEngine" Version="3.0.9208" />
-  </ItemGroup>-->
+  </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
   </ItemGroup>
