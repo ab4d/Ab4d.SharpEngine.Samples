@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Remove="Resources\CadImporter-for-SharpEngine.png" />
+    <None Remove="Resources\palazz_sport.bin" />
     <None Remove="Resources\Shaders\spv\FogShader.frag.spv" />
     <None Remove="Resources\Shaders\spv\FogShader.vert.spv" />
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
@@ -49,6 +50,10 @@
     <Content Include="Resources\Textures\sharp-engine-logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\palazz_sport.bin" />
   </ItemGroup>
 
   <ItemGroup>
