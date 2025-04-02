@@ -112,6 +112,18 @@ public class TwoDimensionalCamera
         get => UsedCameraController.IsPointerWheelZoomEnabled;
         set => UsedCameraController.IsPointerWheelZoomEnabled = value;
     }
+    
+    /// <summary>
+    /// Gets or sets a float value that specifies a value that used when zooming with pointer or mouse wheel.
+    /// When zooming out the Camera's Distance or CameraWidth is multiplied with this value.
+    /// When zooming in the Camera's Distance or CameraWidth is divided with this value.
+    /// Default value is 1.2. Bigger value increases the speed of zooming with pointer or mouse wheel. The value should be bigger than 1.
+    /// </summary>
+    public float WheelDistanceChangeFactor
+    {
+        get => UsedCameraController.PointerWheelDistanceChangeFactor;
+        set => UsedCameraController.PointerWheelDistanceChangeFactor = value;
+    }
 
     /// <summary>
     /// Gets or sets the zoom factor.

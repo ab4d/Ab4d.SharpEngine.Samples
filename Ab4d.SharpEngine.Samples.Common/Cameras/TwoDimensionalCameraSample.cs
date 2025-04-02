@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Cameras;
+﻿using System.Diagnostics.CodeAnalysis;
+using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
@@ -15,10 +16,12 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class TwoDimensionalCameraSample : CommonSample
 {
     public override string Title => "TwoDimensionalCamera";
-    public override string Subtitle => "TwoDimensionalCamera can be used to easily show 2D graphics with Ab4d.SharpEngine.\nIt provides 2D camera panning (left mouse button) and zooming (mouse wheel).";
+    public override string Subtitle => "TwoDimensionalCamera can be used to easily show 2D graphics with Ab4d.SharpEngine.";
 
     private TwoDimensionalCamera? _twoDimensionalCamera;
     private ICommonSampleUIElement? _sceneInfoLabel;
+
+    private VectorFontFactory? _vectorFontFactory;
 
     public TwoDimensionalCameraSample(ICommonSamplesContext context)
         : base(context)
@@ -40,9 +43,15 @@ public class TwoDimensionalCameraSample : CommonSample
         // NOTE: TwoDimensionalCamera class is available with full source in this samples project in the Common folder.
 
         _twoDimensionalCamera = new TwoDimensionalCamera(
-            pointerCameraController, 
+            pointerCameraController,
             useScreenPixelUnits: true, // when false, then the size in device independent units is used (as size of DXViewportView); when true size in screen pixels is used (see SharpHorizontalAndVerticalLines sample)
-            coordinateSystemType: TwoDimensionalCamera.TwoDimensionalCoordinateSystems.CenterOfViewOrigin); // This is also the default option and currently the only available option
+            coordinateSystemType: TwoDimensionalCamera.TwoDimensionalCoordinateSystems.CenterOfViewOrigin) // This is also the default option and currently the only available option
+        {
+            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed,
+            IsWheelZoomEnabled = true,
+            WheelDistanceChangeFactor = 1.2f, // Increase this value to zoom faster; decrease to zoom slower (but the value must not be lower than 1)
+        };
 
         _twoDimensionalCamera.CameraChanged += delegate (object? sender, EventArgs args)
         {
@@ -54,16 +63,15 @@ public class TwoDimensionalCameraSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        CreateShapesSample();
-    }
-                
-    private void CreateShapesSample()
-    {
-        var scene = Scene;
-        if (scene == null)
-            return;
+        AddText("Manually created 2D lines and shapes:", new Vector3(-400, 250, 0), Colors.Black, fontSize: 20);
 
-        scene.RootNode.Clear(); 
+        var simpleShapesGroup = new GroupNode("SimpleShapes")
+        {
+            Transform = new TranslateTransform(-100, 150, 0)
+        };
+
+        scene.RootNode.Add(simpleShapesGroup);
+
 
         //
         // Mark coordinate origin (0, 0)
@@ -83,7 +91,7 @@ public class TwoDimensionalCameraSample : CommonSample
             LineThickness = 1,
         };
 
-        scene.RootNode.Add(multiLineNode);
+        simpleShapesGroup.Add(multiLineNode);
 
         //
         // Create a few lines
@@ -107,7 +115,7 @@ public class TwoDimensionalCameraSample : CommonSample
                 LineThickness = i + 1
             };
 
-            scene.RootNode.Add(lineNode);
+            simpleShapesGroup.Add(lineNode);
         }
 
 
@@ -130,7 +138,7 @@ public class TwoDimensionalCameraSample : CommonSample
             IsClosed      = true
         };
 
-        scene.RootNode.Add(polyLineNode);
+        simpleShapesGroup.Add(polyLineNode);
 
 
         //
@@ -148,7 +156,7 @@ public class TwoDimensionalCameraSample : CommonSample
             EndPosition = new Vector3(300, -100, 0),
         };
 
-        scene.RootNode.Add(lineWithPattern1);
+        simpleShapesGroup.Add(lineWithPattern1);
 
 
         var lineWithPattern2 = new LineNode(lineWithPatternMaterial)
@@ -157,7 +165,7 @@ public class TwoDimensionalCameraSample : CommonSample
             EndPosition = new Vector3(300, -110, 0),
         };
 
-        scene.RootNode.Add(lineWithPattern2);
+        simpleShapesGroup.Add(lineWithPattern2);
 
 
         //
@@ -186,7 +194,7 @@ public class TwoDimensionalCameraSample : CommonSample
             Transform     = new TranslateTransform(0, -50, 0)
         };
 
-        scene.RootNode.Add(curveLineNode);
+        simpleShapesGroup.Add(curveLineNode);
 
 
         var ellipseLineNode = new EllipseLineNode()
@@ -200,7 +208,7 @@ public class TwoDimensionalCameraSample : CommonSample
             LineThickness = 2,
         };
 
-        scene.RootNode.Add(ellipseLineNode);
+        simpleShapesGroup.Add(ellipseLineNode);
 
 
         //
@@ -240,7 +248,7 @@ public class TwoDimensionalCameraSample : CommonSample
         // This will move the solid shape slightly behind the 3D line so the line will be always on top of the shape
         meshModelNode.Transform = new TranslateTransform(200, -50, -0.5f);
 
-        scene.RootNode.Add(meshModelNode);
+        simpleShapesGroup.Add(meshModelNode);
 
 
         // Also add an outline to the shape
@@ -252,17 +260,75 @@ public class TwoDimensionalCameraSample : CommonSample
             Transform     = new TranslateTransform(200, -50, 0)
         };
 
-        scene.RootNode.Add(shapeOutlineNode);
+        simpleShapesGroup.Add(shapeOutlineNode);
+
+
+        AddText("Imported 2D CAD drawing:", new Vector3(-400, -50, 0), Colors.Black, fontSize: 20);
+
+        var importedLinesGroup = LoadSampleLinesData(lineThickness: 0.8f, targetPosition: new Vector2(-550, -280), targetSize: new Vector2(800, 600));
+
+        scene.RootNode.Add(importedLinesGroup);
     }
 
-    private void LoadSampleLinesData(float lineThickness, Vector2 targetPosition, Vector2 targetSize)
+    private void AddText(string text, Vector3 position, Color4 textColor, float fontSize = 20, TextPositionTypes positionType = TextPositionTypes.Baseline)
     {
         if (Scene == null)
             return;
 
-        Scene.RootNode.Clear();
+        if (_vectorFontFactory == null)
+            EnsureVectorFont();
 
+        var textMesh = _vectorFontFactory.CreateTextMesh(text,
+                                                         position,
+                                                         positionType,
+                                                         textDirection: new Vector3(1, 0, 0),
+                                                         upDirection: new Vector3(0, 1, 0),
+                                                         fontSize: fontSize);
 
+        if (textMesh == null)
+            return;
+
+        var usedMaterial = new SolidColorMaterial(textColor);
+        var textMeshModelNode = new MeshModelNode(textMesh, usedMaterial)
+        {
+            BackMaterial = usedMaterial // Make text visible from both sides
+        };
+
+        Scene.RootNode.Add(textMeshModelNode);
+    }
+
+    [MemberNotNull(nameof(_vectorFontFactory))]
+    private void EnsureVectorFont()
+    {
+        if (_vectorFontFactory != null)   
+            return;
+
+        string fontName = "Roboto-Black.ttf";
+        string fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontName);
+
+        // Load the font file
+        // This method can be called multiple times when the same fontName and fontFilePath is used.
+        // You can also check if font is loaded by calling:
+        // bool isLoaded = TrueTypeFontLoader.Instance.IsFontLoaded(fontName);
+
+        try
+        {
+            TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
+
+            // You can also use the async version of LoadFontFile method that read the font file in a background thread:
+            //await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Error loading font:\n" + ex.Message);
+            return;
+        }
+
+        _vectorFontFactory = new VectorFontFactory(fontName);
+    }
+
+    private GroupNode LoadSampleLinesData(float lineThickness, Vector2 targetPosition, Vector2 targetSize)
+    {
         // Read many lines from a custom bin file format.
         // The bin file was created from a metafile (wmf) file that was read by Ab2d.ReaderWmf,
         // then the lines were grouped by color and saved to a custom bin file.
@@ -279,13 +345,16 @@ public class TwoDimensionalCameraSample : CommonSample
         float scale = Math.Min(xScale, yScale); // Preserve aspect ratio - so use the minimal scale
 
         float xOffset = targetCenter.X - boundsSize.X * scale * 0.5f;
-        float yOffset = targetCenter.Y + boundsSize.Y * scale * 0.5f; // targetCenter.Y - bounds.Height * scale * 0.5 + bounds.Height * scale // because we flipped y we need to offset by height
+        float yOffset = targetCenter.Y - boundsSize.Y * scale * 0.5f; // targetCenter.Y - bounds.Height * scale * 0.5 + bounds.Height * scale // because we flipped y we need to offset by height
 
 
         
         var transformMatrix = new Matrix3x2(scale, 0,
                                             0, -scale, // We also need to flip y axis because here y axis is pointing up
                                             xOffset, yOffset);
+
+
+        var linesGroup = new GroupNode("ImportedLines");
 
         for (var i = 0; i < lines.Count; i++)
         {
@@ -308,7 +377,7 @@ public class TwoDimensionalCameraSample : CommonSample
                     LineThickness = lineThickness < 0 ? oneLineData.LineThickness : lineThickness
                 };
 
-                Scene.RootNode.Add(polyLineVisual3D);
+                linesGroup.Add(polyLineVisual3D);
             }
             else
             {
@@ -319,9 +388,11 @@ public class TwoDimensionalCameraSample : CommonSample
                     LineThickness = lineThickness < 0 ? oneLineData.LineThickness : lineThickness
                 };
 
-                Scene.RootNode.Add(multiLineNode);
+                linesGroup.Add(multiLineNode);
             }
         }
+
+        return linesGroup;
     }
 
     private static List<LineData> ReadLineDataFromBin(out Vector2 boundsPosition, out Vector2 boundsSize)
@@ -412,15 +483,8 @@ public class TwoDimensionalCameraSample : CommonSample
     {
         ui.CreateStackPanel(alignment: PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateLabel("Scene selection:", isHeader: true);
-
-        ui.CreateRadioButtons(new string[] { "Simple 2D scene", "Stadium plan" }, (selectedIndex, selectedText) =>
-        {
-            if (selectedIndex == 0)
-                CreateShapesSample();
-            else
-                LoadSampleLinesData(lineThickness: 0.8f, new Vector2(-400, -300), new Vector2(800, 600));
-        }, selectedItemIndex: 0);
+        ui.CreateLabel("2D Camera controls:", isHeader: true);
+        ui.CreateLabel("PAN - left mouse button\nZOOM - mouse wheel\nQUICK ZOOM - left & right mouse button");
 
         ui.CreateLabel("View info:", isHeader: true);
 
