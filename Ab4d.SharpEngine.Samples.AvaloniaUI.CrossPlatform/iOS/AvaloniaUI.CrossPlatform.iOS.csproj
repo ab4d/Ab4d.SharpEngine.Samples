@@ -6,10 +6,11 @@
     <TargetFramework>net9.0-ios</TargetFramework>
     <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <!--Generate CodesignKey: one way to do that is to open the project in Rider. Then right click on project and select open in XCode. There in the Sign tab generate the key.-->
-    <!--<CodesignKey>Apple Development: ...</CodesignKey>-->
+    <ApplicationId>com.ab4d.sharpengine.samples.avaloniaui</ApplicationId>
+    <!-- To start the app on iOS device you will need a provisioning profile. See:
+    https://github.com/ab4d/Ab4d.SharpEngine.Samples#step-by-step-instructions-to-run-the-samples-on-macos-and-ios
+    https://learn.microsoft.com/en-us/xamarin/ios/get-started/installation/device-provisioning/manual-provisioning -->
+    <!--<CodesignKey>Apple Development: emial (id)</CodesignKey>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +21,7 @@
     <ProjectReference Include="..\Shared\AvaloniaUI.CrossPlatform.Shared.csproj" />
   </ItemGroup>
 
-  <!-- iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
+  <!-- iOS requires libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
   <!-- When starting iOS simulator, use the dylib from ios-arm64_x86_64-simulator folder -->
   <ItemGroup>
     <Content Include="../../lib/MoltenVK/ios-arm64/libMoltenVK.dylib">
