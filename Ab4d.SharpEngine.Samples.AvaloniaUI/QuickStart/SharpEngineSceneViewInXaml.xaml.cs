@@ -172,7 +172,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                 Text = "Error creating VulkanDevice:\r\n" + ex.Message,
                 Foreground = Brushes.Red,
                 VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                TextWrapping = TextWrapping.Wrap
             };
 
             RootGrid.Children.Add(errorTextBlock);

@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-    <AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
-    <RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
+		<AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
+		<RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
 
-    <TargetFrameworks>net9.0-android</TargetFrameworks>
+        <TargetFrameworks>net9.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 
@@ -26,18 +26,19 @@
 		<ApplicationTitle>Ab4d.SharpEngine.Samples.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.ab4d.sharpengine.samples.maui</ApplicationId>
+		<ApplicationId>com.ab4d.sharpengine.samples.maui.ios</ApplicationId>
 		<ApplicationIdGuid>538a7162-4116-41b8-9595-00f749556712</ApplicationIdGuid>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'macOS'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 
 	</PropertyGroup>
 
@@ -77,18 +78,13 @@
     </PropertyGroup>
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-    <!-- To start the app on iOS you will need a provisioning profile.
-	     See: https://learn.microsoft.com/en-us/xamarin/ios/get-started/installation/device-provisioning/manual-provisioning
-	     Another option is to use JetBrains Rider: open the project in Rider, right click on project and select "Open in XCode". 
-		   In XCode click on the root node in the hierarchy on the left and then on the center in the tab select "Signing & Capabilities".
-		   There enter the Bundle Identifier (copy it from csproj ApplicationIdcheck), check Automatically manage signing and select corresponding team.
-		   XCode will generate the provisioning profile. -->
-	  <!-- <CodesignKey>Apple Development: emial (id)</CodesignKey>
-      <CodesignProvision>iOS Team Provisioning Profile: com.ab4d.sharpengine.samples.maui</CodesignProvision> -->
+      <!-- To start the app on iOS device you will need a provisioning profile. See:
+      https://github.com/ab4d/Ab4d.SharpEngine.Samples#step-by-step-instructions-to-run-the-samples-on-macos-and-ios
+      https://learn.microsoft.com/en-us/xamarin/ios/get-started/installation/device-provisioning/manual-provisioning -->
+      <!--<CodesignKey>Apple Development: emial (id)</CodesignKey>-->
       <MtouchLink>SdkOnly</MtouchLink>
       <MtouchFloat32>true</MtouchFloat32>
     </PropertyGroup>
-
 
 	<!-- Mac Catalyst and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">

@@ -5,7 +5,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</string>
 	<key>CFBundleIdentifier</key>
-	<string>companyName.Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</string>
+	<string>com.ab4d.sharpengine.samples.avaloniaui</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
@@ -13,7 +13,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
-	<string>13.0</string>
+	<string>15.0</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
