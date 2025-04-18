@@ -71,7 +71,10 @@ public class BooleanMeshSample : CommonSample
         // Save the SynchronizationContext from the current (UI) thread so we can call the method on this thread from the background thread
         // We could also use Dispatcher or some other UI framework specific class, but because this is a cross-plaform sample, we use SynchronizationContext
         var synchronizationContext = SynchronizationContext.Current;
-        
+
+        if (synchronizationContext == null)
+            return;
+
         // After that we can subtract each of the sphere meshes from the initialBooleanMesh.
         // This can be done in background thread (we use Dispatcher.Invoke to "send" the mesh to the UI thread)
         Task.Factory.StartNew(() =>
@@ -88,14 +91,13 @@ public class BooleanMeshSample : CommonSample
 
                 // Get the Mesh after the last Subtract
                 var mesh = _initialBooleanMesh.GetMesh();
-                
+
                 synchronizationContext!.Post(generatedMeshObject =>
                 {
                     ShowNewOriginalMesh((StandardMesh)generatedMeshObject!);
                 }, state: mesh);
             }
         })
-
         // After all the boolean operations are completed, we generate texture coordinates
         // so we will be able to use texture image as material (meshes that are created with boolean operations do not have texture coordinates defined)
         //.ContinueWith(_ => GenerateTextureCoordinates(), TaskScheduler.FromCurrentSynchronizationContext()); // The last one is run on UI thread
