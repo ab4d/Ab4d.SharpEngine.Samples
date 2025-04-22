@@ -35,11 +35,29 @@ public sealed class CustomOverlayPanelSample : CommonSample
 
     protected override void OnDisposed()
     {
-        if (Scene != null && _spriteBatch != null)
-            Scene.RemoveSpriteBatch(_spriteBatch);
-
         if (SceneView != null)
             SceneView.SceneUpdating -= ParentSceneView_SceneUpdating;
+
+        // Dispose objects that are created in this sample
+        if (Scene != null && _spriteBatch != null)
+        {
+            Scene.RemoveSpriteBatch(_spriteBatch);
+
+            _spriteBatch.Dispose();
+            _spriteBatch = null;
+        }
+
+        if (_overlayPanelSceneView != null)
+        {
+            _overlayPanelSceneView.Dispose();
+            _overlayPanelSceneView = null;
+        }
+        
+        if (_overlayPanelScene != null)
+        {
+            _overlayPanelScene.Dispose();
+            _overlayPanelScene = null;
+        }
 
         base.OnDisposed();
     }
