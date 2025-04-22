@@ -32,6 +32,8 @@ public class GltfImporterExporterSample : CommonSample
 
     private EdgeLinesFactory? _edgeLinesFactory;
 
+    private Vector2? _savedAxisPanelPosition;
+
     private bool _isFullLoggingEnabled = false;
 
     private enum ViewTypes
@@ -69,6 +71,15 @@ public class GltfImporterExporterSample : CommonSample
         ImportFile(fileName);
 
         ShowCameraAxisPanel = true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_savedAxisPanelPosition != null && CameraAxisPanel != null)
+            CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
+
+        base.OnDisposed();
     }
 
     protected void ImportFile(string? fileName)
@@ -395,7 +406,10 @@ public class GltfImporterExporterSample : CommonSample
 
             // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
             if (CameraAxisPanel != null)
+            {
+                _savedAxisPanelPosition = CameraAxisPanel.Position;
                 CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
+            }
         }
     }
 }

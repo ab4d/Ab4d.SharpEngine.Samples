@@ -28,6 +28,8 @@ public class PointCloudImporterSample : CommonSample
     private bool _isZAxisUp = true;
     private float _pixelsSize = 1;
 
+    private Vector2? _savedAxisPanelPosition;
+
     private float _boundsDiagonalLength;
     private PixelsNode? _pixelsNode;
 
@@ -44,6 +46,15 @@ public class PointCloudImporterSample : CommonSample
 
         ShowCameraAxisPanel = true;
     }   
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_savedAxisPanelPosition != null && CameraAxisPanel != null)
+            CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
+
+        base.OnDisposed();
+    }
 
     protected void LoadPointCloud(string? fileName)
     {
@@ -259,7 +270,10 @@ public class PointCloudImporterSample : CommonSample
 
             // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
             if (CameraAxisPanel != null)
+            {
+                _savedAxisPanelPosition = CameraAxisPanel.Position;
                 CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
+            }
         }
     }
 }
