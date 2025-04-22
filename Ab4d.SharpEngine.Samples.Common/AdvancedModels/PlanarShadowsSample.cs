@@ -127,14 +127,12 @@ public class PlanarShadowsSample : CommonSample
 
         var spherePositions = new List<Vector3>();
 
-        var rnd = new Random();
-
         float planeCellSize = _planeModelNode.Size.X / 10;
 
         while (spherePositions.Count < 10)
         {
-            int cellXIndex = rnd.Next(10);
-            int cellYIndex = rnd.Next(10);
+            int cellXIndex = GetRandomInt(10);
+            int cellYIndex = GetRandomInt(10);
 
             var spherePosition = new Vector3((cellXIndex - 5) * planeCellSize + planeCellSize / 2,
                                              0,
@@ -148,7 +146,7 @@ public class PlanarShadowsSample : CommonSample
 
 
             // t defines an animation time between 0 and 1.
-            float t = rnd.NextSingle();
+            float t = GetRandomFloat();
 
             var sphereVisual3D = new SphereModelNode()
             {
