@@ -126,7 +126,7 @@ public class FitIntoViewSample : CommonSample
 
         for (int i = 0; i < 6; i++)
         {
-            var randomCenterPosition = new Vector3(_rnd.NextSingle() * 100 - 50, _rnd.NextSingle() * 60 - 30, _rnd.NextSingle() * 100 - 50);
+            var randomCenterPosition = new Vector3(GetRandomFloat() * 100 - 50, GetRandomFloat() * 60 - 30, GetRandomFloat() * 100 - 50);
 
             var boxVisual3D = new BoxModelNode()
             {
