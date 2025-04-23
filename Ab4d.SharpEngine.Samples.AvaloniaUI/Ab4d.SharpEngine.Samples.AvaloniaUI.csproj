@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <!-- MacOS and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
-  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('macosaa'))">
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('macos'))">
     <Content Include="../lib/MoltenVK/macos-arm64_x86_64/libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
