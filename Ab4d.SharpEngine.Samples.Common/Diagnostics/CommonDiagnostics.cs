@@ -965,7 +965,7 @@ PipelineChangesCount: {8:#,##0}",
             {
                 var physicalDeviceDetail = allPhysicalDeviceDetails[i];
 
-                sb.Append($"{i}: {physicalDeviceDetail.DeviceName} ({physicalDeviceDetail.DeviceProperties.DeviceType}, DeviceId: {physicalDeviceDetail.DeviceProperties.DeviceID}, DeviceLUID: ");
+                sb.Append($"{i}: {physicalDeviceDetail.DeviceName} ({physicalDeviceDetail.DeviceProperties.DeviceType}, VulkanAPI v{physicalDeviceDetail.DeviceApiVersion}, DeviceId: {physicalDeviceDetail.DeviceProperties.DeviceID}, DeviceLUID: ");
 
                 if (physicalDeviceDetail.IsDeviceLUIDValid)
                     sb.Append(physicalDeviceDetail.DeviceLUID);
