@@ -231,7 +231,7 @@ public class CommonDiagnostics
 
         if (_sharpEngineSceneView.GpuDevice != null)
         {
-            string deviceInfoText = _sharpEngineSceneView.GpuDevice.GpuName;
+            string deviceInfoText = $@"{_sharpEngineSceneView.GpuDevice.GpuName} (API v{_sharpEngineSceneView.GpuDevice.PhysicalDeviceDetails.DeviceApiVersion})";
             viewInfo = deviceInfoText + Environment.NewLine + viewInfo;
         }
 
