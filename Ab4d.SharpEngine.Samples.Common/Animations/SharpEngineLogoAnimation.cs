@@ -90,14 +90,14 @@ public class SharpEngineLogoAnimation : IDisposable
 
         _transformationAnimation.AddTarget(_hashModel);
 
-        _transformationAnimation.AddRotateKeyframe(0,                               new Vector3(0, 101, 0));
-        _transformationAnimation.AddRotateKeyframe(endInitialRotationFrameNumber,   new Vector3(0, 65, 0));
+        _transformationAnimation.AddRotateKeyframe(0,                              new Vector3(0, 101, 0));
+        _transformationAnimation.AddRotateKeyframe(endInitialRotationFrameNumber,  new Vector3(0, 65, 0));
         _transformationAnimation.AddRotateKeyframe(lastRotateFrameNumber,          new Vector3(73, 24, 55));
         _transformationAnimation.AddRotateKeyframe(startColorAnimationFrameNumber, new Vector3(73, 24, 55));
         _transformationAnimation.AddRotateKeyframe(lastColorFrameNumber,           new Vector3(73, 24, 55));
 
-        _transformationAnimation.AddTranslateKeyframe(0,                               new Vector3(0, 0, 350));
-        _transformationAnimation.AddTranslateKeyframe(endInitialRotationFrameNumber,   new Vector3(0, 0, 300));
+        _transformationAnimation.AddTranslateKeyframe(0,                              new Vector3(0, 0, 350));
+        _transformationAnimation.AddTranslateKeyframe(endInitialRotationFrameNumber,  new Vector3(0, 0, 300));
         _transformationAnimation.AddTranslateKeyframe(lastRotateFrameNumber,          new Vector3(-6, 31, -6));
         _transformationAnimation.AddTranslateKeyframe(startColorAnimationFrameNumber, new Vector3(-6, 31, -6));
         _transformationAnimation.AddTranslateKeyframe(lastColorFrameNumber,           new Vector3(-6, 31, 300));
@@ -137,6 +137,13 @@ public class SharpEngineLogoAnimation : IDisposable
     {
         _transformationAnimation?.Seek(_transformationAnimation.Duration);
         _materialAnimation?.Seek(_materialAnimation.Duration);
+    }
+    
+    public void Goto(float animationTimeInSeconds)
+    {
+        var animationTimeMs = animationTimeInSeconds * 1000;
+        _transformationAnimation?.Seek(animationTimeMs);
+        _materialAnimation?.Seek(animationTimeMs);
     }
 
     public void SetAnimationDuration(float durationInSeconds)
