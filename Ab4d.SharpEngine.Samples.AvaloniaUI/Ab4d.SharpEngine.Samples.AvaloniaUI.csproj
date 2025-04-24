@@ -66,7 +66,10 @@
 
   <!-- MacOS and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('macos'))">
-    <Content Include="../lib/MoltenVK/macos-arm64_x86_64/libMoltenVK.dylib">
+    <!--<Content Include="../lib/MoltenVK/macos-arm64_x86_64/libMoltenVK.dylib">-->
+
+    <!-- Use special build of libMoltenVK.dylib that provides support for wide lines - see readme in that folder -->
+    <Content Include="../lib/MoltenVK/macos-arm64_x86_64/widelines-v1.3/libMoltenVK.dylib">
       <Link>libMoltenVK.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

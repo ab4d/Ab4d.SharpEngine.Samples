@@ -88,13 +88,17 @@
 
 	<!-- Mac Catalyst and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-	  <None Include="..\lib\MoltenVK\macos-arm64_x86_64\libMoltenVK.dylib" PublishFolderType="Assembly">
-	    <Link>libMoltenVK.dylib</Link>
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+
+	  <!-- You can also use special build of libMoltenVK.dylib that provides support for wide lines - see readme in that folder -->
+	  <!-- <Content Include="../lib/MoltenVK/macos-arm64_x86_64/widelines-v1.3/libMoltenVK.dylib" PublishFolderType="Assembly">-->
+    
+	  <None Include="../lib/MoltenVK/macos-arm64_x86_64/libMoltenVK.dylib" PublishFolderType="Assembly">
+		<Link>libMoltenVK.dylib</Link>
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 
-  <!-- When starting iOS simulator, use the dylib from ios-arm64_x86_64-simulator folder -->
+<!-- When starting iOS simulator, use the dylib from ios-arm64_x86_64-simulator folder -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 	  <None Include="..\lib\MoltenVK\ios-arm64\libMoltenVK.dylib" PublishFolderType="Assembly">
 	    <Link>libMoltenVK.dylib</Link>
