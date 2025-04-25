@@ -266,7 +266,12 @@ public class WireframeRenderingSample : CommonSample
 
         ui.CreateLabel("Wireframe rendering technique:", isHeader: true);
 
-        ui.CreateRadioButtons(new string[] { "Create wireframe positions", "Use LineMaterial", "WireframeRenderingStep"}, 
+        ui.CreateRadioButtons(new string[]
+            {
+                "Create wireframe positions (?):Uses LineUtils.AddWireframeLinePositions method to generated line positions\nthat represent wireframe lines for the specified mesh", 
+                "Use LineMaterial (?):Render the 3D meshes by using LineMaterial instead of using StandardMaterial", 
+                "OverrideEffectTechnique (?): Render all objects by using a WireframeRenderingEffectTechnique\n(setting it to DefaultRenderObjectsRenderingStep.OverrideEffectTechnique)"
+            }, 
             (selectedIndex, selectedText) =>
             {
                 if (_wireframeRenderingTechnique == WireframeRenderingTechniques.WireframeRenderingStep)
@@ -276,6 +281,9 @@ public class WireframeRenderingSample : CommonSample
                 RecreateWireframe();
             },
             selectedItemIndex: 0);
+
+        ui.AddSeparator();
+        ui.CreateLabel("See code behind to see how each\nrendering technique is implemented.");
         
                 
         ui.AddSeparator();
