@@ -15,7 +15,7 @@ public class TubeLinesSample : CommonSample
     // _segmentsCount defines how many segments each tube mesh has.
     private int _segmentsCount = 6;
 
-    private bool _isEmissiveMaterial = true;
+    private bool _isSolidColorMaterial = true;
 
     // For another sample that uses tube lines see also AdvancedModels/StreamlinesSample
 
@@ -157,12 +157,12 @@ public class TubeLinesSample : CommonSample
         }
     }
 
-    private StandardMaterial CreateLineMaterial(Color4 lineColor)
+    private Material CreateLineMaterial(Color4 lineColor)
     {
-        if (_isEmissiveMaterial)
+        if (_isSolidColorMaterial)
         {
             // Use EmissiveColor so that the tube lines are always rendered with the same color regardless of the lights.
-            return new StandardMaterial() { EmissiveColor = lineColor };
+            return new SolidColorMaterial(lineColor);
         }
 
         // When no emissive material is used, then tube lines will be shaded based on light positions
@@ -184,11 +184,11 @@ public class TubeLinesSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateCheckBox("Use EmissiveColor (?):When EmissiveColor is used, then the tube lines are always rendered with the same color regardless of the lights.",
-            _isEmissiveMaterial,
+        ui.CreateCheckBox("Use SolidColorMaterial (?):When SolidColorMaterial is used, then the tube lines are always rendered with the same color regardless of the lights.",
+            _isSolidColorMaterial,
             (isChecked) =>
             {
-                _isEmissiveMaterial = isChecked;
+                _isSolidColorMaterial = isChecked;
                 RecreateScene();
             });
     }
