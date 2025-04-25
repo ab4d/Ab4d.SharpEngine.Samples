@@ -126,7 +126,10 @@ public abstract class StandardModelsSampleBase : CommonSample
         if (normalLinePositions == null)
             return;
 
-        var lineMaterial = new LineMaterial(Colors.Orange, normalsLineThickness);
+        var lineMaterial = new LineMaterial(Colors.Orange, normalsLineThickness)
+        {
+            EndLineCap = LineCap.ArrowAnchor
+        };
 
         normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, lineMaterial, "NormalLines");
 
