@@ -78,7 +78,7 @@ public class MultiMaterialModelNodeSample : CommonSample
         if (addSubMesh)
             _multiMaterialModelNode.AddSubMesh(subMesh);
         else
-            _multiMaterialModelNode.RemoveSubMesh(subMesh, checkMaterials: false); // set checkMaterials to prevent removing the material from the _multiMaterialModelNode
+            _multiMaterialModelNode.RemoveSubMesh(subMesh, removeUnusedMaterials: false); // set checkMaterials to prevent removing the material from the _multiMaterialModelNode
     }
 
     private void SetSubMeshStartIndexLocation(SubMesh? subMesh, int startIndexLocation, ICommonSampleUIElement? otherSliderUIElement)
