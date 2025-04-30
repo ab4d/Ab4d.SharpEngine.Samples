@@ -235,6 +235,12 @@ public class WireframeRenderingSample : CommonSample
         if (Scene == null || SceneView == null || _testSceneNode == null || SceneView.DefaultRenderObjectsRenderingStep == null)
             return;
 
+        // Recreate the test scene from 3D models (not 3D lines) that will be rendered as wireframe by WireframeRenderingEffectTechnique
+        Scene.RootNode.Clear();
+
+        _testSceneNode = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
+        Scene.RootNode.Add(_testSceneNode);
+
         var wireframeRenderingEffectTechnique = new WireframeRenderingEffectTechnique(Scene, "CustomWireframeRenderingEffectTechnique")
         {
             UseLineColorFromDiffuseColor = !_useSingleColorLines,
