@@ -269,10 +269,10 @@ public class SliceModelsSample : CommonSample
             _backGroupNode.Visibility = _showBack ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
 
         if (_frontEdgeLinesNode != null)
-            _frontEdgeLinesNode.Visibility = _showEdgeLines ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            _frontEdgeLinesNode.Visibility = (_showFront && _showEdgeLines) ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
 
         if (_backEdgeLinesNode != null)
-            _backEdgeLinesNode.Visibility = _showEdgeLines ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            _backEdgeLinesNode.Visibility = (_showBack && _showEdgeLines) ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
