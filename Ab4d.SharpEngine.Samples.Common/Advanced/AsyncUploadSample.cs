@@ -100,6 +100,10 @@ public class AsyncUploadSample : CommonSample
 
             if (!_isUploadDelayed)
             {
+                //
+                // Detailed comments about texture loading can be found in the Materials/MaterialsSample.cs file - see "3) Material with Diffuse texture" section
+                //
+
                 // The easiest way to load texture in the background thread is to use the StandardMaterial,
                 // set the file name and loadInBackground to true.
                 // We can also set the initialDiffuseColor - this will show the material as gray until the texture is loaded.

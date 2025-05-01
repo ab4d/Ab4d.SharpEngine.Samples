@@ -136,10 +136,43 @@ public class MaterialsSample : CommonSample
         // 3) Material with Diffuse texture
         //
 
+        // Because Ab4d.SharpEngine is cross-platform and can work with different UI frameworks, 
+        // it cannot use an OS or UI framework dependent bitmap readers.
+        // Therefore, there is a IBitmapIO interface that provides an abstraction for bitmap IO operations (reading and saving images).
+        // See online help for IBitmapIO: https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Common_IBitmapIO.htm
+        //
+        // Ab4d.SharpEngine provides the PngBitmapIO that implements IBitmapIO and as its name suggests it reads and writes png files.
+        // The PngBitmapIO is also set to the GpuDevice.DefaultBitmapIO and is used as a fallback IBitmapIO provider.
+        // So if you need to read or write png files, then you do not need any additional third-party dependencies to read bitmap files.
+        //
+        // But if you want to read jpg or other file types, or would like to use OS or other native file readers and writers,
+        // then you can implement your own class that implements IBitmapIO interface or use existing implementation of IBitmapIO.
+        //
+        // The following are existing implementation of IBitmapIO:
+        // 
+        // | class name:           | assembly:                   | comments:
+        // |--------------------------------------------------------------------------------------
+        // | PngBitmapIO           | Ab4d.SharpEngine            | reads and writes only png files; by default set to GpuDevice.DefaultBitmapIO
+        // | SkiaSharpBitmapIO     | Ab4d.SharpEngine.Avalonia   |
+        // | WpfBitmapIO           | Ab4d.SharpEngine.WPF        |
+        // | SystemDrawingBitmapIO | Ab4d.SharpEngine.WinForms   |
+        // | WinUIBitmapIO         | Ab4d.SharpEngine.WinUI      |
+        //
+        // 
+        // There are multiple ways to create a texture from a bitmap image.
+        // You can use define the bitmap file name in the constructor of StandardMaterial or SolidColorMaterial.
+        // You can also use TextureLoader to get the GpuImage and then set that to DiffuseTexture property in the material.
+        // It is also possible to load the texture in the background.
+        // See samples and code comments below.
+        //
+        // If not otherwise specified, then the IBitmapIO that is defined in GpuDevice.DefaultBitmapIO is used.
+        // That property is by default set to an instance of PngBitmapIO.
+        
+
         string textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/10x10-texture.png"); // NOTE: SharpEngine will automatically adjust directory separator ('\' or '/' based on the used OS).
 
         // The most easy way to define a texture material is to set the file name in the StandardMaterial constructor.
-        // We also need to set the BitmapIO provider that will read the bitmap (this is automatically set by the sample; it can be WpfBitmapIO, AvaloniaBitmapIO, WinUIBitmapIO, SkiaSharpBitmapIO or ImageMagickBitmapIO)
+        // We also need to set the BitmapIO provider that will read the bitmap (this is automatically set by the sample; it can be WpfBitmapIO, SkiaSharpBitmapIO (from Ab4d.SharpEngine.Avalonia), WinUIBitmapIO or ImageMagickBitmapIO)
         // This will save the texture name and when the GpuDevice is available, then the texture file will be loaded and a GpuImage object will be created on the graphics card.
         var material3 = new StandardMaterial(textureFileName, this.BitmapIO, name: "10x10-texture.png"); // name is optional
 
