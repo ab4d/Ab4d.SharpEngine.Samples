@@ -94,7 +94,6 @@
 
       <ListBox Name="SamplesList" Grid.Row="7"
                Margin="5 15 0 5" Padding="0 0 0 0"
-               SelectedIndex="0"
                Background="{StaticResource BackgroundBrush}"
                BorderThickness="1"
                BorderBrush="{StaticResource BackgroundBrush}"
