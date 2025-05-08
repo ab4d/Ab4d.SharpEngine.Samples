@@ -721,6 +721,10 @@ public class ComplexSceneSample : CommonSample
 
     private async Task CreateBitmapTextNodesAsync(Scene scene)
     {
+        if (this.IsDisposed)
+            return; // The sample was disposed before this async task was started
+
+
         var text1Position = new Vector3(-400, 150, 100);
 
         var wireCross3D = new WireCrossNode(text1Position, Colors.Red);
@@ -796,6 +800,10 @@ public class ComplexSceneSample : CommonSample
         {
             var blackBitmapFont = await CreateBitmapFontAsync(fontFileName, scene.GpuDevice.DefaultBitmapIO);
 
+            if (this.IsDisposed)
+                return; // The sample was disposed while waiting for the CreateBitmapFontAsync to finish
+
+
             if (blackBitmapFont != null)
             {
                 var blackBitmapTextCreator = await BitmapTextCreator.CreateAsync(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO, cacheFontGpuImages: false); // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
@@ -823,6 +831,9 @@ public class ComplexSceneSample : CommonSample
         fontFileName = fontPath + (useArialFont ? "arial_black_with_outline_128.fnt" : "roboto_black_with_outline_128.fnt");
 
         var blackWithOutlineBitmapFont = await CreateBitmapFontAsync(fontFileName, BitmapIO);
+
+        if (this.IsDisposed)
+            return; // The sample was disposed while waiting for the CreateBitmapFontAsync to finish
 
 
         if (blackWithOutlineBitmapFont != null && scene.GpuDevice != null)
