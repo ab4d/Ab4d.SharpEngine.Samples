@@ -123,6 +123,7 @@
   <Sample Location="Advanced.MeshOutlineSample" Title="Mesh outlines" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
+  <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" IsNew="True" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
