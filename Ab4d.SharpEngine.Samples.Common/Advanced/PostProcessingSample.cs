@@ -12,12 +12,14 @@ public class PostProcessingSample : CommonSample
 
     private bool _isBlackAndWhitePostProcess = true;
     private bool _isToonShadingPostProcess = false;
+    private bool _isGammaCorrectionPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
     private int _blurFilterSize = 7; // MAX value is 15 (=SeparableKernelPostProcess.MaxFilterSize)
 
     private BlackAndWhitePostProcess _blackAndWhitePostProcess;
     private ToonShadingPostProcess _toonShadingPostProcess;
+    private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
     private GaussianBlurPostProcess _gaussianBlurPostProcess2;
 
@@ -26,6 +28,7 @@ public class PostProcessingSample : CommonSample
     {
         _blackAndWhitePostProcess = new BlackAndWhitePostProcess();
         _toonShadingPostProcess = new ToonShadingPostProcess();
+        _gammaCorrectionPostProcess = new GammaCorrectionPostProcess();
 
         // GaussianBlur requires two passes: horizontal and vertical
         _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
@@ -101,6 +104,9 @@ public class PostProcessingSample : CommonSample
         if (_isToonShadingPostProcess)
             SceneView!.PostProcesses.Add(_toonShadingPostProcess);
         
+        if (_isGammaCorrectionPostProcess)
+            SceneView!.PostProcesses.Add(_gammaCorrectionPostProcess);
+        
         if (_isGaussianBlurPostProcess)
         {
             SceneView!.PostProcesses.Add(_gaussianBlurPostProcess1);
@@ -129,6 +135,23 @@ public class PostProcessingSample : CommonSample
             _isToonShadingPostProcess = isChecked;
             UpdatePostProcesses();
         });
+        
+        ui.AddSeparator();
+        
+        
+        ui.CreateCheckBox("Gamma Correction", _isGammaCorrectionPostProcess, isChecked =>
+        {
+            _isGammaCorrectionPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+        
+        ui.CreateSlider(0.25f, 3f, () => _gammaCorrectionPostProcess.Gamma,
+            newValue => _gammaCorrectionPostProcess.Gamma = newValue,
+            width: 100,
+            keyText: "      Gamma:",
+            keyTextWidth: 140,
+            formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
+        
         
         ui.AddSeparator();
 
