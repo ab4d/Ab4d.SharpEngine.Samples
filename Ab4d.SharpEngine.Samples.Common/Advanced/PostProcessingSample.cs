@@ -14,6 +14,7 @@ public class PostProcessingSample : CommonSample
     private bool _isToonShadingPostProcess = false;
     private bool _isGammaCorrectionPostProcess = false;
     private bool _isColorOverlayPostProcess = false;
+    private bool _isSoberEdgeDetectionPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
     private int _blurFilterSize = 7; // MAX value is 15 (=SeparableKernelPostProcess.MaxFilterSize)
@@ -22,6 +23,7 @@ public class PostProcessingSample : CommonSample
     private ToonShadingPostProcess _toonShadingPostProcess;
     private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
     private ColorOverlayPostProcess _colorOverlayPostProcess;
+    private SoberEdgeDetectionPostProcess _soberEdgeDetectionPostProcess;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
     private GaussianBlurPostProcess _gaussianBlurPostProcess2;
 
@@ -30,8 +32,9 @@ public class PostProcessingSample : CommonSample
     {
         _blackAndWhitePostProcess = new BlackAndWhitePostProcess();
         _toonShadingPostProcess = new ToonShadingPostProcess();
-        _gammaCorrectionPostProcess = new GammaCorrectionPostProcess() { Gamma = 2.2f}; // 2.2 is also a default value
-        _colorOverlayPostProcess = new ColorOverlayPostProcess() { AddedColor = Color4.Black, ColorMultiplier = Colors.Red }; // Default color for AddedColor is Black; default color for ColorMultiplier is White (those settings do not change the rendered image)
+        _gammaCorrectionPostProcess = new GammaCorrectionPostProcess() { Gamma = 2.2f};                                              // 2.2 is also a default value
+        _colorOverlayPostProcess = new ColorOverlayPostProcess() { AddedColor = Color4.Black, ColorMultiplier = Colors.Red };        // Default color for AddedColor is Black; default color for ColorMultiplier is White (those settings do not change the rendered image)
+        _soberEdgeDetectionPostProcess = new SoberEdgeDetectionPostProcess() { EdgeThreshold = 0.05f, AddEdgeToCurrentColor = true}; // Use default settings
 
         // GaussianBlur requires two passes: horizontal and vertical
         _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
@@ -110,6 +113,9 @@ public class PostProcessingSample : CommonSample
         if (_isGammaCorrectionPostProcess)
             SceneView!.PostProcesses.Add(_gammaCorrectionPostProcess);
         
+        if (_isSoberEdgeDetectionPostProcess)
+            SceneView!.PostProcesses.Add(_soberEdgeDetectionPostProcess);
+        
         if (_isColorOverlayPostProcess)
             SceneView!.PostProcesses.Add(_colorOverlayPostProcess);
         
@@ -157,6 +163,36 @@ public class PostProcessingSample : CommonSample
             keyText: "      Gamma:",
             keyTextWidth: 140,
             formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
+        
+        ui.AddSeparator();
+        
+        
+        ui.CreateCheckBox("Sober Edge Detection", _isSoberEdgeDetectionPostProcess, isChecked =>
+        {
+            _isSoberEdgeDetectionPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+
+        var edgeThresholds = new float[] { 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.3f, 0.5f, 0.8f, 0.9f, 1f}; 
+        var edgeThresholdTexts = edgeThresholds.Select(v => v.ToString()).ToArray(); 
+        ui.CreateComboBox(edgeThresholdTexts,
+            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex],
+            selectedItemIndex: 2,
+            width: 100,
+            keyText: "      Edge Threshold:",
+            keyTextWidth: 140);
+        
+        // CheckBox cannot have left margin
+        //ui.CreateCheckBox("      AddEdgeToCurrentColor", true, isChecked => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = isChecked);
+        
+        ui.CreateComboBox(new string[] { "false", "true" },
+            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = selectedIndex > 0,
+            selectedItemIndex: 1,
+            width: 60,
+            keyText: "      AddEdgeToCurrentColor:",
+            keyTextWidth: 180);
+        
+        
         
         ui.AddSeparator();
         
