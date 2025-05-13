@@ -14,6 +14,8 @@ public class PostProcessingSample : CommonSample
     private bool _isToonShadingPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
+    private int _blurFilterSize = 7; // MAX value is 15 (=SeparableKernelPostProcess.MaxFilterSize)
+
     private BlackAndWhitePostProcess _blackAndWhitePostProcess;
     private ToonShadingPostProcess _toonShadingPostProcess;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
@@ -26,8 +28,8 @@ public class PostProcessingSample : CommonSample
         _toonShadingPostProcess = new ToonShadingPostProcess();
 
         // GaussianBlur requires two passes: horizontal and vertical
-        _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalPass: false);
-        _gaussianBlurPostProcess2 = new GaussianBlurPostProcess(isVerticalPass: true);
+        _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
+        _gaussianBlurPostProcess2 = new GaussianBlurPostProcess(isVerticalBlur: true, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
     }
 
     /// <inheritdoc />
@@ -77,20 +79,34 @@ public class PostProcessingSample : CommonSample
     /// <inheritdoc />
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        sceneView.BackgroundColor = Colors.Aqua;
-
-        if (_isBlackAndWhitePostProcess)
-            sceneView.PostProcesses.Add(_blackAndWhitePostProcess);
-
-        if (_isGaussianBlurPostProcess)
-        {
-            sceneView.PostProcesses.Add(_gaussianBlurPostProcess1);
-            sceneView.PostProcesses.Add(_gaussianBlurPostProcess2);
-        }
+        UpdatePostProcesses();
 
         base.OnSceneViewInitialized(sceneView);
     }
 
+    private void UpdatePostProcesses()
+    {
+        if (SceneView == null)
+            return;
+        
+        var sceneView = SceneView;
+
+        // We clear all post processes and add only the selected ones.
+        // This preserves the order of post processes so that they are executed as they are shown in the UI.
+        sceneView.PostProcesses.Clear();
+        
+        if (_isBlackAndWhitePostProcess)
+            SceneView!.PostProcesses.Add(_blackAndWhitePostProcess);
+        
+        if (_isToonShadingPostProcess)
+            SceneView!.PostProcesses.Add(_toonShadingPostProcess);
+        
+        if (_isGaussianBlurPostProcess)
+        {
+            SceneView!.PostProcesses.Add(_gaussianBlurPostProcess1);
+            SceneView!.PostProcesses.Add(_gaussianBlurPostProcess2);
+        }
+    }
 
     /// <inheritdoc />
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
@@ -101,12 +117,8 @@ public class PostProcessingSample : CommonSample
 
         ui.CreateCheckBox("Black and white", _isBlackAndWhitePostProcess, isChecked =>
         {
-            if (isChecked)
-                SceneView!.PostProcesses.Add(_blackAndWhitePostProcess);
-            else
-                SceneView!.PostProcesses.Remove(_blackAndWhitePostProcess);
-
             _isBlackAndWhitePostProcess = isChecked;
+            UpdatePostProcesses();
         });
         
         ui.AddSeparator();
@@ -114,46 +126,59 @@ public class PostProcessingSample : CommonSample
         
         ui.CreateCheckBox("Toon Shading", _isToonShadingPostProcess, isChecked =>
         {
-            if (isChecked)
-                SceneView!.PostProcesses.Add(_toonShadingPostProcess);
-            else
-                SceneView!.PostProcesses.Remove(_toonShadingPostProcess);
-
             _isToonShadingPostProcess = isChecked;
+            UpdatePostProcesses();
         });
         
         ui.AddSeparator();
 
         ui.CreateCheckBox("Gaussian Blur", _isGaussianBlurPostProcess, isChecked =>
         {
-            if (isChecked)
+            _isGaussianBlurPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+        
+        var blurFilterSizes = new[] { 3, 5, 7, 9, 11, 13, 15 };
+        var blurFilterSizeTexts = blurFilterSizes.Select(s => s.ToString()).ToArray();
+        var selectedItemIndex = Array.IndexOf(blurFilterSizes, _blurFilterSize);
+        
+        ui.CreateComboBox(blurFilterSizeTexts, (selectedIndex, selectedText) =>
+        {
+            _gaussianBlurPostProcess1.Dispose(); // This will also remove the post process from the SceneView.PostProcesses
+            _gaussianBlurPostProcess2.Dispose();
+            
+            _blurFilterSize = blurFilterSizes[selectedIndex];
+            
+            _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = _gaussianBlurPostProcess1.BlurRangeScale, BlurStandardDeviation = _gaussianBlurPostProcess1.BlurStandardDeviation };
+            _gaussianBlurPostProcess2 = new GaussianBlurPostProcess(isVerticalBlur: true,  filterSize: _blurFilterSize) { BlurRangeScale = _gaussianBlurPostProcess1.BlurRangeScale, BlurStandardDeviation = _gaussianBlurPostProcess1.BlurStandardDeviation };
+            
+            if (_isGaussianBlurPostProcess)
             {
                 SceneView!.PostProcesses.Add(_gaussianBlurPostProcess1);
                 SceneView!.PostProcesses.Add(_gaussianBlurPostProcess2);
             }
-            else
+        }, selectedItemIndex, keyText: "      Filter size:", keyTextWidth: 140);
+        
+        ui.CreateSlider(0, 5, () => _gaussianBlurPostProcess1.BlurStandardDeviation,
+            newValue =>
             {
-                SceneView!.PostProcesses.Remove(_gaussianBlurPostProcess1);
-                SceneView!.PostProcesses.Remove(_gaussianBlurPostProcess2);
-            }
-
-            _isGaussianBlurPostProcess = isChecked;
-        });
-
-        ui.CreateSlider(0, 5, () => _gaussianBlurPostProcess1.BlurScale,
-            newValue => _gaussianBlurPostProcess1.BlurScale = newValue,
+                _gaussianBlurPostProcess1.BlurStandardDeviation = newValue;
+                _gaussianBlurPostProcess2.BlurStandardDeviation = newValue;
+            },
             width: 100,
-            keyText: "      BlurScale",
-            keyTextWidth: 100,
+            keyText: "      StandardDeviation:",
+            keyTextWidth: 140,
             formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
         
-        ui.CreateSlider(0, 5, () => _gaussianBlurPostProcess1.BlurStrength,
-            newValue => _gaussianBlurPostProcess1.BlurStrength = newValue,
+        ui.CreateSlider(0, 5, () => _gaussianBlurPostProcess1.BlurRangeScale,
+            newValue =>
+            {
+                _gaussianBlurPostProcess1.BlurRangeScale = newValue;
+                _gaussianBlurPostProcess2.BlurRangeScale = newValue;
+            },
             width: 100,
-            keyText: "      BlurStrength",
-            keyTextWidth: 100,
+            keyText: "      BlurRangeScale:",
+            keyTextWidth: 140,
             formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
-
-        ui.CreateButton("BG", () => SceneView.BackgroundColor = Color4.Transparent);
     }
 }
