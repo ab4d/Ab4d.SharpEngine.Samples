@@ -13,6 +13,7 @@ public class PostProcessingSample : CommonSample
     private bool _isBlackAndWhitePostProcess = true;
     private bool _isToonShadingPostProcess = false;
     private bool _isGammaCorrectionPostProcess = false;
+    private bool _isColorOverlayPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
     private int _blurFilterSize = 7; // MAX value is 15 (=SeparableKernelPostProcess.MaxFilterSize)
@@ -20,6 +21,7 @@ public class PostProcessingSample : CommonSample
     private BlackAndWhitePostProcess _blackAndWhitePostProcess;
     private ToonShadingPostProcess _toonShadingPostProcess;
     private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
+    private ColorOverlayPostProcess _colorOverlayPostProcess;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
     private GaussianBlurPostProcess _gaussianBlurPostProcess2;
 
@@ -28,7 +30,8 @@ public class PostProcessingSample : CommonSample
     {
         _blackAndWhitePostProcess = new BlackAndWhitePostProcess();
         _toonShadingPostProcess = new ToonShadingPostProcess();
-        _gammaCorrectionPostProcess = new GammaCorrectionPostProcess();
+        _gammaCorrectionPostProcess = new GammaCorrectionPostProcess() { Gamma = 2.2f}; // 2.2 is also a default value
+        _colorOverlayPostProcess = new ColorOverlayPostProcess() { AddedColor = Color4.Black, ColorMultiplier = Colors.Red }; // Default color for AddedColor is Black; default color for ColorMultiplier is White (those settings do not change the rendered image)
 
         // GaussianBlur requires two passes: horizontal and vertical
         _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
@@ -107,6 +110,9 @@ public class PostProcessingSample : CommonSample
         if (_isGammaCorrectionPostProcess)
             SceneView!.PostProcesses.Add(_gammaCorrectionPostProcess);
         
+        if (_isColorOverlayPostProcess)
+            SceneView!.PostProcesses.Add(_colorOverlayPostProcess);
+        
         if (_isGaussianBlurPostProcess)
         {
             SceneView!.PostProcesses.Add(_gaussianBlurPostProcess1);
@@ -152,8 +158,39 @@ public class PostProcessingSample : CommonSample
             keyTextWidth: 140,
             formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
         
-        
         ui.AddSeparator();
+        
+        
+        ui.CreateCheckBox("Color Overlay", _isColorOverlayPostProcess, isChecked =>
+        {
+            _isColorOverlayPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+
+        ui.CreateComboBox(new string[] { "Black", "Red", "Green", "Blue", "#555555" },
+            (selectedIndex, selectedText) =>
+            {
+                if (Color4.TryParse(selectedText, out var addedColor))
+                    _colorOverlayPostProcess.AddedColor = addedColor;
+            },
+            selectedItemIndex: 0,
+            width: 100,
+            keyText: "      Added Color:",
+            keyTextWidth: 140);
+        
+        ui.CreateComboBox(new string[] { "White", "Red", "Green", "Blue", "#888888FF", "#444444FF", "#44444444" }, // the last value sets alpha to #44 - note that all other values also need to be multiplied by alpha because we are using alpha-premultiplied colors
+            (selectedIndex, selectedText) =>
+            {
+                if (Color4.TryParse(selectedText, out var colorMultiplier))
+                    _colorOverlayPostProcess.ColorMultiplier = colorMultiplier;
+            },
+            selectedItemIndex: 1,
+            width: 100,
+            keyText: "      Color Multiplier:",
+            keyTextWidth: 140);
+
+        ui.AddSeparator();
+        
 
         ui.CreateCheckBox("Gaussian Blur", _isGaussianBlurPostProcess, isChecked =>
         {
