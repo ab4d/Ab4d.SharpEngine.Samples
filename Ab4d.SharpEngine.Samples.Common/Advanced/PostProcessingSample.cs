@@ -15,6 +15,7 @@ public class PostProcessingSample : CommonSample
     private bool _isGammaCorrectionPostProcess = false;
     private bool _isColorOverlayPostProcess = false;
     private bool _isSoberEdgeDetectionPostProcess = false;
+    private bool _isExpandPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
     private int _blurFilterSize = 7; // MAX value is 15 (=SeparableKernelPostProcess.MaxFilterSize)
@@ -24,6 +25,8 @@ public class PostProcessingSample : CommonSample
     private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
     private ColorOverlayPostProcess _colorOverlayPostProcess;
     private SoberEdgeDetectionPostProcess _soberEdgeDetectionPostProcess;
+    private ExpandPostProcess _expandPostProcess1;
+    private ExpandPostProcess _expandPostProcess2;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
     private GaussianBlurPostProcess _gaussianBlurPostProcess2;
 
@@ -35,6 +38,10 @@ public class PostProcessingSample : CommonSample
         _gammaCorrectionPostProcess = new GammaCorrectionPostProcess() { Gamma = 2.2f};                                              // 2.2 is also a default value
         _colorOverlayPostProcess = new ColorOverlayPostProcess() { AddedColor = Color4.Black, ColorMultiplier = Colors.Red };        // Default color for AddedColor is Black; default color for ColorMultiplier is White (those settings do not change the rendered image)
         _soberEdgeDetectionPostProcess = new SoberEdgeDetectionPostProcess() { EdgeThreshold = 0.05f, AddEdgeToCurrentColor = true}; // Use default settings
+        
+        // ExpandPostProcess requires two passes: horizontal and vertical
+        _expandPostProcess1 = new ExpandPostProcess(isVerticalRenderingPass: false, expansionWidth: 3, backgroundColor: Color4.Transparent); // Expand for 2 pixels
+        _expandPostProcess2 = new ExpandPostProcess(isVerticalRenderingPass: true, expansionWidth: 3, backgroundColor: Color4.Transparent);  
 
         // GaussianBlur requires two passes: horizontal and vertical
         _gaussianBlurPostProcess1 = new GaussianBlurPostProcess(isVerticalBlur: false, filterSize: _blurFilterSize) { BlurRangeScale = 3 };
@@ -119,6 +126,12 @@ public class PostProcessingSample : CommonSample
         if (_isColorOverlayPostProcess)
             SceneView!.PostProcesses.Add(_colorOverlayPostProcess);
         
+        if (_isExpandPostProcess)
+        {
+            SceneView!.PostProcesses.Add(_expandPostProcess1);
+            SceneView!.PostProcesses.Add(_expandPostProcess2);
+        }
+        
         if (_isGaussianBlurPostProcess)
         {
             SceneView!.PostProcesses.Add(_gaussianBlurPostProcess1);
@@ -192,8 +205,6 @@ public class PostProcessingSample : CommonSample
             keyText: "      AddEdgeToCurrentColor:",
             keyTextWidth: 180);
         
-        
-        
         ui.AddSeparator();
         
         
@@ -225,6 +236,61 @@ public class PostProcessingSample : CommonSample
             keyText: "      Color Multiplier:",
             keyTextWidth: 140);
 
+        ui.AddSeparator();
+        
+        
+        ui.CreateCheckBox("Expand", _isExpandPostProcess, isChecked =>
+        {
+            _isExpandPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+        
+        ui.CreateSlider(1, 16, () => _expandPostProcess1.ExpansionWidth,
+            newValue =>
+            {
+                _expandPostProcess1.ExpansionWidth = (int)newValue;
+                _expandPostProcess2.ExpansionWidth = (int)newValue;
+            },
+            width: 100,
+            keyText: "      ExpansionWidth:",
+            keyTextWidth: 140,
+            formatShownValueFunc: sliderValue => $"{sliderValue:F0}");
+
+        var expandColors = new Color4[] { Colors.Red, Colors.Blue, Colors.Black };
+        ui.CreateComboBox(new string[] { "unchanged", "Red", "Blue", "Black" },
+            (selectedIndex, selectedText) =>
+            {
+                Vector4 colorOffsets, colorFactors;
+                if (selectedIndex == 0)
+                {
+                    // Preserve the object colors
+                    colorOffsets = ExpandPostProcess.DefaultOffsets; // = new Vector4(0, 0, 0, 0);
+                    colorFactors = ExpandPostProcess.DefaultFactors; // = new Vector4(1, 1, 1, 1);
+                }
+                else
+                {
+                    // With Offsets and Factors we can adjust the colors of the effect.
+                    // Offsets are added to each color and then the color is multiplied by Factors.
+                    //
+                    // The following values render expansion in the specified color,
+                    // for example for red (1, 0, 0, 1) the red color is added to the original color
+                    // and then the color is multiplied by (1, 0, 0, 1) to clear the green and blue color components.
+
+                    colorOffsets = expandColors[selectedIndex - 1].ToVector4();
+                    colorFactors = colorOffsets;
+                }
+                
+                _expandPostProcess1.Offsets = colorOffsets;
+                _expandPostProcess1.Factors = colorFactors;
+
+                _expandPostProcess2.Offsets = colorOffsets;
+                _expandPostProcess2.Factors = colorFactors;
+            },
+            selectedItemIndex: 0,
+            width: 100,
+            keyText: "      Expand color:",
+            keyTextWidth: 140);
+        
         ui.AddSeparator();
         
 
