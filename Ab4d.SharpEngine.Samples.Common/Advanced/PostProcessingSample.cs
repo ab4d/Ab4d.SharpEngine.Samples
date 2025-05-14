@@ -53,6 +53,16 @@ public class PostProcessingSample : CommonSample
     {
         if (SceneView != null)
             SceneView.PostProcesses.Clear();
+        
+        _blackAndWhitePostProcess.Dispose();
+        _toonShadingPostProcess.Dispose();
+        _gammaCorrectionPostProcess.Dispose();
+        _colorOverlayPostProcess.Dispose();
+        _soberEdgeDetectionPostProcess.Dispose();
+        _expandPostProcess1.Dispose();
+        _expandPostProcess2.Dispose();
+        _gaussianBlurPostProcess1.Dispose();
+        _gaussianBlurPostProcess2.Dispose();
 
         base.OnDisposed();
     }
