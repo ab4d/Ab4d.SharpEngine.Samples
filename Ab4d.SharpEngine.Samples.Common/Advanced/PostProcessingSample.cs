@@ -190,34 +190,6 @@ public class PostProcessingSample : CommonSample
         ui.AddSeparator();
         
         
-        ui.CreateCheckBox("Sober Edge Detection", _isSoberEdgeDetectionPostProcess, isChecked =>
-        {
-            _isSoberEdgeDetectionPostProcess = isChecked;
-            UpdatePostProcesses();
-        });
-
-        var edgeThresholds = new float[] { 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.3f, 0.5f, 0.8f, 0.9f, 1f}; 
-        var edgeThresholdTexts = edgeThresholds.Select(v => v.ToString()).ToArray(); 
-        ui.CreateComboBox(edgeThresholdTexts,
-            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex],
-            selectedItemIndex: 2,
-            width: 100,
-            keyText: "      Edge Threshold:",
-            keyTextWidth: 140);
-        
-        // CheckBox cannot have left margin
-        //ui.CreateCheckBox("      AddEdgeToCurrentColor", true, isChecked => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = isChecked);
-        
-        ui.CreateComboBox(new string[] { "false", "true" },
-            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = selectedIndex > 0,
-            selectedItemIndex: 1,
-            width: 60,
-            keyText: "      AddEdgeToCurrentColor:",
-            keyTextWidth: 180);
-        
-        ui.AddSeparator();
-        
-        
         ui.CreateCheckBox("Color Overlay", _isColorOverlayPostProcess, isChecked =>
         {
             _isColorOverlayPostProcess = isChecked;
@@ -300,6 +272,61 @@ public class PostProcessingSample : CommonSample
             width: 100,
             keyText: "      Expand color:",
             keyTextWidth: 140);
+        
+        ui.AddSeparator();
+        
+        
+        ui.CreateCheckBox("Sober Edge Detection", _isSoberEdgeDetectionPostProcess, isChecked =>
+        {
+            _isSoberEdgeDetectionPostProcess = isChecked;
+            UpdatePostProcesses();
+        });
+
+        var colorFactors = new Vector4[]
+        {
+            new Vector4(0.25f, 0.25f, 0.25f, 0.25f),   // equal - this is the default value where all colors and alpha contribute to the edge detection
+            new Vector4(1, 0, 0, 0),                   // red - only red color contribute to the edge detection
+            new Vector4(0, 1, 0, 0),                   // green
+            new Vector4(0, 0, 1, 0),                   // blue    
+            new Vector4(0, 0, 0, 1),                   // alpha - this can be used to get the outer edges of the object when the background is transparent
+            new Vector4(0.2125f, 0.7154f, 0.0721f, 0), // edge detection based on luminance; note that this does not include alpha color so black color will be the same as transparent background
+        };
+        ui.CreateComboBox(new string[] { "equal", "Red", "Green", "Blue", "Alpha", "Luminance" },
+            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.ColorFactors = colorFactors[selectedIndex],
+            selectedItemIndex: 0,
+            width: 100,
+            keyText: "      Color Factors:",
+            keyTextWidth: 140);
+        
+        ui.CreateComboBox(new string[] { "Black", "Red", "Green", "Blue", "#55555555" },
+            (selectedIndex, selectedText) =>
+            {
+                if (Color4.TryParse(selectedText, out var edgeColor))
+                    _soberEdgeDetectionPostProcess.EdgeColor = edgeColor;
+            },
+            selectedItemIndex: 0,
+            width: 100,
+            keyText: "      Edge Color:",
+            keyTextWidth: 140);
+        
+        var edgeThresholds = new float[] { 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.3f, 0.5f, 0.8f, 0.9f, 1f}; 
+        var edgeThresholdTexts = edgeThresholds.Select(v => v.ToString()).ToArray(); 
+        ui.CreateComboBox(edgeThresholdTexts,
+            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex],
+            selectedItemIndex: 2,
+            width: 100,
+            keyText: "      Edge Threshold:",
+            keyTextWidth: 140);
+        
+        // CheckBox cannot have left margin
+        //ui.CreateCheckBox("      AddEdgeToCurrentColor", true, isChecked => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = isChecked);
+        
+        ui.CreateComboBox(new string[] { "false", "true" },
+            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = selectedIndex > 0,
+            selectedItemIndex: 1,
+            width: 60,
+            keyText: "      AddEdgeToCurrentColor:",
+            keyTextWidth: 180);
         
         ui.AddSeparator();
         
