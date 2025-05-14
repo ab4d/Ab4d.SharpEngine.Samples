@@ -1,0 +1,107 @@
+Entry points:
+  main (fragment)
+
+Execution modes:
+  OriginUpperLeft
+
+subpass inputs
+=============
+
+=============
+
+inputs
+=============
+
+ ID 160 : inUV (Location : 0)
+=============
+
+outputs
+=============
+
+ ID 197 : outColor (Location : 0)
+=============
+
+textures
+=============
+
+ ID 157 : inputTexture (Set : 1) (Binding : 0)
+=============
+
+separate images
+=============
+
+=============
+
+separate samplers
+=============
+
+=============
+
+images
+=============
+
+=============
+
+ssbos
+=============
+
+=============
+
+ubos
+=============
+
+=============
+
+push
+=============
+
+ ID 172 : pushConstants
+=============
+
+counters
+=============
+
+=============
+
+acceleration structures
+=============
+
+=============
+
+record buffers
+=============
+
+=============
+
+builtin inputs
+=============
+
+=============
+
+builtin outputs
+=============
+
+=============
+
+Active members in buffer: pushConstants
+==================
+
+Member #  0 (hueOffset): Offset:    0, Range:    4
+Member #  1 (saturationFactor): Offset:    4, Range:    4
+Member #  2 (brightnessFactor): Offset:    8, Range:    4
+==================
+
+Specialization constants
+==================
+
+==================
+
+Capabilities
+============
+Capability: 1
+============
+
+Extensions
+============
+============
+

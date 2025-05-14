@@ -54,6 +54,7 @@ public class PostProcessingSample : CommonSample
         if (SceneView != null)
             SceneView.PostProcesses.Clear();
         
+        // Most of the post processes do not create any resources, but still it is a good practice to dispose them (maybe in the future they will require some resources).
         _blackAndWhitePostProcess.Dispose();
         _toonShadingPostProcess.Dispose();
         _gammaCorrectionPostProcess.Dispose();

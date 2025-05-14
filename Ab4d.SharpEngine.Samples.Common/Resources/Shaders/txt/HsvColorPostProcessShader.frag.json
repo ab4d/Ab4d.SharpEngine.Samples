@@ -1,0 +1,59 @@
+{
+    "entryPoints" : [
+        {
+            "name" : "main",
+            "mode" : "frag"
+        }
+    ],
+    "types" : {
+        "_170" : {
+            "name" : "postProcessSetup",
+            "members" : [
+                {
+                    "name" : "hueOffset",
+                    "type" : "float",
+                    "offset" : 0
+                },
+                {
+                    "name" : "saturationFactor",
+                    "type" : "float",
+                    "offset" : 4
+                },
+                {
+                    "name" : "brightnessFactor",
+                    "type" : "float",
+                    "offset" : 8
+                }
+            ]
+        }
+    },
+    "inputs" : [
+        {
+            "type" : "vec2",
+            "name" : "inUV",
+            "location" : 0
+        }
+    ],
+    "outputs" : [
+        {
+            "type" : "vec4",
+            "name" : "outColor",
+            "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "inputTexture",
+            "set" : 1,
+            "binding" : 0
+        }
+    ],
+    "push_constants" : [
+        {
+            "type" : "_170",
+            "name" : "pushConstants",
+            "push_constant" : true
+        }
+    ]
+}

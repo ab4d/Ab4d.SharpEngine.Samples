@@ -80,6 +80,12 @@ public class CustomFogEffectSample : CommonSample
     {
         // First create an instance of AssemblyShaderBytecodeProvider.
         // This will allow using ShadersManager to cache and get the shaders from the assembly's EmbeddedResources.
+        // Instead of AssemblyShaderBytecodeProvider, it is also possible to use:
+        // - DictionaryShaderBytecodeProvider
+        // - DirectoryShaderBytecodeProvider
+        // - FileShaderBytecodeProvider
+        // - SimpleShaderBytecodeProvider
+        
         var resourceAssembly = this.GetType().Assembly;
         var assemblyShaderBytecodeProvider = new AssemblyShaderBytecodeProvider(resourceAssembly, resourceRootName: resourceAssembly.GetName().Name + ".Resources.Shaders.spv.");
 

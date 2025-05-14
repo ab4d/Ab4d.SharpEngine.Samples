@@ -57,6 +57,23 @@ echo.
 
 
 
+set SHADER_NAME=HsvColorPostProcessShader
+
+echo #### Start compiling %SHADER_NAME% shaders ####
+
+set IN_FILE_NAME=%SHADER_NAME%.frag
+set OUT_FILE_NAME=%IN_FILE_NAME%
+
+rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt
+glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
+if errorlevel 1 goto onError
+echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
+
+spirv-cross --vulkan-semantics --dump-resources spv\%OUT_FILE_NAME%.spv 2> txt\%OUT_FILE_NAME%.resources.txt --output txt\%OUT_FILE_NAME%.txt
+spirv-cross --reflect --vulkan-semantics --output txt\%OUT_FILE_NAME%.json spv\%OUT_FILE_NAME%.spv
+
+echo.
+
 
 if [%1%] == [debug] (
 echo ######## Compiled shaders with DEBUG options ########
