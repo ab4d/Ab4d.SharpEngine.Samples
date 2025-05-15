@@ -15,8 +15,6 @@ public class CustomPostProcessSample : CommonSample
 
     private ICommonSampleUIElement? _modeButton;
     private ICommonSampleUIElement? _hueSlider;
-    private ICommonSampleUIElement? _saturationSlider;
-    private ICommonSampleUIElement? _brightnessSlider;
 
     public CustomPostProcessSample(ICommonSamplesContext context)
         : base(context)
@@ -97,14 +95,14 @@ public class CustomPostProcessSample : CommonSample
             keyTextWidth: 70,
             formatShownValueFunc: sliderValue => $"{sliderValue:F0}");
 
-        _saturationSlider = ui.CreateSlider(0, 2, () => _hsvColorPostProcess.SaturationFactor,
+        ui.CreateSlider(0, 2, () => _hsvColorPostProcess.SaturationFactor,
             newValue => _hsvColorPostProcess.SaturationFactor = newValue,
             width: 100,
             keyText: "Saturation:",
             keyTextWidth: 70,
             formatShownValueFunc: sliderValue => $"{sliderValue:F2}");
 
-        _brightnessSlider = ui.CreateSlider(0, 2, () => _hsvColorPostProcess.BrightnessFactor,
+        ui.CreateSlider(0, 2, () => _hsvColorPostProcess.BrightnessFactor,
             newValue => _hsvColorPostProcess.BrightnessFactor = newValue,
             width: 100,
             keyText: "Brightness:",
