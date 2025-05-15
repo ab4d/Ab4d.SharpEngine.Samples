@@ -120,6 +120,7 @@
   <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia"/>
   <Sample Location="Advanced.ComplexSceneSample" Title="Complex scene sample" />
   <Sample Location="Advanced.AsyncUploadSample" Title="Async upload" />
+  <Sample Location="Advanced.ModelOptimizerSample" Title="ModelOptimizer" />
   <Sample Location="Advanced.MeshOutlineSample" Title="Mesh outlines" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
