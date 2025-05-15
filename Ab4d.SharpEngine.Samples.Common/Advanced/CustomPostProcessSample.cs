@@ -64,7 +64,10 @@ public class CustomPostProcessSample : CommonSample
     protected override void OnDisposed()
     {
         if (SceneView != null)
+        {
+            SceneView.SceneUpdating -= OnSceneUpdating;
             SceneView.PostProcesses.Clear();
+        }
         
         // Most of the post processes do not create any resources, but still it is a good practice to dispose them (maybe in the future they will require some resources).
         _hsvColorPostProcess.Dispose();
