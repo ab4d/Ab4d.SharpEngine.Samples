@@ -15,13 +15,16 @@ public class MeshModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "MeshModelNode";
     public override string Subtitle => 
-@"MeshModelNode defines a 3D model from Positions, Normals, TextureCoordinates and TriangleIndices.
+@"MeshModelNode defines a 3D model by providing a mesh and a material.
+Mesh defines the geometry of the 3D model.
+It is usually defined with Positions, Normals, TextureCoordinates and TriangleIndices.
+For better locality of data on the GPU, the data are stored in an array of PositionNormalTextureVertex values.
 
 Note that the order of triangles is important:
 The front side of the triangles (oriented in anti-clockwise direction) is shown by the Material property;
-Back side is show by the the BackMaterial property (red in this sample; see bottom side of the plane).
+The back side is show by the the BackMaterial property (red in this sample; see bottom side of the plane).
 
-Click on 'Reverse triangles order' to see the effect of changed order.";
+Click on 'Reverse triangles order' to see the effect of the changed order.";
 
     private StandardMesh? _standardMesh;
     private StandardMesh? _reversedMesh;
@@ -279,8 +282,8 @@ Click on 'Reverse triangles order' to see the effect of changed order.";
             for (int i = 0; i < positions.Length; i++)
                 sb.AppendFormat("\r\n{0}: ({1} {2} {3})", i, positions[i].X, positions[i].Y, positions[i].Z);
 
-            ui.CreateLabel("Positions (black numbers):");
-            ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
+            ui.CreateLabel("Positions (black numbers): (?):Positions define the positions of model vertices in 3D space.");
+            ui.CreateTextBox(width: 180, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
         }
         
         var normals = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Normals);
@@ -292,8 +295,8 @@ Click on 'Reverse triangles order' to see the effect of changed order.";
                 sb.AppendFormat("\r\n{0}: ({1} {2} {3})", i, normals[i].X, normals[i].Y, normals[i].Z);
 
             ui.AddSeparator();
-            ui.CreateLabel("Normals (orange arrows):");
-            ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
+            ui.CreateLabel("Normals (orange arrows): (?):Normal are 3D vectors that define the direction of the surface\nthat is defined by the Position with the same index as the Normal.\nNormals are used when calculating how much light the surface gets\n(shading of the surface).\n\nFor example, in this sample all normals point up (0,1,0) that is in the Y direction.\nNote that to get sharp edges, the positions need to be duplicated\nso that one position can define the normal in one direction\nand the other position can define the normal in the other direction.\nSee normals for BoxModelNode in the next sample.");
+            ui.CreateTextBox(width: 180, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
         }
         
         var textureCoordinates = _standardMesh.GetDataChannelArray<Vector2>(MeshDataChannelTypes.TextureCoordinates);
@@ -305,14 +308,14 @@ Click on 'Reverse triangles order' to see the effect of changed order.";
                 sb.AppendFormat("\r\n{0}: ({1} {2})", i, textureCoordinates[i].X, textureCoordinates[i].Y);
 
             ui.AddSeparator();
-            ui.CreateLabel("TextureCoordinates:");
-            ui.CreateTextBox(width: 160, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
+            ui.CreateLabel("TextureCoordinates: (?):Texture coordinates are used to map the 2D texture image to 3D positions.\nThey are represented as 2D positions (Vector2).\nFor example, value (0,0) means that the Position with the same index\nas this TextureCoordinate will be mapped to the top left pixel in the 2D texture.\n(1,1) maps to bottom right position. The values between the Positions\nare interpolated to get the actual pixel from 2D texture.");
+            ui.CreateTextBox(width: 180, height: 0, sb.ToString().Substring(2)); // Substring(2) is used to strip off initial new line "\r\n"
         }
         
         
         ui.AddSeparator();
-        ui.CreateLabel("TriangleIndices:");
-        _triangleIndicesTextBox = ui.CreateTextBox(width: 160, height: 0, "");
+        ui.CreateLabel("TriangleIndices: (?):Triangle indices connect three Positions into one triangle.\nFor example '0, 2, 1' means that a triangle is formed by connecting the first Position (index: 0),\nthird Position (index: 2) and the second Position (index: 1).");
+        _triangleIndicesTextBox = ui.CreateTextBox(width: 180, height: 0, "");
 
         UpdateTriangleIndicesTextBox();
 
