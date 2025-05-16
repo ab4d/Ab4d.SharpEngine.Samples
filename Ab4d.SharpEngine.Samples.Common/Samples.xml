@@ -25,28 +25,6 @@
   <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
 
-  <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
-  <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
-  <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
-  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
-  <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
-  <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
-  <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
-  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
-  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms"/>
-  <Sample IsSeparator="True" />
-  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
-  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
-  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
-
-  <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
-  <Sample Location="Lights.LightsSample" Title="Lights"/>
-  
-  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
-  <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
-  <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
-
   <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
   <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
   <Sample IsSeparator="True" />
@@ -106,6 +84,28 @@
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
   <Sample Location="Lines.SpecialLineRenderingSample" Title="Special line rendering"/>  
   <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
+
+  <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
+  <Sample Location="Lights.LightsSample" Title="Lights"/>
+
+  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
+  <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
+  <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
+
+  <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
+  <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
+  <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
+  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
+  <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
+  <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
+  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms"/>
+  <Sample IsSeparator="True" />
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
   <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
