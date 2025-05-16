@@ -55,7 +55,7 @@
   <Sample Location="AdvancedModels.TriangulatedExtrudedShapeSample" Title="Triangulated &amp; extruded shape"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
   <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
-  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations" IsUpdated="True" UpdateInfo="Added Combined mesh"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>

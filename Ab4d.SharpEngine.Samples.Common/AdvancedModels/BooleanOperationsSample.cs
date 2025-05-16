@@ -7,6 +7,7 @@ using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
+using System;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -32,15 +33,26 @@ public class BooleanOperationsSample : CommonSample
 
         // Subtract
         var subtractedMesh = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Subtract(boxMesh, sphereMesh, processOnlyIntersectingTriangles: false);
-        ShowMesh(scene, subtractedMesh, -150);
+        ShowMesh(scene, subtractedMesh, -250);
 
         // Intersect
         var intersectedMesh = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Intersect(boxMesh, sphereMesh, processOnlyIntersectingTriangles: false);
-        ShowMesh(scene, intersectedMesh, 0);
+        ShowMesh(scene, intersectedMesh, -100);
 
         //Union
         var unionMesh = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Union(boxMesh, sphereMesh, processOnlyIntersectingTriangles: false);
-        ShowMesh(scene, unionMesh, 150);
+        ShowMesh(scene, unionMesh, 50);
+
+        // Combine
+        //
+        // NOTE:
+        // Combine is not a regular Boolean operation.
+        // It just adds all the vertices and triangles of the second mesh to the first mesh.
+        // This is much faster than Boolean's Union method and usually works perfectly when the combined mesh is rendered.
+        // But because the meshes can intersect, the combined mesh is not valid for 3D printing and some other operations.
+        var combinedMesh = Ab4d.SharpEngine.Utilities.MeshUtils.CombineMeshes(boxMesh, sphereMesh);
+        ShowMesh(scene, combinedMesh, 250);
+        
 
 
         var textBlockFactory = context.GetTextBlockFactory();
@@ -49,21 +61,24 @@ public class BooleanOperationsSample : CommonSample
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
 
-        var textNode = textBlockFactory.CreateTextBlock("Subtract", new Vector3(-150, -45, 100), textAttitude: 30);
+        var textNode = textBlockFactory.CreateTextBlock("Subtract", new Vector3(-250, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock("Intersect", new Vector3(0, -45, 100), textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("Intersect", new Vector3(-100, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
-        textNode = textBlockFactory.CreateTextBlock("Union", new Vector3(150, -45, 100), textAttitude: 30);
+        textNode = textBlockFactory.CreateTextBlock("Union", new Vector3(50, -45, 100), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+        
+        textNode = textBlockFactory.CreateTextBlock("Combine (*)", new Vector3(250, -45, 100), textAttitude: 30);
         scene.RootNode.Add(textNode);
 
 
         var wireGridNode = new WireGridNode()
         {
             CenterPosition = new Vector3(0, -51, 0),
-            Size = new Vector2(600, 300),
-            WidthCellsCount = 12,
+            Size = new Vector2(700, 300),
+            WidthCellsCount = 14,
             HeightCellsCount = 6,
             MajorLineColor = Colors.DimGray,
             MajorLineThickness = 2
@@ -76,7 +91,8 @@ public class BooleanOperationsSample : CommonSample
         {
             targetPositionCamera.Heading = 30;
             targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 700;
+            targetPositionCamera.Distance = 800;
+            targetPositionCamera.TargetPosition = new Vector3(-30, -50, 0);
         }
     }
 
@@ -126,5 +142,9 @@ public class BooleanOperationsSample : CommonSample
         ui.CreateRadioButtons(new string[] { "Solid model", "Solid model with wireframe" },
                               (index, selectedText) => UpdateVisibleLines(index),
                               1);
+        
+        ui.AddSeparator();
+
+        ui.CreateLabel("(*) Combine just adds all the vertices and triangles of the second mesh to the first mesh. This is done by MeshUtils.CombineMeshes method and is much faster than Boolean's Union method.", width: 250).SetStyle("italic");
     }
 }
