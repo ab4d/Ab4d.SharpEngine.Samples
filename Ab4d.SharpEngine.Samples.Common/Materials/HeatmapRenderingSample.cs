@@ -134,8 +134,8 @@ public class HeatmapRenderingSample : CommonSample
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
 
-        var readerObj = new ReaderObj();
-        var teapotModelNode = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        var teapotModelNode = objImporter.Import(fileName);
 
         // teapotModelNode.GetLocalBoundingBox()
         // {Minimum:<-45.6221, 0, -29.923> Maximum:<52.8465, 48.2153, 31.3027>}
@@ -148,7 +148,7 @@ public class HeatmapRenderingSample : CommonSample
         //     SizeZ: 61.2257
 
         // Get the MeshModelNode so we will be able to update the texture coordinates
-        _teapotMeshModelNode = readerObj.NamedObjects["Teapot001"] as MeshModelNode;
+        _teapotMeshModelNode = objImporter.NamedObjects["Teapot001"] as MeshModelNode;
 
         _testObjectsGroup.Add(teapotModelNode);
     }

@@ -77,8 +77,8 @@ public class HitTestingWithIdBitmapSample : CommonSample
         // Read model from obj file
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
 
-        var readerObj = new ReaderObj();
-        var importedModel = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        var importedModel = objImporter.Import(fileName);
 
         // Position the model so its center is at (0, 0, 0) and scale it to (100, 100, 100)
         Ab4d.SharpEngine.Utilities.ModelUtils.PositionAndScaleSceneNode(importedModel, 

@@ -7,11 +7,11 @@ using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Importers;
 
-public class ReaderObjSample : CommonSample
+public class ObjImporterSample : CommonSample
 {
-    public override string Title => "ReaderObj - import 3D models from obj files";
+    public override string Title => "ObjImporter - import 3D models from obj files";
 
-    private string _subtitle = "ReaderObj is written in C# and is part of the Ab4d.SharpEngine library.";
+    private string _subtitle = "ObjImporter is written in C# and is part of the core Ab4d.SharpEngine library.";
     public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
@@ -36,7 +36,7 @@ public class ReaderObjSample : CommonSample
     private ViewTypes _currentViewType = ViewTypes.SolidObjectWithEdgeLines;
 
 
-    public ReaderObjSample(ICommonSamplesContext context)
+    public ObjImporterSample(ICommonSamplesContext context)
         : base(context)
     {
     }
@@ -69,7 +69,7 @@ public class ReaderObjSample : CommonSample
         string fileExtension = System.IO.Path.GetExtension(fileName);
         if (!fileExtension.Equals(".obj", StringComparison.OrdinalIgnoreCase))
         {
-            ShowErrorMessage("ReaderObj support only obj files and does not support importing files from file extension: " + fileExtension);
+            ShowErrorMessage("ObjImporter support only obj files and does not support importing files from file extension: " + fileExtension);
             return;
         }
 
@@ -88,14 +88,14 @@ public class ReaderObjSample : CommonSample
         // FixDirectorySeparator method returns file path with correctly sets backslash or slash as directory separator based on the current OS.
         fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
 
-        // Create ReaderObj object
+        // Create a ObjImporter object
         // To read texture images we also need to provide BitmapIO and 
         // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
-        var readerObj = new ReaderObj(this.BitmapIO, this.GpuDevice);
+        var objImporter = new ObjImporter(this.BitmapIO, this.GpuDevice);
 
         try
         {
-            _importedModelNodes = readerObj.ReadSceneNodes(fileName);
+            _importedModelNodes = objImporter.Import(fileName);
             _importedFileName   = fileName;
         }
         catch (Exception ex)
@@ -111,14 +111,14 @@ public class ReaderObjSample : CommonSample
         //
         //string texturesDirectory;
         //var defaultMaterial = StandardMaterials.Orange;
-        //var readSceneNodes = readerObj.ReadSceneNodes(fileName, texturesDirectory, defaultMaterial);
+        //var readSceneNodes = objImporter.Import(fileName, texturesDirectory, defaultMaterial);
 
 
         // To read obj file from stream use the following
         // (GetResourceStream should return the Stream of the specified resourceFileName)
         //using (var fileStream = System.IO.File.OpenRead(fileName))
         //{
-        //    _importedModelNodes = readerObj.ReadSceneNodes(fileStream, resourceFileName => GetResourceStream(resourceFileName));
+        //    _importedModelNodes = objImporter.Import(fileStream, resourceFileName => GetResourceStream(resourceFileName));
         //}
 
         //Stream? GetResourceStream(string resourceName)
@@ -134,7 +134,7 @@ public class ReaderObjSample : CommonSample
 
 
         // It is also possible to read only obj file data without converting that into SharpEngine's objects:
-        //var objFileData = readerObj.ReadObjFileData(fileName);
+        //var objFileData = objImporter.ReadObjFileData(fileName);
 
 
         Scene.RootNode.Add(_importedModelNodes);

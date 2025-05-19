@@ -129,8 +129,8 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
     {
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
 
-        var readerObj = new ReaderObj();
-        var backgroundTeapotModel = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        var backgroundTeapotModel = objImporter.Import(fileName);
         backgroundTeapotModel.Name = "BackgroundTeapotModel";
 
         ModelUtils.ChangeMaterial(backgroundTeapotModel, StandardMaterials.Blue);
@@ -154,7 +154,7 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         scene.RootNode.Add(backgroundTeapotModel);
 
         
-        var overlayTeapotModel = readerObj.ReadSceneNodes(fileName);
+        var overlayTeapotModel = objImporter.Import(fileName);
         overlayTeapotModel.Name = "OverlayTeapotModel";
 
         ModelUtils.ChangeMaterial(overlayTeapotModel, StandardMaterials.Red);

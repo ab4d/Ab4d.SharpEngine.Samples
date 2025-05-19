@@ -83,8 +83,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms.CameraControllers
         {
             string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\house with trees.obj");
 
-            var readerObj = new ReaderObj();
-            var readGroupNode = readerObj.ReadSceneNodes(fileName);
+            var objImporter = new ObjImporter();
+            var readGroupNode = objImporter.Import(fileName);
 
             ModelUtils.PositionAndScaleSceneNode(readGroupNode, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
 

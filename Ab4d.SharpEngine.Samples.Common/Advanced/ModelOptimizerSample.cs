@@ -46,11 +46,11 @@ public class ModelOptimizerSample : CommonSample
 
         Scene.RootNode.Clear();
 
-        // Create ReaderObj object
+        // Create ObjImporter object
         // To read texture images we also need to provide BitmapIO and 
         // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
-        var readerObj = new ReaderObj(this.BitmapIO, this.GpuDevice);
-        _originalGroupNode = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter(this.BitmapIO, this.GpuDevice);
+        _originalGroupNode = objImporter.Import(fileName);
 
         //Ab4d.SharpEngine.Utilities.ModelUtils.MakeTwoSidedMaterial(_originalGroupNode);
         //Ab4d.SharpEngine.Utilities.ModelUtils.SetAlphaClipThreshold(_originalGroupNode, alphaClipThreshold: 0.1f);

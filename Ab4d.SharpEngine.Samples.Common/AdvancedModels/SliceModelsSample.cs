@@ -88,8 +88,8 @@ public class SliceModelsSample : CommonSample
         // Read model from obj file
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
 
-        var readerObj = new ReaderObj();
-        _importedModel = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        _importedModel = objImporter.Import(fileName);
 
 
         // Uncomment to read model from some other file format:

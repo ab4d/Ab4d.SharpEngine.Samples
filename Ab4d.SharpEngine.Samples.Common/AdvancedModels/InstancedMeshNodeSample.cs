@@ -114,8 +114,8 @@ public class InstancedMeshNodeSample : CommonSample
             {
                 var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
 
-                var readerObj = new ReaderObj();
-                var teapotNode = readerObj.ReadSceneNodes(teapotFileName);
+                var objImporter = new ObjImporter();
+                var teapotNode = objImporter.Import(teapotFileName);
 
                 if (teapotNode.Count > 0 && teapotNode[0] is MeshModelNode teapotMeshModelNode)
                 {

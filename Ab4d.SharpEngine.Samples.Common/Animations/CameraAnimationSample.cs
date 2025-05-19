@@ -36,8 +36,8 @@ public class CameraAnimationSample : CommonSample
 
         var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
 
-        var readerObj = new ReaderObj();
-        var teapotNode = readerObj.ReadSceneNodes(teapotFileName);
+        var objImporter = new ObjImporter();
+        var teapotNode = objImporter.Import(teapotFileName);
 
         Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(teapotNode, StandardMaterials.Gold.SetSpecular(Colors.White, 32));
         Ab4d.SharpEngine.Utilities.ModelUtils.PositionAndScaleSceneNode(teapotNode, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center | PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));

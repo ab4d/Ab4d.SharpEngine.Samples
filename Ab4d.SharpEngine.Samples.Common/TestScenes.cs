@@ -31,8 +31,8 @@ public static class TestScenes
 
         string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models", testSceneFileName);
 
-        var readerObj = new ReaderObj();
-        var readGroupNode = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        var readGroupNode = objImporter.Import(fileName);
 
         return readGroupNode;
     }

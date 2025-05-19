@@ -182,8 +182,8 @@ public class HitTestingSample : CommonSample
 
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
 
-        var readerObj = new ReaderObj();
-        _teapotModelNode = readerObj.ReadSceneNodes(fileName);
+        var objImporter = new ObjImporter();
+        _teapotModelNode = objImporter.Import(fileName);
 
         ModelUtils.PositionAndScaleSceneNode(_teapotModelNode,
                                              position: new Vector3(0, -20, 0),
