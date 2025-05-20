@@ -18,6 +18,8 @@ public class ObjImporterExporterSample : CommonSample
 
     private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
 
+    private bool _isTwoSidedMaterials = true;
+    
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
     private SceneNode? _importedModelNodes;
@@ -70,6 +72,8 @@ public class ObjImporterExporterSample : CommonSample
         if (Scene == null || fileName == null)
             return;
 
+        ClearErrorMessage();
+        
         Scene.RootNode.Clear();
         _importedFileName = null;
 
@@ -98,7 +102,10 @@ public class ObjImporterExporterSample : CommonSample
         // Create a ObjImporter object
         // To read texture images we also need to provide BitmapIO and 
         // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
-        var objImporter = new ObjImporter(this.BitmapIO, this.GpuDevice);
+        var objImporter = new ObjImporter(this.BitmapIO, this.GpuDevice)
+        {
+            UseTwoSidedMaterials = _isTwoSidedMaterials
+        };
 
         try
         {
@@ -277,6 +284,14 @@ public class ObjImporterExporterSample : CommonSample
             _currentViewType = (ViewTypes)selectedIndex;
             UpdateShownLines();
         }, selectedItemIndex: (int)_currentViewType);
+        
+        ui.AddSeparator();
+        ui.CreateCheckBox("Two-sided materials", _isTwoSidedMaterials, isChecked =>
+        {
+            _isTwoSidedMaterials = isChecked;
+            if (_importedFileName != null)
+                ImportFile(_importedFileName);
+        });
         
         
         ui.AddSeparator();
