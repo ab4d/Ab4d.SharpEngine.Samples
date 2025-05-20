@@ -310,7 +310,26 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
 
             try
             {
-                _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
+                _commonDiagnostics.ExportSceneToGltf(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
+            }
+            catch
+            {
+                // pass
+            }
+        }
+        
+        private void ExportToObjMenuItem_OnTapped(object sender, RoutedEventArgs e)
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+            // TOOD: How to create SaveFileDialog in WinUI?
+
+            string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SharpEngineScene.glb");
+
+            try
+            {
+                _commonDiagnostics.ExportSceneToObj(SharpEngineSceneView.Scene, fileName);
             }
             catch
             {

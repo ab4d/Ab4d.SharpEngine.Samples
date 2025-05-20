@@ -320,7 +320,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
             saveFileDialog.FileName = "SharpEngineScene.gltf";
-            saveFileDialog.DefaultExt = "txt";
+            saveFileDialog.DefaultExt = "gltf";
             saveFileDialog.Filter = "glTF file with embedded data and images (.gltf)|*.gltf|glTF binary file with embedded data and images (.glb)|*.glb";
             saveFileDialog.Title = "Export Scene to glTF File";
 
@@ -328,13 +328,46 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             {
                 try
                 {
-                    _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, saveFileDialog.FileName);
+                    _commonDiagnostics.ExportSceneToGltf(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, saveFileDialog.FileName);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error saving gltf file:\r\n" + ex.Message);
                 }
             }
+        }
+                
+        private void ExportToObjMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.AddExtension = false;
+            saveFileDialog.CheckFileExists = false;
+            saveFileDialog.CheckPathExists = true;
+            saveFileDialog.OverwritePrompt = false;
+            saveFileDialog.ValidateNames = false;
+
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            saveFileDialog.FileName = "SharpEngineScene.obj";
+            saveFileDialog.DefaultExt = "obj";
+            saveFileDialog.Filter = "Obj file (.obj)|*.obj";
+            saveFileDialog.Title = "Export Scene to obj file";
+
+            if (saveFileDialog.ShowDialog() ?? false)
+            {
+                try
+                {
+                    _commonDiagnostics.ExportSceneToObj(SharpEngineSceneView.Scene, saveFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error saving obj file:\r\n" + ex.Message);
+                }
+            }            
         }
         
         private void RenderToBitmapMenuItem_OnClick(object sender, RoutedEventArgs e)

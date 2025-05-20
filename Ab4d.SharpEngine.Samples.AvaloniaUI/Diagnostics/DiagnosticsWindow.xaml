@@ -38,6 +38,7 @@
                 <MenuItem Name="DumpEngineSettingsMenuItem" Header="Dump engine settings" Click="DumpEngineSettingsMenuItem_OnClick"/>
                 <MenuItem Name="DumpSystemInfoMenuItem" Header="Dump System info" Click="DumpSystemInfoMenuItem_OnClick"/>
                 <MenuItem Name="ExportToGltfMenuItem" Header="Export Scene to glTF" Click="ExportToGltfMenuItem_OnClick"/>
+                <MenuItem Name="ExportToObjMenuItem" Header="Export Scene to obj" Click="ExportToObjMenuItem_OnClick"/>
                 <MenuItem Name="RenderToBitmapMenuItem" Header="Save rendered scene to Desktop" Click="RenderToBitmapMenuItem_OnClick"/>
                 <MenuItem Name="ShowFullSceneDumpMenuItem" Header="Get full scene dump" Click="ShowFullSceneDumpMenuItem_OnClick"/>
 

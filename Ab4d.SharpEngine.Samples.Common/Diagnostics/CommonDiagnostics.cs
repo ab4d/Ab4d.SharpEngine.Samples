@@ -296,7 +296,7 @@ public class CommonDiagnostics
         return isGltfExporterAvailable;
     }
 
-    public bool ExportScene(Scene scene, SceneView sceneView, string fileName) // sceneView is not yet used, but may be used in the future to export the camera
+    public bool ExportSceneToGltf(Scene scene, SceneView sceneView, string fileName) // sceneView is not yet used, but may be used in the future to export the camera
     {
         if (_gltfExporterType == null)
             return false;
@@ -322,6 +322,15 @@ public class CommonDiagnostics
             _exportBinaryMethodInfo!.Invoke(_gltfExporter, new object?[] { fileName });
         else
             _exportEmbeddedMethodInfo!.Invoke(_gltfExporter, new object?[] { fileName });
+
+        return true;
+    }
+    
+    public bool ExportSceneToObj(Scene scene, string fileName)
+    {
+        var objExporter = new ObjExporter();
+        objExporter.AddScene(scene);
+        objExporter.Export(fileName);
 
         return true;
     }

@@ -351,7 +351,37 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
             if (fileName == null)
                 return;
 
-            _commonDiagnostics.ExportScene(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
+            _commonDiagnostics.ExportSceneToGltf(SharpEngineSceneView.Scene, SharpEngineSceneView.SceneView, fileName);
+        }
+                
+        private async void ExportToObjMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (SharpEngineSceneView == null)
+                return;
+
+            
+            // Run file selection dialog
+            var topLevel = TopLevel.GetTopLevel(this);
+            Debug.Assert(topLevel != null, nameof(topLevel) + " != null");
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Export Scene to obj file",
+                SuggestedFileName = "SharpEngineScene.obj",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("Obj file")
+                    {
+                        Patterns = new[] { "*.obj" },
+                        MimeTypes = new[] { "model/obj" }
+                    },
+                }
+            });
+
+            var fileName = file?.TryGetLocalPath();
+            if (fileName == null)
+                return;
+
+            _commonDiagnostics.ExportSceneToObj(SharpEngineSceneView.Scene, fileName);
         }
         
         private void RenderToBitmapMenuItem_OnClick(object sender, RoutedEventArgs e)

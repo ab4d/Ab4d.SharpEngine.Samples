@@ -16,7 +16,7 @@ public class GltfImporterExporterSample : CommonSample
 {
     public override string Title => "glTF 2 Importer and Exporter";
 
-    private string _subtitle = "Ab4d.SharpEngine.glTF can import from glTF 2 files and export the current scene to that file format.\nTo export 3D scene for any other example, open Diagnostics window and select 'Export Scene to glTF'.";
+    private string _subtitle = "glTF 2 file importer and exporter are defined in the Ab4d.SharpEngine.glTF NuGet package.\nThey can import from glTF 2 files (.gltf or .glb) and export the current scene to that file format.\nTo export 3D scene for any other example, open Diagnostics window and select 'Export Scene to glTF'.";
     public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\voyager.gltf";
@@ -388,7 +388,7 @@ public class GltfImporterExporterSample : CommonSample
 
         if (isDragAndDropSupported)
         {
-            _subtitle += "\nDrag and drop .gltf or .glb file here to open it.";
+            _subtitle = "Drag and drop .gltf or .glb file here to open it.\n\n" + _subtitle;
         }
         else
         {
