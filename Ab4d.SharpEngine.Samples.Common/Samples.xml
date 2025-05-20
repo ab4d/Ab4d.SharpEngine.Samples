@@ -67,6 +67,7 @@
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
   <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter" IsUpdated="True" UpdateInfo="Renamed ReaderObj to ObjImporter and added ObjExporter"/>
+  <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter" IsNew="True"/>
   <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter"/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
   <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
