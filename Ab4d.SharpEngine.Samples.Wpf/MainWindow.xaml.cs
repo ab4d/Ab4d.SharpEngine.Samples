@@ -166,6 +166,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             var sampleLocation = xmlElement.GetAttribute("Location");
+            
+            if (string.IsNullOrEmpty(sampleLocation))
+                return; // probably user selected a separator (this can be selected by using keyboard)
+            
 
             if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
