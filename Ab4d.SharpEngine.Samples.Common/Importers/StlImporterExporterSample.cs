@@ -24,7 +24,7 @@ public class StlImporterExporterSample : CommonSample
     
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
-    private SceneNode? _importedModelNodes;
+    private MeshModelNode? _importedMeshModelNode;
 
     private EdgeLinesFactory? _edgeLinesFactory;
     
@@ -36,6 +36,10 @@ public class StlImporterExporterSample : CommonSample
     private string? _importedFileName;
     private string? _exportFileName;
 
+    private Color4? _importedModelColor;
+    private bool _isImportedModelConvertedToYUp;
+
+
     private enum ViewTypes
     {
         SolidObjectsOnly = 0,
@@ -43,13 +47,14 @@ public class StlImporterExporterSample : CommonSample
         SolidObjectWithWireframe = 2
     }
 
-    private ViewTypes _currentViewType = ViewTypes.SolidObjectWithWireframe;
+    private ViewTypes _currentViewType = ViewTypes.SolidObjectsOnly;
     
 
 
     public StlImporterExporterSample(ICommonSamplesContext context)
         : base(context)
     {
+        
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -112,12 +117,18 @@ public class StlImporterExporterSample : CommonSample
         try
         {
             // Import the 3D model from the file into MeshModelNode
-            _importedModelNodes = stlImporter.Import(fileName);
+            _importedMeshModelNode = stlImporter.Import(fileName);
             
             // To import from a stream, use:
             //_importedModelNodes = stlImporter.Import(stlStream);
             
             _importedFileName = fileName;
+            
+            // When color is set in binary stl file (written in file header after the "COLOR=" text),
+            // then save it so we can reuse that when exporting the model.
+            _importedModelColor = stlImporter.LastReadModelColor;
+            _isImportedModelConvertedToYUp = _convertToYUp;
+            
             UpdateExportFileName();
         }
         catch (Exception ex)
@@ -126,11 +137,11 @@ public class StlImporterExporterSample : CommonSample
             return;
         }
 
-        if (_importedModelNodes == null)
+        if (_importedMeshModelNode == null)
             return;
         
         
-        Scene.RootNode.Add(_importedModelNodes);
+        Scene.RootNode.Add(_importedMeshModelNode);
 
 
         if (_objectLinesNode == null)
@@ -149,20 +160,20 @@ public class StlImporterExporterSample : CommonSample
         UpdateShownLines();
 
 
-        if (_importedModelNodes.WorldBoundingBox.IsUndefined)
-            _importedModelNodes.Update();
+        if (_importedMeshModelNode.WorldBoundingBox.IsUndefined)
+            _importedMeshModelNode.Update();
 
-        if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
+        if (targetPositionCamera != null && !_importedMeshModelNode.WorldBoundingBox.IsUndefined)
         {
-            targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
-            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
+            targetPositionCamera.TargetPosition = _importedMeshModelNode.WorldBoundingBox.GetCenterPosition();
+            targetPositionCamera.Distance = _importedMeshModelNode.WorldBoundingBox.GetDiagonalLength() * 1.5f;
         }
     }
 
 
     private void UpdateShownLines()
     {
-        if (_importedModelNodes == null || _objectLinesNode == null)
+        if (_importedMeshModelNode == null || _objectLinesNode == null)
             return; // no model imported
 
         if (_currentViewType == ViewTypes.SolidObjectsOnly)
@@ -178,14 +189,14 @@ public class StlImporterExporterSample : CommonSample
             // This can reuse the lists and array that are internally used by the EdgeLinesFactory
             // See comments in Lines/EdgeLinesSample.cs for more info about edge lines generation.
             _edgeLinesFactory ??= new EdgeLinesFactory();
-            var edgeLinePositions = _edgeLinesFactory.CreateEdgeLines(_importedModelNodes, 15);
+            var edgeLinePositions = _edgeLinesFactory.CreateEdgeLines(_importedMeshModelNode, 15);
 
             _objectLinesNode.Positions = edgeLinePositions.ToArray();
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
         }
         else if (_currentViewType == ViewTypes.SolidObjectWithWireframe)
         {
-            var wireframePositions = LineUtils.GetWireframeLinePositions(_importedModelNodes, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
+            var wireframePositions = LineUtils.GetWireframeLinePositions(_importedMeshModelNode, removedDuplicateLines: false); // remove duplicates can take some time for bigger models
 
             _objectLinesNode.Positions = wireframePositions;
             _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
@@ -204,50 +215,56 @@ public class StlImporterExporterSample : CommonSample
     
     private void ExportScene()
     {
-        //if (_importedFileName == null || _exportFileName == null || Scene == null)
-        //    return;
+        if (_importedMeshModelNode == null || _importedFileName == null || _exportFileName == null || Scene == null)
+            return;
 
-        //_exportSuccessfulLabel?.SetIsVisible(false);
+        _exportSuccessfulLabel?.SetIsVisible(false);
 
-        //string fullExportFileName;
-        //if (System.IO.Path.IsPathRooted(_exportFileName))
-        //{
-        //    fullExportFileName = _exportFileName;
-        //}
-        //else
-        //{
-        //    if (!_importedFileName.EndsWith(_initialFileName)) // User opened file?
-        //        fullExportFileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_importedFileName)!, _exportFileName);
-        //    else // initial file name - do not save to the bin/debug folder but to desktop
-        //        fullExportFileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), _exportFileName);
-        //}
+        string fullExportFileName;
+        if (System.IO.Path.IsPathRooted(_exportFileName))
+        {
+            fullExportFileName = _exportFileName;
+        }
+        else
+        {
+            if (!_importedFileName.EndsWith(_initialFileName)) // User opened file?
+                fullExportFileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_importedFileName)!, _exportFileName);
+            else // initial file name - do not save to the bin/debug folder but to desktop
+                fullExportFileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), _exportFileName);
+        }
 
-        //// First create an instance of ObjExporter
-        //var objExporter = new ObjExporter();
+        
+        // .stl file can contain only one mesh
+        var mesh = _importedMeshModelNode.GetMesh();
+        
+        if (mesh == null)
+            return;
+        
+        
+        // First create an instance of StlExporter
+        var stlExporter = new StlExporter();
+        
+        // If imported model was converted to Y-up, then convert that back to Z-up
+        stlExporter.ConvertToZUp = _isImportedModelConvertedToYUp;
+        
+        // If we have read the model color, then we also save it
+        stlExporter.ModelColor = _importedModelColor;
+        
+        // The following code can be used to export the current model color:
+        //if (_importedMeshModelNode.Material is StandardMaterialBase standardMaterial)
+        //    stlExporter.ModelColor = new Color4(standardMaterial.DiffuseColor, standardMaterial.Opacity);
 
-        //// Then add Scene to the exporter
-        //objExporter.AddScene(Scene);
+        try
+        {
+            stlExporter.Export(fullExportFileName, mesh);
 
-        //// We could also export only a selected SceneNode (can be a GroupNode)
-        ////objExporter.AddSceneNode(sceneNode);
-
-        //try
-        //{
-        //    objExporter.Export(fullExportFileName);
-
-        //    // To export to stream use:
-        //    //objExporter.Export(objFileStream, (filename, data) =>
-        //    //{
-        //    //    // export data with fileName to some custom stream
-        //    //});
-
-        //    _exportSuccessfulLabel?.SetText("Exported to:\n" + fullExportFileName);
-        //    _exportSuccessfulLabel?.SetIsVisible(true);
-        //}
-        //catch (Exception ex)
-        //{
-        //    ShowErrorMessage("Error exporting:\n" + ex.Message);
-        //}
+            _exportSuccessfulLabel?.SetText("Exported to:\n" + fullExportFileName);
+            _exportSuccessfulLabel?.SetIsVisible(true);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Error exporting:\n" + ex.Message);
+        }
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
