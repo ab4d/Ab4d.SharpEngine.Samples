@@ -13,13 +13,14 @@ public class StlImporterExporterSample : CommonSample
 {
     public override string Title => "Stl Importer and Exporter";
 
-    private string _subtitle = "StlImporter and StlExporter classes are part of the core Ab4d.SharpEngine library.\nThey can import from text or binary .stl files and export a single ModelNode into .stl file.";
+    private string _subtitle = ".stl files are very commonly used for 3D printing. The initially imported file can be used to print a fan that can be connected to LEGO bricks.\n\nStlImporter and StlExporter classes are part of the core Ab4d.SharpEngine library.\nThey can import from text or binary .stl files and export a single ModelNode into a binary .stl file.";
     public override string? Subtitle => _subtitle;
 
-    //private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
-    private readonly string _initialFileName = @"C:\Users\User\Downloads\STLdotNET-master\tests\Data\ASCII.stl";
+    private readonly string _initialFileName = "Resources\\Models\\lego-fan.stl";
+    //private readonly string _initialFileName = @"C:\Users\User\Downloads\STLdotNET-master\tests\Data\ASCII.stl";
 
     private bool _isTwoSidedMaterials = true;
+    private bool _convertToYUp = true;
     
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
@@ -42,7 +43,7 @@ public class StlImporterExporterSample : CommonSample
         SolidObjectWithWireframe = 2
     }
 
-    private ViewTypes _currentViewType = ViewTypes.SolidObjectWithEdgeLines;
+    private ViewTypes _currentViewType = ViewTypes.SolidObjectWithWireframe;
     
 
 
@@ -102,13 +103,19 @@ public class StlImporterExporterSample : CommonSample
         fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
 
         // Create a StlImporter object
-        // To read texture images we also need to provide BitmapIO and 
-        // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
-        var stlImporter = new StlImporter(this.BitmapIO, this.GpuDevice);
+        var stlImporter = new StlImporter()
+        {
+            UseTwoSidedMaterials = _isTwoSidedMaterials,
+            ConvertToYUp = _convertToYUp
+        };
 
         try
         {
+            // Import the 3D model from the file into MeshModelNode
             _importedModelNodes = stlImporter.Import(fileName);
+            
+            // To import from a stream, use:
+            //_importedModelNodes = stlImporter.Import(stlStream);
             
             _importedFileName = fileName;
             UpdateExportFileName();
@@ -119,40 +126,10 @@ public class StlImporterExporterSample : CommonSample
             return;
         }
 
-
-        // By default, textures are read from the same directory as the obj file.
-        // If they are not stored in some other folder, then the folder can be specified in the texturesDirectory parameter.
-        // 
-        // It is also possible to change the default material. When it is not specified then StandardMaterials.Silver is used.
-        //
-        //string texturesDirectory;
-        //var defaultMaterial = StandardMaterials.Orange;
-        //var readSceneNodes = objImporter.Import(fileName, texturesDirectory, defaultMaterial);
-
-
-        // To read obj file from stream use the following
-        // (GetResourceStream should return the Stream of the specified resourceFileName)
-        //using (var fileStream = System.IO.File.OpenRead(fileName))
-        //{
-        //    _importedModelNodes = objImporter.Import(fileStream, resourceFileName => GetResourceStream(resourceFileName));
-        //}
-
-        //Stream? GetResourceStream(string resourceName)
-        //{
-        //    var directoryName = System.IO.Path.GetDirectoryName(_importedFileName);
-        //    var fileName = System.IO.Path.Combine(directoryName, resourceName);
-
-        //    if (System.IO.File.Exists(fileName))
-        //        return System.IO.File.OpenRead(fileName);
-
-        //    return null;
-        //}
-
-
-        // It is also possible to read only obj file data without converting that into SharpEngine's objects:
-        //var objFileData = objImporter.ReadObjFileData(fileName);
-
-
+        if (_importedModelNodes == null)
+            return;
+        
+        
         Scene.RootNode.Add(_importedModelNodes);
 
 
@@ -160,7 +137,7 @@ public class StlImporterExporterSample : CommonSample
         {
             var lineMaterial = new LineMaterial(Color3.Black, 1)
             {
-                DepthBias = 0.005f
+                DepthBias = 0.001f
             };
 
             _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
@@ -178,7 +155,7 @@ public class StlImporterExporterSample : CommonSample
         if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
         {
             targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
-            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2;
+            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
         }
     }
 
@@ -289,6 +266,13 @@ public class StlImporterExporterSample : CommonSample
         ui.CreateCheckBox("Two-sided materials", _isTwoSidedMaterials, isChecked =>
         {
             _isTwoSidedMaterials = isChecked;
+            if (_importedFileName != null)
+                ImportFile(_importedFileName);
+        });
+        
+        ui.CreateCheckBox("Convert to Y-up (?):The models in stl files are usually defined in Z-up coordinate system.\nThis checkbox sets ConvertToYUp property to true to convert the model to Y-up coordinate system.", _convertToYUp, isChecked =>
+        {
+            _convertToYUp = isChecked;
             if (_importedFileName != null)
                 ImportFile(_importedFileName);
         });
