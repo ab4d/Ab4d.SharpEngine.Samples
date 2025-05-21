@@ -10,6 +10,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     public override string Title => "CircleModelNode";
 
     private int _segmentsCount = 30;
+    
+    private float _innerRadius = 0;
+    private float _radius = 50;
 
     private Vector3 _normal = new Vector3(0, 1, 0);
     private Vector3 _upDirection = new Vector3(0, 0, -1);
@@ -29,7 +32,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _circleModelNode = new CircleModelNode("SampleCircle")
         {
             CenterPosition = new Vector3(0, 0, 0),
-            Radius = 50,
+            Radius = _radius,
+            InnerRadius = _innerRadius // When InnerRadius is bigger than zero, then the center of the circle is hollow until the InnerRadius.
         };
 
         // Use MeshFactory.CreateCircleMesh to create a circle mesh, for example:
@@ -72,6 +76,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         if (_circleModelNode == null)
             return;
 
+        _circleModelNode.InnerRadius = _innerRadius;
+        _circleModelNode.Radius = _radius;
+        
         _circleModelNode.Segments = _segmentsCount;
 
         _circleModelNode.Normal = _normal;
@@ -89,7 +96,34 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
         ui.CreateKeyValueLabel("CenterPosition:", () => "(0, 0, 0)", keyTextWidth: 110);
-        ui.CreateKeyValueLabel("Radius:", () => "50", keyTextWidth: 110);
+        
+        ui.AddSeparator();
+        
+        ui.CreateSlider(10, 70,
+            () => _radius,
+            newValue =>
+            {
+                _radius = newValue;
+                UpdateModelNode();
+            },
+            100,
+            keyText: "Radius:",
+            keyTextWidth: 110,
+            formatShownValueFunc: newValue => newValue.ToString("F1"));
+        
+        ui.CreateSlider(0, 50,
+            () => _innerRadius,
+            newValue =>
+            {
+                _innerRadius = newValue;
+                UpdateModelNode();
+            },
+            100,
+            keyText: "InnerRadius:",
+            keyTextWidth: 110,
+            formatShownValueFunc: newValue => newValue.ToString("F1"));
+        
+        ui.AddSeparator();
 
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1) },
                                   itemChangedAction: OnNormalChanged,
