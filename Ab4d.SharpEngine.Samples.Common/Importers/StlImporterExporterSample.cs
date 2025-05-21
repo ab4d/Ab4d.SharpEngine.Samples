@@ -237,6 +237,9 @@ public class StlImporterExporterSample : CommonSample
         // .stl file can contain only one mesh
         var mesh = _importedMeshModelNode.GetMesh();
         
+        
+        
+        
         if (mesh == null)
             return;
         
@@ -257,7 +260,10 @@ public class StlImporterExporterSample : CommonSample
         try
         {
             stlExporter.Export(fullExportFileName, mesh);
-
+            
+            // You can also export a ModelNode. 
+            //stlExporter.Export(fullExportFileName, modelNode, exportModelColor: true);
+            
             _exportSuccessfulLabel?.SetText("Exported to:\n" + fullExportFileName);
             _exportSuccessfulLabel?.SetIsVisible(true);
         }
