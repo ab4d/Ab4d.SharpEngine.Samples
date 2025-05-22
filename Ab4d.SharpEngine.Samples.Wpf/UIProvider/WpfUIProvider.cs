@@ -236,7 +236,7 @@ public class WpfUIProvider : ICommonSampleUIProvider
 
     public void AddSeparator(double height = 8)
     {
-        _lastSeparator = height;
+        _lastSeparator += height;
     }
 
     public void UpdateAllValues()

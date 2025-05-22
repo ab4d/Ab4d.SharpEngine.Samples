@@ -309,7 +309,7 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
 
     public void AddSeparator(double height = 8)
     {
-        _lastSeparator = (int)height;
+        _lastSeparator += (int)height;
     }
 
     public void UpdateAllValues()
