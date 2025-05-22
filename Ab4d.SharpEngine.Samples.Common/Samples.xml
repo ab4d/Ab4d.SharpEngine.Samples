@@ -31,7 +31,7 @@
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
-  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode" IsUpdated="True" UpdateInfo="Added new InnerRadius and TextureMapping and new 'Show radial gradient' button"/>
   <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
   <Sample Location="StandardModels.ConeModelNodeSample" Title="ConeModelNode"/>
   <Sample Location="StandardModels.PyramidModelNodeSample" Title="PyramidModelNode"/>

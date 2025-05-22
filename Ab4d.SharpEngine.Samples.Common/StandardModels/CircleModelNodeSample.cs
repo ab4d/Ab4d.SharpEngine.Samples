@@ -1,7 +1,10 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
+using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 
@@ -13,12 +16,18 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     
     private float _innerRadius = 0;
     private float _radius = 50;
+    private CircleTextureMappingTypes _textureMappingType = CircleTextureMappingTypes.Rectangular;
 
     private Vector3 _normal = new Vector3(0, 1, 0);
     private Vector3 _upDirection = new Vector3(0, 0, -1);
 
     private CircleModelNode? _circleModelNode;
-
+    
+    private StandardMaterial? _gradientMaterial1;
+    private StandardMaterial? _gradientMaterial2;
+    private ICommonSampleUIElement? _textureMappingComboBox;
+    private ICommonSampleUIElement? _textureImageComboBox;
+    
     private LineNode? _normalLine;
     private LineNode? _upDirectionLine;
     private float _directionLinesLength = 60;
@@ -51,7 +60,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _normalLine = new LineNode("NormalLine")
         {
             LineColor = Colors.Red,
-            LineThickness = 2,
+            LineThickness = 3,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, _directionLinesLength, 0),
             EndLineCap = LineCap.ArrowAnchor
@@ -62,13 +71,22 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _upDirectionLine = new LineNode("UpDirectionLine")
         {
             LineColor = Colors.Green,
-            LineThickness = 2,
+            LineThickness = 3,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, 0, -_directionLinesLength),
             EndLineCap = LineCap.ArrowAnchor
         };
 
         scene.RootNode.Add(_upDirectionLine);
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        _gradientMaterial1?.DisposeWithTexture();
+        _gradientMaterial2?.DisposeWithTexture();
+        
+        base.OnDisposed();
     }
 
     protected override void UpdateModelNode()
@@ -79,6 +97,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _circleModelNode.InnerRadius = _innerRadius;
         _circleModelNode.Radius = _radius;
         
+        _circleModelNode.TextureMappingType = _textureMappingType;
         _circleModelNode.Segments = _segmentsCount;
 
         _circleModelNode.Normal = _normal;
@@ -93,11 +112,72 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         base.UpdateModelNode();
     }
 
+    private void SetTextureImage(int textureIndex)
+    {
+        if (GpuDevice == null || _circleModelNode == null)
+            return;
+
+        Material? newMaterial = null;
+        
+        if (textureIndex == 0)
+        {
+            newMaterial = modelMaterial; // Use default material
+        }
+        else if (textureIndex == 1)
+        {
+            if (_gradientMaterial1 == null)
+            {
+                // Create a gradient texture from red to transparent
+                // 
+                // IMPORTANT:
+                // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
+                // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
+                // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
+                var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, Colors.Red, Colors.Transparent, isHorizontal: false);
+                _gradientMaterial1 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
+            }
+            
+            newMaterial = _gradientMaterial1;
+        }
+        else if (textureIndex == 2)
+        {
+            // Create the gradient that will show two red circles
+            var gradient = new GradientStop[]
+            {
+                new GradientStop(Colors.Transparent, 0.0f),
+                new GradientStop(Colors.Transparent, 0.35f),
+                new GradientStop(Colors.Red, 0.4f),
+                new GradientStop(Colors.Red, 0.5f),
+                new GradientStop(Colors.Transparent, 0.55f),
+                new GradientStop(Colors.Transparent, 0.70f),
+                new GradientStop(Colors.Red, 0.75f),
+                new GradientStop(Colors.Red, 0.95f),
+                new GradientStop(Colors.Transparent, 1.0f),
+            };
+            
+            // IMPORTANT:
+            // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
+            // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
+            // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
+            var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
+            _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
+            
+            newMaterial = _gradientMaterial2;
+        }
+        
+        
+        _circleModelNode.Material = newMaterial; 
+        
+        if (_circleModelNode.BackMaterial != null) // Also update BackMaterial if it was also used before
+            _circleModelNode.BackMaterial = newMaterial;
+    }
+
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
         ui.CreateKeyValueLabel("CenterPosition:", () => "(0, 0, 0)", keyTextWidth: 110);
         
         ui.AddSeparator();
+        
         
         ui.CreateSlider(10, 70,
             () => _radius,
@@ -125,15 +205,24 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         
         ui.AddSeparator();
 
+        
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1) },
-                                  itemChangedAction: OnNormalChanged,
+                                  itemChangedAction: (selectedIndex, selectedVector) =>
+                                  {
+                                      _normal = Vector3.Normalize(selectedVector);
+                                      UpdateModelNode();
+                                  },
                                   selectedItemIndex: 0,
                                   width: 120,
                                   keyText: "Normal: ",
                                   keyTextWidth: 110).SetColor(Colors.Red);
 
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, -1) },
-                                  itemChangedAction: OnUpDirectionChanged,
+                                  itemChangedAction: (selectedIndex, selectedVector) =>
+                                  {
+                                      _upDirection = Vector3.Normalize(selectedVector);
+                                      UpdateModelNode();
+                                  },
                                   selectedItemIndex: 0,
                                   width: 120,
                                   keyText: "UpDirection: ",
@@ -141,6 +230,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         ui.AddSeparator();
 
+        
         ui.CreateSlider(3, 40,
             () => _segmentsCount,
             newValue =>
@@ -159,17 +249,52 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
 
         AddMeshStatisticsControls(ui);
-    }
 
-    private void OnNormalChanged(int itemIndex, Vector3 selectedVector)
-    {
-        _normal = Vector3.Normalize(selectedVector);
-        UpdateModelNode();
-    }
-    
-    private void OnUpDirectionChanged(int itemIndex, Vector3 selectedVector)
-    {
-        _upDirection = Vector3.Normalize(selectedVector);
-        UpdateModelNode();
+        ui.AddSeparator();
+        ui.AddSeparator();
+        
+
+        _textureMappingComboBox = ui.CreateComboBox(new string[] { "Rectangular", "RadialFromCenter", "RadialFromInnerRadius" },
+            (selectedIndex, selectedText) =>
+            {
+                _textureMappingType = (CircleTextureMappingTypes)selectedIndex;
+                UpdateModelNode();
+            },
+            selectedItemIndex: 0,
+            width: 120,
+            keyText: "TextureMapping:",
+            keyTextWidth: 110);
+        
+        ui.AddSeparator();
+        
+        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles" },
+            (selectedIndex, selectedText) =>
+            {
+                SetTextureImage(selectedIndex);
+                isTextureCheckBox?.SetValue(true);
+            },
+            selectedItemIndex: 0,
+            width: 120,
+            keyText: "Texture image:",
+            keyTextWidth: 110);
+        
+        ui.AddSeparator();
+        ui.AddSeparator();
+        
+        ui.CreateButton("Show radial gradient (?):This button shows how to create a radial gradient with CircleModelNode.\nIt creates a linear gradient texture from red to transparent color,\nchecks the 'Is texture material' CheckBox and\nsets the 'TextureMapping' ComboBox to 'RadialFromInnerRadius'.", () =>
+        {
+            SetTextureImage(1);
+            isTextureCheckBox?.SetValue(true);
+            _textureImageComboBox?.SetValue(1); // 1 = 'Red to Transparent gradient'
+            _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
+        });
+        
+        ui.CreateButton("Show two red circles", () =>
+        {
+            SetTextureImage(1);
+            isTextureCheckBox?.SetValue(true);
+            _textureImageComboBox?.SetValue(2); // 1 = 'Red circles'
+            _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
+        });
     }
 }
