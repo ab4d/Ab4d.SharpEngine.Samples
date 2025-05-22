@@ -158,4 +158,28 @@ public class RadioButtonsUIElement : WinFormsUIElement
         foreach (RadioButton radioButton in _radioBoxesFlowLayoutPanel.Controls.OfType<RadioButton>())
             radioButton.ForeColor = winFormsColor;
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is int newIndex)
+        {
+            if (newIndex < 0 || newIndex > _items.Length - 1)
+                throw new ArgumentOutOfRangeException(nameof(newIndex), $"Expected index between 0 and {_items.Length - 1}, but got {newIndex}");
+
+            ((RadioButton)_radioBoxesFlowLayoutPanel.Controls[newIndex]).Checked = true;
+        }
+        else if (newValue is string newSelectedItem)
+        {
+            int index = Array.IndexOf(_items, newSelectedItem);
+            
+            if (index == -1)
+                throw new ArgumentException($"Selected item '{newSelectedItem}' not found in the items list.");
+            
+            ((RadioButton)_radioBoxesFlowLayoutPanel.Controls[index]).Checked = true;
+        }
+        else
+        {
+            throw new ArgumentException($"SetValue for RadioButton expects int or string value, but got {newValue?.GetType().Name}");
+        }
+    }     
 }

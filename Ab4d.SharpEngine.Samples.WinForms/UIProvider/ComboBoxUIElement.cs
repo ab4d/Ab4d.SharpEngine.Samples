@@ -136,4 +136,20 @@ public class ComboBoxUIElement : WinFormsUIElement
         if (_keyLabel != null)
             _keyLabel.ForeColor = winFormsColor;
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is int newIndex)
+        {
+            _comboBox.SelectedIndex = newIndex;
+        }
+        else if (newValue is string newSelectedItem)
+        {
+            _comboBox.SelectedItem = newSelectedItem;
+        }
+        else
+        {
+            throw new ArgumentException($"SetValue for ComboBox expects int or string value, but got {newValue?.GetType().Name}");
+        }
+    }      
 }

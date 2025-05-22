@@ -47,4 +47,12 @@ public class CheckBoxUIElement : AvaloniaUIElement
     {
         _checkBox.Foreground = new SolidColorBrush(avaloniaColor);
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is not bool isChecked)
+            throw new ArgumentException($"SetValue for CheckBox expects bool value, but got {newValue?.GetType().Name}");
+
+        _checkBox.IsChecked = isChecked;
+    }    
 }

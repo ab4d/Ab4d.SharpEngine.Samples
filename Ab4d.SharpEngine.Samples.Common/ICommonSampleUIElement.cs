@@ -25,4 +25,6 @@ public interface ICommonSampleUIElement
     string? GetPropertyValue(string propertyName);
 
     void UpdateValue();
+
+    void SetValue(object newValue);
 }

@@ -101,4 +101,9 @@ public abstract class WpfUIElement : ICommonSampleUIElement
     {
         throw new InvalidOperationException(); // This must be provided by a derived element (if supported)
     }
+    
+    public virtual void SetValue(object newValue)
+    {
+        throw new NotImplementedException($"SetValue for {this.GetType().Name} not implemented"); // This must be provided by a derived element (if supported)
+    }
 }

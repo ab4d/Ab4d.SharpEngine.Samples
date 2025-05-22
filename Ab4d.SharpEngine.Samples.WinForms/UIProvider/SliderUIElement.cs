@@ -210,4 +210,24 @@ public class SliderUIElement : WinFormsUIElement
         if (_valueLabel != null)
             _valueLabel.ForeColor = winFormsColor;
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is int newIntValue)
+        {
+            _trackBar.Value = newIntValue;
+        }
+        else if (newValue is float newFloatValue)
+        {
+            _trackBar.Value = (int)newFloatValue;
+        }
+        else if (newValue is double newDoubleValue)
+        {
+            _trackBar.Value = (int)newDoubleValue;
+        }
+        else
+        {
+            throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
+        }
+    }       
 }

@@ -186,4 +186,24 @@ public class SliderUIElement : WpfUIElement
         if (_valueTextBlock != null)
             _valueTextBlock.Foreground = new SolidColorBrush(wpfColor);
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is int newIntValue)
+        {
+            _slider.Value = newIntValue;
+        }
+        else if (newValue is float newFloatValue)
+        {
+            _slider.Value = newFloatValue;
+        }
+        else if (newValue is double newDoubleValue)
+        {
+            _slider.Value = newDoubleValue;
+        }
+        else
+        {
+            throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
+        }
+    }   
 }

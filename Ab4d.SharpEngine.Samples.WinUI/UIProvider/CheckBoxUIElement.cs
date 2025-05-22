@@ -55,6 +55,14 @@ public class CheckBoxUIElement : WinUIElement
         //var tb = FindChildElement<TextBlock>(_checkBox);
         //tb.Foreground = new SolidColorBrush(wpfColor);
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is not bool isChecked)
+            throw new ArgumentException($"SetValue for CheckBox expects bool value, but got {newValue?.GetType().Name}");
+
+        _checkBox.IsChecked = isChecked;
+    }
 
     //ChildType? FindChildElement<ChildType>(Microsoft.UI.Xaml.DependencyObject tree) where ChildType : Microsoft.UI.Xaml.DependencyObject
     //{

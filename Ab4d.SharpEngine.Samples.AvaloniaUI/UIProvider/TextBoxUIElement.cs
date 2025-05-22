@@ -54,4 +54,12 @@ public class TextBoxUIElement : AvaloniaUIElement
         _textBox.Text = text;
         return this;
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is not string newText)
+            throw new ArgumentException($"SetValue for TextBox expects string value, but got {newValue?.GetType().Name}");
+
+        _textBox.Text = newText;
+    }      
 }

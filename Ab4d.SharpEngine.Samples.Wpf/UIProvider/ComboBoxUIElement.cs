@@ -108,4 +108,20 @@ public class ComboBoxUIElement : WpfUIElement
         if (_keyTextBlock != null)
             _keyTextBlock.Foreground = new SolidColorBrush(wpfColor);
     }
+    
+    public override void SetValue(object newValue)
+    {
+        if (newValue is int newIndex)
+        {
+            _comboBox.SelectedIndex = newIndex;
+        }
+        else if (newValue is string newSelectedItem)
+        {
+            _comboBox.SelectedItem = newSelectedItem;
+        }
+        else
+        {
+            throw new ArgumentException($"SetValue for ComboBox expects int or string value, but got {newValue?.GetType().Name}");
+        }
+    }    
 }
