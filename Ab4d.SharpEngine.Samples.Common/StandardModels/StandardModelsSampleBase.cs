@@ -162,7 +162,7 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected virtual void AddMeshStatisticsControls(ICommonSampleUIProvider ui, bool addSharpEdgeInfo = false, float sharpEdgeInfoWidth =  220)
     {
-        ui.CreateLabel("Stats", isHeader: true);
+        ui.CreateLabel("Mesh Statistics", isHeader: true);
         _positionsCountLabel = ui.CreateKeyValueLabel("Positions:", () => positionsCountText, keyTextWidth: 70);
         _trianglesCountLabel = ui.CreateKeyValueLabel("Triangles:", () => trianglesCountText, keyTextWidth: 70);
 
