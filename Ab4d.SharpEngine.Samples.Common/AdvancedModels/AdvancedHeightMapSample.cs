@@ -163,7 +163,7 @@ public class AdvancedHeightMapSample : CommonSample
                 samplerType = CommonSamplerTypes.Clamp;
 
             // Create 1D texture; "linear" texture that requires special texture coordinates
-            var texture1 = TextureFactory.CreateGradientTexture(GpuDevice, _gradientData, textureWidth: 256);
+            var texture1 = TextureFactory.CreateGradientTexture(GpuDevice, _gradientData, textureSize: 256);
 
             if (_heigthMapMaterial2 == null)
             {

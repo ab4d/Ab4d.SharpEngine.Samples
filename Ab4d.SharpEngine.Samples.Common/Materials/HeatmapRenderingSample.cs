@@ -162,7 +162,7 @@ public class HeatmapRenderingSample : CommonSample
         if (_gradientTexture != null)
             _gradientTexture.Dispose();
 
-        _gradientTexture = TextureFactory.CreateGradientTexture(Scene.GpuDevice, _allGradientStops[gradientIndex], textureWidth: 256);
+        _gradientTexture = TextureFactory.CreateGradientTexture(Scene.GpuDevice, _allGradientStops[gradientIndex], textureSize: 256);
 
         _teapotMeshModelNode.Material = new StandardMaterial(_gradientTexture);
     }

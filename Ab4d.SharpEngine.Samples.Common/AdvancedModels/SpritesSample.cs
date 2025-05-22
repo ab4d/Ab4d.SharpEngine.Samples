@@ -106,7 +106,7 @@ public class SpritesSample : CommonSample
                 new GradientStop(Colors.Red,        offset: 1.0f),
             };
 
-            var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureWidth: 256);
+            var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureSize: 256);
 
             // If we only need from two colors, we can also use startColor and endColor instead of gradientStops:
             //var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, startColor: Colors.DeepSkyBlue, endColor: Colors.Yellow, textureWidth: 256);

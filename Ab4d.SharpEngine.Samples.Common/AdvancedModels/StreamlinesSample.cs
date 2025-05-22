@@ -38,7 +38,7 @@ public class StreamlinesSample : CommonSample
             new GradientStop(Colors.Red, 1.0f),
         };
 
-        var gradientTexture = TextureFactory.CreateGradientTexture(scene.GpuDevice, gradient, textureWidth: 256);
+        var gradientTexture = TextureFactory.CreateGradientTexture(scene.GpuDevice, gradient, textureSize: 256);
 
         _gradientMaterial = new StandardMaterial(gradientTexture);
 
