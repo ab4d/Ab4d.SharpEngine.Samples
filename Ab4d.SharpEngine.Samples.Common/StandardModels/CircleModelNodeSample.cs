@@ -25,12 +25,22 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     
     private StandardMaterial? _gradientMaterial1;
     private StandardMaterial? _gradientMaterial2;
+    private StandardMaterial? _gradientMaterial3;
+    
     private ICommonSampleUIElement? _textureMappingComboBox;
     private ICommonSampleUIElement? _textureImageComboBox;
+    private ICommonSampleUIElement? _animationButton;
+    
+    private DateTime _animationStartTime;
+    private GpuImage? _animatedGradientTexture;
+    private GradientStop[]? _animatedGradientStops;
+    private SceneView? _subscribedSceneView;
     
     private LineNode? _normalLine;
     private LineNode? _upDirectionLine;
     private float _directionLinesLength = 60;
+    
+
 
     public CircleModelNodeSample(ICommonSamplesContext context) : base(context)
     {
@@ -79,12 +89,33 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         scene.RootNode.Add(_upDirectionLine);
     }
+    
+    protected override void OnSceneViewInitialized(SceneView sceneView)
+    {
+        sceneView.SceneUpdating += SceneViewOnSceneUpdating;
+        _subscribedSceneView = sceneView;
+
+        base.OnSceneViewInitialized(sceneView);
+    }
+    
+    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
+    {
+         if (_animationStartTime != DateTime.MinValue)
+            UpdateAnimatedGradient();
+    }
 
     /// <inheritdoc />
     protected override void OnDisposed()
     {
         _gradientMaterial1?.DisposeWithTexture();
         _gradientMaterial2?.DisposeWithTexture();
+        _gradientMaterial3?.DisposeWithTexture();
+        
+        if (_subscribedSceneView != null)
+        {
+            _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+            _subscribedSceneView = null;
+        }
         
         base.OnDisposed();
     }
@@ -119,6 +150,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         Material? newMaterial = null;
         
+        _animationStartTime = DateTime.MinValue; // This will stop the animation
+        
         if (textureIndex == 0)
         {
             newMaterial = modelMaterial; // Use default material
@@ -141,9 +174,11 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         }
         else if (textureIndex == 2)
         {
-            // Create the gradient that will show two red circles
-            var gradient = new GradientStop[]
+            if (_gradientMaterial2 == null)
             {
+                // Create the gradient that will show two red circles
+                var gradient = new GradientStop[]
+                {
                 new GradientStop(Colors.Transparent, 0.0f),
                 new GradientStop(Colors.Transparent, 0.35f),
                 new GradientStop(Colors.Red, 0.4f),
@@ -153,23 +188,59 @@ public class CircleModelNodeSample : StandardModelsSampleBase
                 new GradientStop(Colors.Red, 0.75f),
                 new GradientStop(Colors.Red, 0.95f),
                 new GradientStop(Colors.Transparent, 1.0f),
-            };
-            
-            // IMPORTANT:
-            // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
-            // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
-            // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
-            var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
-            _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
+                };
+
+                // IMPORTANT:
+                // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
+                // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
+                // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
+                var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
+                _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "RedCirclesMaterial");
+            }
             
             newMaterial = _gradientMaterial2;
         }
-        
-        
+        else if (textureIndex == 3)
+        {
+            _gradientMaterial3 ??= new StandardMaterial("AnimatedGradientMaterial");
+            UpdateAnimatedGradient(); // This will also create the _animatedGradientTexture
+            
+            newMaterial = _gradientMaterial3;
+        }
+
+
         _circleModelNode.Material = newMaterial; 
         
         if (_circleModelNode.BackMaterial != null) // Also update BackMaterial if it was also used before
             _circleModelNode.BackMaterial = newMaterial;
+    }
+    
+    private void UpdateAnimatedGradient()
+    {
+        if (GpuDevice == null)
+            return;
+        
+        var elapsedSeconds = (DateTime.Now - _animationStartTime).TotalSeconds;
+
+        // gradientProgress defines the center of the red circle
+        // the red circle thickness is 0.2 and there is also a transition from transparent to red for 0.1
+        // go from 0.2 to 0.8 over 1 second
+        var gradientProgress = 0.2f + (float)(elapsedSeconds % 1) * 0.6f; 
+
+        _animatedGradientStops ??= new GradientStop[4];
+
+        _animatedGradientStops[0] = new GradientStop(Colors.Transparent, gradientProgress - 0.2f);
+        _animatedGradientStops[1] = new GradientStop(Colors.Red,         gradientProgress - 0.1f);
+        _animatedGradientStops[2] = new GradientStop(Colors.Red,         gradientProgress + 0.1f);
+        _animatedGradientStops[3] = new GradientStop(Colors.Transparent, gradientProgress + 0.2f);
+
+        if (_animatedGradientTexture != null)
+            _animatedGradientTexture.Dispose();
+
+        _animatedGradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, _animatedGradientStops, isHorizontal: false, name: "AnimatedGradientTexture");
+        
+        if (_gradientMaterial3 != null)
+            _gradientMaterial3.DiffuseTexture = _animatedGradientTexture;
     }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
@@ -261,20 +332,20 @@ public class CircleModelNodeSample : StandardModelsSampleBase
                 UpdateModelNode();
             },
             selectedItemIndex: 0,
-            width: 120,
+            width: 140,
             keyText: "TextureMapping:",
             keyTextWidth: 110);
         
         ui.AddSeparator();
         
-        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles" },
+        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Animated circles" },
             (selectedIndex, selectedText) =>
             {
                 SetTextureImage(selectedIndex);
                 isTextureCheckBox?.SetValue(true);
             },
             selectedItemIndex: 0,
-            width: 120,
+            width: 140,
             keyText: "Texture image:",
             keyTextWidth: 110);
         
@@ -283,7 +354,6 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         
         ui.CreateButton("Show radial gradient (?):This button shows how to create a radial gradient with CircleModelNode.\nIt creates a linear gradient texture from red to transparent color,\nchecks the 'Is texture material' CheckBox and\nsets the 'TextureMapping' ComboBox to 'RadialFromInnerRadius'.", () =>
         {
-            SetTextureImage(1);
             isTextureCheckBox?.SetValue(true);
             _textureImageComboBox?.SetValue(1); // 1 = 'Red to Transparent gradient'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
@@ -291,10 +361,30 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         
         ui.CreateButton("Show two red circles", () =>
         {
-            SetTextureImage(1);
             isTextureCheckBox?.SetValue(true);
             _textureImageComboBox?.SetValue(2); // 1 = 'Red circles'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
+        });
+        
+        ui.AddSeparator();
+        
+        _animationButton = ui.CreateButton("Start gradient animation", () =>
+        {
+            if (_animationStartTime == DateTime.MinValue)
+            {
+                isTextureCheckBox?.SetValue(true);
+                _textureImageComboBox?.SetValue(3);   // 1 = 'Animated circles'
+                _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
+                
+                _animationStartTime = DateTime.Now; // Start animation
+
+                _animationButton?.SetText("Stop gradient animation");
+            }
+            else
+            {
+                _animationStartTime = DateTime.MinValue; // Stop animation
+                _animationButton?.SetText("Start gradient animation");
+            }
         });
     }
 }
