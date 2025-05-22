@@ -39,8 +39,13 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected string positionsCountText = "0";
     protected string trianglesCountText = "0";
-    private ICommonSampleUIElement? _positionsCountLabel;
-    private ICommonSampleUIElement? _trianglesCountLabel;
+    
+    protected ICommonSampleUIElement? positionsCountLabel;
+    protected ICommonSampleUIElement? trianglesCountLabel;
+    protected ICommonSampleUIElement? showTrianglesCheckBox;
+    protected ICommonSampleUIElement? showNormalsCheckBox;
+    protected ICommonSampleUIElement? isSemiTransparentCheckBox;
+    protected ICommonSampleUIElement? isTextureCheckBox;
 
     public StandardModelsSampleBase(ICommonSamplesContext context)
         : base(context)
@@ -143,16 +148,16 @@ public abstract class StandardModelsSampleBase : CommonSample
         ui.CreateLabel("View", isHeader: true);
 
         if (isTrianglesCheckBoxShown)
-            ui.CreateCheckBox("Show triangles", isShowTrianglesChecked, OnShowTrianglesChanged);
+            showTrianglesCheckBox = ui.CreateCheckBox("Show triangles", isShowTrianglesChecked, OnShowTrianglesChanged);
 
         if (isNormalsCheckBoxShown)
-            ui.CreateCheckBox("Show normals", isShowNormalsChecked, OnShowNormalsChanged);
+            showNormalsCheckBox = ui.CreateCheckBox("Show normals", isShowNormalsChecked, OnShowNormalsChanged);
 
         if (isSemiTransparentCheckBoxShown)
-            ui.CreateCheckBox("Is semi-transparent", isSemiTransparentMaterialChecked, OnIsSemiTransparentChanged);
+            isSemiTransparentCheckBox = ui.CreateCheckBox("Is semi-transparent", isSemiTransparentMaterialChecked, OnIsSemiTransparentChanged);
 
         if (isTextureCheckBoxShown)
-            ui.CreateCheckBox("Is texture material", isTextureMaterialChecked, OnIsTextureMaterialChanged);
+            isTextureCheckBox = ui.CreateCheckBox("Is texture material", isTextureMaterialChecked, OnIsTextureMaterialChanged);
 
         if (propertiesTitleText != null)
             ui.CreateLabel(propertiesTitleText, isHeader: true);
@@ -163,8 +168,8 @@ public abstract class StandardModelsSampleBase : CommonSample
     protected virtual void AddMeshStatisticsControls(ICommonSampleUIProvider ui, bool addSharpEdgeInfo = false, float sharpEdgeInfoWidth =  220)
     {
         ui.CreateLabel("Mesh Statistics", isHeader: true);
-        _positionsCountLabel = ui.CreateKeyValueLabel("Positions:", () => positionsCountText, keyTextWidth: 70);
-        _trianglesCountLabel = ui.CreateKeyValueLabel("Triangles:", () => trianglesCountText, keyTextWidth: 70);
+        positionsCountLabel = ui.CreateKeyValueLabel("Positions:", () => positionsCountText, keyTextWidth: 70);
+        trianglesCountLabel = ui.CreateKeyValueLabel("Triangles:", () => trianglesCountText, keyTextWidth: 70);
 
         if (addSharpEdgeInfo)
         {
@@ -181,11 +186,11 @@ public abstract class StandardModelsSampleBase : CommonSample
         uint trianglesCount = (uint)(standardMesh?.IndexCount ?? 0) / 3;
         trianglesCountText = trianglesCount.ToString();
 
-        if (_positionsCountLabel != null)
-            _positionsCountLabel.UpdateValue();
+        if (positionsCountLabel != null)
+            positionsCountLabel.UpdateValue();
         
-        if (_trianglesCountLabel != null)
-            _trianglesCountLabel.UpdateValue();
+        if (trianglesCountLabel != null)
+            trianglesCountLabel.UpdateValue();
     }
 
     protected abstract void OnCreatePropertiesUI(ICommonSampleUIProvider ui);
