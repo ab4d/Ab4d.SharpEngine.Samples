@@ -16,6 +16,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     
     private float _innerRadius = 0;
     private float _radius = 50;
+    private float _startAngle = 0;
     private CircleTextureMappingTypes _textureMappingType = CircleTextureMappingTypes.Rectangular;
 
     private Vector3 _normal = new Vector3(0, 1, 0);
@@ -127,6 +128,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         _circleModelNode.InnerRadius = _innerRadius;
         _circleModelNode.Radius = _radius;
+        _circleModelNode.StartAngle = _startAngle;
         
         _circleModelNode.TextureMappingType = _textureMappingType;
         _circleModelNode.Segments = _segmentsCount;
@@ -271,6 +273,18 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             },
             100,
             keyText: "InnerRadius:",
+            keyTextWidth: 110,
+            formatShownValueFunc: newValue => newValue.ToString("F1"));
+        
+        ui.CreateSlider(0, 360,
+            () => _startAngle,
+            newValue =>
+            {
+                _startAngle = newValue;
+                UpdateModelNode();
+            },
+            100,
+            keyText: "StartAngle: (?):StartAngle is useful when Segments Count is low.\nFor example, when segments count is 4, the angle may be set to 45\nto get a rectangle that is aligned with axes.",
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
         
