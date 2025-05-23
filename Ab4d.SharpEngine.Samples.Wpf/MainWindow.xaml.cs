@@ -37,9 +37,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "Importers.StlImporterExporterSample";
-        private string? _startupPage = "StandardModels.CircleModelNodeSample";
-        //private string? _startupPage = null;
+        //private string? _startupPage = "Advanced.ComplexSceneSample";
+        private string? _startupPage = null;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
