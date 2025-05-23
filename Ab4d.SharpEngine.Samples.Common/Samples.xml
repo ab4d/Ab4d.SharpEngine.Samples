@@ -31,7 +31,7 @@
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
-  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode" IsUpdated="True" UpdateInfo="Added new InnerRadius and TextureMapping and new 'Show radial gradient' button"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode" IsUpdated="True" UpdateInfo="Added new InnerRadius, StartAngle, HeightScaleFactor and TextureMapping properties and CreateRectangle method"/>
   <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
   <Sample Location="StandardModels.ConeModelNodeSample" Title="ConeModelNode"/>
   <Sample Location="StandardModels.PyramidModelNodeSample" Title="PyramidModelNode"/>
@@ -92,6 +92,7 @@
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
+  <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures" IsNew="True"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
 
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>

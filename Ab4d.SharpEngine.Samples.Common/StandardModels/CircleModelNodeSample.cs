@@ -317,6 +317,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         ui.CreateButton("Create rectangle (?):This button calls CreateRectangle method that sets the properties\nof this CircleModelNode so that it renders a rectangle.", () =>
         {
+            // CreateRectangle sets the properties of this CircleModelNode so that it renders a rectangle (Segments is set to 4 and StartAngle to 45)
             _circleModelNode!.CreateRectangle(position: new Vector3(0, 0, 0), 
                                               positionType: PositionTypes.Center, 
                                               size: new Vector2(80, 60), 
