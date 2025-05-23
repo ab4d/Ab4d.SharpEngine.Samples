@@ -26,21 +26,18 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     
     private StandardMaterial? _gradientMaterial1;
     private StandardMaterial? _gradientMaterial2;
-    private StandardMaterial? _gradientMaterial3;
+
+    private ICommonSampleUIElement? _segmentsSlider;
+    private ICommonSampleUIElement? _startAngleSlider;
+    private ICommonSampleUIElement? _innerRadiusSlider;
+    private ICommonSampleUIElement? _radiusSlider;
     
     private ICommonSampleUIElement? _textureMappingComboBox;
     private ICommonSampleUIElement? _textureImageComboBox;
-    private ICommonSampleUIElement? _animationButton;
-    
-    private DateTime _animationStartTime;
-    private GpuImage? _animatedGradientTexture;
-    private GradientStop[]? _animatedGradientStops;
-    private SceneView? _subscribedSceneView;
     
     private LineNode? _normalLine;
     private LineNode? _upDirectionLine;
     private float _directionLinesLength = 60;
-    
 
 
     public CircleModelNodeSample(ICommonSamplesContext context) : base(context)
@@ -90,33 +87,12 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
         scene.RootNode.Add(_upDirectionLine);
     }
-    
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        sceneView.SceneUpdating += SceneViewOnSceneUpdating;
-        _subscribedSceneView = sceneView;
-
-        base.OnSceneViewInitialized(sceneView);
-    }
-    
-    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
-    {
-         if (_animationStartTime != DateTime.MinValue)
-            UpdateAnimatedGradient();
-    }
 
     /// <inheritdoc />
     protected override void OnDisposed()
     {
         _gradientMaterial1?.DisposeWithTexture();
         _gradientMaterial2?.DisposeWithTexture();
-        _gradientMaterial3?.DisposeWithTexture();
-        
-        if (_subscribedSceneView != null)
-        {
-            _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
-            _subscribedSceneView = null;
-        }
         
         base.OnDisposed();
     }
@@ -151,8 +127,6 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             return;
 
         Material? newMaterial = null;
-        
-        _animationStartTime = DateTime.MinValue; // This will stop the animation
         
         if (textureIndex == 0)
         {
@@ -202,47 +176,12 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             
             newMaterial = _gradientMaterial2;
         }
-        else if (textureIndex == 3)
-        {
-            _gradientMaterial3 ??= new StandardMaterial("AnimatedGradientMaterial");
-            UpdateAnimatedGradient(); // This will also create the _animatedGradientTexture
-            
-            newMaterial = _gradientMaterial3;
-        }
 
 
         _circleModelNode.Material = newMaterial; 
         
         if (_circleModelNode.BackMaterial != null) // Also update BackMaterial if it was also used before
             _circleModelNode.BackMaterial = newMaterial;
-    }
-    
-    private void UpdateAnimatedGradient()
-    {
-        if (GpuDevice == null)
-            return;
-        
-        var elapsedSeconds = (DateTime.Now - _animationStartTime).TotalSeconds;
-
-        // gradientProgress defines the center of the red circle
-        // the red circle thickness is 0.2 and there is also a transition from transparent to red for 0.1
-        // go from 0.2 to 0.8 over 1 second
-        var gradientProgress = 0.2f + (float)(elapsedSeconds % 1) * 0.6f; 
-
-        _animatedGradientStops ??= new GradientStop[4];
-
-        _animatedGradientStops[0] = new GradientStop(Colors.Transparent, gradientProgress - 0.2f);
-        _animatedGradientStops[1] = new GradientStop(Colors.Red,         gradientProgress - 0.1f);
-        _animatedGradientStops[2] = new GradientStop(Colors.Red,         gradientProgress + 0.1f);
-        _animatedGradientStops[3] = new GradientStop(Colors.Transparent, gradientProgress + 0.2f);
-
-        if (_animatedGradientTexture != null)
-            _animatedGradientTexture.Dispose();
-
-        _animatedGradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, _animatedGradientStops, isHorizontal: false, name: "AnimatedGradientTexture");
-        
-        if (_gradientMaterial3 != null)
-            _gradientMaterial3.DiffuseTexture = _animatedGradientTexture;
     }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
@@ -252,7 +191,32 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.AddSeparator();
         
         
-        ui.CreateSlider(10, 70,
+        CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1) },
+            itemChangedAction: (selectedIndex, selectedVector) =>
+            {
+                _normal = Vector3.Normalize(selectedVector);
+                UpdateModelNode();
+            },
+            selectedItemIndex: 0,
+            width: 120,
+            keyText: "Normal: ",
+            keyTextWidth: 110).SetColor(Colors.Red);
+
+        CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, -1) },
+            itemChangedAction: (selectedIndex, selectedVector) =>
+            {
+                _upDirection = Vector3.Normalize(selectedVector);
+                UpdateModelNode();
+            },
+            selectedItemIndex: 0,
+            width: 120,
+            keyText: "UpDirection: ",
+            keyTextWidth: 110).SetColor(Colors.Green);
+        
+        ui.AddSeparator();
+        
+        
+        _radiusSlider = ui.CreateSlider(10, 70,
             () => _radius,
             newValue =>
             {
@@ -264,7 +228,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
         
-        ui.CreateSlider(0, 50,
+        _innerRadiusSlider = ui.CreateSlider(0, 50,
             () => _innerRadius,
             newValue =>
             {
@@ -276,7 +240,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
         
-        ui.CreateSlider(0, 360,
+        _startAngleSlider = ui.CreateSlider(0, 360,
             () => _startAngle,
             newValue =>
             {
@@ -290,33 +254,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         
         ui.AddSeparator();
 
-        
-        CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1) },
-                                  itemChangedAction: (selectedIndex, selectedVector) =>
-                                  {
-                                      _normal = Vector3.Normalize(selectedVector);
-                                      UpdateModelNode();
-                                  },
-                                  selectedItemIndex: 0,
-                                  width: 120,
-                                  keyText: "Normal: ",
-                                  keyTextWidth: 110).SetColor(Colors.Red);
-
-        CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 0, -1), new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(1, 0, -1) },
-                                  itemChangedAction: (selectedIndex, selectedVector) =>
-                                  {
-                                      _upDirection = Vector3.Normalize(selectedVector);
-                                      UpdateModelNode();
-                                  },
-                                  selectedItemIndex: 0,
-                                  width: 120,
-                                  keyText: "UpDirection: ",
-                                  keyTextWidth: 110).SetColor(Colors.Green);
-
-        ui.AddSeparator();
-
-        
-        ui.CreateSlider(3, 40,
+                
+        _segmentsSlider = ui.CreateSlider(3, 40,
             () => _segmentsCount,
             newValue =>
             {
@@ -332,10 +271,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             formatShownValueFunc: newValue => ((int)newValue).ToString());
 
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
-
-        AddMeshStatisticsControls(ui);
-
-        ui.AddSeparator();
+        
         ui.AddSeparator();
         
 
@@ -350,9 +286,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "TextureMapping:",
             keyTextWidth: 110);
         
-        ui.AddSeparator();
-        
-        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Animated circles" },
+        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles" },
             (selectedIndex, selectedText) =>
             {
                 SetTextureImage(selectedIndex);
@@ -363,42 +297,60 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "Texture image:",
             keyTextWidth: 110);
         
+
         ui.AddSeparator();
         ui.AddSeparator();
-        
+
         ui.CreateButton("Show radial gradient (?):This button shows how to create a radial gradient with CircleModelNode.\nIt creates a linear gradient texture from red to transparent color,\nchecks the 'Is texture material' CheckBox and\nsets the 'TextureMapping' ComboBox to 'RadialFromInnerRadius'.", () =>
         {
             isTextureCheckBox?.SetValue(true);
             _textureImageComboBox?.SetValue(1); // 1 = 'Red to Transparent gradient'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
-        
+
         ui.CreateButton("Show two red circles", () =>
         {
             isTextureCheckBox?.SetValue(true);
             _textureImageComboBox?.SetValue(2); // 1 = 'Red circles'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
+
+        ui.CreateButton("Create rectangle (?):This button calls CreateRectangle method that sets the properties\nof this CircleModelNode so that it renders a rectangle.", () =>
+        {
+            _circleModelNode!.CreateRectangle(position: new Vector3(0, 0, 0), 
+                                              positionType: PositionTypes.Center, 
+                                              size: new Vector2(80, 60), 
+                                              innerSizeFactor: 0.5f, 
+                                              widthDirection: new Vector3(1, 0, 0), 
+                                              heightDirection: new Vector3(0, 0, -1));
+
+            // We could also call the following overload of CreateRectangle:
+            //_circleModelNode.CreateRectangle(centerPosition: new Vector3(0, 0, 0), size: new Vector2(80, 60), innerSizeFactor: 0.5f);
+
+            // Calling CreateRectangle sets the properties on _circleModelNode so a rectangle is created.
+            // Set the UI sliders to the new value. We need to first read the new values and then update the UI elements.
+            // If we would just update the _radiusSlider, then the _circleModelNode properties would be set from the UI elements that were not updated yet.
+            
+            var newRadius      = _circleModelNode.Radius;
+            var newInnerRadius = _circleModelNode.InnerRadius;
+            var newSegments    = _circleModelNode.Segments;
+            var newStartAngle  = _circleModelNode.StartAngle;
+
+            _radiusSlider.SetValue(newRadius);
+            _innerRadiusSlider.SetValue(newInnerRadius);
+            _segmentsSlider.SetValue(newSegments);
+            _startAngleSlider.SetValue(newStartAngle);
+
+            
+            base.UpdateModelNode(); // Update normals and triangles
+        });
         
         ui.AddSeparator();
-        
-        _animationButton = ui.CreateButton("Start gradient animation", () =>
-        {
-            if (_animationStartTime == DateTime.MinValue)
-            {
-                isTextureCheckBox?.SetValue(true);
-                _textureImageComboBox?.SetValue(3);   // 1 = 'Animated circles'
-                _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
-                
-                _animationStartTime = DateTime.Now; // Start animation
 
-                _animationButton?.SetText("Stop gradient animation");
-            }
-            else
-            {
-                _animationStartTime = DateTime.MinValue; // Stop animation
-                _animationButton?.SetText("Start gradient animation");
-            }
-        });
+
+        ui.CreateLabel("TIP: See also 'Materials / Animated textures'\nsample that uses CircleModelNode with\nanimated textures.");
+
+
+        AddMeshStatisticsControls(ui);
     }
 }
