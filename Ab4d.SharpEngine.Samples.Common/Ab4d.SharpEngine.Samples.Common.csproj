@@ -51,10 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Materials\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Resources\Models\dragon_vrip_res3.obj">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
