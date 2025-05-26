@@ -130,6 +130,7 @@
   <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" IsNew="True" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
+  <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" IsNew="True" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />
 
