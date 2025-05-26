@@ -81,6 +81,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             // To test the OverlayTexture presentation type (has the best performance, but does not allow rendering any WPF controls over the 3D graphics),
             // uncomment the following code:
             //MainSceneView.PresentationType = PresentationTypes.OverlayTexture;
+            //MainSceneView.BackgroundColor = System.Windows.Media.Colors.White;
             //MainSceneView.Margin = new Thickness(0, 0, 350, 0); // We need to add some right margin so the sample settings will be still visible
 
             //MainSceneView.MultisampleCount = 1; // Disable MSSA (multi-sample anti-aliasing)
