@@ -40,7 +40,7 @@ public class PostProcessingSample : CommonSample
         _soberEdgeDetectionPostProcess = new SoberEdgeDetectionPostProcess() { EdgeThreshold = 0.05f, AddEdgeToCurrentColor = true}; // Use default settings
         
         // ExpandPostProcess requires two passes: horizontal and vertical
-        _expandPostProcess1 = new ExpandPostProcess(isVerticalRenderingPass: false, expansionWidth: 3, backgroundColor: Color4.Transparent); // Expand for 2 pixels
+        _expandPostProcess1 = new ExpandPostProcess(isVerticalRenderingPass: false, expansionWidth: 3, backgroundColor: Color4.Transparent); // Expand for 3 pixels
         _expandPostProcess2 = new ExpandPostProcess(isVerticalRenderingPass: true, expansionWidth: 3, backgroundColor: Color4.Transparent);  
 
         // GaussianBlur requires two passes: horizontal and vertical
