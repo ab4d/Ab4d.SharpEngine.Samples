@@ -228,8 +228,8 @@ public class AnimatedTexturesSample : CommonSample
     {
         sceneView.SceneUpdating += SceneViewOnSceneUpdating;
         _subscribedSceneView = sceneView;
-        
-        _animationStartTime = DateTime.Now;
+
+        StartAnimation();
 
         base.OnSceneViewInitialized(sceneView);
     }
@@ -265,8 +265,22 @@ public class AnimatedTexturesSample : CommonSample
     }
     
     // ReSharper disable once MemberCanBePrivate.Global - this is public because it is used in automated tests
+    public void StartAnimation()
+    {
+        _animationStartTime = DateTime.Now;
+    }
+    
+    public void StopAnimation()
+    {
+        _animationStartTime = DateTime.MinValue;
+    }
+    
+    // ReSharper disable once MemberCanBePrivate.Global - this is public because it is used in automated tests
     public void UpdateAnimatedGradient(double elapsedSeconds)
     {
+        if (GpuDevice == null)
+            return;
+        
         // gradientProgress defines the center of the red circle
         // the red circle thickness is 0.2 and there is also a transition from transparent to red for 0.1
         // go from 0.2 to 0.8 over 1 second
@@ -288,7 +302,10 @@ public class AnimatedTexturesSample : CommonSample
         _animatedGradientTexture1 = TextureFactory.CreateGradientTexture(GpuDevice, _animatedGradientStops, isHorizontal: false, name: "AnimatedGradientTexture");
         
         if (_gradientMaterial1 != null)
+        {
+            _gradientMaterial1.DiffuseTextureSamplerType = CommonSamplerTypes.Clamp; // Change sampler from default Mirror to Clamp so that the  border color is used for texture coordinates outside the texture
             _gradientMaterial1.DiffuseTexture = _animatedGradientTexture1;
+        }        
         
         
         
@@ -301,6 +318,9 @@ public class AnimatedTexturesSample : CommonSample
         _animatedGradientTexture2 = TextureFactory.CreateGradientTexture(GpuDevice, startColor, endColor: Color4.Transparent, isHorizontal: false, name: "AnimatedGradientTexture2");
         
         if (_gradientMaterial2 != null)
+        {
+            _gradientMaterial2.DiffuseTextureSamplerType = CommonSamplerTypes.Clamp; // Change sampler from default Mirror to Clamp so that the  border color is used for texture coordinates outside the texture 
             _gradientMaterial2.DiffuseTexture = _animatedGradientTexture2;
+        }
     }    
 }
