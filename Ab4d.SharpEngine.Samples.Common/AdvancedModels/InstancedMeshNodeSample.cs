@@ -5,6 +5,7 @@ using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
+using Ab4d.SharpEngine.Core;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -17,9 +18,14 @@ public class InstancedMeshNodeSample : CommonSample
     private WorldColorInstanceData[]? _instancesData;
     private StandardMesh? _sphereMesh;
     private StandardMesh? _pyramidMesh;
+    private StandardMesh? _planeMesh;
     private StandardMesh? _teapotMesh;
+    private GpuImage? _treeGpuImage;
     private ICommonSampleUIElement? _totalPositionsLabel;
     private bool _useTransparency;
+    private bool _isUsingTexture;
+    
+    private ICommonSampleUIElement? _singleColorCheckBox;
 
     public InstancedMeshNodeSample(ICommonSamplesContext context)
         : base(context)
@@ -99,6 +105,9 @@ public class InstancedMeshNodeSample : CommonSample
         if (_instancedMeshNode == null || _instancesData == null)
             return;
         
+        _instancedMeshNode.SetDiffuseTexture(null); // disable texture if it was set before
+        _isUsingTexture = false;
+        
         if (selectedIndex == 0)
         {
             _pyramidMesh ??= MeshFactory.CreatePyramidMesh(new Vector3(0, 0, 0), new Vector3(10, 10, 10));
@@ -131,6 +140,42 @@ public class InstancedMeshNodeSample : CommonSample
 
             _instancedMeshNode.Mesh = _teapotMesh;
         }
+        else if (selectedIndex == 3)
+        {
+            _planeMesh ??= MeshFactory.CreatePlaneMesh(centerPosition: new Vector3(0, 0, 0), 
+                                                       planeNormal: new Vector3(-1, 0, 0), 
+                                                       planeHeightDirection: new Vector3(0, 1, 0), 
+                                                       width: 10, 
+                                                       height: 10, 
+                                                       widthSegments: 1, 
+                                                       heightSegments: 1);
+
+            if (_treeGpuImage == null && Scene != null)
+                _treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture.png", Scene);
+            
+            _instancedMeshNode.Mesh = _planeMesh;
+            _instancedMeshNode.SetDiffuseTexture(_treeGpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values
+
+            // Other overloads of SetDiffuseTexture:
+            //_instancedMeshNode.SetDiffuseTexture(_treeGpuImage, colorMask: Colors.Red, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Set color mask
+            //_instancedMeshNode.SetDiffuseTexture(_treeGpuImage, colorMask: Colors.Red, gpuSampler, alphaClipThreshold: 0.5f);                // use custom gpuSampler
+            //_instancedMeshNode.SetDiffuseTexture(_treeGpuImage, colorMask: Colors.Red, gpuSampler, alphaClipThreshold: 0.5f);                // use custom gpuSampler with color mask
+
+            _isUsingTexture = true;
+            
+
+            if (targetPositionCamera != null)
+            {
+                var normalizedHeading = Utilities.CameraUtils.NormalizeAngleTo360(targetPositionCamera.Heading);
+
+                // If camera is looking from the back (heading > 180), then set Heading to 90 so that the camera is looking from the front.
+                // This prevents that user would see empty scene (showing only back faces of the plane).
+                if (normalizedHeading > 180)
+                    targetPositionCamera.Heading = 90; 
+            }
+        }
+        
+        _singleColorCheckBox?.SetValue(_isUsingTexture); // Check "Use single color" when showing texture; uncheck for others to see nice color gradient
 
         _totalPositionsLabel?.UpdateValue();
     }
@@ -251,10 +296,12 @@ public class InstancedMeshNodeSample : CommonSample
 
         if (isChecked)
         {
+            Color4 baseColor = _isUsingTexture ? Colors.White : Colors.Orange;
+
             if (_instancedMeshNode.UseAlphaBlend)
-                _instancedMeshNode.UseSingleObjectColor(Colors.Orange.SetAlpha(0.5f)); // all instances will be rendered by Orange color
+                _instancedMeshNode.UseSingleObjectColor(baseColor.SetAlpha(0.5f)); // all instances will be rendered by White or Orange color
             else
-                _instancedMeshNode.UseSingleObjectColor(Colors.Orange); // all instances will be rendered by Orange color
+                _instancedMeshNode.UseSingleObjectColor(baseColor); // all instances will be rendered by White or Orange color
         }
         else
         {
@@ -274,10 +321,12 @@ public class InstancedMeshNodeSample : CommonSample
 
         if (_instancedMeshNode.IsUsingSingleObjectColor)
         {
+            Color4 baseColor = _isUsingTexture ? Colors.White : Colors.Orange;
+            
             if (isChecked)
-                _instancedMeshNode.UseSingleObjectColor(Colors.Orange.SetAlpha(0.5f));
+                _instancedMeshNode.UseSingleObjectColor(baseColor.SetAlpha(0.5f));
             else
-                _instancedMeshNode.UseSingleObjectColor(Colors.Orange);
+                _instancedMeshNode.UseSingleObjectColor(baseColor);
         }
         else
         {
@@ -285,13 +334,28 @@ public class InstancedMeshNodeSample : CommonSample
 
             if (isChecked)
             {
-                // Alpha color value is changed based on the index
-                for (int i = 0; i < _instancesData.Length; i++)
+                if (_isUsingTexture)
                 {
-                    _instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red,
-                                                                _instancesData[i].DiffuseColor.Green,
-                                                                _instancesData[i].DiffuseColor.Blue,
-                                                                alpha: i * factor);
+                    // adjust factor so that alpha values are defined in range from 0.5 to 1.
+                    // This is required because alpha clip threshold is set to 0.5 and all alpha values below 0.5 are discarded.
+                    factor /= 2; 
+                    
+                    // When rendering texture, then use White color with changed alpha color
+                    for (int i = 0; i < _instancesData.Length; i++)
+                    {
+                        _instancesData[i].DiffuseColor = new Color4(1, 1, 1, alpha: 0.5f + i * factor);
+                    }
+                }
+                else
+                {
+                    // Alpha color value is changed based on the index
+                    for (int i = 0; i < _instancesData.Length; i++)
+                    {
+                        _instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red,
+                                                                    _instancesData[i].DiffuseColor.Green,
+                                                                    _instancesData[i].DiffuseColor.Blue,
+                                                                    alpha: i * factor);
+                    }
                 }
             }
             else
@@ -324,7 +388,13 @@ public class InstancedMeshNodeSample : CommonSample
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         ui.CreateLabel("Mesh:");
-        ui.CreateRadioButtons(new string[] { "Pyramid (16 positions)", "Sphere (961 positions)", "Teapot (2,976 positions)" }, (selectedIndex, selectedText) => ChangeMesh(selectedIndex), selectedItemIndex: 1);
+        ui.CreateRadioButtons(new string[]
+        {
+            "Pyramid (16 positions)", 
+            "Sphere (961 positions)", 
+            "Teapot (2,976 positions)",
+            "Plane with texture (4 positions)",
+        }, (selectedIndex, selectedText) => ChangeMesh(selectedIndex), selectedItemIndex: 1);
 
         ui.AddSeparator();
 
@@ -355,7 +425,7 @@ public class InstancedMeshNodeSample : CommonSample
         ui.AddSeparator();
 
         ui.CreateCheckBox("Use transparent colors", false, isChecked => ChangeTransparency(isChecked));
-        ui.CreateCheckBox("Use single colors (?): By calling UseSingleObjectColor method, it is possible to render all meshes with single color and not the color that is defined in InstancesData", false, isChecked => ChangeUseSingleObjectColor(isChecked));
+        _singleColorCheckBox = ui.CreateCheckBox("Use single color (?): By calling UseSingleObjectColor method, it is possible to render all meshes with single color and not the color that is defined in InstancesData", false, isChecked => ChangeUseSingleObjectColor(isChecked));
         ui.CreateCheckBox("Use solid color material (?): When IsSolidColorMaterial is true, then no shading is applied to materials", false, isChecked =>
         {
             if (_instancedMeshNode != null)

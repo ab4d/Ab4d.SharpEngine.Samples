@@ -43,7 +43,7 @@
   <Sample Location="StandardModels.PositionAndScaleSample" Title="Position and scale"/>
 
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
-  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing" IsUpdated="True" UpdatedInfo="Added support for using texture on each instance. Check 'Plane with texture' mesh."/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
