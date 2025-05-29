@@ -14,7 +14,7 @@ public class PostProcessingSample : CommonSample
     private bool _isToonShadingPostProcess = false;
     private bool _isGammaCorrectionPostProcess = false;
     private bool _isColorOverlayPostProcess = false;
-    private bool _isSoberEdgeDetectionPostProcess = false;
+    private bool _isSobelEdgeDetectionPostProcess = false;
     private bool _isExpandPostProcess = false;
     private bool _isGaussianBlurPostProcess = true;
 
@@ -24,7 +24,7 @@ public class PostProcessingSample : CommonSample
     private ToonShadingPostProcess _toonShadingPostProcess;
     private GammaCorrectionPostProcess _gammaCorrectionPostProcess;
     private ColorOverlayPostProcess _colorOverlayPostProcess;
-    private SoberEdgeDetectionPostProcess _soberEdgeDetectionPostProcess;
+    private SobelEdgeDetectionPostProcess _sobelEdgeDetectionPostProcess;
     private ExpandPostProcess _expandPostProcess1;
     private ExpandPostProcess _expandPostProcess2;
     private GaussianBlurPostProcess _gaussianBlurPostProcess1;
@@ -37,7 +37,7 @@ public class PostProcessingSample : CommonSample
         _toonShadingPostProcess = new ToonShadingPostProcess();
         _gammaCorrectionPostProcess = new GammaCorrectionPostProcess() { Gamma = 2.2f};                                              // 2.2 is also a default value
         _colorOverlayPostProcess = new ColorOverlayPostProcess() { AddedColor = Color4.Black, ColorMultiplier = Colors.Red };        // Default color for AddedColor is Black; default color for ColorMultiplier is White (those settings do not change the rendered image)
-        _soberEdgeDetectionPostProcess = new SoberEdgeDetectionPostProcess() { EdgeThreshold = 0.05f, AddEdgeToCurrentColor = true}; // Use default settings
+        _sobelEdgeDetectionPostProcess = new SobelEdgeDetectionPostProcess() { EdgeThreshold = 0.05f, AddEdgeToCurrentColor = true}; // Use default settings
         
         // ExpandPostProcess requires two passes: horizontal and vertical
         _expandPostProcess1 = new ExpandPostProcess(isVerticalRenderingPass: false, expansionWidth: 3, backgroundColor: Color4.Transparent); // Expand for 3 pixels
@@ -59,7 +59,7 @@ public class PostProcessingSample : CommonSample
         _toonShadingPostProcess.Dispose();
         _gammaCorrectionPostProcess.Dispose();
         _colorOverlayPostProcess.Dispose();
-        _soberEdgeDetectionPostProcess.Dispose();
+        _sobelEdgeDetectionPostProcess.Dispose();
         _expandPostProcess1.Dispose();
         _expandPostProcess2.Dispose();
         _gaussianBlurPostProcess1.Dispose();
@@ -131,8 +131,8 @@ public class PostProcessingSample : CommonSample
         if (_isGammaCorrectionPostProcess)
             SceneView!.PostProcesses.Add(_gammaCorrectionPostProcess);
         
-        if (_isSoberEdgeDetectionPostProcess)
-            SceneView!.PostProcesses.Add(_soberEdgeDetectionPostProcess);
+        if (_isSobelEdgeDetectionPostProcess)
+            SceneView!.PostProcesses.Add(_sobelEdgeDetectionPostProcess);
         
         if (_isColorOverlayPostProcess)
             SceneView!.PostProcesses.Add(_colorOverlayPostProcess);
@@ -277,9 +277,9 @@ public class PostProcessingSample : CommonSample
         ui.AddSeparator();
         
         
-        ui.CreateCheckBox("Sober Edge Detection", _isSoberEdgeDetectionPostProcess, isChecked =>
+        ui.CreateCheckBox("Sobel Edge Detection", _isSobelEdgeDetectionPostProcess, isChecked =>
         {
-            _isSoberEdgeDetectionPostProcess = isChecked;
+            _isSobelEdgeDetectionPostProcess = isChecked;
             UpdatePostProcesses();
         });
 
@@ -293,7 +293,7 @@ public class PostProcessingSample : CommonSample
             new Vector4(0.2125f, 0.7154f, 0.0721f, 0), // edge detection based on luminance; note that this does not include alpha color so black color will be the same as transparent background
         };
         ui.CreateComboBox(new string[] { "equal", "Red", "Green", "Blue", "Alpha", "Luminance" },
-            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.ColorFactors = colorFactors[selectedIndex],
+            (selectedIndex, selectedText) => _sobelEdgeDetectionPostProcess.ColorFactors = colorFactors[selectedIndex],
             selectedItemIndex: 0,
             width: 100,
             keyText: "      Color Factors:",
@@ -303,7 +303,7 @@ public class PostProcessingSample : CommonSample
             (selectedIndex, selectedText) =>
             {
                 if (Color4.TryParse(selectedText, out var edgeColor))
-                    _soberEdgeDetectionPostProcess.EdgeColor = edgeColor;
+                    _sobelEdgeDetectionPostProcess.EdgeColor = edgeColor;
             },
             selectedItemIndex: 0,
             width: 100,
@@ -313,7 +313,7 @@ public class PostProcessingSample : CommonSample
         var edgeThresholds = new float[] { 0.01f, 0.02f, 0.05f, 0.1f, 0.2f, 0.3f, 0.5f, 0.8f, 0.9f, 1f}; 
         var edgeThresholdTexts = edgeThresholds.Select(v => v.ToString()).ToArray(); 
         ui.CreateComboBox(edgeThresholdTexts,
-            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex],
+            (selectedIndex, selectedText) => _sobelEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex],
             selectedItemIndex: 2,
             width: 100,
             keyText: "      Edge Threshold:",
@@ -323,7 +323,7 @@ public class PostProcessingSample : CommonSample
         //ui.CreateCheckBox("      AddEdgeToCurrentColor", true, isChecked => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = isChecked);
         
         ui.CreateComboBox(new string[] { "false", "true" },
-            (selectedIndex, selectedText) => _soberEdgeDetectionPostProcess.AddEdgeToCurrentColor = selectedIndex > 0,
+            (selectedIndex, selectedText) => _sobelEdgeDetectionPostProcess.AddEdgeToCurrentColor = selectedIndex > 0,
             selectedItemIndex: 1,
             width: 60,
             keyText: "      AddEdgeToCurrentColor:",

@@ -21,7 +21,7 @@ public class OutlinesOverObjectsSample: CommonSample
     private RenderingLayer? _filteredRenderingLayer1;
     private RenderingLayer? _filteredRenderingLayer2;
 
-    private SoberEdgeDetectionPostProcess? _soberEdgeDetectionPostProcess;
+    private SobelEdgeDetectionPostProcess? _sobelEdgeDetectionPostProcess;
     private ExpandPostProcess? _expandPostProcess1;
     private ExpandPostProcess? _expandPostProcess2;
     
@@ -113,7 +113,7 @@ public class OutlinesOverObjectsSample: CommonSample
             _outlineObjectsSceneView.PostProcesses.Clear();
             
             // Most of the post processes do not create any resources, but still it is a good practice to dispose them (maybe in the future they will require some resources).
-            _soberEdgeDetectionPostProcess?.Dispose();
+            _sobelEdgeDetectionPostProcess?.Dispose();
             _expandPostProcess1?.Dispose();
             _expandPostProcess2?.Dispose();
             
@@ -160,8 +160,8 @@ public class OutlinesOverObjectsSample: CommonSample
             renderObjectsRenderingStep.FilterObjectsFunction += (renderingItem) => renderingItem.ParentSceneNode != null && _selectedObjects.Contains(renderingItem.ParentSceneNode);
         }
 
-        // After the selected objects are rendered, we apply a SoberEdgeDetectionPostProcess to find the edges of the rendered objects.
-        _soberEdgeDetectionPostProcess = new SoberEdgeDetectionPostProcess()
+        // After the selected objects are rendered, we apply a SobelEdgeDetectionPostProcess to find the edges of the rendered objects.
+        _sobelEdgeDetectionPostProcess = new SobelEdgeDetectionPostProcess()
         {
             EdgeThreshold = 0.05f,                  // This value can be increased to slightly reduce the size of the edge
             ColorFactors = new Vector4(0, 0, 0, 1), // Detect edge only on alpha channel so we do not get inner-object edges but only outer-object edges
@@ -171,7 +171,7 @@ public class OutlinesOverObjectsSample: CommonSample
             NonEdgeColor = Color4.TransparentBlack  // all color components set to 0
         };
 
-        _outlineObjectsSceneView.PostProcesses.Add(_soberEdgeDetectionPostProcess);
+        _outlineObjectsSceneView.PostProcesses.Add(_sobelEdgeDetectionPostProcess);
         
         
         // ExpandPostProcess requires two passes: horizontal and vertical
@@ -303,8 +303,8 @@ public class OutlinesOverObjectsSample: CommonSample
         ui.CreateComboBox(new string[] { "Black", "Red", "Green", "Blue", "#55000055" /* semi-transparent red */ },
             (selectedIndex, selectedText) =>
             {
-                if (_soberEdgeDetectionPostProcess != null && Color4.TryParse(selectedText, out var edgeColor))
-                    _soberEdgeDetectionPostProcess.EdgeColor = edgeColor;
+                if (_sobelEdgeDetectionPostProcess != null && Color4.TryParse(selectedText, out var edgeColor))
+                    _sobelEdgeDetectionPostProcess.EdgeColor = edgeColor;
                 
                 UpdateOutlines();
             },
