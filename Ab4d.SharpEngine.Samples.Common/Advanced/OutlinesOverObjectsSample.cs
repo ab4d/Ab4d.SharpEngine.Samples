@@ -168,7 +168,7 @@ public class OutlinesOverObjectsSample: CommonSample
             ClearColor = Color4.Transparent,        // Use transparent color for background
             AddEdgeToCurrentColor = false,          // do not multiply the edge color with the current color
             EdgeColor = Colors.Red,
-            NonEdgeColor = new Color4(0, 0, 0, 0)   // Transparent
+            NonEdgeColor = Color4.TransparentBlack  // all color components set to 0
         };
 
         _outlineObjectsSceneView.PostProcesses.Add(_soberEdgeDetectionPostProcess);

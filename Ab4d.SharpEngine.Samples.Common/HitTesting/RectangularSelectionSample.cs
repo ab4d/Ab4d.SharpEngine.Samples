@@ -612,7 +612,7 @@ public abstract class RectangularSelectionSample : CommonSample
             {
                 _bitmapIdSceneView = new SceneView(Scene, "BitmapID-SceneView");
                 _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
-                _bitmapIdSceneView.BackgroundColor = new Color4(0, 0, 0, 0); // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+                _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
             }
             else if (_bitmapIdSceneView.Width != SceneView.Width || _bitmapIdSceneView.Height != SceneView.Height)
             {
@@ -631,7 +631,7 @@ public abstract class RectangularSelectionSample : CommonSample
 
             // But we still need to make sure that the BackgroundColor is set to black (no object id)
             // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
-            SceneView.BackgroundColor = new Color4(0, 0, 0, 0);
+            SceneView.BackgroundColor = Color4.TransparentBlack;
         }
 
 
