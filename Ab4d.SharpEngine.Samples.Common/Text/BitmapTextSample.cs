@@ -7,7 +7,7 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 
-namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
+namespace Ab4d.SharpEngine.Samples.Common.Text;
 
 // Ab4d.SharpEngine can show text by rendering bitmap font.
 // Bitmap font is defined by one or more textures with rendered characters and font data that define where on the texture the character is.
@@ -39,7 +39,7 @@ namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 public class BitmapTextSample : CommonSample
 {
     public override string Title => "Bitmap Text";
-    public override string Subtitle => "SharpEngine can render text by using BitmapTextCreator that can render bitmap fonts.";
+    public override string Subtitle => "BitmapTextCreator can be used to render text from bitmap fonts.";
     
     private string _textToShow = "Demo bitmap text\nwith some special characters:\n{}@äöčšž";
 
@@ -213,8 +213,8 @@ public class BitmapTextSample : CommonSample
         {
             if (targetPositionCamera.ProjectionType == ProjectionTypes.Orthographic)
             {
-                scaleX = (desiredScreenSize.X / SceneView.Width) / _textSize.X;
-                scaleY = (desiredScreenSize.Y / SceneView.Height) / _textSize.Y;
+                scaleX = desiredScreenSize.X / SceneView.Width / _textSize.X;
+                scaleY = desiredScreenSize.Y / SceneView.Height / _textSize.Y;
             }
             else
             {
@@ -232,7 +232,7 @@ public class BitmapTextSample : CommonSample
                 // To get look direction distance we project the distanceVector to the look direction vector
                 var lookDirectionDistance = Vector3.Dot(distanceVector, lookDirection);
 
-                var worldSize = Utilities.CameraUtils.GetPerspectiveWorldSize(desiredScreenSize, lookDirectionDistance, targetPositionCamera.FieldOfView, new Vector2(SceneView.Width, SceneView.Height));
+                var worldSize = CameraUtils.GetPerspectiveWorldSize(desiredScreenSize, lookDirectionDistance, targetPositionCamera.FieldOfView, new Vector2(SceneView.Width, SceneView.Height));
 
 
                 scaleX = worldSize.X / _textSize.X;
@@ -308,7 +308,7 @@ public class BitmapTextSample : CommonSample
         string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\");
         fontPath = FileUtils.FixDirectorySeparator(fontPath);
         
-        var allFontFiles = System.IO.Directory.GetFiles(fontPath, "*.fnt");
+        var allFontFiles = Directory.GetFiles(fontPath, "*.fnt");
 
         _fontFiles = new List<string>(allFontFiles.Length + 1);
         _fontDescriptions = new List<string>(allFontFiles.Length + 1);
@@ -323,7 +323,7 @@ public class BitmapTextSample : CommonSample
             if (fontFile.Contains(".text."))
                 continue;
 
-            var fontFileName = System.IO.Path.GetFileName(fontFile);
+            var fontFileName = Path.GetFileName(fontFile);
             var fontFileParts = fontFileName.Split('_');
 
             var fontName = fontFileParts[0]; // Start with font name
@@ -373,7 +373,7 @@ public class BitmapTextSample : CommonSample
         ui.CreateComboBox(fontSizes.Select(f => f.ToString()).ToArray(), 
             (selectedIndex, selectedText) =>
             {
-                _fontSize = Int32.Parse(selectedText!);
+                _fontSize = int.Parse(selectedText!);
                 RecreateText();
             }, selectedItemIndex: Array.IndexOf(fontSizes, (int)_fontSize), 
             width: 80, 

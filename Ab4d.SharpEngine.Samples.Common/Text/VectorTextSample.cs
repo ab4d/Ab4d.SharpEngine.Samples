@@ -9,7 +9,7 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 
-namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
+namespace Ab4d.SharpEngine.Samples.Common.Text;
 
 public class VectorTextSample : CommonSample
 {
@@ -80,7 +80,7 @@ public class VectorTextSample : CommonSample
         }
 
 
-        if (!System.IO.Path.IsPathRooted(fontFileName))
+        if (!Path.IsPathRooted(fontFileName))
             fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontFileName);
 
 
@@ -290,7 +290,7 @@ public class VectorTextSample : CommonSample
         for (int i = from; i <= to; i++)
         {
             text += (char)i;
-            if (i > from && (i % lineLength) == 0)
+            if (i > from && i % lineLength == 0)
                 text += "\r\n";
         }
 
@@ -440,7 +440,7 @@ public class VectorTextSample : CommonSample
         ui.CreateComboBox(fontSizes.Select(f => f.ToString()).ToArray(), 
             (selectedIndex, selectedText) =>
             {
-                _fontSize = Int32.Parse(selectedText!);
+                _fontSize = int.Parse(selectedText!);
                 RecreateText();
             }, selectedItemIndex: Array.IndexOf(fontSizes, (int)_fontSize), 
             width: 80, 
@@ -477,7 +477,7 @@ public class VectorTextSample : CommonSample
             }, width: 90, 
             keyText: "FontStretch:", 
             keyTextWidth: 80,
-            formatShownValueFunc: fontStretch => $"{(fontStretch*100):F0}%");
+            formatShownValueFunc: fontStretch => $"{fontStretch*100:F0}%");
 
         ui.CreateLabel("BezierCurveSegmentsCount: (?):Specifies into how many segments (individual straight lines)\neach bezier curve from the character glyph is converted.\nSmaller values produce smaller meshes or less outline positions (are faster to render),\nbigger values produce more accurate fonts but are slower to render.\nSee 'Text mesh info' below to see the number of triangles used to define the text.\nZoom the camera to be very close to the text to see the difference on the curved parts.");
         ui.CreateSlider(1, 12, () => _bezierCurveSegmentsCount, 
