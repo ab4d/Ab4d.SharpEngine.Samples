@@ -236,12 +236,6 @@ public class OutlinesOverObjectsSample: CommonSample
 
         // Update the _overlayPanelGpuImage if its size is no longer the same as the _outlineObjectsSceneView size.
 
-        if (_overlayPanelGpuImage != null && (_overlayPanelGpuImage.Width != _outlineObjectsSceneView.Width || _overlayPanelGpuImage.Height != _outlineObjectsSceneView.Height))
-        {
-            _overlayPanelGpuImage.Dispose();
-            _overlayPanelGpuImage = null;
-        }
-
         if (_overlayPanelGpuImage == null)
         {
             _overlayPanelGpuImage = new GpuImage(GpuDevice,
@@ -252,6 +246,11 @@ public class OutlinesOverObjectsSample: CommonSample
                 IsPreMultipliedAlpha = true,
                 HasTransparentPixels = true,
             };
+        }
+        else
+        {
+            if (_overlayPanelGpuImage.Width != _outlineObjectsSceneView.Width || _overlayPanelGpuImage.Height != _outlineObjectsSceneView.Height)
+                _overlayPanelGpuImage.Resize(_outlineObjectsSceneView.Width, _outlineObjectsSceneView.Height);
         }
 
 
