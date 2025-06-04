@@ -40,8 +40,6 @@ public class BitmapTextSample : CommonSample
 {
     public override string Title => "Bitmap Text";
     public override string Subtitle => "BitmapTextCreator can be used to render text from bitmap fonts.";
-
-    public static bool UseAsyncMethods = true;
     
     private string _textToShow = "Demo bitmap text\nwith some special characters:\n{}@äöčšž";
 
