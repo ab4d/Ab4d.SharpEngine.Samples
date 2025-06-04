@@ -7,9 +7,9 @@ namespace Ab4d.SharpEngine.Samples.Common.Text;
 
 public class InstancedTextNodePerformanceSample : CommonSample
 {
-    public override string Title => "InstancedTextNode";
+    public override string Title => "InstancedTextNode - amazing performance";
 
-    public override string Subtitle => "InstancedTextNode is using mesh instancing and can very efficiently render millions of characters";
+    public override string Subtitle => "InstancedTextNode is using mesh instancing and can render millions of characters very efficiently";
     
     // Start with 8,000 individual texts (each shows its coordinates)
     private int _xCount = 10;
@@ -118,6 +118,10 @@ public class InstancedTextNodePerformanceSample : CommonSample
                     float xPos = (float)(centerPosition.X - (size.X / 2.0) + (x * xStep));
 
                     string infoText = $"({xPos:0} {yPos:0} {zPos:0})";
+
+                    // NOTE:
+                    // Here we set hasBackSide to true. This makes the text visible from both sides but
+                    // this requires rendering twice as many triangles. Set hasBackSide to false to increase the performance.
                     instancedTextNode.AddText(infoText, textColor, new Vector3(xPos, yPos, zPos), fontSize, hasBackSide: true);
                 }
             }
