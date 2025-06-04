@@ -16,10 +16,12 @@ public class InstancedTextNodePerformanceSample : CommonSample
     private int _yCount = 20;
     private int _zCount = 40;
     private float _fontSize = 20;
+    private bool _hasBackSize = true;
     
     private BitmapFont? _bitmapFont;
     private InstancedTextNode? _instancedTextNode;
     private ICommonSampleUIElement? _charsCountLabel;
+    private ICommonSampleUIElement? _alphaClipThresholdLabel;
 
     public InstancedTextNodePerformanceSample(ICommonSamplesContext context)
         : base(context)
@@ -118,11 +120,7 @@ public class InstancedTextNodePerformanceSample : CommonSample
                     float xPos = (float)(centerPosition.X - (size.X / 2.0) + (x * xStep));
 
                     string infoText = $"({xPos:0} {yPos:0} {zPos:0})";
-
-                    // NOTE:
-                    // Here we set hasBackSide to true. This makes the text visible from both sides but
-                    // this requires rendering twice as many triangles. Set hasBackSide to false to increase the performance.
-                    instancedTextNode.AddText(infoText, textColor, new Vector3(xPos, yPos, zPos), fontSize, hasBackSide: true);
+                    instancedTextNode.AddText(infoText, textColor, new Vector3(xPos, yPos, zPos), fontSize, hasBackSide: _hasBackSize);
                 }
             }
         }
@@ -188,6 +186,27 @@ public class InstancedTextNodePerformanceSample : CommonSample
         
         _charsCountLabel = ui.CreateLabel("Total chars count: ").SetStyle("bold");
         UpdateTotalCharsCount();
+        
+        ui.AddSeparator();
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("Render BackSide (?):By default the front and back side of the text are rendered.\nIt is possible to improve performance, by rendering\nonly the front side (reducing the number of drawn triangles by half).", _hasBackSize, isChecked =>
+        {
+            _hasBackSize = isChecked;
+            RecreateInstancedTextNode(this.Scene!);
+        });
+        
+        ui.AddSeparator();
+        
+        _alphaClipThresholdLabel = ui.CreateKeyValueLabel("AlphaClipThreshold: (?):AlphaClipThreshold specifies at which alpha value the pixels will be clipped (not rendered).\nDefault value is 0.5.", () => _instancedTextNode?.AlphaClipThreshold.ToString("F2") ?? "0");
+        ui.CreateSlider(0, 1, () => _instancedTextNode?.AlphaClipThreshold ?? 0, newValue =>
+        {
+            if (_instancedTextNode != null)
+            {
+                _instancedTextNode.AlphaClipThreshold = newValue;
+                _alphaClipThresholdLabel.UpdateValue();
+            }
+        });
         
         ui.AddSeparator();
 
