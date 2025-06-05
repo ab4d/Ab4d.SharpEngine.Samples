@@ -10,7 +10,7 @@ public class InstancedTextNodeSample : CommonSample
 {
     public override string Title => "InstancedTextNode - updating shown text";
 
-    public override string Subtitle => "This sample shows how to change the text that is rendered by InstancedTextNode";
+    public override string Subtitle => "This sample shows some additional options and how to change the text that is rendered by InstancedTextNode";
     
     private BitmapFont? _defaultBitmapFont;
     private BitmapFont? _additionalBitmapFont;
