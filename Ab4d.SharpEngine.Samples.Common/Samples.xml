@@ -96,7 +96,6 @@
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
-  <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures" IsNew="True"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
 
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
