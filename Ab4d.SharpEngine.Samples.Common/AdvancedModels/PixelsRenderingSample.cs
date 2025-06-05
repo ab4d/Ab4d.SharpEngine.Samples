@@ -1,11 +1,13 @@
-﻿using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
+using System.Numerics;
+using Ab4d.SharpEngine.Core;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -16,8 +18,14 @@ public class PixelsRenderingSample : CommonSample
     public override string Subtitle => "See also 'Importers / Point-cloud importer' sample";
 
     private float _pixelSize = 2;
+    private bool _useTexture = false;
 
-    private List<PixelsNode> _shownPositionsNodes = new();
+    private PixelsNode? _pixelsNode;
+    private GpuImage? _treeGpuImage;
+    private Color4 _savedPixelsColor;
+    
+    private ICommonSampleUIElement? _pixelSizeComboBox;
+    
 
     public PixelsRenderingSample(ICommonSamplesContext context)
         : base(context)
@@ -27,6 +35,16 @@ public class PixelsRenderingSample : CommonSample
     protected override void OnCreateScene(Scene scene)
     {
         ChangeShownPositions(selectedIndex: 2); // Show Dragon model
+        
+                
+        // IMPORTANT:
+        // With PixelNode and PixelMaterial, the texture is always rendered to a square area (width == height)
+        // so it is recommended that the texture is also square otherwise it will be stretched.
+        //
+        // In this sample we use a special TreeTexture-square.png that is the same as TreeTexture.png but
+        // has added transparent pixels on the left and right so that the final image is squared.
+        //_treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture-square.png", scene);
+        _treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture-square.png", scene);
 
         if (targetPositionCamera != null)
         {
@@ -61,10 +79,44 @@ public class PixelsRenderingSample : CommonSample
         // Create PixelsNode that will show the positions.
         // We can also pass the positionBounds that define the BoundingBox of the positions.
         // If this is not done, the BoundingBox is calculated by the SharpEngine by checking all the positions.
-        var pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, pixelSize, "PixelsNode");
+        _pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, pixelSize, "PixelsNode");
 
-        Scene.RootNode.Add(pixelsNode);
-        _shownPositionsNodes.Add(pixelsNode);
+        UpdatePixelsTexture();
+
+        Scene.RootNode.Add(_pixelsNode);
+    }
+    
+    private void UpdatePixelsTexture()
+    {
+        if (_pixelsNode == null || _treeGpuImage == null)
+            return;
+        
+        if (_useTexture)
+        {
+            if (!_pixelsNode.HasTexture)
+            {
+                // Save the current pixel color, because calling SetTexture will set the PixelColor to white (no color mask)
+                _savedPixelsColor = _pixelsNode.PixelColor; 
+
+                _pixelsNode.SetTexture(_treeGpuImage);
+
+                // SetTexture has some additional overrides:
+                //pixelsNode.SetTexture(_treeGpuImage, colorMask: Colors.Red, alphaClipThreshold: 0.1f);
+
+                // We could also set the texture directly to the PixelMaterial of the PixelsNode
+                //var pixelMaterial = pixelsNode.GetMaterial();
+                //pixelMaterial.DiffuseTexture = _treeGpuImage;
+                //pixelMaterial.PixelColor = Color4.White; // No color mask
+            }
+        }
+        else
+        {
+            if (_pixelsNode.HasTexture)
+            {
+                _pixelsNode.RemoveTexture();
+                _pixelsNode.PixelColor = _savedPixelsColor; // Restore the saved pixel color
+            }
+        }
     }
     
     private void ShowMillionBlocks(int xCount, int zCount, Vector3 blockSize, Color4 pixelColor)
@@ -132,8 +184,6 @@ public class PixelsRenderingSample : CommonSample
         // Dispose existing positions
         Scene.RootNode.DisposeAllChildren(disposeMaterials: false, disposeMeshes: true);
 
-        _shownPositionsNodes.Clear();
-
         switch (selectedIndex)
         {
                 case 0: // Box
@@ -200,15 +250,29 @@ public class PixelsRenderingSample : CommonSample
 
         var pixelSizes = new float[] { 0.1f, 0.5f, 1, 2, 4, 8, 16, 32 };
 
-        ui.CreateComboBox(
-            pixelSizes.Select(s => s.ToString()).ToArray(), 
+        _pixelSizeComboBox = ui.CreateComboBox(
+            pixelSizes.Select(s => s.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
             {
                 _pixelSize = pixelSizes[selectedIndex];
-                
-                foreach (var positionsNode in _shownPositionsNodes)
-                    positionsNode.PixelSize = _pixelSize;
-            }, 
+
+                if (_pixelsNode != null)
+                    _pixelsNode.PixelSize = _pixelSize;
+            },
             selectedItemIndex: 3);
+
+
+        ui.AddSeparator();
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("Use texture (billboard)", _useTexture, (isChecked) =>
+        {
+            _useTexture = isChecked;
+            
+            if (_pixelSize < 16)
+                _pixelSizeComboBox.SetValue("32"); // Increase pixel size to 32 so that texture is visible
+
+            UpdatePixelsTexture();
+        });
     }
 }
