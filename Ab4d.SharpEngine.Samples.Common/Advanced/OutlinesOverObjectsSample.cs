@@ -308,10 +308,25 @@ public class OutlinesOverObjectsSample: CommonSample
                 UpdateOutlines();
             },
             selectedItemIndex: 1,
-            width: 105,
+            width: 100,
             keyText: "Edge Color:",
             keyTextWidth: 100);
         
+        
+        var edgeThresholds = new float[] { 0.01f, 0.05f, 0.1f, 0.3f, 0.9f}; 
+        var edgeThresholdTexts = edgeThresholds.Select(v => v.ToString()).ToArray(); 
+        ui.CreateComboBox(edgeThresholdTexts,
+            (selectedIndex, selectedText) =>
+            {
+                if (_sobelEdgeDetectionPostProcess != null)
+                    _sobelEdgeDetectionPostProcess.EdgeThreshold = edgeThresholds[selectedIndex];
+
+                UpdateOutlines();
+            },
+            selectedItemIndex: 1,
+            width: 100,
+            keyText: "Edge Threshold:",
+            keyTextWidth: 100);        
         
         ui.CreateComboBox(new string[] { "Disabled", "1", "2", "3" },
             (selectedIndex, selectedText) =>
@@ -339,7 +354,7 @@ public class OutlinesOverObjectsSample: CommonSample
                 UpdateOutlines();
             },
             selectedItemIndex: 0,
-            width: 105,
+            width: 100,
             keyText: "Expand edge: (?):When enabled, then the ExpandPostProcess is used to expand the outline",
             keyTextWidth: 100);
     }    
