@@ -198,7 +198,7 @@ public class PixelsRenderingSample : CommonSample
 
                 case 2: // Dragon model
                     var dragonMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, finalSize: new Vector3(300, 300, 300));
-                    ShowMesh(dragonMesh, Colors.Gold);
+                    ShowMesh(dragonMesh, Colors.Orange);
                     break;
 
                 case 3: // 10,000 pixels (100 x 1 x 100)
@@ -248,7 +248,11 @@ public class PixelsRenderingSample : CommonSample
         ui.AddSeparator();
         ui.CreateLabel("PixelSize:");
 
-        var pixelSizes = new float[] { 0.1f, 0.5f, 1, 2, 4, 8, 16, 32 };
+        // Max point size is determined by the Vulkan device limits:
+        // var maxPointSize = this.Scene.GpuDevice.PhysicalDeviceDetails.PhysicalDeviceLimitsEx.PointSizeRange[1]
+        // This is 2047.9375 for NVIDIA
+        
+        var pixelSizes = new float[] { 0.1f, 0.5f, 1, 2, 4, 8, 16, 32, 64 };
 
         _pixelSizeComboBox = ui.CreateComboBox(
             pixelSizes.Select(s => s.ToString()).ToArray(),
