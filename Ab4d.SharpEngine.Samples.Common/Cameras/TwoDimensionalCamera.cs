@@ -190,7 +190,8 @@ public class TwoDimensionalCamera
     /// <param name="coordinateSystemType">CoordinateSystemTypes</param>
     public TwoDimensionalCamera(ManualPointerCameraController pointerCameraController, bool useScreenPixelUnits, TwoDimensionalCoordinateSystems coordinateSystemType = TwoDimensionalCoordinateSystems.CenterOfViewOrigin)
     {
-        ArgumentNullException.ThrowIfNull(nameof(pointerCameraController));
+        if (pointerCameraController == null)
+            throw new ArgumentNullException(nameof(pointerCameraController));
 
         if (pointerCameraController.SceneView == null)
             throw new ArgumentException("The SceneView property of the pointerCameraController is not set");

@@ -1,15 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using System.Drawing;
-using System.Runtime.CompilerServices;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.Transformations;
-using Ab4d.SharpEngine.glTF.Schema;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 
@@ -275,15 +271,17 @@ public class TwoDimensionalCameraSample : CommonSample
         if (Scene == null)
             return;
 
-        if (_vectorFontFactory == null)
-            EnsureVectorFont();
+        var vectorFontFactory = GetVectorFont();
+        
+        if (vectorFontFactory == null)
+            return;
 
-        var textMesh = _vectorFontFactory.CreateTextMesh(text,
-                                                         position,
-                                                         positionType,
-                                                         textDirection: new Vector3(1, 0, 0),
-                                                         upDirection: new Vector3(0, 1, 0),
-                                                         fontSize: fontSize);
+        var textMesh = vectorFontFactory.CreateTextMesh(text,
+                                                        position,
+                                                        positionType,
+                                                        textDirection: new Vector3(1, 0, 0),
+                                                        upDirection: new Vector3(0, 1, 0),
+                                                        fontSize: fontSize);
 
         if (textMesh == null)
             return;
@@ -297,11 +295,10 @@ public class TwoDimensionalCameraSample : CommonSample
         Scene.RootNode.Add(textMeshModelNode);
     }
 
-    [MemberNotNull(nameof(_vectorFontFactory))]
-    private void EnsureVectorFont()
+    private VectorFontFactory? GetVectorFont()
     {
         if (_vectorFontFactory != null)   
-            return;
+            return _vectorFontFactory;
 
         string fontName = "Roboto-Black.ttf";
         string fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontName);
@@ -321,10 +318,12 @@ public class TwoDimensionalCameraSample : CommonSample
         catch (Exception ex)
         {
             ShowErrorMessage("Error loading font:\n" + ex.Message);
-            return;
+            return null;
         }
 
         _vectorFontFactory = new VectorFontFactory(fontName);
+        
+        return _vectorFontFactory;
     }
 
     private GroupNode LoadSampleLinesData(float lineThickness, Vector2 targetPosition, Vector2 targetSize)
@@ -397,11 +396,17 @@ public class TwoDimensionalCameraSample : CommonSample
 
     private static List<LineData> ReadLineDataFromBin(out Vector2 boundsPosition, out Vector2 boundsSize)
     {
-        List<LineData> lines = null;
+        List<LineData> lines;
 
+        // Get all the names of the embedded resources in the assembly
         //var manifestResourceNames = typeof(TwoDimensionalCameraSample).Assembly.GetManifestResourceNames();
 
-        using (var stream = typeof(TwoDimensionalCameraSample).Assembly.GetManifestResourceStream("Ab4d.SharpEngine.Samples.Common.Resources.palazz_sport.bin"))
+        var stream = typeof(TwoDimensionalCameraSample).Assembly.GetManifestResourceStream("Ab4d.SharpEngine.Samples.Common.Resources.palazz_sport.bin");
+        
+        if (stream == null)
+            throw new FileNotFoundException("The embedded resource 'palazz_sport.bin' was not found in the assembly. Please make sure it is included in the project and set to 'Embedded Resource'.");
+
+        using (stream)
         {
             using (var reader = new BinaryReader(stream))
             {
