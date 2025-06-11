@@ -26,6 +26,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     
     private StandardMaterial? _gradientMaterial1;
     private StandardMaterial? _gradientMaterial2;
+    private StandardMaterial? _gradientMaterial3;
 
     private ICommonSampleUIElement? _segmentsSlider;
     private ICommonSampleUIElement? _startAngleSlider;
@@ -127,7 +128,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             return;
 
         Material? newMaterial = null;
-        
+
         if (textureIndex == 0)
         {
             newMaterial = modelMaterial; // Use default material
@@ -145,7 +146,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
                 var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, Colors.Red, Colors.Transparent, isHorizontal: false);
                 _gradientMaterial1 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
             }
-            
+
             newMaterial = _gradientMaterial1;
         }
         else if (textureIndex == 2)
@@ -173,10 +174,20 @@ public class CircleModelNodeSample : StandardModelsSampleBase
                 var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
                 _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "RedCirclesMaterial");
             }
-            
+
             newMaterial = _gradientMaterial2;
         }
+        else if (textureIndex == 3)
+        {
+            if (_gradientMaterial3 == null)
+            {
+                string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/saturn-rings-1x512.png");
+                var gpuImage = TextureLoader.CreateTexture(fileName, GpuDevice);
+                _gradientMaterial3 = new StandardMaterial(gpuImage, name: "SaturnRingsTextureMaterial");
+            }
 
+            newMaterial = _gradientMaterial3;
+        }
 
         _circleModelNode.Material = newMaterial; 
         
@@ -255,7 +266,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.AddSeparator();
 
                 
-        _segmentsSlider = ui.CreateSlider(3, 40,
+        _segmentsSlider = ui.CreateSlider(3, 50,
             () => _segmentsCount,
             newValue =>
             {
@@ -286,11 +297,11 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "TextureMapping:",
             keyTextWidth: 110);
         
-        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles" },
+        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Saturn rings" },
             (selectedIndex, selectedText) =>
             {
+                isTextureCheckBox?.SetValue(true);   
                 SetTextureImage(selectedIndex);
-                isTextureCheckBox?.SetValue(true);
             },
             selectedItemIndex: 0,
             width: 140,
@@ -308,10 +319,15 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
 
-        ui.CreateButton("Show two red circles", () =>
+        ui.CreateButton("Show Saturn rings", () =>
         {
             isTextureCheckBox?.SetValue(true);
-            _textureImageComboBox?.SetValue(2); // 1 = 'Red circles'
+            
+            // Inner diameter of rings is: 184.000 km; Outer diameter of rings is 274.000 km (source: https://wisp.physics.wisc.edu/astro104/lecture22/F15_02.jpg)
+            _radiusSlider?.SetValue(50);
+            _innerRadiusSlider?.SetValue(33);
+            
+            _textureImageComboBox?.SetValue(3); // 3 = 'Saturn rings'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
 
