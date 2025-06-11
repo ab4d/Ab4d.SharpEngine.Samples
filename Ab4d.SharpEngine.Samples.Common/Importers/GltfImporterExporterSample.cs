@@ -35,7 +35,7 @@ public class GltfImporterExporterSample : CommonSample
 
     private Vector2? _savedAxisPanelPosition;
 
-    private bool _isFullLoggingEnabled = false;
+    private bool _isFullLoggingEnabled;
 
     private enum ViewTypes
     {
@@ -427,7 +427,7 @@ public class GltfImporterExporterSample : CommonSample
         
         public MyDracoReader(byte[] dracoFileBytes)
         {
-            _dracoMesh = Draco.Decode(dracoFileBytes) as DracoMesh;
+            _dracoMesh = (DracoMesh)Draco.Decode(dracoFileBytes);
         }
         
         public override Vector3[] GetPositions()
@@ -449,7 +449,7 @@ public class GltfImporterExporterSample : CommonSample
             return positions;
         }
 
-        public override Vector3[] GetNormals()
+        public override Vector3[]? GetNormals()
         {
             var attribute = _dracoMesh.GetNamedAttribute(Openize.Drako.AttributeType.Normal);
             
@@ -469,7 +469,7 @@ public class GltfImporterExporterSample : CommonSample
             return normals;
         }
         
-        public override Vector4[] GetTangents()
+        public override Vector4[]? GetTangents()
         {
             // Openize.Drako does not define Tangent attribute type.
             // When Tangent data is present, it stores that as Generic attribute.
@@ -494,7 +494,7 @@ public class GltfImporterExporterSample : CommonSample
             return tangents;
         }
         
-        public override Vector2[] GetTextureCoordinates()
+        public override Vector2[]? GetTextureCoordinates()
         {
             var attribute = _dracoMesh.GetNamedAttribute(AttributeType.TexCoord);
 
@@ -516,7 +516,7 @@ public class GltfImporterExporterSample : CommonSample
             return textureCoordinates;
         }
         
-        public override int[] GetTriangleIndices()
+        public override int[]? GetTriangleIndices()
         {
             if (_dracoMesh.Indices == null || _dracoMesh.Indices.Count == 0)
                 return null;
