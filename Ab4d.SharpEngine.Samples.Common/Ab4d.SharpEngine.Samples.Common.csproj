@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
+    <PackageReference Include="Openize.Drako" Version="1.4.3" /> <!-- Required only to read Draco compressed glTF file -->
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
     <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9287-rc1" />

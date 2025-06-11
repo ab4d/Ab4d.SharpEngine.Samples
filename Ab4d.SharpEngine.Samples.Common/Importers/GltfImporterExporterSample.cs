@@ -1,14 +1,15 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using Ab4d.Assimp;
+using Ab4d.SharpEngine.Assimp;
+using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.glTF;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
-using System.Runtime.InteropServices;
-using Ab4d.Assimp;
-using Ab4d.SharpEngine.Assimp;
-using Ab4d.SharpEngine.Cameras;
+using Openize.Drako;
 using System.Numerics;
-using Ab4d.SharpEngine.glTF;
+using System.Runtime.InteropServices;
 
 namespace Ab4d.SharpEngine.Samples.Common.Importers;
 
@@ -16,7 +17,7 @@ public class GltfImporterExporterSample : CommonSample
 {
     public override string Title => "glTF 2 Importer and Exporter";
 
-    private string _subtitle = "glTF 2 file importer and exporter are defined in the Ab4d.SharpEngine.glTF NuGet package.\nThey can import from glTF 2 files (.gltf or .glb) and export the current scene to that file format.\nTo export 3D scene for any other example, open Diagnostics window and select 'Export Scene to glTF'.";
+    private string _subtitle = "glTF 2 file importer and exporter are defined in the Ab4d.SharpEngine.glTF NuGet package.\nThey can import from glTF 2 files (.gltf or .glb) and export the current scene to that file format.\nTo export 3D scene for any other example, open Diagnostics window and select 'Export Scene to glTF'.\n\nThis sample also used a third-party Openize.Drako library to read Draco compressed glTF files.";
     public override string? Subtitle => _subtitle;
 
     private readonly string _initialFileName = "Resources\\Models\\voyager.gltf";
@@ -142,6 +143,11 @@ public class GltfImporterExporterSample : CommonSample
         // When "Enable full logging" CheckBox is checked, then we show full logging; otherwise only warnings and errors are shown
         glTfImporter.LogInfoMessages = _isFullLoggingEnabled;
         glTfImporter.LoggerCallback = (logLevel, message) => System.Diagnostics.Debug.WriteLine($"glTfImporter: {logLevel} {message}");
+        
+        
+        // To support Draco compressed meshes we need to set the DracoMeshReaderFactory.
+        // The MyDracoReader class is defined below and uses Openize.Drako library to read Draco compressed meshes.Add commentMore actions
+        glTfImporter.DracoMeshReaderFactory = (dracoFileBytes) => new MyDracoReader(dracoFileBytes);
 
         try
         {
@@ -412,4 +418,115 @@ public class GltfImporterExporterSample : CommonSample
             }
         }
     }
+    
+
+    // Custom DracoMeshReader that uses Openize.Drako library to read Draco compressed meshes.
+    class MyDracoReader : DracoMeshReader
+    {
+        private readonly DracoMesh _dracoMesh;
+        
+        public MyDracoReader(byte[] dracoFileBytes)
+        {
+            _dracoMesh = Draco.Decode(dracoFileBytes) as DracoMesh;
+        }
+        
+        public override Vector3[] GetPositions()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(Openize.Drako.AttributeType.Position);
+
+            // IndicesMap define the mapping from the original indices to the new indices in the attribute buffer,
+            // for example for box.gltf, the IndicesMap is [2, 2, 2, 0, 0, 0, ...
+            // and this means that the first 3 positions in the final positions array are the same as the 2nd position in the attribute (compressed buffer)
+            var positionsCount = attribute.IndicesMap.Length;
+            var positions = new Vector3[positionsCount];
+            for (int i = 0; i < positionsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                var pos = attribute.GetValueAsVector3(index);
+                positions[i] = new Vector3(pos.X, pos.Y, pos.Z);
+            }
+            
+            return positions;
+        }
+
+        public override Vector3[] GetNormals()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(Openize.Drako.AttributeType.Normal);
+            
+            if (attribute == null)
+                return null;
+
+            // See comment in GetPositions
+            var normalsCount = attribute.IndicesMap.Length;
+            var normals = new Vector3[normalsCount];
+            for (int i = 0; i < normalsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                var n = attribute.GetValueAsVector3(index);
+                normals[i] = new Vector3(n.X, n.Y, n.Z);
+            }
+            
+            return normals;
+        }
+        
+        public override Vector4[] GetTangents()
+        {
+            // Openize.Drako does not define Tangent attribute type.
+            // When Tangent data is present, it stores that as Generic attribute.
+            // In this cas we need to check that the DataType is FLOAT32 and ComponentsCount is 4 (Vector4)
+            var attribute = _dracoMesh.GetNamedAttribute(AttributeType.Generic);
+
+            if (attribute == null || attribute.ComponentsCount != 4 || attribute.DataType != DataType.FLOAT32)
+                return null;
+            
+            var oneVector4 = new float[4];
+            
+            var tangentsCount = attribute.IndicesMap.Length;
+            var tangents = new Vector4[tangentsCount];
+        
+            for (int i = 0; i < tangentsCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                attribute.GetValue(index, oneVector4);
+                tangents[i] = new Vector4(oneVector4[0], oneVector4[1], oneVector4[2], oneVector4[3]);
+            }
+            
+            return tangents;
+        }
+        
+        public override Vector2[] GetTextureCoordinates()
+        {
+            var attribute = _dracoMesh.GetNamedAttribute(AttributeType.TexCoord);
+
+            if (attribute == null)
+                return null;
+            
+            var oneUV = new float[2];
+            
+            var textureCoordinatesCount = attribute.IndicesMap.Length;
+            var textureCoordinates = new Vector2[textureCoordinatesCount];
+        
+            for (int i = 0; i < textureCoordinatesCount; i++)
+            {
+                int index = attribute.IndicesMap[i];
+                attribute.GetValue(index, oneUV);
+                textureCoordinates[i] = new Vector2(oneUV[0], oneUV[1]);
+            }
+            
+            return textureCoordinates;
+        }
+        
+        public override int[] GetTriangleIndices()
+        {
+            if (_dracoMesh.Indices == null || _dracoMesh.Indices.Count == 0)
+                return null;
+            
+            var indicesCount = _dracoMesh.Indices.Count;
+            var indices = new int[indicesCount];
+            for (int i = 0; i < indicesCount; i++)
+                indices[i] = _dracoMesh.Indices[i];
+
+            return indices;
+        }
+    }        
 }
