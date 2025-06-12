@@ -43,7 +43,6 @@ public class PixelsRenderingSample : CommonSample
         //
         // In this sample we use a special TreeTexture-square.png that is the same as TreeTexture.png but
         // has added transparent pixels on the left and right so that the final image is squared.
-        //_treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture-square.png", scene);
         _treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture-square.png", scene);
 
         if (targetPositionCamera != null)
