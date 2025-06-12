@@ -167,20 +167,9 @@ public class TwoDimensionalCamera
     public Vector2 ViewSize { get; private set; }
 
     /// <summary>
-    /// IsLoaded is true when the TwoDimensionalCamera and its ParentDXViewportView is loaded and the dpi scale information is valid. 
-    /// </summary>
-    public bool IsLoaded { get; private set; }
-
-    /// <summary>
     /// CameraChanged event is triggered when the camera is changed (this can happen also when the size of the view is changed).
     /// </summary>
     public event EventHandler? CameraChanged;
-
-    /// <summary>
-    /// Loaded event is triggered when the parentDXViewportView is loaded and when the dpi scale information is valid. See also <see cref="IsLoaded"/> property.
-    /// </summary>
-    public event EventHandler? Loaded;
-
 
     /// <summary>
     /// Constructor
@@ -242,8 +231,6 @@ public class TwoDimensionalCamera
         pointerCameraController.ZoomMode                         = CameraZoomMode.PointerPosition;
     }
 
-
-
     /// <summary>
     /// Returns the position and size of a rectangle that represent the visible area in the units of this camera.
     /// This takes <see cref="ZoomFactor"/> and <see cref="Offset"/> into account.
@@ -261,17 +248,6 @@ public class TwoDimensionalCamera
 
         return (new Vector2(x1, y1), new Vector2(width, height));
     }
-
-
-    //private void ParentSharpEngineSceneViewOnLoaded(object? sender, RoutedEventArgs e)
-    //{
-    //    IsLoaded = true;
-
-    //    ParentSharpEngineSceneView.Loaded -= ParentSharpEngineSceneViewOnLoaded;
-
-    //    UpdateDpiScale();
-    //    OnLoaded();
-    //}
 
     /// <summary>
     /// Update method manually updates the DpiScale and ViewSize.
@@ -291,103 +267,6 @@ public class TwoDimensionalCamera
         ZoomFactor = 1;
     }
 
-
-    ///// <summary>
-    ///// Returns a Vector3 in the 3D world coordinates from the 2D view coordinates (for example converts a mouse coordinate to coordinates in which the shown lines and shapes are defined).
-    ///// See <see cref="ToWpfPosition(Point3D)"/> to get the opposite conversion.
-    ///// </summary>
-    ///// <param name="viewPosition">2D position in view coordinates</param>
-    ///// <returns>Point3D in the view coordinates</returns>
-    //public Vector3 ToWorldPosition3D(Vector2 viewPosition)
-    //{
-    //    var point2d = ToViewPosition(viewPosition);
-    //    return new Vector3(point2d.X, point2d.Y, 0);
-    //}
-
-    ///// <summary>
-    ///// Returns a Point in the view coordinates from the 2D wpfPosition (for example converts a mouse coordinate to coordinates in which the shown lines and shapes are defined).
-    ///// See <see cref="ToWpfPosition(Point)"/> to get the opposite conversion.
-    ///// </summary>
-    ///// <param name="wpfPosition">WPF's 2D position</param>
-    ///// <returns>Point in the view coordinates</returns>
-    //public Point ToViewPosition(Point wpfPosition)
-    //{
-    //    float scale = _zoomFactor;
-    //    if (UseScreenPixelUnits)
-    //        scale *= _dpiScale;
-
-    //    // adjust because we have center of screen in the middle (where the camera looks to)
-    //    var offset = UsedCamera.Offset + UsedCamera.TargetPosition;
-
-    //    float x = ( (wpfPosition.X - ViewSize.Width  * 0.5) / scale) + offset.X;
-    //    float y = (-(wpfPosition.Y - ViewSize.Height * 0.5) / scale) + offset.Y;
-
-    //    return new Point(x, y);
-    //}
-
-    ///// <summary>
-    ///// Returns a Point in the WPF coordinates from the 2D view coordinates (for example converts a line or shape coordinate to WPF coordinates of an overlay Canvas).
-    ///// See <see cref="ToViewPosition(Point)"/> to get the opposite conversion.
-    ///// </summary>
-    ///// <param name="viewPosition">2D view coordinates</param>
-    ///// <returns>WPF's 2D position</returns>        
-    //public Point ToWpfPosition(Point viewPosition)
-    //{
-    //    float scale = _zoomFactor;
-    //    if (UseScreenPixelUnits)
-    //        scale *= _dpiScale;
-
-    //    // adjust because we have center of screen in the middle (where the camera looks to)
-    //    var offset = UsedCamera.Offset + UsedCamera.TargetPosition;
-
-    //    // For the formula in ToViewPosition
-    //    // x2                      = ((x1 - ViewSize.Width * 0.5) / scale) + offset.X;
-    //    // x2 - offset.X           = ((x1 - ViewSize.Width * 0.5) / scale);
-    //    // (x2 - offset.X) * scale = x1 - ViewSize.Width * 0.5;
-    //    // x1                      = ((x2 - offset.X) * scale) + ViewSize.Width * 0.5;
-
-    //    float x = ( (viewPosition.X - offset.X) * scale) + ViewSize.Width * 0.5;
-    //    float y = (-(viewPosition.Y - offset.Y) * scale) + ViewSize.Height * 0.5;
-
-    //    return new Point(x, y);
-    //}
-
-    ///// <summary>
-    ///// Returns a Point in the WPF coordinates from the view coordinates specified as as Point3D (for example converts a line or shape coordinate to WPF coordinates of an overlay Canvas).
-    ///// See <see cref="ToWorldPosition3D"/> to get the opposite conversion.
-    ///// </summary>
-    ///// <param name="viewPosition3D">view coordinates as Point3D</param>
-    ///// <returns>WPF's 2D position</returns>           
-    //public Point ToWpfPosition(Point3D viewPosition3D)
-    //{
-    //    var point2d = ToWpfPosition(new Point(viewPosition3D.X, viewPosition3D.Y));
-    //    return new Point(point2d.X, point2d.Y);
-    //}
-
-
-    ///// <summary>
-    ///// Gets the size in the current view units and zoom level
-    ///// (for example if you want to show a rectangle that will be shown as 10 WPF units wide rectangle, then use this method to get the required size in view units and for the current zoom factor).
-    ///// </summary>
-    ///// <param name="wpfSize">wpfSize</param>
-    ///// <returns>size in the current view units and zoom factor</returns>
-    //public float GetViewSizeFromWpfSize(float wpfSize)
-    //{
-    //    return wpfSize / ZoomFactor;
-    //}
-
-    ///// <summary>
-    ///// Gets the size in WPF units form the view units.
-    ///// This represents the size as visible by the user in WPF units based on the view units and current zoom factor.
-    ///// </summary>
-    ///// <param name="viewSize">size in view units</param>
-    ///// <returns>size in WPF units</returns>        
-    //public float GetWpfSizeFromViewSize(float viewSize)
-    //{
-    //    return viewSize * ZoomFactor;
-    //}
-
-
     /// <summary>
     /// OnCameraChanged
     /// </summary>
@@ -396,16 +275,6 @@ public class TwoDimensionalCamera
         if (CameraChanged != null)
             CameraChanged(this, EventArgs.Empty);
     }
-
-    /// <summary>
-    /// OnLoaded
-    /// </summary>
-    protected void OnLoaded()
-    {
-        if (Loaded != null)
-            Loaded(this, EventArgs.Empty);
-    }
-
 
     private void OnSceneViewInitialized(object? sender, EventArgs e)
     {
@@ -418,9 +287,6 @@ public class TwoDimensionalCamera
     private void OnSceneViewSizeChanged(object? sender, ViewSizeChangedEventArgs e)
     {
         ProcessSizeChanged();
-
-        //if (!this.IsLoaded)
-        //    ParentSharpEngineSceneViewOnLoaded(sender, new Avalonia.Interactivity.RoutedEventArgs());
     }
 
     private void UpdateDpiScale()
@@ -462,7 +328,5 @@ public class TwoDimensionalCamera
         ViewSize = new Vector2(viewWidth, viewHeight);
 
         UsedCamera.ViewWidth = viewWidth / _zoomFactor;
-
-        //OnCameraChanged(); // OnCameraChanged is called from ProcessCameraChanged that is called after we change the CameraWidth
     }
 }
