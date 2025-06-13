@@ -216,6 +216,8 @@ public class AnimatedTexturesSample : CommonSample
         // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
         base.SubscribeSceneUpdating(UpdateAnimatedGradient);
         
+        UpdateAnimatedGradient(elapsedSeconds: 0);
+        
 
         if (targetPositionCamera != null)
         {
