@@ -114,8 +114,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (_currentCommonSample == null)
                 return;
 
-            _currentCommonSample.InitializeScene(MainSceneView.Scene);
-            _currentCommonSample.InitializeSceneView(MainSceneView.SceneView);
+            _currentCommonSample.InitializeSharpEngineView(MainSceneView);
             _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
 
             _currentCommonSample.CreateUI(_avaloniaUiProvider);
