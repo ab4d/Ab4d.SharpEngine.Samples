@@ -481,6 +481,16 @@ public abstract class CommonSample
         if (_timeToHideErrorMessage == DateTime.MinValue)
             UnsubscribeSceneUpdatingEvent();
     }
+    
+    // This is called from automated tests to prevent animating the sample
+    // The difference between this method and UnsubscribeSceneUpdating is that
+    // this method preserves the _subscribedSceneUpdatingAction and allows calling CallSceneUpdating later.
+    public void PreventSceneUpdating()
+    {
+        var savedSceneUpdatingAction = _subscribedSceneUpdatingAction;
+        UnsubscribeSceneUpdatingEvent();
+        _subscribedSceneUpdatingAction = savedSceneUpdatingAction;
+    }
 
     public void CallSceneUpdating(float customElapsedSeconds)
     {
