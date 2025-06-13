@@ -14,9 +14,6 @@ public class SpritesSample : CommonSample
     private GpuImage? _treeTexture;
 
     private SpriteBatch? _animatedSpriteBatch;
-    private DateTime _animationStartTime;
-
-    private SceneView? _subscribedSceneView;
 
     public SpritesSample(ICommonSamplesContext context)
         : base(context)
@@ -166,31 +163,26 @@ public class SpritesSample : CommonSample
         // and only the animated SpriteBatch needs to recreate its RenderingItems.
         _animatedSpriteBatch = sceneView.CreateOverlaySpriteBatch("AnimatedSpriteBatch");
 
-        UpdateAnimatedSpriteBatch();
+        
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateAnimatedSpriteBatch);
 
-        sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
-        _subscribedSceneView = sceneView;
+        // Set the initial position of the animated sprite batch
+        UpdateAnimatedSpriteBatch(elapsedSeconds: 0);
     }
 
-    private void OnSceneViewOnSceneUpdating(object? sender, EventArgs args)
-    {
-        UpdateAnimatedSpriteBatch();
-    }
-
-
-    private void UpdateAnimatedSpriteBatch()
+    private void UpdateAnimatedSpriteBatch(float elapsedSeconds)
     {
         if (_animatedSpriteBatch == null || _uvCheckerTexture == null || SceneView == null)
             return;
 
-        var now = DateTime.Now;
-
-        if (_animationStartTime == DateTime.MinValue)
-            _animationStartTime = now;
-
-        var elapsedTime = now - _animationStartTime;
-        var animatedAngle = (float)(elapsedTime.TotalSeconds * 90f) % 360f;
-        var scale = MathF.Sin((float)elapsedTime.TotalSeconds * 2) * 0.1f + 0.12f; // from 0.02 to 0.22
+        var animatedAngle = (elapsedSeconds * 90f) % 360f;
+        var scale = MathF.Sin(elapsedSeconds * 2) * 0.1f + 0.12f; // from 0.02 to 0.22
         var imageSize = new Vector2(_uvCheckerTexture.Width * scale, _uvCheckerTexture.Height * scale);
 
         // Set sprite position so that the center will be at the center of the view
@@ -211,12 +203,6 @@ public class SpritesSample : CommonSample
 
     protected override void OnDisposed()
     {
-        if (_subscribedSceneView != null)
-        {
-            _subscribedSceneView.SceneUpdating -= OnSceneViewOnSceneUpdating;
-            _subscribedSceneView = null;
-        }
-
         Scene?.RemoveAllSpriteBatches();
         SceneView?.RemoveAllSpriteBatches();
 

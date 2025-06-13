@@ -28,8 +28,6 @@ public class ComplexSceneSample : CommonSample
 
     private ModelNode? _animatedModel1;
 
-    private long _initialTimestamp;
-
     private MatrixTransform? _silverPyramidTransform;
     private MatrixTransform? _redPyramidTransform;
     private TranslateTransform? _specialMaterialGroupTransform;
@@ -66,7 +64,6 @@ public class ComplexSceneSample : CommonSample
     {
         if (SceneView != null)
         {
-            SceneView.SceneUpdating -= UpdateModelWorldMatrices;
 
 #if ADVANCED_TIME_MEASUREMENT
             SceneView.SceneRendered -= SceneViewOnSceneRendered;
@@ -80,8 +77,13 @@ public class ComplexSceneSample : CommonSample
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        // Subscribe to SceneUpdating to update animations
-        sceneView.SceneUpdating += UpdateModelWorldMatrices;
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateModelWorldMatrices);
 
 #if ADVANCED_TIME_MEASUREMENT
         sceneView.SceneRendered += SceneViewOnSceneRendered;
@@ -877,22 +879,15 @@ public class ComplexSceneSample : CommonSample
         scene.Lights.Add(new SpotLight(new Vector3(300, 0, 300), new Vector3(-1, -0.3f, 0)) { Color = new Color3(0.4f, 0.4f, 0.4f) });
     }
 
-    private void UpdateModelWorldMatrices(object? sender, EventArgs e)
+    private void UpdateModelWorldMatrices(float elapsedSeconds)
     {
         if (!_isAnimatingScene)
             return;
 
         if (_animatedModel1 == null)
             return;
-
-
-        if (_initialTimestamp == 0)
-            _initialTimestamp = Stopwatch.GetTimestamp();
-
-        long currentTimestamp = Stopwatch.GetTimestamp();
-        float totalTime = (currentTimestamp - _initialTimestamp) / (float)Stopwatch.Frequency;
-
-        var world = Matrix4x4.CreateRotationY(MathF.Sin(totalTime) * MathF.PI);
+        
+        var world = Matrix4x4.CreateRotationY(MathF.Sin(elapsedSeconds) * MathF.PI);
         world.M43 = -120f;
 
         if (_silverPyramidTransform != null)
@@ -900,7 +895,7 @@ public class ComplexSceneSample : CommonSample
 
         if (_redPyramidTransform != null)
         {
-            world = Matrix4x4.CreateRotationY(MathF.Sin(totalTime + 1) * MathF.PI);
+            world = Matrix4x4.CreateRotationY(MathF.Sin(elapsedSeconds + 1) * MathF.PI);
             world.M42 = 60f;
             world.M43 = -120f;
 
@@ -908,7 +903,7 @@ public class ComplexSceneSample : CommonSample
         }
 
         if (_specialMaterialGroupTransform != null)
-            _specialMaterialGroupTransform.Y = MathF.Sin(totalTime * 2) * 20 + 15;
+            _specialMaterialGroupTransform.Y = MathF.Sin(elapsedSeconds * 2) * 20 + 15;
     }
 
     private GpuImage CreateCustomTexture(VulkanDevice gpuDevice, int width, int height, float alphaValue)

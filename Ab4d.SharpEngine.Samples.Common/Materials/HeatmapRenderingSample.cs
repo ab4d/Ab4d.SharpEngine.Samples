@@ -45,10 +45,6 @@ public class HeatmapRenderingSample : CommonSample
 
     private WireCrossNode? _hitWireCrossNode;
 
-    private SceneView? _subscribedSceneView;
-
-    private DateTime _animationStartTime;
-
     private static readonly GradientStop[] _gradient1 = new GradientStop[]
     {
         new GradientStop(Colors.DodgerBlue, 0.0f),
@@ -97,6 +93,15 @@ public class HeatmapRenderingSample : CommonSample
             targetPositionCamera.TargetPosition = new Vector3(0, 20, 0);
             targetPositionCamera.Distance = 150;
         }
+        
+        
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateHeatPosition);
     }
 
     protected override void OnDisposed()
@@ -107,21 +112,7 @@ public class HeatmapRenderingSample : CommonSample
             _gradientTexture = null;
         }
 
-        if (_subscribedSceneView != null)
-        {
-            _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
-            _subscribedSceneView = null;
-        }
-
         base.OnDisposed();
-    }
-
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        sceneView.SceneUpdating += SceneViewOnSceneUpdating;
-        _subscribedSceneView = sceneView;
-
-        base.OnSceneViewInitialized(sceneView);
     }
 
     private void ShowTeapot()
@@ -207,19 +198,10 @@ public class HeatmapRenderingSample : CommonSample
         geometryMesh.UpdateMesh(geometryMesh.BoundingBox);
     }
     
-    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
+    private void UpdateHeatPosition(float elapsedSeconds)
     {
         if (SceneView == null)
             return;
-
-        if (_animationStartTime == DateTime.MinValue)
-        {
-            _animationStartTime = DateTime.Now;
-            return;
-        }
-
-        float elapsedSeconds = (float)(DateTime.Now - _animationStartTime).TotalSeconds;
-
 
         // Position around center of the OverlayCanvas and with radius = 100 and in clockwise direction (negate the elapsedSeconds)
         float xPos = MathF.Sin(-elapsedSeconds * 2) * 100 + (float)SceneView.Width  / (2 * SceneView.DpiScaleX);

@@ -26,6 +26,12 @@ public abstract class CommonSample
     private string? _errorMessageToShow;
     private DateTime _timeToHideErrorMessage;
 
+    private Action<float>? _subscribedSceneUpdatingAction;
+    private SceneView? _subscribedSceneView;
+    private DateTime _startTime;
+    
+    public bool IsSceneUpdatingSubscribed => _subscribedSceneUpdatingAction != null;
+
     public Scene? Scene { get; private set; }
     public SceneView? SceneView { get; private set; }
 
@@ -244,6 +250,10 @@ public abstract class CommonSample
         if (ShowCameraAxisPanel && _createdCamera != null)
             CameraAxisPanel = CreateCameraAxisPanel(_createdCamera);
 
+        // If SubscribeSceneUpdating was called before the SceneView was initialized, then we need to subscribe to SceneUpdating event
+        if (_subscribedSceneUpdatingAction != null && _subscribedSceneView == null)
+            SubscribeSceneUpdatingEvent();
+
         OnSceneViewInitialized(sceneView);
     }
 
@@ -371,7 +381,7 @@ public abstract class CommonSample
             CameraAxisPanel = null;
         }
 
-        UnsubscribeSceneUpdating();
+        UnsubscribeSceneUpdatingEvent();
         SceneView?.RemoveAllSpriteBatches();
 
         ResetCameraAxisPanel(); // Reset position of CameraAxisPanel - it may be changed, for example in AssimpImporterSample when FileLoad panel is shown in bottom left
@@ -453,47 +463,91 @@ public abstract class CommonSample
         }
 
         if (showTimeMs > 0)
-            SubscribeSceneUpdating(DateTime.Now.AddMilliseconds(showTimeMs));
+            DelayHideErrorMessage(DateTime.Now.AddMilliseconds(showTimeMs));
+    }
+
+    public void SubscribeSceneUpdating(Action<float> sceneUpdatingAction)
+    {
+        _startTime = DateTime.Now;
+        _subscribedSceneUpdatingAction = sceneUpdatingAction;
+        
+        SubscribeSceneUpdatingEvent();
+    }
+        
+    public void UnsubscribeSceneUpdating()
+    {
+        _subscribedSceneUpdatingAction = null;
+
+        if (_timeToHideErrorMessage == DateTime.MinValue)
+            UnsubscribeSceneUpdatingEvent();
+    }
+
+    public void CallSceneUpdating(float customElapsedSeconds)
+    {
+        if (_subscribedSceneUpdatingAction == null)
+            throw new InvalidOperationException("Cannot call CallSceneUpdating when the SubscribeSceneUpdating method was not called");
+        
+        _subscribedSceneUpdatingAction(customElapsedSeconds);
     }
 
     private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
     {
-        bool unsubscribe = false;
+        bool waitToShowErrorMessage = false;
 
-        if (_timeToHideErrorMessage == DateTime.MinValue)
+        if (_timeToHideErrorMessage != DateTime.MinValue)
         {
-            unsubscribe = true;
+            if (DateTime.Now >= _timeToHideErrorMessage)
+            {
+                _errorMessagePanel?.SetIsVisible(false); // Hide error message
+                _timeToHideErrorMessage = DateTime.MinValue;
+            }
+            else
+            {
+                waitToShowErrorMessage = true;
+            }
         }
-        else if (DateTime.Now >= _timeToHideErrorMessage)
+        
+        if (_subscribedSceneUpdatingAction != null)
         {
-            _errorMessagePanel?.SetIsVisible(false); // Hide error message
-            unsubscribe = true;
+            double elapsedTime = (DateTime.Now - _startTime).TotalSeconds;
+            _subscribedSceneUpdatingAction((float)elapsedTime);
         }
 
-        if (unsubscribe)
-            UnsubscribeSceneUpdating(); 
+        if (!waitToShowErrorMessage && _subscribedSceneUpdatingAction == null)
+            UnsubscribeSceneUpdatingEvent(); 
     }
 
-    private void SubscribeSceneUpdating(DateTime timeToHideErrorMessage)
+    private void DelayHideErrorMessage(DateTime timeToHideErrorMessage)
     {
         if (SceneView == null || timeToHideErrorMessage < DateTime.Now)
             return;
 
-        if (_timeToHideErrorMessage == DateTime.MinValue) // not yet subscribed?
-            SceneView.SceneUpdating += SceneViewOnSceneUpdating;
-
         _timeToHideErrorMessage = timeToHideErrorMessage;
+        SubscribeSceneUpdatingEvent();
     }
 
-    private void UnsubscribeSceneUpdating()
+    private void SubscribeSceneUpdatingEvent()
     {
-        if (SceneView == null || _timeToHideErrorMessage == DateTime.MinValue)
+        if (_subscribedSceneView != null || SceneView == null)
             return;
 
-        SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+        SceneView.SceneUpdating += SceneViewOnSceneUpdating;
+        _subscribedSceneView = SceneView;
+    }
+    
+    private void UnsubscribeSceneUpdatingEvent()
+    {
+        if (_subscribedSceneView == null)
+            return;
+
+        _subscribedSceneUpdatingAction = null;
         _timeToHideErrorMessage = DateTime.MinValue;
+        
+        _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
+        _subscribedSceneView = null;
     }
 
+    
 
     protected void ClearErrorMessage()
     {

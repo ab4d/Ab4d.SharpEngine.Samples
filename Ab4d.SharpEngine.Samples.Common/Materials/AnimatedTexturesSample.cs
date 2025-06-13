@@ -15,11 +15,6 @@ public class AnimatedTexturesSample : CommonSample
     public override string Title => "Animated textures";
     public override string Subtitle => "Using CircleModelNode and animating texture with gradient. This can be used for object selection.";
 
-        
-    private DateTime _animationStartTime;
-    private SceneView? _subscribedSceneView;
-
-    
     private GpuImage? _animatedGradientTexture1;
     private GpuImage? _animatedGradientTexture2;
     
@@ -40,7 +35,6 @@ public class AnimatedTexturesSample : CommonSample
         _gradientMaterial1 = new SolidColorMaterial("AnimatedGradientMaterial1");
         _gradientMaterial2 = new SolidColorMaterial("AnimatedGradientMaterial2");
 
-        UpdateAnimatedGradient();
         
         
         var circleModelNode1 = new CircleModelNode("CircleModelNode1")
@@ -214,6 +208,14 @@ public class AnimatedTexturesSample : CommonSample
         scene.RootNode.Add(circleModelNode8);
         
         
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateAnimatedGradient);
+        
 
         if (targetPositionCamera != null)
         {
@@ -224,59 +226,15 @@ public class AnimatedTexturesSample : CommonSample
         }
     }
     
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        sceneView.SceneUpdating += SceneViewOnSceneUpdating;
-        _subscribedSceneView = sceneView;
-
-        StartAnimation();
-
-        base.OnSceneViewInitialized(sceneView);
-    }
-    
-    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
-    {
-        if (_animationStartTime != DateTime.MinValue)
-            UpdateAnimatedGradient();
-    }
-
     /// <inheritdoc />
     protected override void OnDisposed()
     {
         _gradientMaterial1?.DisposeWithTexture();
-        
-        if (_subscribedSceneView != null)
-        {
-            _subscribedSceneView.SceneUpdating -= SceneViewOnSceneUpdating;
-            _subscribedSceneView = null;
-        }
-        
         base.OnDisposed();
     }
 
-    private void UpdateAnimatedGradient()
-    {
-        if (GpuDevice == null)
-            return;
-
-        var elapsedSeconds = (DateTime.Now - _animationStartTime).TotalSeconds;
-        
-        UpdateAnimatedGradient(elapsedSeconds);
-    }
-    
     // ReSharper disable once MemberCanBePrivate.Global - this is public because it is used in automated tests
-    public void StartAnimation()
-    {
-        _animationStartTime = DateTime.Now;
-    }
-    
-    public void StopAnimation()
-    {
-        _animationStartTime = DateTime.MinValue;
-    }
-    
-    // ReSharper disable once MemberCanBePrivate.Global - this is public because it is used in automated tests
-    public void UpdateAnimatedGradient(double elapsedSeconds)
+    public void UpdateAnimatedGradient(float elapsedSeconds)
     {
         if (GpuDevice == null)
             return;

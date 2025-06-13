@@ -27,8 +27,6 @@ public class PlanarShadowsSample : CommonSample
     private float _lightHorizontalAngle;
     private float _lightDistance;
 
-    private DateTime _lastAnimationTime;
-
     private GroupNode? _sampleObjectsGroupNode;
     private PlaneModelNode? _planeModelNode;
 
@@ -38,6 +36,8 @@ public class PlanarShadowsSample : CommonSample
     private StandardMaterial _transparentShadowMaterial;
 
     private MeshModelNode? _shadowModel;
+
+    private float _lastElapsedSeconds;
     
     public PlanarShadowsSample(ICommonSamplesContext context)
         : base(context)
@@ -96,7 +96,16 @@ public class PlanarShadowsSample : CommonSample
         UpdateLights();
 
         UpdateShadowModel();
-
+        
+        
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(AnimateAllObjects);
+        
 
         if (targetPositionCamera != null)
         {
@@ -104,20 +113,6 @@ public class PlanarShadowsSample : CommonSample
             targetPositionCamera.Distance = 800;
             targetPositionCamera.ShowCameraLight = ShowCameraLightType.Never; // prevent adding camera's light
         }
-    }
-
-    protected override void OnDisposed()
-    {
-        StopAnimation();
-
-        base.OnDisposed();
-    }
-
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        StartAnimation();
-
-        base.OnSceneViewInitialized(sceneView);
     }
 
     private void CreateTestSpheres()
@@ -164,18 +159,6 @@ public class PlanarShadowsSample : CommonSample
         }
     }
 
-    private void StartAnimation()
-    {
-        if (SceneView != null)
-            SceneView.SceneUpdating += SceneViewOnSceneUpdating;
-    }
-
-    private void StopAnimation()
-    {
-        if (SceneView != null)
-            SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
-    }
-
     private void UpdateShadowModel()
     {
         if (_planarShadowMeshCreator == null || Scene == null)
@@ -216,19 +199,6 @@ public class PlanarShadowsSample : CommonSample
         }
     }
 
-    private void SceneViewOnSceneUpdating(object? sender, EventArgs e)
-    {
-        var now = DateTime.Now;
-
-        if (_lastAnimationTime != DateTime.MinValue)
-        {
-            double elapsedSeconds = (now - _lastAnimationTime).TotalSeconds;
-            AnimateAllObjects((float)elapsedSeconds * 0.5f); // take 2 seconds for one animation
-        }
-
-        _lastAnimationTime = now;
-    }
-
     private float GetAnimatedHeight(float t)
     {
         return MathF.Sin(t * MathF.PI * 2f) // make new sin cycle on each whole value of t
@@ -237,18 +207,21 @@ public class PlanarShadowsSample : CommonSample
                + AnimationMinHeight;        // add min height
     }
 
-    private void AnimateAllObjects(float dt)
+    private void AnimateAllObjects(float elapsedSeconds)
     {
         if (_sampleObjectsGroupNode == null)
             return;
 
+        var dt = (elapsedSeconds - _lastElapsedSeconds) * 0.5f; // take 2 seconds for one animation
+        _lastElapsedSeconds = elapsedSeconds;
+        
         foreach (var oneSphereModelNode in _sampleObjectsGroupNode.GetAllChildren<SphereModelNode>())
         {
             if (oneSphereModelNode.Tag is not float || oneSphereModelNode.Transform is not TranslateTransform translateTransform)
                 continue;
 
+            
             var t = (float)oneSphereModelNode.Tag;
-
             t += dt;
 
             oneSphereModelNode.Tag = t;

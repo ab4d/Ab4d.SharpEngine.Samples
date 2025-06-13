@@ -35,7 +35,6 @@ public class InstancedArrowsSample : CommonSample
 
     private Color4[]? _gradientColors;
 
-    private DateTime _startTime;
     private TranslateTransform? _sphereTranslate;
 
     private int _cameraIndex;
@@ -125,15 +124,20 @@ public class InstancedArrowsSample : CommonSample
             targetPositionCamera.Attitude = -20;
             targetPositionCamera.Distance = 2500;
         }
-
-        _startTime = DateTime.Now;
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         sceneView.IsCollectingStatistics = true;
 
-        sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateAnimatedArrows);
+        
         sceneView.SceneRendered += SceneViewOnSceneRendered;
         _subscribedSceneView = sceneView;
     }
@@ -147,15 +151,8 @@ public class InstancedArrowsSample : CommonSample
         }
     }
 
-    private void OnSceneViewOnSceneUpdating(object? sender, EventArgs args)
+    private void UpdateAnimatedArrows(float elapsedSeconds)
     {
-        UpdateAnimatedArrows();
-    }
-
-    private void UpdateAnimatedArrows()
-    {
-        float elapsedSeconds = (float)(DateTime.Now - _startTime).TotalSeconds;
-
         // Update statistics only once per second
         if (DateTime.Now.Second != _lastSecond)
         {
@@ -616,7 +613,6 @@ public class InstancedArrowsSample : CommonSample
     {
         if (_subscribedSceneView != null)
         {
-            _subscribedSceneView.SceneUpdating -= OnSceneViewOnSceneUpdating;
             _subscribedSceneView.SceneRendered -= SceneViewOnSceneRendered;
             _subscribedSceneView = null;
         }

@@ -28,15 +28,39 @@ public sealed class CustomOverlayPanelSample : CommonSample
     private GpuImage? _overlayPanelGpuImage;
     private RawImageData? _rawImageData;
 
+    private SceneView? _subscribedSceneView;
+    
     public CustomOverlayPanelSample(ICommonSamplesContext context) 
         : base(context)
     {
     }
 
+    protected override void OnCreateScene(Scene scene)
+    {
+        var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
+                                                position: new Vector3(0, 0, 0),
+                                                positionType: PositionTypes.Bottom,
+                                                finalSize: new Vector3(100, 100, 100));
+
+        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Silver.SetSpecular(32)));
+
+
+        var wireGridNode = new WireGridNode()
+        {
+            CenterPosition = new Vector3(0, -0.1f, 0),
+            Size = new Vector2(200, 200),
+        };
+
+        scene.RootNode.Add(wireGridNode);
+    }
+    
     protected override void OnDisposed()
     {
-        if (SceneView != null)
-            SceneView.SceneUpdating -= ParentSceneView_SceneUpdating;
+        if (_subscribedSceneView != null)
+        {
+            _subscribedSceneView.SceneUpdating -= ParentSceneView_SceneUpdating;
+            _subscribedSceneView = null;
+        }
 
         // Dispose objects that are created in this sample
         if (Scene != null && _spriteBatch != null)
@@ -60,25 +84,6 @@ public sealed class CustomOverlayPanelSample : CommonSample
         }
 
         base.OnDisposed();
-    }
-
-    protected override void OnCreateScene(Scene scene)
-    {
-        var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
-                                                position: new Vector3(0, 0, 0),
-                                                positionType: PositionTypes.Bottom,
-                                                finalSize: new Vector3(100, 100, 100));
-
-        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Silver.SetSpecular(32)));
-
-
-        var wireGridNode = new WireGridNode()
-        {
-            CenterPosition = new Vector3(0, -0.1f, 0),
-            Size = new Vector2(200, 200),
-        };
-
-        scene.RootNode.Add(wireGridNode);
     }
 
     protected override void OnSceneViewInitialized(SceneView parentSceneView)
@@ -136,6 +141,7 @@ public sealed class CustomOverlayPanelSample : CommonSample
 
         // Subscribe to SceneUpdating - there we will update the sprite
         parentSceneView.SceneUpdating += ParentSceneView_SceneUpdating;
+        _subscribedSceneView = parentSceneView;
     }
     
     private void ParentSceneView_SceneUpdating(object? o, EventArgs e)

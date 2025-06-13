@@ -11,8 +11,6 @@ public class CustomPostProcessSample : CommonSample
     
     private HsvColorPostProcess _hsvColorPostProcess;
 
-    private DateTime _startTime;
-
     private ICommonSampleUIElement? _modeButton;
     private ICommonSampleUIElement? _hueSlider;
 
@@ -53,9 +51,14 @@ public class CustomPostProcessSample : CommonSample
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         sceneView.PostProcesses.Add(_hsvColorPostProcess);
-        _startTime = DateTime.Now; 
         
-        sceneView.SceneUpdating += OnSceneUpdating;
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateHsvColor);
 
         base.OnSceneViewInitialized(sceneView);
     }
@@ -63,24 +66,14 @@ public class CustomPostProcessSample : CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
-        if (SceneView != null)
-        {
-            SceneView.SceneUpdating -= OnSceneUpdating;
-            SceneView.PostProcesses.Clear();
-        }
-        
         // Most of the post processes do not create any resources, but still it is a good practice to dispose them (maybe in the future they will require some resources).
         _hsvColorPostProcess.Dispose();
 
         base.OnDisposed();
     }
 
-    private void OnSceneUpdating(object? sender, EventArgs e)
+    private void UpdateHsvColor(float elapsedSeconds)
     {
-        if (_startTime == DateTime.MinValue) 
-            return;
-        
-        var elapsedSeconds = (DateTime.Now - _startTime).TotalSeconds;
         _hsvColorPostProcess.HueOffset = ((float)elapsedSeconds * 120f) % 360; // Hue value is in range from 0 to 360, so we need 3 seconds to go from 0 to 360 degrees
 
         _hueSlider?.UpdateValue();
@@ -116,15 +109,15 @@ public class CustomPostProcessSample : CommonSample
 
         _modeButton = ui.CreateButton("Stop animation", () =>
         {
-            if (_startTime == DateTime.MinValue)
+            if (base.IsSceneUpdatingSubscribed)
             {
-                _startTime = DateTime.Now; // When _startTime is defined, then the HUE is animated
-                _modeButton?.SetText("Stop animation");
+                base.UnsubscribeSceneUpdating();
+                _modeButton?.SetText("Start animation");
             }
             else
             {
-                _startTime = DateTime.MinValue;
-                _modeButton?.SetText("Start animation");
+                base.SubscribeSceneUpdating(UpdateHsvColor);
+                _modeButton?.SetText("Stop animation");
             }
         });
     }
