@@ -151,7 +151,7 @@ public class InstancedMeshNodeSample : CommonSample
                                                        heightSegments: 1);
 
             if (_treeGpuImage == null && Scene != null)
-                _treeGpuImage = TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture.png", Scene);
+                _treeGpuImage = base.GetCommonTexture("TreeTexture.png", Scene);
             
             _instancedMeshNode.Mesh = _planeMesh;
             _instancedMeshNode.SetDiffuseTexture(_treeGpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values

@@ -20,11 +20,13 @@ public class SimpleHeightMapSample : CommonSample
     protected override void OnCreateScene(Scene scene)
     {
         // Load height data from image
-        var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/europe_height.png");
+        var heightDateFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/europe_height.png");
+        var heightImageData = BitmapIO.LoadBitmap(heightDateFileName);
         var heightData = HeightMapSurfaceNode.CreateHeightDataFromImageData(heightImageData);
 
         // Use this as texture for HeightMapModel
-        var europeTextureMaterial = new StandardMaterial("Resources/HeightMaps/europe.png", BitmapIO);
+        var heightTextureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/europe.png");
+        var europeTextureMaterial = new StandardMaterial(heightTextureFileName, BitmapIO);
         var backgroundMaterial    = StandardMaterials.Gray.SetSpecular(Color3.White, 16);
 
         // Create height map surface

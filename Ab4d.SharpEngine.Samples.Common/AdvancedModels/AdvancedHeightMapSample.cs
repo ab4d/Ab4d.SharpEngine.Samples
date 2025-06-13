@@ -61,7 +61,9 @@ public class AdvancedHeightMapSample : CommonSample
         // Load height data from image
         // _heightData array should contain values from 0 to 1
         //var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/simpleHeightMap.png");
-        var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/vulkan-heightmap-cropped.png");
+
+        var heightDateFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/vulkan-heightmap-cropped.png");
+        var heightImageData = BitmapIO.LoadBitmap(heightDateFileName);
         _heightData = HeightMapSurfaceNode.CreateHeightDataFromImageData(heightImageData);
 
         var graySpecularMaterial = StandardMaterials.Gray.SetSpecular(Color3.White, 16);

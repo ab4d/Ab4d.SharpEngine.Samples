@@ -31,7 +31,8 @@ public class TubesSample : CommonSample
 
         if (BitmapIO.IsFileFormatImportSupported("png"))
         {
-            var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO);
+            var textureFileName = base.GetCommonTexturePath("uvchecker2.jpg");
+            var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
 
             // Low-segment tubes (to show that segments are correctly handled)
             CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 600, material: textureMaterial);

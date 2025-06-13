@@ -254,7 +254,7 @@ public abstract class StandardModelsSampleBase : CommonSample
         if (isTextureMaterialChecked)
         {
             if (textureImage == null || textureImage.IsDisposed || textureImage.GpuDevice != this.GpuDevice)
-                textureImage = GetCommonTexture(this.GpuDevice, "10x10-texture.png");
+                textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
 
             standardMaterial.DiffuseTexture = textureImage;
             standardMaterial.DiffuseColor = Color3.White; // When using DiffuseTexture, then DiffuseColor is used as a filter (it is multiplies by each color in the texture)

@@ -140,7 +140,7 @@ public class BooleanMeshSample : CommonSample
 
         Ab4d.SharpEngine.Utilities.MeshUtils.GenerateCubicTextureCoordinates(_lastShownMesh);
 
-        var textureImage = GetCommonTexture(this.GpuDevice, "10x10-texture.png");
+        var textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
 
         if (textureImage != null)
         {

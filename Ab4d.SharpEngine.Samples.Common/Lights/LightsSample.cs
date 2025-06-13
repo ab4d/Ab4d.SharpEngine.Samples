@@ -43,7 +43,8 @@ public class LightsSample : CommonSample
         var standardMaterial = new StandardMaterial(Colors.Silver);
         var specularMaterial = new StandardMaterial(Colors.Silver) { SpecularPower = 64 };
 
-        var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO);
+        var textureFileName = base.GetCommonTexturePath("uvchecker2.jpg");
+        var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
         var specularTextureMaterial = (StandardMaterial)textureMaterial.Clone();
         specularTextureMaterial.SpecularPower = 64;
 

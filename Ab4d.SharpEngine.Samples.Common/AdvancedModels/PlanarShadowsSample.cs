@@ -48,13 +48,15 @@ public class PlanarShadowsSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
+        var textureFileName = base.GetCommonTexturePath("10x10-texture.png");
+        
         _planeModelNode = new PlaneModelNode()
         {
             Position = new Vector3(0, 0, 0),
             Size = new Vector2(400, 400),
             Normal = new Vector3(0, 1, 0),
             HeightDirection = new Vector3(0, 0, -1),
-            Material = new StandardMaterial(@"Resources\Textures\10x10-texture.png", BitmapIO),
+            Material = new StandardMaterial(textureFileName, BitmapIO),
             BackMaterial = StandardMaterials.DimGray
         };
 

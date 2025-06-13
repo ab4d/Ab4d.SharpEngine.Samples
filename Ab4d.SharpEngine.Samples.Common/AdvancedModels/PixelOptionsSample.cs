@@ -176,8 +176,12 @@ public class PixelOptionsSample : CommonSample
             // This is needed to prevent darkening the at the edges of the circle that is produces by using semi-transparent pixels 
             // that are generated when producing mip-maps and when using the default anisotropic sampler.
             //
-            _whiteCircleGpuImage ??= TextureLoader.CreateTexture(@"Resources\Textures\white-circle-64x64-noaa.png", Scene, generateMipMaps: false);
-
+            if (_whiteCircleGpuImage == null)
+            {
+                var textureFileName = base.GetCommonTexturePath("white-circle-64x64-noaa.png");
+                _whiteCircleGpuImage ??= TextureLoader.CreateTexture(textureFileName, Scene, generateMipMaps: false);
+            }
+            
             // If you prefer using anti-aliased circles and do not mind the artifacts at the edges, then use the white-circle-64x64.png instead 
             // and do not specify the ClampNoInterpolation sampler.
             //_whiteCircleGpuImage ??= TextureLoader.CreateTexture(@"Resources\Textures\white-circle-64x64.png", scene, generateMipMaps: true); // generateMipMaps is true by default

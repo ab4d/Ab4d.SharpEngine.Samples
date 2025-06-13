@@ -1,15 +1,11 @@
-﻿using System;
-using System.Numerics;
-using System.Reflection;
-using System.Xml;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
-using Ab4d.Vulkan;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common;
 
@@ -82,11 +78,11 @@ public abstract class CommonSample
         this.context = context;
     }
 
-    public static List<XmlNode> LoadSamples(string samplesXmlFilePath, string uiFramework, Action<string>? showErrorAction)
+    public static List<System.Xml.XmlNode> LoadSamples(string samplesXmlFilePath, string uiFramework, Action<string>? showErrorAction)
     {
-        var filteredXmlNodeList = new List<XmlNode>();
+        var filteredXmlNodeList = new List<System.Xml.XmlNode>();
 
-        var xmlDcoument = new XmlDocument();
+        var xmlDcoument = new System.Xml.XmlDocument();
         xmlDcoument.Load(samplesXmlFilePath);
 
         if (xmlDcoument.DocumentElement == null)
@@ -105,7 +101,7 @@ public abstract class CommonSample
         }
         
 
-        foreach (XmlNode xmlNode in xmlNodeList)
+        foreach (System.Xml.XmlNode xmlNode in xmlNodeList)
         {
             if (xmlNode.Attributes != null)
             {
@@ -175,10 +171,10 @@ public abstract class CommonSample
             return null;
         }
 
-        var constructors = sampleType.GetConstructors(BindingFlags.Instance | BindingFlags.Public);
+        var constructors = sampleType.GetConstructors(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
         // Try to find a constructor that takes ICommonSamplesContext, else use constructor without any parameters
-        ConstructorInfo? selectedConstructorInfo = null;
+        System.Reflection.ConstructorInfo? selectedConstructorInfo = null;
         bool isCommonSampleType = false;
 
         foreach (var constructorInfo in constructors)
@@ -396,15 +392,33 @@ public abstract class CommonSample
 
     }
 
-    public GpuImage? GetCommonTexture(VulkanDevice? gpuDevice, string textureName)
+    public string GetCommonTexturePath(string textureName)
     {
-        // TODO: Add caching
+        // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
+        // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
+        return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
+    }
 
-        if (gpuDevice == null)
-            return null; 
+    public GpuImage GetCommonTexture(string textureName, Scene? scene)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
 
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Textures", textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO);
+        if (scene.GpuDevice != null)
+            return GetCommonTexture(textureName, scene.GpuDevice); // Use GpuDevice so the image is also cached on GpuDevice
+
+        // else, cache on Scene object:
+        string fileName = GetCommonTexturePath(textureName);
+        var textureImage = TextureLoader.CreateTexture(fileName, scene, BitmapIO, useSceneCache: true);
+        
+        return textureImage;
+    }
+    
+    public GpuImage GetCommonTexture(string textureName, VulkanDevice? gpuDevice)
+    {
+        ArgumentNullException.ThrowIfNull(gpuDevice);
+
+        string fileName = GetCommonTexturePath(textureName);
+        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO, useGpuDeviceCache: true);
         
         return textureImage;
     }

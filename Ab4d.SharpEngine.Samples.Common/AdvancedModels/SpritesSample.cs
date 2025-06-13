@@ -29,10 +29,9 @@ public class SpritesSample : CommonSample
         if (scene.GpuDevice == null)
             return;
 
-        _uvCheckerTexture = TextureLoader.CreateTexture(@"Resources/Textures/uvchecker.png", scene.GpuDevice, BitmapIO);
-        _treeTexture = TextureLoader.CreateTexture(@"Resources/Textures/TreeTexture.png", scene.GpuDevice, BitmapIO);
-
-
+        _uvCheckerTexture = base.GetCommonTexture("uvchecker.png", scene);
+        _treeTexture      = base.GetCommonTexture("TreeTexture.png", scene);
+        
         // Create SpriteBatch on the Scene object (note that there we CANNOT use absolute coordinates and can use only relative coordinates, that are in range from 0 to 1)
         // It is also possible to create SpiteBatch on SceneView (see OnSceneViewInitialized below). In this case absolute coordinates can be used.
         var sceneSpriteBatch = scene.CreateOverlaySpriteBatch("SceneOverlaySpriteBatch");
@@ -220,18 +219,6 @@ public class SpritesSample : CommonSample
 
         Scene?.RemoveAllSpriteBatches();
         SceneView?.RemoveAllSpriteBatches();
-
-        if (_uvCheckerTexture != null)
-        {
-            _uvCheckerTexture.Dispose();
-            _uvCheckerTexture = null;
-        }
-        
-        if (_treeTexture != null)
-        {
-            _treeTexture.Dispose();
-            _treeTexture = null;
-        }
 
         base.OnDisposed();
     }
