@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
@@ -42,6 +43,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
     private bool _showRectangle = false;
     private ICommonSampleUIElement? _buttonRectangle;
+
+    protected int selectedTextureIdx = 0;
 
     public CircleModelNodeSample(ICommonSamplesContext context) : base(context)
     {
@@ -124,77 +127,92 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         base.UpdateModelNode();
     }
 
-    private void SetTextureImage(int textureIndex)
+    private Material? SetTextureImage(int textureIndex)
     {
         if (GpuDevice == null || _circleModelNode == null)
-            return;
+            return null;
 
-        Material? newMaterial = null;
-
-        if (textureIndex == 0)
+        switch (textureIndex)
         {
-            newMaterial = modelMaterial; // Use default material
-        }
-        else if (textureIndex == 1)
-        {
-            if (_gradientMaterial1 == null)
+            case 0:
+                return modelMaterial; // Use default material (10x10-texture)
+            case 1:
             {
-                // Create a gradient texture from red to transparent
-                //
-                // IMPORTANT:
-                // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
-                // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
-                // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
-                var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, Colors.Red, Colors.Transparent, isHorizontal: false);
-                _gradientMaterial1 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
-            }
-
-            newMaterial = _gradientMaterial1;
-        }
-        else if (textureIndex == 2)
-        {
-            if (_gradientMaterial2 == null)
-            {
-                // Create the gradient that will show two red circles
-                var gradient = new GradientStop[]
+                if (_gradientMaterial1 == null)
                 {
-                new GradientStop(Colors.Transparent, 0.0f),
-                new GradientStop(Colors.Transparent, 0.35f),
-                new GradientStop(Colors.Red, 0.4f),
-                new GradientStop(Colors.Red, 0.5f),
-                new GradientStop(Colors.Transparent, 0.55f),
-                new GradientStop(Colors.Transparent, 0.70f),
-                new GradientStop(Colors.Red, 0.75f),
-                new GradientStop(Colors.Red, 0.95f),
-                new GradientStop(Colors.Transparent, 1.0f),
-                };
+                    // Create a gradient texture from red to transparent
+                    //
+                    // IMPORTANT:
+                    // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
+                    // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
+                    // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
+                    var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, Colors.Red, Colors.Transparent, isHorizontal: false);
+                    _gradientMaterial1 = new StandardMaterial(gradientTexture, name: "GradientMaterial");
+                }
 
-                // IMPORTANT:
-                // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
-                // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
-                // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
-                var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
-                _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "RedCirclesMaterial");
+                return _gradientMaterial1;
             }
-
-            newMaterial = _gradientMaterial2;
-        }
-        else if (textureIndex == 3)
-        {
-            if (_gradientMaterial3 == null)
+            case 2:
             {
-                string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/saturn-rings-1x512.png");
-                var gpuImage = TextureLoader.CreateTexture(fileName, GpuDevice);
-                _gradientMaterial3 = new StandardMaterial(gpuImage, name: "SaturnRingsTextureMaterial");
-            }
+                if (_gradientMaterial2 == null)
+                {
+                    // Create the gradient that will show two red circles
+                    var gradient = new GradientStop[]
+                    {
+                        new GradientStop(Colors.Transparent, 0.0f),
+                        new GradientStop(Colors.Transparent, 0.35f),
+                        new GradientStop(Colors.Red, 0.4f),
+                        new GradientStop(Colors.Red, 0.5f),
+                        new GradientStop(Colors.Transparent, 0.55f),
+                        new GradientStop(Colors.Transparent, 0.70f),
+                        new GradientStop(Colors.Red, 0.75f),
+                        new GradientStop(Colors.Red, 0.95f),
+                        new GradientStop(Colors.Transparent, 1.0f),
+                    };
 
-            newMaterial = _gradientMaterial3;
+                    // IMPORTANT:
+                    // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
+                    // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
+                    // (the X coordinate goes around the circle as the point angle goes from 0 to 360).
+                    var gradientTexture = TextureFactory.CreateGradientTexture(GpuDevice, gradient, isHorizontal: false);
+                    _gradientMaterial2 = new StandardMaterial(gradientTexture, name: "RedCirclesMaterial");
+                }
+
+                return _gradientMaterial2;
+            }
+            case 3:
+            {
+                if (_gradientMaterial3 == null)
+                {
+                    string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/saturn-rings-1x512.png");
+                    var gpuImage = TextureLoader.CreateTexture(fileName, GpuDevice);
+                    _gradientMaterial3 = new StandardMaterial(gpuImage, name: "SaturnRingsTextureMaterial");
+                }
+
+                return _gradientMaterial3;
+            }
         }
 
-        _circleModelNode.Material = newMaterial;
+        return null;
+    }
 
-        if (_circleModelNode.BackMaterial != null) // Also update BackMaterial if it was also used before
-            _circleModelNode.BackMaterial = newMaterial;
+    protected override Material GetMaterial()
+    {
+        // This handles texture vs. non texture switch (to ensure that materials and such exist)
+        var material = base.GetMaterial();
+
+        // Override texture with selected one.
+        if (isTextureMaterialChecked)
+        {
+            material = SetTextureImage(selectedTextureIdx);
+        }
+
+        // Apply semi-transparency flag
+        if (material is StandardMaterial standardMaterial)
+            standardMaterial.Opacity = isSemiTransparentMaterialChecked ? 0.8f : 1.0f;
+
+        Debug.Assert(material != null, nameof(material) + " != null");
+        return material;
     }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
@@ -302,8 +320,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Saturn rings" },
             (selectedIndex, selectedText) =>
             {
+                selectedTextureIdx = selectedIndex;
                 isTextureCheckBox?.SetValue(true);
-                SetTextureImage(selectedIndex);
+                UpdateMaterial();
             },
             selectedItemIndex: 0,
             width: 140,
