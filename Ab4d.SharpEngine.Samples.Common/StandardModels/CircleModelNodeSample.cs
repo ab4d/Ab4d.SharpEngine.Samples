@@ -13,7 +13,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     public override string Title => "CircleModelNode";
 
     private int _segmentsCount = 30;
-    
+
     private float _innerRadius = 0;
     private float _radius = 50;
     private float _startAngle = 0;
@@ -23,7 +23,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     private Vector3 _upDirection = new Vector3(0, 0, -1);
 
     private CircleModelNode? _circleModelNode;
-    
+
     private StandardMaterial? _gradientMaterial1;
     private StandardMaterial? _gradientMaterial2;
     private StandardMaterial? _gradientMaterial3;
@@ -32,14 +32,16 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     private ICommonSampleUIElement? _startAngleSlider;
     private ICommonSampleUIElement? _innerRadiusSlider;
     private ICommonSampleUIElement? _radiusSlider;
-    
+
     private ICommonSampleUIElement? _textureMappingComboBox;
     private ICommonSampleUIElement? _textureImageComboBox;
-    
+
     private LineNode? _normalLine;
     private LineNode? _upDirectionLine;
     private float _directionLinesLength = 60;
 
+    private bool _showRectangle = false;
+    private ICommonSampleUIElement? _buttonRectangle;
 
     public CircleModelNodeSample(ICommonSamplesContext context) : base(context)
     {
@@ -94,7 +96,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     {
         _gradientMaterial1?.DisposeWithTexture();
         _gradientMaterial2?.DisposeWithTexture();
-        
+
         base.OnDisposed();
     }
 
@@ -106,7 +108,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         _circleModelNode.InnerRadius = _innerRadius;
         _circleModelNode.Radius = _radius;
         _circleModelNode.StartAngle = _startAngle;
-        
+
         _circleModelNode.TextureMappingType = _textureMappingType;
         _circleModelNode.Segments = _segmentsCount;
 
@@ -138,7 +140,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             if (_gradientMaterial1 == null)
             {
                 // Create a gradient texture from red to transparent
-                // 
+                //
                 // IMPORTANT:
                 // When the gradient texture is used for CircleModeNode, then the gradient must be vertical (isHorizontal: false).
                 // This is needed because the texture coordinates of the CircleModelNode for the Y coordinate go from the center to the outer circle edge
@@ -189,8 +191,8 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             newMaterial = _gradientMaterial3;
         }
 
-        _circleModelNode.Material = newMaterial; 
-        
+        _circleModelNode.Material = newMaterial;
+
         if (_circleModelNode.BackMaterial != null) // Also update BackMaterial if it was also used before
             _circleModelNode.BackMaterial = newMaterial;
     }
@@ -198,10 +200,10 @@ public class CircleModelNodeSample : StandardModelsSampleBase
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
         ui.CreateKeyValueLabel("CenterPosition:", () => "(0, 0, 0)", keyTextWidth: 110);
-        
+
         ui.AddSeparator();
-        
-        
+
+
         CreateComboBoxWithVectors(ui: ui, vectors: new Vector3[] { new Vector3(0, 1, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1) },
             itemChangedAction: (selectedIndex, selectedVector) =>
             {
@@ -223,10 +225,10 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             width: 120,
             keyText: "UpDirection: ",
             keyTextWidth: 110).SetColor(Colors.Green);
-        
+
         ui.AddSeparator();
-        
-        
+
+
         _radiusSlider = ui.CreateSlider(10, 70,
             () => _radius,
             newValue =>
@@ -238,7 +240,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "Radius:",
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
-        
+
         _innerRadiusSlider = ui.CreateSlider(0, 50,
             () => _innerRadius,
             newValue =>
@@ -250,7 +252,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "InnerRadius:",
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
-        
+
         _startAngleSlider = ui.CreateSlider(0, 360,
             () => _startAngle,
             newValue =>
@@ -262,17 +264,17 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "StartAngle: (?):StartAngle is useful when Segments Count is low.\nFor example, when segments count is 4, the angle may be set to 45\nto get a rectangle that is aligned with axes.",
             keyTextWidth: 110,
             formatShownValueFunc: newValue => newValue.ToString("F1"));
-        
+
         ui.AddSeparator();
 
-                
+
         _segmentsSlider = ui.CreateSlider(3, 50,
             () => _segmentsCount,
             newValue =>
             {
                 if (_segmentsCount == (int)newValue)
                     return; // Do no update when only decimal part of the value is changed
-                
+
                 _segmentsCount = (int)newValue;
                 UpdateModelNode();
             },
@@ -282,9 +284,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             formatShownValueFunc: newValue => ((int)newValue).ToString());
 
         ui.CreateLabel("(Default value for Segments is 30)").SetStyle("italic");
-        
+
         ui.AddSeparator();
-        
+
 
         _textureMappingComboBox = ui.CreateComboBox(new string[] { "Rectangular", "RadialFromCenter", "RadialFromInnerRadius" },
             (selectedIndex, selectedText) =>
@@ -296,18 +298,18 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             width: 140,
             keyText: "TextureMapping:",
             keyTextWidth: 110);
-        
+
         _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Saturn rings" },
             (selectedIndex, selectedText) =>
             {
-                isTextureCheckBox?.SetValue(true);   
+                isTextureCheckBox?.SetValue(true);
                 SetTextureImage(selectedIndex);
             },
             selectedItemIndex: 0,
             width: 140,
             keyText: "Texture image:",
             keyTextWidth: 110);
-        
+
 
         ui.AddSeparator();
         ui.AddSeparator();
@@ -322,32 +324,50 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.CreateButton("Show Saturn rings", () =>
         {
             isTextureCheckBox?.SetValue(true);
-            
+
             // Inner diameter of rings is: 184.000 km; Outer diameter of rings is 274.000 km (source: https://wisp.physics.wisc.edu/astro104/lecture22/F15_02.jpg)
             _radiusSlider?.SetValue(50);
             _innerRadiusSlider?.SetValue(33);
-            
+
             _textureImageComboBox?.SetValue(3); // 3 = 'Saturn rings'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
 
-        ui.CreateButton("Create rectangle (?):This button calls CreateRectangle method that sets the properties\nof this CircleModelNode so that it renders a rectangle.", () =>
-        {
-            // CreateRectangle sets the properties of this CircleModelNode so that it renders a rectangle (Segments is set to 4 and StartAngle to 45)
-            _circleModelNode!.CreateRectangle(position: new Vector3(0, 0, 0), 
-                                              positionType: PositionTypes.Center, 
-                                              size: new Vector2(80, 60), 
-                                              innerSizeFactor: 0.5f, 
-                                              widthDirection: new Vector3(1, 0, 0), 
-                                              heightDirection: new Vector3(0, 0, -1));
+        const string labelRectangle = "Create rectangle (?):This button calls CreateRectangle method that sets the properties\nof this CircleModelNode so that it renders a rectangle.";
+        const string labelCircle =  "Create circle (?):This button (re)sets the properties\nof this CircleModelNode so that it renders a circle.";
 
-            // We could also call the following overload of CreateRectangle:
-            //_circleModelNode.CreateRectangle(centerPosition: new Vector3(0, 0, 0), size: new Vector2(80, 60), innerSizeFactor: 0.5f);
+        _buttonRectangle = ui.CreateButton(labelRectangle, () =>
+        {
+            // Toggle the flag
+            _showRectangle = !_showRectangle;
+
+            _buttonRectangle!.SetText(_showRectangle ? labelCircle : labelRectangle);
+
+            if (_showRectangle) {
+                // CreateRectangle sets the properties of this CircleModelNode so that it renders a rectangle (Segments is set to 4 and StartAngle to 45)
+                _circleModelNode!.CreateRectangle(position: new Vector3(0, 0, 0),
+                                                  positionType: PositionTypes.Center,
+                                                  size: new Vector2(80, 60),
+                                                  innerSizeFactor: 0.5f,
+                                                  widthDirection: new Vector3(1, 0, 0),
+                                                  heightDirection: new Vector3(0, 0, -1));
+
+                // We could also call the following overload of CreateRectangle:
+                //_circleModelNode.CreateRectangle(centerPosition: new Vector3(0, 0, 0), size: new Vector2(80, 60), innerSizeFactor: 0.5f);
+            }
+            else
+            {
+                // Reset the properties to those of a circle
+                _circleModelNode!.Segments = 30;
+                _circleModelNode!.InnerRadius = 0;
+                _circleModelNode!.Radius = 50;
+                _circleModelNode!.StartAngle = 0;
+            }
 
             // Calling CreateRectangle sets the properties on _circleModelNode so a rectangle is created.
             // Set the UI sliders to the new value. We need to first read the new values and then update the UI elements.
             // If we would just update the _radiusSlider, then the _circleModelNode properties would be set from the UI elements that were not updated yet.
-            
+
             var newRadius      = _circleModelNode.Radius;
             var newInnerRadius = _circleModelNode.InnerRadius;
             var newSegments    = _circleModelNode.Segments;
@@ -358,10 +378,10 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             _segmentsSlider.SetValue(newSegments);
             _startAngleSlider.SetValue(newStartAngle);
 
-            
+
             base.UpdateModelNode(); // Update normals and triangles
         });
-        
+
         ui.AddSeparator();
 
 
