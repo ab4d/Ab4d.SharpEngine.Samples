@@ -44,7 +44,9 @@ public class ButtonUIElement : AvaloniaUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
-        _button.Content = text;
+        var (textToShow, toolTip) = avaloniaUIProvider.ParseTextAndToolTip(text);
+        _button.Content = textToShow;
+        ToolTip.SetTip(_button, toolTip);
         return this;
     }
 }
