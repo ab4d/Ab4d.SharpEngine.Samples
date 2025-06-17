@@ -59,7 +59,9 @@ public class LabelUIElement : AvaloniaUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
-        _textBlock.Text = text;
+        var (textToShow, toolTip) = avaloniaUIProvider.ParseTextAndToolTip(text);
+        _textBlock.Text = textToShow;
+        ToolTip.SetTip(_textBlock, toolTip);       
         return this;
     }
 

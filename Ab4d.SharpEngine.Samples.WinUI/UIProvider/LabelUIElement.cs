@@ -62,7 +62,9 @@ public class LabelUIElement : WinUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
-        _textBlock.Text = text;
+        var (textToShow, toolTip) = winUIProvider.ParseTextAndToolTip(text);
+        _textBlock.Text = textToShow;
+        ToolTipService.SetToolTip(_textBlock, toolTip);
         return this;
     }
 

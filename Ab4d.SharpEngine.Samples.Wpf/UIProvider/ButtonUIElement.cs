@@ -43,7 +43,9 @@ public class ButtonUIElement : WpfUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
-        _button.Content = text;
+        var (textToShow, toolTip) = wpfUIProvider.ParseTextAndToolTip(text);
+        _button.Content = textToShow;
+        _button.ToolTip = toolTip;
         return this;
     }
 }

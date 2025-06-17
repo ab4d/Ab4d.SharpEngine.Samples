@@ -44,7 +44,9 @@ public class ButtonUIElement : WinFormsUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
-        _button.Text = text;
-        return this;
+        var (textToShow, toolTip) = winFormsUIProvider.ParseTextAndToolTip(text);
+        _button.Text = textToShow;
+        winFormsUIProvider.SetToolTip(_button, toolTip);
+        return this;        
     }
 }

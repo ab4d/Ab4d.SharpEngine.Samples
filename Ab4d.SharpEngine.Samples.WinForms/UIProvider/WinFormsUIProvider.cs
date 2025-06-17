@@ -87,7 +87,7 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
         basePanel.SizeChanged += BasePanelOnSizeChanged;
     }
 
-    public void SetToolTip(Control control, string toolTip)
+    public void SetToolTip(Control control, string? toolTip)
     {
         _toolTipProvider.SetToolTip(control, toolTip);
     }
