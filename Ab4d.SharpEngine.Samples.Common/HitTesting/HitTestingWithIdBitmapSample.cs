@@ -28,7 +28,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 public class HitTestingWithIdBitmapSample : CommonSample
 {
     public override string Title => "Hit-testing with rendering to ID bitmap";
-    public override string? Subtitle => "Rotate the camera with left mouse button to render new ID bitmap.";
+    public override string? Subtitle => "This sample shows how to render 3D scene where object color is defined by its ID. This creates an ID bitmap that can be used for hit-testing (getting object ID from the pixel color). Click on 'Save ID bitmap' to see the generated ID bitmap.\nRotate the camera with left mouse button to render a new ID bitmap.";
 
     // After camera is changed, wait 250 ms (1/4 of a second) before rendering another ID bitmap
     // This significantly improves rendering performance, especially when the application is full screen (there it takes a long time to copy rendered ID bitmap to main memory).
