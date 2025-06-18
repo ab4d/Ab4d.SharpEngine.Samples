@@ -55,7 +55,7 @@ public class InputEventsManagerSample : CommonSample
 
 
         // Glass box is used to demonstrate the RegisterExcludedSceneNode method (3D models that do not block hit-testing)
-        _glassBoxModelNode = new BoxModelNode(centerPosition: new Vector3(0, 90, 200), size: new Vector3(200, 220, 10), material: StandardMaterials.LightBlue.SetOpacity(0.3f), "Glass box");
+        _glassBoxModelNode = new BoxModelNode(centerPosition: new Vector3(0, 90, 200), size: new Vector3(200, 220, 10), material: StandardMaterials.LightBlue.SetOpacity(0.5f), "Glass box");
         scene.RootNode.Add(_glassBoxModelNode);
 
         

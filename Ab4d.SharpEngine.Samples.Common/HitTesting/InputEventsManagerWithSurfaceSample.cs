@@ -68,7 +68,7 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
                                         heightDirection: new Vector3(0, 1, 0), 
                                         name: "DragPlane")
         {
-            Material = StandardMaterials.Gray.SetOpacity(opacity: 0.2f),
+            Material = StandardMaterials.Gray.SetOpacity(opacity: 0.5f),
         };
 
         _dragPlane.BackMaterial = _dragPlane.Material;
