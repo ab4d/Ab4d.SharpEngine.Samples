@@ -53,6 +53,10 @@ public class AssimpImporterSample : CommonSample
     {
         _assimpImporter = InitAssimpLibrary(scene.GpuDevice, this.BitmapIO, "assimp-lib", ShowErrorMessage);
 
+        // Show used Assimp native version
+        if (_assimpImporter != null)
+            _subtitle = _subtitle.Replace("library (https", $"library v{_assimpImporter.AssimpVersionString} (https");
+        
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 50;
@@ -150,7 +154,7 @@ https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=ms
             throw new Exception("Cannot initialize native Assimp library");
 
         var assimpImporter = new AssimpImporter(bitmapIO, gpuDevice); // It is also possible to create AssimpImporter without GpuDevice - in this case the textures will be created later when the materials with textures are initialized
-
+        
         return assimpImporter;
     }
 
