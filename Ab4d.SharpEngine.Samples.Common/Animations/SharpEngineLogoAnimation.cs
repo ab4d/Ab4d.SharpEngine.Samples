@@ -188,9 +188,6 @@ public class SharpEngineLogoAnimation : IDisposable
         var showLogoImageAmount = 1 - showLogoModelAmount;
 
         _logoTextureMaterial.Opacity = showLogoImageAmount;
-        
-        // When increasing transparency of the logo model, we also increase the EmissiveColor amount to prevent color bleeding
-        _hashModelMaterial.EmissiveColor = new Color3(showLogoImageAmount, showLogoImageAmount, showLogoImageAmount);
     }
 
     public void Dispose()
