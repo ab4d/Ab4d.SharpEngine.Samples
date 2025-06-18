@@ -26,8 +26,14 @@
       Toolkit;
       Mvvm;
       ThemeService;
+      SkiaRenderer;
     </UnoFeatures>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Ab4d.SharpEngine" />
   </ItemGroup>

@@ -665,16 +665,20 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         if (!SceneView.IsInitialized)
             return;
 
-        float dpiScaleX = canvas.TotalMatrix.ScaleX;
-        float dpiScaleY = canvas.TotalMatrix.ScaleY;
-        int pixelWidth  = (int)Math.Round(area.Width * dpiScaleX);
-        int pixelHeight = (int)Math.Round(area.Height * dpiScaleY);
+        var displayInformation = DisplayInformation.GetForCurrentView();
+        float dpiScale = (float)displayInformation.RawPixelsPerViewPixel;
+        if (dpiScale == 0)
+            dpiScale = 1;
+        
+        int pixelWidth  = (int)Math.Round(area.Width * dpiScale);
+        int pixelHeight = (int)Math.Round(area.Height * dpiScale);
 
         // The _renderedSceneBitmap is already scaled by dpiScale, so we need to reset the canvas.TotalMatrix to identity matrix. 
         // This prevents scaling the texture and copy the pixels from _renderedSceneBitmap to screen pixels without scaling.
         // Note that Skia provides the IgnorePixelScaling property, but this is not available with the SKCanvasElement.
         // The SKCanvasElement size is specified in device independent units.
-        canvas.Scale(1 / dpiScaleX, 1 / dpiScaleY);
+        var scaleFactor = 1 / dpiScale;
+        canvas.Scale(scaleFactor, scaleFactor);
 
         if (SceneView.Width != pixelWidth || SceneView.Height != pixelHeight)
         {
