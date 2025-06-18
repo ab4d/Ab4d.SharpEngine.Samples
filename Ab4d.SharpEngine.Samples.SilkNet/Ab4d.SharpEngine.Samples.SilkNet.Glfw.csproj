@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.CrossPlatform</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.CrossPlatform</RootNamespace>    
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>3.1.9287</Version>   
+    <Version>3.1.9300</Version>   
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>GLFW</DefineConstants>
@@ -28,8 +28,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.88.8" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('IMAGE_MAGIC'))">
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9287-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9300-rc3" />
   </ItemGroup>
   
 <!--  
