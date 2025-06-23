@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class FreeCameraSample : CommonSample
 {
     public override string Title => "FreeCameraSample";
-    public override string? Subtitle => "FreeCameraSample is defined by CameraPosition, TargetPosition and UpDirection. It can be rotated freely.\nLEFT MOUSE BUTTON: rotate camera; LEFT MOUSE BUTTON + CTRL: move camera";
+    public override string? Subtitle => "FreeCameraSample is defined by CameraPosition, TargetPosition and UpDirection. It can be rotated freely.\nA common technique to use the free camera is to make clockwise and anti-clockwise circles while rotating the camera.\nLEFT MOUSE BUTTON: rotate camera; LEFT MOUSE BUTTON + CTRL: move camera";
 
     private FreeCamera? _freeCamera;
 
