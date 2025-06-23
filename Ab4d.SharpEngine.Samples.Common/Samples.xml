@@ -95,7 +95,7 @@
   <Sample Location="Lights.LightsSample" Title="Lights"/>
 
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsTwoSided property to SolidColorMaterial"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures" IsNew="True"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>

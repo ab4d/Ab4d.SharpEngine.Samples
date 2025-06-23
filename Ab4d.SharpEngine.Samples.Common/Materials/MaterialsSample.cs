@@ -316,6 +316,11 @@ public class MaterialsSample : CommonSample
 
         var solidColorMaterial = new SolidColorMaterial(Colors.Orange, "SolidColorMaterial");
 
+        // NOTE:
+        // SolidColorMaterial also supports IsTwoSided property.
+        // When it is true, the front and back triangles are rendered with one draw call.
+        //solidColorMaterial.IsTwoSided = true;
+
         var modelNode6 = new MeshModelNode(_sphereMesh, solidColorMaterial, "SolidColorModel")
         {
             Transform = new TranslateTransform(250, 0, 0)
@@ -449,6 +454,12 @@ public class MaterialsSample : CommonSample
                 }
             }
         }
+        
+        // NOTE:
+        // SolidColorMaterial supports IsTwoSided property.
+        // When it is true, the front and back triangles are rendered with one draw call.
+        // This is the same as Material and BackMaterial are set to the same material, but it renders twice as fast.
+        //solidColorMaterial.IsTwoSided = true;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
