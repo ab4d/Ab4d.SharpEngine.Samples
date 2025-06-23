@@ -51,22 +51,6 @@ public class TubesSample : CommonSample
         }
     }
 
-    protected override void OnCreateLights(Scene scene)
-    {
-        scene.Lights.Clear();
-
-        // Add lights
-        scene.SetAmbientLight(intensity: 0.3f);
-
-        var directionalLight = new DirectionalLight(new Vector3(-1, -0.3f, 0));
-        scene.Lights.Add(directionalLight);
-
-        scene.Lights.Add(new PointLight(new Vector3(500, 200, 100), range: 10000));
-
-        //base.OnCreateLights(scene);
-    }
-
-
     private void CreateTubeMeshes(Scene scene, int segments, float startAngle, float endAngle, float zOffset, StandardMaterial material)
     {
         var circleDescription = startAngle == 0 && endAngle == 360 ? "full circle" : "partial circle";
