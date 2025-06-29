@@ -810,6 +810,10 @@ public class ComplexSceneSample : CommonSample
             {
                 var blackBitmapTextCreator = await BitmapTextCreator.CreateAsync(scene, blackBitmapFont, scene.GpuDevice.DefaultBitmapIO, cacheFontGpuImages: false); // Do not cache the font bitmaps for black font version (this will also dispose the font bitmaps when this sample is not shown any more)
 
+                if (this.IsDisposed)
+                    return; // The sample was disposed while waiting for the CreateBitmapFontAsync to finish
+                
+                
                 _disposables.Add(blackBitmapTextCreator);
 
                 var textNode3 = blackBitmapTextCreator.CreateTextNode(text: "Bolder text node",
