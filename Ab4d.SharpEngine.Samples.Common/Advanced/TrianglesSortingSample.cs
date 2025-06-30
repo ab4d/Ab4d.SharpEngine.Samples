@@ -19,6 +19,8 @@ public class TrianglesSortingSample : CommonSample
     private bool _isSortingEnabled = true;
 
     private int _sortCount;
+    
+    private Color4 _savedBackgroundColor;
 
     private ICommonSampleUIElement? _sortButton;
     private ICommonSampleUIElement? _sortedCountLabel;
@@ -45,6 +47,7 @@ public class TrianglesSortingSample : CommonSample
     /// <inheritdoc />
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
+        _savedBackgroundColor = sceneView.BackgroundColor;
         sceneView.BackgroundColor = Colors.White;
 
         base.OnSceneViewInitialized(sceneView);
@@ -57,7 +60,7 @@ public class TrianglesSortingSample : CommonSample
             targetPositionCamera.CameraChanged -= TargetPositionCameraOnCameraChanged;
 
         if (SceneView != null)
-            SceneView.BackgroundColor = Colors.Transparent; // Revert to default
+            SceneView.BackgroundColor = _savedBackgroundColor; // Restore the original background color
 
         base.OnDisposed();
     }

@@ -73,6 +73,8 @@ public class CustomFogEffectSample : CommonSample
     private float _fogDistance = 150;
     private Color3 _fogColor = Color3.White;
 
+    private Color4 _savedBackgroundColor;
+
     private List<FogMaterial> _allFogMaterials = new List<FogMaterial>();
 
     public CustomFogEffectSample(ICommonSamplesContext context)
@@ -157,10 +159,20 @@ public class CustomFogEffectSample : CommonSample
         }
     }
 
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (SceneView != null)
+            SceneView.BackgroundColor = _savedBackgroundColor; // Restore the original background color
+        
+        base.OnDisposed();
+    }
+
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
+        _savedBackgroundColor = sceneView.BackgroundColor;
         sceneView.BackgroundColor = _fogColor.ToColor4();
-
+        
         base.OnSceneViewInitialized(sceneView);
     }
 
