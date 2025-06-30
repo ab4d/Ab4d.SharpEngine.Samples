@@ -319,6 +319,10 @@ public class InstancedMeshNodeSample : CommonSample
         // When using transparent colors (Alpha < 1), we need to enable alpha-blending
         _instancedMeshNode.UseAlphaBlend = isChecked;
 
+        // By default, the instance colors and color set in UseSingleObjectColor method are not alpha pre-multiplied.
+        // But if we want to use alpha pre-multiplied colors, then we can set IsPreMultipliedAlphaColor to true.
+        //_instancedMeshNode.IsPreMultipliedAlphaColor = false;
+
         if (_instancedMeshNode.IsUsingSingleObjectColor)
         {
             Color4 baseColor = _isUsingTexture ? Colors.White : Colors.Orange;
