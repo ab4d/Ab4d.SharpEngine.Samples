@@ -403,15 +403,24 @@ public class ComplexSceneSample : CommonSample
         float alpha = 0.3f;
         for (int i = 0; i < positionsCount; i++)
         {
-            // When using transparent colors in VertexColorMaterial, we need to convert them to alpha pre-multiplied values.
-            // This is done by multiplying all the color components by alpha value:
-            transparentPositionColors[i] = new Color4(transparentPositionColors[i].Red * alpha, 
-                                                      transparentPositionColors[i].Green * alpha, 
-                                                      transparentPositionColors[i].Blue * alpha, 
+            // By default, we do not need to pre-multiply the color components by alpha value when using VertexColorMaterial.
+            // But if we have alpha pre-multiplied colors, then we need to set the IsPreMultipliedAlphaColor in VertexColorMaterial to true.
+            transparentPositionColors[i] = new Color4(transparentPositionColors[i].Red, 
+                                                      transparentPositionColors[i].Green, 
+                                                      transparentPositionColors[i].Blue, 
                                                       alpha);
+            
+            // The following code sets alpha pre-multiplied values:
+            //transparentPositionColors[i] = new Color4(transparentPositionColors[i].Red * alpha, 
+            //                                          transparentPositionColors[i].Green * alpha, 
+            //                                          transparentPositionColors[i].Blue * alpha, 
+            //                                          alpha);
         }
 
-        var vertexColorMaterial2 = new VertexColorMaterial(transparentPositionColors, "VertexColorMaterial-transparent");
+        var vertexColorMaterial2 = new VertexColorMaterial(transparentPositionColors, "VertexColorMaterial-transparent")
+        {
+            //IsPreMultipliedAlphaColor = false // When alpha pre-multiplied colors are used 
+        };
 
         var vertexColorModel2 = new BoxModelNode(centerPosition: new Vector3(0, 0, -280), size: new Vector3(80, 80, 60), "VertexColorBox-transparent")
         {
