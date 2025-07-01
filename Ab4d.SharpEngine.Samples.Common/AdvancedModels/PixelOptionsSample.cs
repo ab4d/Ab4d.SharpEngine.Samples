@@ -150,6 +150,9 @@ public class PixelOptionsSample : CommonSample
 
         int transparentPixelsStartIndex = _hasTransparentPixelColors ? int.MaxValue : 0; // make all pixels transparent; use the following to make only half of the pixels transparent: _hasTransparentPixelColors ? pixelsCount / 2 : 0;
 
+        // By default, the transparent colors are not alpha pre-multiplied.
+        // To use alpha pre-multiplied colors, set the IsPreMultipliedAlphaColor property to true.
+        
         for (int i = 0; i < pixelsCount; i++)
         {
             float green = 1.0f - ((float)i / (float)pixelsCount);
