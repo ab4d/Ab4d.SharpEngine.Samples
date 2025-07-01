@@ -282,10 +282,10 @@ public class MaterialsSample : CommonSample
         //var vertexColorMaterial = new VertexColorMaterial(positionColors, "SphereVertexColorMaterial");
 
         // When using transparent colors (alpha < 1) for VertexColorMaterial,
-        // we need to convert the colors to alpha pre-multiplied values.
-        // This is done by multiplying all the color components by alpha value, for example:
-        // float alpha = 0.3f;
-        // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
+        // then the HasTransparency property on the VertexColorMaterial must be set to true.
+        //
+        // By default, the colors are not pre-multiplied by alpha value,
+        // but if you want to use alpha pre-multiplied colors, then set the IsPreMultiplyAlpha property on VertexColorMaterial to true.
 
         var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial");
 
@@ -377,10 +377,10 @@ public class MaterialsSample : CommonSample
             positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
 
             // When using transparent colors (alpha < 1) for VertexColorMaterial,
-            // we need to convert the colors to alpha pre-multiplied values.
-            // This is done by multiplying all the color components by alpha value, for example:
-            // float alpha = 0.3f;
-            // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
+            // then the HasTransparency property on the VertexColorMaterial must be set to true.
+            //
+            // By default, the colors are not pre-multiplied by alpha value,
+            // but if you want to use alpha pre-multiplied colors, then set the IsPreMultiplyAlpha property on VertexColorMaterial to true.
         }
 
         return positionColors;
@@ -409,10 +409,10 @@ public class MaterialsSample : CommonSample
             positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
 
             // When using transparent colors (alpha < 1) for VertexColorMaterial,
-            // we need to convert the colors to alpha pre-multiplied values.
-            // This is done by multiplying all the color components by alpha value, for example:
-            // float alpha = 0.3f;
-            // positionColors[i] = new Color4(red * alpha, green * alpha, blue * alpha, alpha);
+            // then the HasTransparency property on the VertexColorMaterial must be set to true.
+            //
+            // By default, the colors are not pre-multiplied by alpha value,
+            // but if you want to use alpha pre-multiplied colors, then set the IsPreMultiplyAlpha property on VertexColorMaterial to true.
         }
 
         return positionColors;
