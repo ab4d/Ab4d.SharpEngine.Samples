@@ -272,5 +272,11 @@ public class SpecialLineRenderingSample : CommonSample
                 ChangeLineRenderingType(selectedIndex);
             }, 
             selectedItemIndex: 2);
+
+        if (Scene != null && Scene.GpuDevice != null && !Scene.GpuDevice.PhysicalDeviceDetails.PossibleFeatures.GeometryShader)
+        {
+            ui.AddSeparator();
+            ui.CreateLabel("Hidden lines are not rendered because GeometryShader is not supported on this GPU!", maxWidth: 200).SetColor(Colors.Red);
+        }
     }
 }

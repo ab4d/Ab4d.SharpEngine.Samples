@@ -361,5 +361,11 @@ but the size of the arrow will be at least 4 times the line thickness.
 
 To set a custom MinLineArrowLength for a LineNode or a derived class, call its SetMinLineArrowLength method.",
             keyTextWidth: 180).SetIsVisible(false));
+        
+        if (Scene != null && Scene.GpuDevice != null && !Scene.GpuDevice.PhysicalDeviceDetails.PossibleFeatures.GeometryShader)
+        {
+            ui.AddSeparator();
+            ui.CreateLabel("Hidden lines are not rendered because GeometryShader is not supported on this GPU!", maxWidth: 200).SetColor(Colors.Red);
+        }
     }
 }
