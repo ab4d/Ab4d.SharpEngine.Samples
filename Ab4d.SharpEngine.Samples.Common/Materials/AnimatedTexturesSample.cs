@@ -232,6 +232,7 @@ public class AnimatedTexturesSample : CommonSample
     protected override void OnDisposed()
     {
         _gradientMaterial1?.DisposeWithTexture();
+        _gradientMaterial2?.DisposeWithTexture();
         base.OnDisposed();
     }
 
