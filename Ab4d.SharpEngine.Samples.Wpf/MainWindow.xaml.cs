@@ -37,8 +37,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        private string? _startupPage = "Materials.AnimatedTexturesSample";
-        //private string? _startupPage = null;
+        //private string? _startupPage = "Materials.AnimatedTexturesSample";
+        private string? _startupPage = null;
         
         public const bool EnableStandardValidation = false; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
 
