@@ -27,6 +27,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     /// </summary>
     public partial class CommonWpfSamplePage : Page
     {
+        public const bool EnableStandardValidation = false; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
+        
         private CommonSample? _currentCommonSample;
         private CommonSample? _lastInitializedSample;
         private PointerCameraController? _pointerCameraController;
@@ -67,7 +69,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
-            //MainSceneView.CreateOptions.EnableStandardValidation = true;
+            MainSceneView.CreateOptions.EnableStandardValidation = EnableStandardValidation;
 
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;

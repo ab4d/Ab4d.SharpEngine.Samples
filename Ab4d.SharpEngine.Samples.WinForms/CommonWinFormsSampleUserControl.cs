@@ -17,6 +17,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms;
 
 public class CommonWinFormsSampleUserControl : UserControl
 {
+    public const bool EnableStandardValidation = true; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
+    
     private CommonSample? _currentCommonSample;
     private CommonSample? _lastInitializedSample;
     private PointerCameraController? _pointerCameraController;
@@ -68,7 +70,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         MainSceneView.Dock = DockStyle.Fill;
 
         // By default, enable Vulkan's standard validation (this may slightly reduce performance)
-        MainSceneView.CreateOptions.EnableStandardValidation = true;
+        MainSceneView.CreateOptions.EnableStandardValidation = EnableStandardValidation;
 
         // Logging was already enabled in SamplesWindow constructor
         //Utilities.Log.LogLevel = LogLevels.Warn;

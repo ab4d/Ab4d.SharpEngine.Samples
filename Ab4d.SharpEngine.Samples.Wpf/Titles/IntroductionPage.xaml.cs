@@ -43,7 +43,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
 
 
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
-            //MainSceneView.CreateOptions.EnableStandardValidation = true;
+            MainSceneView.CreateOptions.EnableStandardValidation = CommonWpfSamplePage.EnableStandardValidation;
 
             // Use 4xMSAA (multi-sample anti-aliasing) and no SSAA (super-sampling anti-aliasing)
             MainSceneView.MultisampleCount = 4;
