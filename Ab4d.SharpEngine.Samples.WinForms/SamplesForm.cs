@@ -23,6 +23,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
         //private string? _startupPage = "StandardModels.TorusKnotModelNodeSample";        
         private string? _startupPage = null;
 
+        public const bool EnableStandardValidation = true; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
+
         private Font? _headerItemFont;
 
         private Control? _currentSampleControl;

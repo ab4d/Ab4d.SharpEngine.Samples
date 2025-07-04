@@ -35,6 +35,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         //private string? _startupPage = "Advanced.ComplexSceneSample";
         private string? _startupPage = null;
 
+        public const bool EnableStandardValidation = false; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
+
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
         private CommonTitleUserControl? _commonTitlePage;
