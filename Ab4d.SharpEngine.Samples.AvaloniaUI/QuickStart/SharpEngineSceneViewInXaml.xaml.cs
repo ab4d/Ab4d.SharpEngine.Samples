@@ -102,8 +102,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             {
                 Heading = -40,
                 Attitude = -30,
-                Distance = 500,
-                ViewWidth = 500,
+                Distance = 600,
                 TargetPosition = new Vector3(0, 0, 0),
                 ShowCameraLight = ShowCameraLightType.Always
             };
