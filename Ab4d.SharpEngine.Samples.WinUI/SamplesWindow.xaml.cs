@@ -53,7 +53,10 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         //private string? _startupPage = "StandardModels.BoxModelNodeSample";
         private string? _startupPage = null;
 
-        public const bool EnableStandardValidation = false; // This is also ready from IntroductionPage - this is required because there the first SharpEngineSceneView is created and this also creates the Vulkan Instance that needs to have StandardValidation enabled so it can also work for other Vulkan devices.
+        // To enable Vulkan's standard validation, set EnableStandardValidation to true.
+        // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
+        // Using Vulkan validation may reduce the performance of rendering. 
+        public const bool EnableStandardValidation = false;
 
         private bool _applySeparator;
         private TextBlock? _errorTextBlock;
