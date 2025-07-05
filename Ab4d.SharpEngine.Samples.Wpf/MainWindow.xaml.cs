@@ -43,7 +43,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         // To enable Vulkan's standard validation, set EnableStandardValidation to true.
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering.
-        public const bool EnableStandardValidation = true;
+        public const bool EnableStandardValidation = false;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
