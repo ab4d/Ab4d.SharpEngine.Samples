@@ -260,6 +260,8 @@ public class PixelOptionsSample : CommonSample
         
         ui.AddSeparator();
 
-        ui.CreateRadioButtons(new string[] { "No texture", "Circle texture", "Tree texture" }, (selectedIndex, selectedText) => ChangeTexture(selectedIndex), selectedItemIndex: 1);
+        ui.CreateRadioButtons(
+            new string[] { "No texture (square pixels)", "Circle texture", "Tree texture" }, 
+            (selectedIndex, selectedText) => ChangeTexture(selectedIndex), selectedItemIndex: 1);
     }
 }
