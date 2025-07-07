@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Shared\AvaloniaUI.CrossPlatform.Shared.csproj", "{ADF28429-719D-4AFA-95F6-89B36AD922D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaUI.CrossPlatform.Shared", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Shared\AvaloniaUI.CrossPlatform.Shared.csproj", "{ADF28429-719D-4AFA-95F6-89B36AD922D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Android\AvaloniaUI.CrossPlatform.Android.csproj", "{21CA8C66-6203-4698-AD67-9ECC34D7008E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaUI.CrossPlatform.Android", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Android\AvaloniaUI.CrossPlatform.Android.csproj", "{21CA8C66-6203-4698-AD67-9ECC34D7008E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Desktop", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Desktop\AvaloniaUI.CrossPlatform.Desktop.csproj", "{CC0C8755-C7FD-4747-8C50-2FAB750BFB31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaUI.CrossPlatform.Desktop", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\Desktop\AvaloniaUI.CrossPlatform.Desktop.csproj", "{CC0C8755-C7FD-4747-8C50-2FAB750BFB31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\iOS\AvaloniaUI.CrossPlatform.iOS.csproj", "{DC20DE39-0D44-46FA-9F21-EC55911AEA86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaUI.CrossPlatform.iOS", "Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform\iOS\AvaloniaUI.CrossPlatform.iOS.csproj", "{DC20DE39-0D44-46FA-9F21-EC55911AEA86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
