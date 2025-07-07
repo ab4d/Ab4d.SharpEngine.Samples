@@ -250,12 +250,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
 
         private void StartStopCameraRotationMenuItem_OnClick(object sender, RoutedEventArgs args)
         {
-            bool isCameraRotating = _commonDiagnostics.ToggleCameraRotation();
-
-            if (isCameraRotating)
-                StartStopCameraRotationMenuItem.Header = "Stop camera rotation";
-            else
-                StartStopCameraRotationMenuItem.Header = "Start camera rotation";
+            _commonDiagnostics.ToggleCameraRotation();
         }
         
         private void DumpSceneNodesMenuItem_OnClick(object sender, RoutedEventArgs e)

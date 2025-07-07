@@ -241,12 +241,7 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Diagnostics
 
         private void StartStopCameraRotationMenuItem_OnTapped(object sender, RoutedEventArgs args)
         {
-            bool isCameraRotating = _commonDiagnostics.ToggleCameraRotation();
-
-            if (isCameraRotating)
-                StartStopCameraRotationMenuItem.Text = "Stop camera rotation";
-            else
-                StartStopCameraRotationMenuItem.Text = "Start camera rotation";
+            _commonDiagnostics.ToggleCameraRotation();
         }
         
         private void DumpSceneNodesMenuItem_OnTapped(object sender, RoutedEventArgs e)
