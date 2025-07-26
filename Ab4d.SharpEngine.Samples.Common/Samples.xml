@@ -105,6 +105,7 @@
   <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
   <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
+  <Sample Location="HitTesting.MeshOctTreeSample" Title="Mesh OctTree"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
