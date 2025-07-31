@@ -108,7 +108,6 @@
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
-  <Sample Location="HitTesting.TriangleHitTestingWithPrimitiveIdMaterialSample" Title="Triangle hit testing with ID bitmap" IsNew="True"/>
   <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
