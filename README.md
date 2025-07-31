@@ -11,15 +11,15 @@ Vulkan is a high performance graphics and cross-platform API that is similar to 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
 - Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
-- Render line caps (arrows, etc.), line with pattern, poly-lines with mitter or bevel connections, hidden lines
+- Render line caps (arrows, etc.), line with pattern, poly-lines with miter or bevel connections, hidden lines
 - Object instancing (InstancedMeshNode)
 - Cameras: TargetPositionCamera, FirstPersonCamera, FreeCamera, MatrixCamera
-- Camera controllers with rotate around the mouse position, zoom to position and other advanced functions
+- Camera controllers that can rotate the camera around the mouse position, zoom to position and other advanced functions
 - Lights: AmbientLight, DirectionalLight, PointLight, SpotLight, CameraLight
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - Improved visual quality with super-sampling and multi-sampling
 - Render vector and bitmap text
-- ReaderObj to read 3D models from obj files
+- Included reader and writer for .obj and .stl files.
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
 
@@ -402,11 +402,10 @@ See https://www.ab4d.com/SharpEngine-history.aspx.
 ## Plans for later versions
 
 - PhysicallyBasedRendering effect
-- Multi-threaded rendering
-- Post-processing
-- Simplified creation of custom effects
 - Shadows
-- Add support for WebGL so that the SharpEngine can work with Blazor WebAssembly in a web browser (first alpha version is planned for the end of Q2 2025).
+- Multi-threaded rendering
+- Simplified creation of custom effects
+- Add support for WebGL so that the SharpEngine can work with Blazor WebAssembly in a web browser (first alpha version is planned for August 2025).
 
 
 ### Notice:
