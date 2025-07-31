@@ -18,7 +18,7 @@
   <Sample Location="Cameras.{uiFramework}Point3DTo2DSample" Title="Point3DTo2D"/>
   <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
-  <Sample Location="Cameras.TwoDimensionalCameraSample" Title="TwoDimensionalCamera" IsNew="True"/>
+  <Sample Location="Cameras.TwoDimensionalCameraSample" Title="TwoDimensionalCamera"/>
 
   <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
@@ -31,7 +31,7 @@
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
-  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode" IsUpdated="True" UpdateInfo="Added new InnerRadius, StartAngle, HeightScaleFactor and TextureMapping properties and CreateRectangle method"/>
+  <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
   <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>
   <Sample Location="StandardModels.ConeModelNodeSample" Title="ConeModelNode"/>
   <Sample Location="StandardModels.PyramidModelNodeSample" Title="PyramidModelNode"/>
@@ -43,7 +43,7 @@
   <Sample Location="StandardModels.PositionAndScaleSample" Title="Position and scale"/>
 
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
-  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing" IsUpdated="True" UpdateInfo="Added support for using texture on each instance. Check 'Plane with texture' mesh."/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
@@ -55,11 +55,11 @@
   <Sample Location="AdvancedModels.TriangulatedExtrudedShapeSample" Title="Triangulated &amp; extruded shape"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
   <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
-  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations" IsUpdated="True" UpdateInfo="Added Combined mesh"/>
+  <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
-  <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering" IsUpdated="True" UpdateInfo="Added support for rendering pixels with texture"/>
-  <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options" IsNew="True"/>
+  <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
+  <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
@@ -67,13 +67,13 @@
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
   <Sample Location="Text.VectorTextSample" Title="Vector text from TrueType font"/>
   <Sample Location="Text.BitmapTextSample" Title="Bitmap text"/>
-  <Sample Location="Text.InstancedTextNodePerformanceSample" Title="Instanced text performance" IsNew="True"/>
-  <Sample Location="Text.InstancedTextNodeSample" Title="Instanced text" IsNew="True"/>
+  <Sample Location="Text.InstancedTextNodePerformanceSample" Title="Instanced text performance"/>
+  <Sample Location="Text.InstancedTextNodeSample" Title="Instanced text"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
-  <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter" IsUpdated="True" UpdateInfo="Renamed ReaderObj to ObjImporter and added ObjExporter"/>
-  <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter" IsNew="True"/>
-  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support to read Draco compressed glTF files"/>
+  <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter"/>
+  <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter"/>
+  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter"/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
   <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
   <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer" Condition="IsWpf, IsAvalonia, IsWinForms"/>
@@ -95,9 +95,9 @@
   <Sample Location="Lights.LightsSample" Title="Lights"/>
 
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsTwoSided property to SolidColorMaterial"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsTwoSided property to VertexColorMaterial"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
-  <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures" IsNew="True"/>
+  <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
 
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
@@ -105,11 +105,10 @@
   <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
   <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
   <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
-  <Sample Location="HitTesting.MeshOctTreeSample" Title="Mesh OctTree"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
-  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
-  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method" />
+  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
   <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
@@ -128,16 +127,16 @@
   <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia"/>
   <Sample Location="Advanced.ComplexSceneSample" Title="Complex scene sample" />
   <Sample Location="Advanced.AsyncUploadSample" Title="Async upload" />
-  <Sample Location="Advanced.ModelOptimizerSample" Title="ModelOptimizer" IsNew="True" />
+  <Sample Location="Advanced.ModelOptimizerSample" Title="ModelOptimizer" />
   <Sample Location="Advanced.MeshOutlineSample" Title="Mesh outlines" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
   <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
-  <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" IsNew="True" />
-  <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" IsNew="True" />
+  <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" />
+  <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
-  <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" IsNew="True" />
-  <Sample Location="Advanced.DepthPrePassSample" Title="Depth pre-pass rendering" IsNew="True" />
+  <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" />
+  <Sample Location="Advanced.DepthPrePassSample" Title="Depth pre-pass rendering" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />
 
