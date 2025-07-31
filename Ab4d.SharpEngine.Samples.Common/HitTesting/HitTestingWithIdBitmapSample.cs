@@ -51,7 +51,6 @@ public class HitTestingWithIdBitmapSample : CommonSample
     private ICommonSampleUIElement? _renderTimeLabel;
 
     private RawImageData? _rawRenderedBitmap;
-    private PngBitmapIO? _pngBitmapIO;
 
     private bool _isIdBitmapDirty;
 
@@ -99,37 +98,41 @@ public class HitTestingWithIdBitmapSample : CommonSample
             scene.RootNode.Add(lineNode);
         }
 
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 25;
             targetPositionCamera.Attitude = -15;
             targetPositionCamera.Distance = 200;
 
-            targetPositionCamera.CameraChanged += (sender, args) =>
-            {
-                // On each camera change, we need to mark that the currently rendered ID Bitmap is not valid anymore
-                // This is also called when SceneView is resized
-
-                _isIdBitmapDirty = true; 
-
-                // Data from ID bitmap are not valid anymore
-                _lastPixelColor = 0;
-                _lastObjectId = -1;
-                _lastObjectName = "";
-
-                _pixelColorLabel?.UpdateValue();
-                _objectIdLabel?.UpdateValue();
-                _objectNameLabel?.UpdateValue();
-
-                _lastCameraChangedTime = DateTime.Now;
-            };
+            targetPositionCamera.CameraChanged += OnTargetPositionCameraOnCameraChanged;
         }
+    }
+
+    private void OnTargetPositionCameraOnCameraChanged(object? sender, EventArgs args)
+    {
+        // On each camera change, we need to mark that the currently rendered ID Bitmap is not valid anymore
+        // This is also called when SceneView is resized
+
+        _isIdBitmapDirty = true;
+
+        // Data from ID bitmap are not valid anymore
+        _lastPixelColor = 0;
+        _lastObjectId = -1;
+        _lastObjectName = "";
+
+        _pixelColorLabel?.UpdateValue();
+        _objectIdLabel?.UpdateValue();
+        _objectNameLabel?.UpdateValue();
+
+        _lastCameraChangedTime = DateTime.Now;
     }
 
     /// <inheritdoc />
     protected override void OnDisposed()
     {
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged -= OnTargetPositionCameraOnCameraChanged;
+        
         if (_bitmapIdSceneView != null)
         {
             _bitmapIdSceneView.Dispose();
@@ -285,10 +288,8 @@ public class HitTestingWithIdBitmapSample : CommonSample
         if (_rawRenderedBitmap == null)
             return;
 
-        _pngBitmapIO ??= new PngBitmapIO();
-
         string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SharpEngineBitmapId.png");
-        _pngBitmapIO.SaveBitmap(_rawRenderedBitmap, fileName);
+        Scene!.GpuDevice!.DefaultBitmapIO.SaveBitmap(_rawRenderedBitmap, fileName);
 
         System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
     }
@@ -432,9 +433,9 @@ public class HitTestingWithIdBitmapSample : CommonSample
         }
         else if (idBitmapFormat == Format.B8G8R8A8Unorm)
         {
-            objectIndex = (int)((idColor >> 24) & 0xFF) +         // blue
-                          (int)((idColor >> 16) & 0xFF) * 0xFF +  // green
-                          (int)((idColor >> 8)  & 0xFF) * 0xFFFF; // red
+            objectIndex = (int)((idColor >> 24) & 0xFF) +            // blue
+                          (int)((idColor >> 16) & 0xFF) * 256 +      // green
+                          (int)((idColor >> 8)  & 0xFF) * 256 * 256; // red
         }
         else
         {
