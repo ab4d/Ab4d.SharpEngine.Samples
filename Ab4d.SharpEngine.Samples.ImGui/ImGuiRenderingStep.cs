@@ -514,7 +514,7 @@ public class ImGuiRenderingStep : RenderingStep
         // Create descriptor sets
         var texturedDescriptorTypes = new[] { DescriptorType.CombinedImageSampler };
         _fontTextureDescriptorSetLayout = gpuDevice.CreateDescriptorSetLayout(texturedDescriptorTypes, ShaderStageFlags.Fragment, name: "ImGuiFontTextureDescriptorSetLayout");
-        _fontTextureDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.StorageBuffer, swapChainImagesCount, name: "ImGuiFontTextureDescriptorPool");
+        _fontTextureDescriptorPool = gpuDevice.CreateDescriptorPool(DescriptorType.CombinedImageSampler, swapChainImagesCount, name: "ImGuiFontTextureDescriptorPool");
         _fontTextureDescriptorSets = gpuDevice.CreateDescriptorSets(_fontTextureDescriptorSetLayout, _fontTextureDescriptorPool, swapChainImagesCount, "ImGuiFontTextureDescriptorSets");
 
         for (int i = 0; i < swapChainImagesCount; i++)
