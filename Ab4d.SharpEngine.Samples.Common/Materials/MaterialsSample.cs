@@ -289,6 +289,11 @@ public class MaterialsSample : CommonSample
 
         var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial");
 
+        // NOTE:
+        // VertexColorMaterial also supports IsTwoSided property.
+        // When it is true, the front and back triangles are rendered with one draw call.
+        //vertexColorMaterial.IsTwoSided = true;
+        
         _vertexColorModelNode = new MeshModelNode(_sphereMesh, vertexColorMaterial, "VertexColorModel")
         {
             Transform = new TranslateTransform(150, 0, 0)
