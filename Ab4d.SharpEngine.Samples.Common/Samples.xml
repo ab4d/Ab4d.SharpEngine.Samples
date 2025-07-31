@@ -107,8 +107,8 @@
   <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
-  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap"/>
-  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
+  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
   <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>

@@ -806,9 +806,9 @@ public abstract class RectangularSelectionSample : CommonSample
         }
         else if (idBitmapFormat == Format.B8G8R8A8Unorm)
         {
-            objectIndex = (int)((idColor >> 24) & 0xFF) +         // blue
-                          (int)((idColor >> 16) & 0xFF) * 0xFF +  // green
-                          (int)((idColor >> 8)  & 0xFF) * 0xFFFF; // red
+            objectIndex = (int)((idColor >> 24) & 0xFF) +            // blue
+                          (int)((idColor >> 16) & 0xFF) * 256 +      // green
+                          (int)((idColor >> 8)  & 0xFF) * 256 * 256; // red
         }
         else
         {
