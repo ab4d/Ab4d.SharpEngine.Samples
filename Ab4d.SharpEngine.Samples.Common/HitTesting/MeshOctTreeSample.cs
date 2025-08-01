@@ -25,6 +25,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // at which an OctTree is generated to speed up hit testing
 // (e.g. if mesh has more positions then a value specified with this property,
 // then OctTree will be generated for the mesh). Default value is 512 positions.
+// To disable automatic MeshOctTree generation, set HitTestOptions.MeshPositionsCountForOctTreeGeneration to int.MaxValue.
 //
 // This sample shows how to manually create an MeshOctTree (this can be also done in background thread).
 //
