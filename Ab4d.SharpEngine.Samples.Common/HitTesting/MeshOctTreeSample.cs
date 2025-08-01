@@ -58,14 +58,24 @@ public class MeshOctTreeSample : CommonSample
     public override string? Subtitle => "MeshOctTree is used to significantly improve hit-testing performance.\nSee the comments in the code behind how each level of oct tree divides the space into 8 segments and how this reduces the number of preformed ray hit tests.";
 
     private const int MaxNodeLevels = 4; // This should be determined by the number of triangles (more triangles bigger max level)
+    
+    private bool _expandChildBoundingBoxes = true;
+    private bool _showActualBoundingBox = true;
+    
+    
+    private static readonly Color4[] _nodeColors = new Color4[] { Colors.Gray, Colors.Red, Colors.Green, Colors.Blue, Colors.Black };
 
+    
     private GroupNode _octTreeLinesGroupNode;
 
     private MeshOctTree? _meshOctTree;
     private StandardMesh? _teapotMesh;
 
-    private bool _expandChildBoundingBoxes = true;
-    private bool _showActualBoundingBox = true;
+    private ICommonSampleUIElement? _level1InfoLabel;
+    private ICommonSampleUIElement? _level2InfoLabel;
+    private ICommonSampleUIElement? _level3InfoLabel;
+    private ICommonSampleUIElement? _level4InfoLabel;
+    
 
     public MeshOctTreeSample(ICommonSamplesContext context)
         : base(context)
@@ -103,6 +113,8 @@ public class MeshOctTreeSample : CommonSample
 
         ShowBoundingBoxes();
 
+        UpdateNodeLevelInfoLabels();
+        
         if (_meshOctTree != null)
         {
             // Write node statistics to the debug output
@@ -118,9 +130,7 @@ public class MeshOctTreeSample : CommonSample
 
         _octTreeLinesGroupNode.Clear();
 
-        var colors = new Color4[] { Colors.Red, Colors.Green, Colors.Blue, Colors.Black };
-
-        int startNodeLevel = 2;
+        int startNodeLevel = 1;
         for (int i = startNodeLevel; i <= MaxNodeLevels; i++)
         {
             var boundingBoxes = _meshOctTree.CollectBoundingBoxesInLevel(i, _showActualBoundingBox);
@@ -131,7 +141,7 @@ public class MeshOctTreeSample : CommonSample
                 {
                     Position      = boundingBox.GetCenterPosition(),
                     Size          = boundingBox.GetSize(),
-                    LineColor     = colors[(i - startNodeLevel) % (colors.Length)],
+                    LineColor     = _nodeColors[(i - startNodeLevel) % (_nodeColors.Length)],
                     LineThickness = 2
                 };
 
@@ -140,14 +150,39 @@ public class MeshOctTreeSample : CommonSample
         }
     }
     
+    private void UpdateNodeLevelInfoLabels()
+    {
+        if (_meshOctTree == null)
+        {
+            _level1InfoLabel?.SetText("1sd node level");
+            _level2InfoLabel?.SetText("2nd node level");
+            _level3InfoLabel?.SetText("3rd node level");
+            _level4InfoLabel?.SetText("4th node level");
+        }
+        else
+        {
+            //_level1InfoLabel?.SetText($"1st node level ({_meshOctTree.GetNodesCountInLevel(1)}/8 nodes)");
+            //_level2InfoLabel?.SetText($"2nd node level ({_meshOctTree.GetNodesCountInLevel(2)}/8 nodes)");
+            //_level3InfoLabel?.SetText($"3rd node level ({_meshOctTree.GetNodesCountInLevel(3)}/64 nodes)");
+            //_level4InfoLabel?.SetText($"4th node level ({_meshOctTree.GetNodesCountInLevel(4)}/512 nodes)");  
+            
+            _level1InfoLabel?.SetText($"1st node level ({_meshOctTree.GetTrianglesCountInLevel(1)} triangles)");
+            _level2InfoLabel?.SetText($"2nd node level ({_meshOctTree.GetTrianglesCountInLevel(2)} triangles)");
+            _level3InfoLabel?.SetText($"3rd node level ({_meshOctTree.GetTrianglesCountInLevel(3)} triangles)");
+            _level4InfoLabel?.SetText($"4th node level ({_meshOctTree.GetTrianglesCountInLevel(4)} triangles)");            
+        }
+    }
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         ui.CreateLabel("Legend:").SetStyle("bold");
-        ui.CreateLabel("2nd node level (8 nodes)").SetColor(Colors.Red);
-        ui.CreateLabel("3nd node level (64 nodes)").SetColor(Colors.Green);
-        ui.CreateLabel("4nd node level (512 nodes)").SetColor(Colors.Blue);
+        _level1InfoLabel = ui.CreateLabel("1st node level").SetColor(_nodeColors[0]);
+        _level2InfoLabel = ui.CreateLabel("2nd node level").SetColor(_nodeColors[1]);
+        _level3InfoLabel = ui.CreateLabel("3rd node level").SetColor(_nodeColors[2]);
+        _level4InfoLabel = ui.CreateLabel("4th node level").SetColor(_nodeColors[3]);
+        UpdateNodeLevelInfoLabels();
         
         
         ui.AddSeparator();
@@ -157,7 +192,7 @@ public class MeshOctTreeSample : CommonSample
             isChecked =>
             {
                 _showActualBoundingBox = isChecked;
-                RecreateOctTree();
+                ShowBoundingBoxes();
             });
         
         ui.CreateCheckBox("Expand BoundingBoxes (?):ExpandChildBoundingBoxes is a float that defined how much the bounding boxes of node overlap.\nBy default the value is set to 0.2 - so each bounding box is extended for 20% (but it does not go out of the parent's bounding box).\nThis way the triangles that lay on node borders will be put into the child nodes instead of having them in the parent node.", 
