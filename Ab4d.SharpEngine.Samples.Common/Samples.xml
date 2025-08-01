@@ -110,7 +110,7 @@
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method" />
   <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
-  <Sample Location="HitTesting.TriangleHitTestingWithPrimitiveIdMaterialSample" Title="Triangle hit testing with ID bitmap" IsNew="True"/>
+  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap" IsNew="True"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.MeshOctTreeSample" Title="OctTree sample" IsNew="True"/>
   <Sample IsSeparator="True" />

@@ -10,7 +10,7 @@ using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
-public class TriangleHitTestingWithPrimitiveIdMaterialSample : CommonSample
+public class TriangleHitTestingSample : CommonSample
 {
     public override string Title => "Triangle hit testing with PrimitiveIdMaterial";
     public override string? Subtitle => "PrimitiveIdMaterial can be used to render the triangles of the mesh so that each triangle has a color that is calculated from the triangle index.\nThis can be used as ID bitmap for very fast triangle hit testing on a very complex mesh.\n\nLeft mouse button: rotate the camera\nMouse wheel: zoom in / out";
@@ -48,7 +48,7 @@ public class TriangleHitTestingWithPrimitiveIdMaterialSample : CommonSample
     private ICommonSampleUIElement? _renderTimeLabel;
     
     
-    public TriangleHitTestingWithPrimitiveIdMaterialSample(ICommonSamplesContext context)
+    public TriangleHitTestingSample(ICommonSamplesContext context)
         : base(context)
     {
         ZoomMode = CameraZoomMode.PointerPosition;
