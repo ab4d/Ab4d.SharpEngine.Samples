@@ -120,10 +120,19 @@ public class TriangleHitTestingWithPrimitiveIdMaterialSample : CommonSample
 
         // Add torus mesh to the _bitmapIdScene and use PrimitiveIdMaterial
         // This will render the triangles with colors that are calculated from the triangle index.
+
+        // The PrimitiveIdMaterial defines AddedColor property that can be used to add a color to the calculated primitive id color.
+        // This can be used when other objects are rendered to the same ID bitmap to distinguish the object with this material from other objects.
+        // 
+        // In this sample we use AddedColor to set alpha to 1 so when saving the ID bitmap to local disk, the triangles will be visible.
+        // This is used when UseAlphaColorForPrimitiveId is false (by default).
+        // When UseAlphaColorForPrimitiveId is true, then alpha color will be also used for triangle index calculation.
+        Color4 addedColor = UseAlphaColorForPrimitiveId ? Color4.TransparentBlack : Color4.White; 
+
         var material = new PrimitiveIdMaterial
         {
             IsTwoSided = false, // We can set that to true if we want to also hit-test the back side of the triangles
-            AddedColor = new Color4(0, 0, 0, UseAlphaColorForPrimitiveId ? 0 : 1) // See comments for UseAlphaColorForPrimitiveId
+            AddedColor = addedColor
         };
 
         var torusKnotModelNode = new MeshModelNode(_torusMesh, material);
