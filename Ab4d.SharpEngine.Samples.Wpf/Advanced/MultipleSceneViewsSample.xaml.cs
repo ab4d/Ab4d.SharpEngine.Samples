@@ -72,7 +72,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
             // Create VulkanDevice
             //
 
-            var engineCreateOptions = new EngineCreateOptions(enableStandardValidation: true);
+            var engineCreateOptions = new EngineCreateOptions(enableStandardValidation: MainWindow.EnableStandardValidation);
 
             // Add Vulkan extension names that are required for using SharedTexture in SharpEngineSceneView
             engineCreateOptions.RequiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNamesForSharedTexture);
