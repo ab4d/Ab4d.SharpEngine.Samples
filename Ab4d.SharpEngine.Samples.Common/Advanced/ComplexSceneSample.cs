@@ -243,7 +243,11 @@ public class ComplexSceneSample : CommonSample
                 // Use async method to load texture in background thread and when loaded set that to Material:
                 TextureLoader.CreateTextureAsync(
                     @"Resources\Textures\10x10-texture.png", gpuDevice, 
-                    textureCreatedCallback: createdGpuImage => geometryModel7.Material = new StandardMaterial(createdGpuImage),
+                    textureCreatedCallback: createdGpuImage =>
+                    {
+                        if (!geometryModel7.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                            geometryModel7.Material = new StandardMaterial(createdGpuImage);
+                    },
                     generateMipMaps: false, useGpuDeviceCache: false);
 
                 // We could also use await, but this would wait with executing the code in this method until the texture is loaded
@@ -287,8 +291,11 @@ public class ComplexSceneSample : CommonSample
                     @"Resources\Textures\uvchecker2.jpg", gpuDevice,
                     textureCreatedCallback: createdGpuImage =>
                     {
-                        textureMaterial.DiffuseTexture = createdGpuImage;
-                        greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
+                        if (!textureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                            textureMaterial.DiffuseTexture = createdGpuImage;
+                        
+                        if (!greenMaskTextureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                            greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
                     },
                     bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
 
