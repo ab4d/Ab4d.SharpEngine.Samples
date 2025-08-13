@@ -54,6 +54,15 @@ Because PointerCameraController does not handle mouse events until mouse is move
 
 When 0 (by default), then rotation, movement or quick zoom are started immediately when the correct mouse buttons and keyboard modifiers are pressed (no mouse movement needed).";
 
+            
+            if (GlobalSharpEngineSettings.MultisampleCount > 0)
+                MainSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
+            
+            if (GlobalSharpEngineSettings.SupersamplingCount > 0)
+                MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
+
+            MainSceneView.CreateOptions.EnableStandardValidation = MainWindow.EnableStandardValidation;
+            
 
             SetupPointerCameraController();
             CreateTestScene();

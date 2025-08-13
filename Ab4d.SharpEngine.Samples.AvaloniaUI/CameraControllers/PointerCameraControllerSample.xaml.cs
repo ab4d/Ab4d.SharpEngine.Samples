@@ -71,6 +71,9 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             
             if (GlobalSharpEngineSettings.SupersamplingCount > 0)
                 MainSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
+            
+            MainSceneView.CreateOptions.EnableStandardValidation = SamplesWindow.EnableStandardValidation;
+            
 
             SetupPointerCameraController();
             CreateTestScene();

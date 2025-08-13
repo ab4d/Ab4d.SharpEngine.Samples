@@ -74,8 +74,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
         {
             var sharpEngineSceneView = new SharpEngineSceneView($"SharpEngineSceneView_{columnIndex}_{rowIndex}");
 
-            // Enable standard validation that provides additional error information when Vulkan SDK is installed on the system.
-            //sharpEngineSceneView.CreateOptions.EnableStandardValidation = true;
+            sharpEngineSceneView.CreateOptions.EnableStandardValidation = SamplesWindow.EnableStandardValidation;
 
             sharpEngineSceneView.MultisampleCount   = multiSampleCount;
             sharpEngineSceneView.SupersamplingCount = supersamplingCount;
