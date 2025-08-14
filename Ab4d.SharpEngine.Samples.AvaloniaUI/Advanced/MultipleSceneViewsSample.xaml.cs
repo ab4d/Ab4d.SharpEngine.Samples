@@ -78,7 +78,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             // Create VulkanDevice
             //
 
-            var engineCreateOptions = new EngineCreateOptions(enableStandardValidation: MainWindow.EnableStandardValidation);
+            var engineCreateOptions = new EngineCreateOptions(enableStandardValidation: SamplesWindow.EnableStandardValidation);
 
             // Add Vulkan extension names that are required for using SharedTexture in SharpEngineSceneView
             engineCreateOptions.RequiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNamesForSharedTexture);
