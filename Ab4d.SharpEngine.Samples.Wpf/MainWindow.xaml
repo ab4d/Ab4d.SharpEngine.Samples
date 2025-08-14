@@ -116,7 +116,7 @@
             <TextBlock Name="SelectedGraphicInfoTextBlock" Grid.Row="4" Text="" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" Margin="10 0 5 0" HorizontalAlignment="Left"/>
             <TextBlock Name="ViewSizeInfoTextBlock" Grid.Row="5" Text="" TextTrimming="CharacterEllipsis" Foreground="{StaticResource ForegroundBrush}" Margin="10 0 5 0" HorizontalAlignment="Left"/>
 
-            <StackPanel Grid.Row="6" Margin="10 10 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
+            <StackPanel Name="ButtonsPanel" Grid.Row="6" Margin="10 10 5 2" HorizontalAlignment="Left" Orientation="Horizontal">
                 <Button Name="GraphicsSettingsButton" Width="100" Margin="0 0 20 0" HorizontalContentAlignment="Left" Click="GraphicsSettingsButton_OnClick">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources/Settings.png" Width="18" Height="18" Margin="5 1 0 0" />
