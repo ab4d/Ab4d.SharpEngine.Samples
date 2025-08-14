@@ -11,6 +11,10 @@ namespace Ab4d.SharpEngine.Samples.Common;
 
 public abstract class CommonSample
 {
+    // When true, the GC.Collect is called after each sample is disposed (in the Dispose method below).
+    public static bool CollectGarbageAfterEachSample = true;
+    
+    
     protected ICommonSamplesContext context;
 
     protected VulkanDevice? GpuDevice => context.GpuDevice;
@@ -392,9 +396,12 @@ public abstract class CommonSample
         if (Scene != null)
             Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
 
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-        GC.Collect();
+        if (CollectGarbageAfterEachSample)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
     }
 
     protected virtual void OnDisposed()
