@@ -260,7 +260,7 @@ public class AnimatedTexturesSample : CommonSample
         if (_animatedGradientTexture1 != null)
             _animatedGradientTexture1.Dispose();
 
-        _animatedGradientTexture1 = TextureFactory.CreateGradientTexture(GpuDevice, _animatedGradientStops, isHorizontal: false, name: "AnimatedGradientTexture");
+        _animatedGradientTexture1 = TextureFactory.CreateGradientTexture(GpuDevice, _animatedGradientStops, isHorizontal: false, name: $"AnimatedGradientTexture_{elapsedSeconds*100:F0}");
         
         if (_gradientMaterial1 != null)
         {
@@ -276,7 +276,7 @@ public class AnimatedTexturesSample : CommonSample
         var progress = (float)(elapsedSeconds % 1);
         var startColor = new Color4(progress, 0, 0, progress); // semi-transparent red based on progress
 
-        _animatedGradientTexture2 = TextureFactory.CreateGradientTexture(GpuDevice, startColor, endColor: Color4.Transparent, isHorizontal: false, name: "AnimatedGradientTexture2");
+        _animatedGradientTexture2 = TextureFactory.CreateGradientTexture(GpuDevice, startColor, endColor: Color4.Transparent, isHorizontal: false, name: $"AnimatedGradientTexture2_{elapsedSeconds*100:F0}");
         
         if (_gradientMaterial2 != null)
         {
