@@ -92,14 +92,16 @@ public class AdvancedHeightMapSample : CommonSample
         UpdateTexture();
 
 
-        // Create height map wireframe, and tie its properties to the height map surface
-        _heightMapWireframeNode = new HeightMapWireframeNode(_heightMapSurfaceNode1, name: "HeightMapWireframe")
+        // Create height map wireframe, and tie its properties to the height map surface.
+        // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
+        _heightMapWireframeNode = new HeightMapWireframeNode(_heightMapSurfaceNode1, 
+                                                             verticalLineFrequency: 5,
+                                                             horizontalLineFrequency: 5,
+                                                             wireframeOffset: 0.05f, // lift the grid slightly on top of the HeightMap
+                                                             name: "HeightMapWireframe")
         {
-            VerticalLineFrequency = 5,
-            HorizontalLineFrequency = 5,
+            // Changing LineColor and Visibility will not call UpdateMesh
             LineColor = Colors.Black,
-            LineThickness = 1,
-            WireframeOffset = 0.05f, // lift the grid slightly on top of the HeightMap
             Visibility = SceneNodeVisibility.Hidden
         };
 
@@ -240,14 +242,17 @@ public class AdvancedHeightMapSample : CommonSample
 
 
         // Create height map contours, and tie its properties to the height map surface
-        _heightMapContoursNode = new HeightMapContoursNode(_heightMapSurfaceNode1, name: "Contours")
+        // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
+        _heightMapContoursNode = new HeightMapContoursNode(_heightMapSurfaceNode1, 
+                                                           numContourLines: 20,
+                                                           majorLinesFrequency: 5,
+                                                           verticalOffset: 0.05f, // lift the grid slightly on top of the HeightMap
+                                                           combineContourLines: _linesType == LinesType.CombinedContourLines,
+                                                           name: "Contours")
         {
-            NumContourLines = 20,
-            MajorLinesFrequency = 5,
+            // Setting LineThickness and LineColor does not call UpdateMesh
             MinorLineThickness = 1f,
             MajorLineThickness = 2f,
-            VerticalOffset = 0.05f, // lift the grid slightly on top of the HeightMap
-            CombineContourLines = _linesType == LinesType.CombinedContourLines
         };
 
         if (_linesType == LinesType.ColoredContourLines)

@@ -45,8 +45,8 @@
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
-  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
-  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
+  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap" IsUpdated="True" UpdateInfo="Using new HeightMapWireframeNode constructor that improved initialization time"/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap" IsUpdated="True" UpdateInfo="Using new HeightMapContoursNode and HeightMapWireframeNode constructors that improved initialization time"/>
   <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>

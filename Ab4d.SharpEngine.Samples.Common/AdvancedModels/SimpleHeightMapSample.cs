@@ -41,10 +41,14 @@ public class SimpleHeightMapSample : CommonSample
 
         
         // Create height map wireframe, and tie its properties to the height map surface
-        var heightMapWireframeNode = new HeightMapWireframeNode(heightMapSurfaceNode, name: "HeightMapWireframe")
+        // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
+        var heightMapWireframeNode = new HeightMapWireframeNode(heightMapSurfaceNode, 
+                                                                verticalLineFrequency: 10,
+                                                                horizontalLineFrequency: 10,
+                                                                wireframeOffset: 0.05f, // lift the grid slightly on top of the HeightMap
+                                                                name: "HeightMapWireframe")
         {
-            VerticalLineFrequency   = 10,
-            HorizontalLineFrequency = 10,
+            // Changing LineColor and LineThickness will not call UpdateMesh
             LineColor               = Colors.DimGray,
             LineThickness           = 1
         };
