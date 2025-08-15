@@ -139,8 +139,11 @@ public class RandomSamplesRunner
         if (_randomSampleStopwatch != null)
         {
             _randomSampleStopwatch.Stop();
+            
             var seconds = _randomSampleStopwatch.Elapsed.TotalSeconds;
-            _logAction($"Ran {StartedSamplesCount} tests in {seconds:F2} seconds => {((seconds*1000)/(double)StartedSamplesCount):F2} ms/test");
+            var startedSamplesCount = StartedSamplesCount - 1; // StartedSamplesCount starts with 1 before the first sample is started
+
+            _logAction($"Opened {startedSamplesCount} samples in {seconds:F2} seconds => {((double)startedSamplesCount/seconds):F1} samples/s or {((seconds*1000)/(double)startedSamplesCount):F2} ms/sample");
         }
                 
         StartedSamplesCount = 0; // mark that tests are not running anymore
@@ -177,6 +180,7 @@ public class RandomSamplesRunner
         while (isTitleAttribute != null || locationAttribute == null); // skip titles and separators
 
         _logAction(StartedSamplesCount + "  " + locationAttribute.Value); // Write which sample is starting
+        
         _sampleSelectorAction(selectedIndex);
 
         StartedSamplesCount++;
