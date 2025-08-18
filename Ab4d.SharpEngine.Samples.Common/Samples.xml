@@ -8,7 +8,6 @@
   <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
   <Sample Location="QuickStart.SharpEngineSceneViewInCode" Title="SharpEngineSceneView in code" />
   <Sample Location="QuickStart.SharpEngineSceneViewInXaml" Title="SharpEngineSceneView in XAML" Condition="IsNotWinForms"/>
-  <Sample Location="QuickStart.AntiAliasingSample" Title="Anti-aliasing (MSAA + SSAA)" Condition="IsWpf, IsAvalonia" />
   
   <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
   <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
@@ -90,6 +89,7 @@
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
   <Sample Location="Lines.SpecialLineRenderingSample" Title="Special line rendering"/>  
   <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
+  <Sample Location="QuickStart.AntiAliasingSample" Title="Anti-aliasing (MSAA + SSAA)" Condition="IsWpf, IsAvalonia" />
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
