@@ -1,6 +1,7 @@
 ﻿#define DEBUG // DEBUG is defined to enable debug logging
 
 using System.Diagnostics;
+using System.Text;
 using System.Xml;
 
 namespace Ab4d.SharpEngine.Samples.Common.Utils;
@@ -35,6 +36,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //         _randomSamplesRunner.Stop();
 //     else
 //         _randomSamplesRunner.Start();
+//         // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
 // } 
 
 
@@ -63,6 +65,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //         _randomSamplesRunner.Stop();
 //     else
 //         _randomSamplesRunner.Start();
+//         // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
 // }
 
 public class RandomSamplesRunner
@@ -179,12 +182,27 @@ public class RandomSamplesRunner
         }
         while (isTitleAttribute != null || locationAttribute == null); // skip titles and separators
 
-        _logAction(StartedSamplesCount + "  " + locationAttribute.Value); // Write which sample is starting
+        _logAction($"{StartedSamplesCount}  [{selectedIndex}] {locationAttribute.Value}"); // Write which sample is starting
         
         _sampleSelectorAction(selectedIndex);
 
         StartedSamplesCount++;
             
         _beginInvokeAction(SelectNewRandomTest);
-    }    
+    }   
+    
+    public void DumpAllSamples()
+    {
+        var sb = new StringBuilder();
+
+        for (int i = 0; i < _samplesList.Count; i++)
+        {
+            var xmlNode = _samplesList[i]!;
+
+            if (xmlNode.Attributes != null)
+                sb.Append($"[{i}]  {(xmlNode.Attributes["Location"]?.Value ?? "<null>")}\r\n");
+        }
+        
+        System.Diagnostics.Debug.WriteLine(sb.ToString());
+    }
 }
