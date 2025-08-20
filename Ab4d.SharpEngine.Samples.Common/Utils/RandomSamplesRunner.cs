@@ -27,9 +27,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //         samplesXmlNodList = samplesXmlNodList.Where(n => n.Attributes != null && n.Attributes["Location"] != null).ToList(); // Skip separators because they are not added to SamplesList.Items
 //         
 //         _randomSamplesRunner = new RandomSamplesRunner(samplesList: samplesXmlNodList,
-//             sampleSelectorAction: sampleIndex => SamplesList.SelectedIndex = sampleIndex,
-//             beginInvokeAction: action => Dispatcher.UIThread.InvokeAsync(action, DispatcherPriority.ApplicationIdle),
-//             customLogAction: null);
+//                                                        sampleSelectorAction: sampleIndex => SamplesList.SelectedIndex = sampleIndex,
+//                                                        beginInvokeAction: action => Dispatcher.UIThread.InvokeAsync(action, DispatcherPriority.ApplicationIdle),
+//                                                        customLogAction: null,
+//                                                        showCurrentlyRunningSample: true); // set to false to speed up showing samples
 //     }
 //             
 //     if (_randomSamplesRunner.IsRunning)
@@ -56,9 +57,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //     if (_randomSamplesRunner == null)
 //     {
 //         _randomSamplesRunner = new RandomSamplesRunner(samplesList: (List<System.Xml.XmlNode>)SampleList.ItemsSource,
-//             sampleSelectorAction: sampleIndex => SampleList.SelectedIndex = sampleIndex,
-//             beginInvokeAction: action => Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action),
-//             customLogAction: null);
+//                                                        sampleSelectorAction: sampleIndex => SampleList.SelectedIndex = sampleIndex,
+//                                                        beginInvokeAction: action => Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action),
+//                                                        customLogAction: null,
+//                                                        showCurrentlyRunningSample: true); // set to false to speed up showing samples
 //     }
 //     
 //     if (_randomSamplesRunner.IsRunning)
@@ -79,6 +81,7 @@ public class RandomSamplesRunner
 
     private int _startSampleIndex;
     private int _endSampleIndex;
+    private bool _showCurrentlyRunningSample;
 
     public bool IsRunning => StartedSamplesCount > 0;
     
@@ -92,12 +95,14 @@ public class RandomSamplesRunner
     public RandomSamplesRunner(List<System.Xml.XmlNode> samplesList, 
                                Action<int> sampleSelectorAction, 
                                Action<Action> beginInvokeAction,
-                               Action<string>? customLogAction)
+                               Action<string>? customLogAction,
+                               bool showCurrentlyRunningSample = true) // Set this to false to speed up showing samples (calling Debug.WriteLine takes a lot of time)
     {
         _samplesList = samplesList;
         _sampleSelectorAction = sampleSelectorAction;
         _beginInvokeAction = beginInvokeAction;
         _logAction = customLogAction ?? ((message) => System.Diagnostics.Debug.WriteLine(message));
+        _showCurrentlyRunningSample = showCurrentlyRunningSample;
     }
     
     /// <summary>
@@ -165,7 +170,7 @@ public class RandomSamplesRunner
 
         do
         {
-            selectedIndex = Random.Shared.Next(_endSampleIndex - _startSampleIndex) + _startSampleIndex;
+            selectedIndex = Random.Shared.Next(_endSampleIndex - _startSampleIndex + 1) + _startSampleIndex;
 
             var xmlNode = _samplesList[selectedIndex]!;
 
@@ -182,7 +187,8 @@ public class RandomSamplesRunner
         }
         while (isTitleAttribute != null || locationAttribute == null); // skip titles and separators
 
-        _logAction($"{StartedSamplesCount}  [{selectedIndex}] {locationAttribute.Value}"); // Write which sample is starting
+        if (_showCurrentlyRunningSample)
+            _logAction($"{StartedSamplesCount}  [{selectedIndex}] {locationAttribute.Value}"); // Write which sample is starting
         
         _sampleSelectorAction(selectedIndex);
 
