@@ -99,8 +99,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             // Note that we must not dispose the RootNode without disposing the Scene.
             MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
 
-            MainSceneView.IsVisible = false;
-
             _lastInitializedSample = null;
         }
 
@@ -128,9 +126,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (_pointerCameraController != null)
                 _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             
-            // Show MainSceneView - this will also render the scene
-            MainSceneView.IsVisible = true;
-
             _lastInitializedSample = _currentCommonSample;
         }
 
