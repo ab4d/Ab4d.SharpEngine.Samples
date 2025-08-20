@@ -170,6 +170,10 @@ to the main CPU memory and then back to the application's GPU).");
             var defaultMultiSampleCount = sharpEngineSceneView.GetDefaultMultiSampleCount(deviceDetails);
             var defaultSuperSamplingCount = sharpEngineSceneView.GetDefaultSuperSamplingCount(deviceDetails);
 
+            if (this.SharpEngineSceneView == null)
+                sharpEngineSceneView.Dispose(); // We can dispose the SharpEngineSceneView
+            
+            
             if (selectedMultiSampleCount == 0)
                 selectedMultiSampleCount = defaultMultiSampleCount;
 
