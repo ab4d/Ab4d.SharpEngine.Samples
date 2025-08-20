@@ -21,7 +21,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
     public partial class IntroductionPage : Page
     {
         private bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
+        private bool SkipInitializingSharpEngine = true; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
@@ -29,6 +29,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
         {
             InitializeComponent();
 
+            
+            // Dispose MainSceneView even when the animation is not started in if below
+            this.Unloaded += delegate (object sender, RoutedEventArgs args)
+            {
+                _sharpEngineLogoAnimation?.Dispose();
+                MainSceneView.Dispose();
+            };
+            
             // When Control key is pressed or when SkipInitializingSharpEngine is true,
             // then no Ab4d.SharpEngine objects are created - only WPF objects are created.
             if (SkipInitializingSharpEngine || Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
@@ -92,12 +100,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
                 PlayAgainButton.Visibility = Visibility.Visible;
             }
-
-            this.Unloaded += delegate (object sender, RoutedEventArgs args)
-            {
-                _sharpEngineLogoAnimation.Dispose();
-                MainSceneView.Dispose();
-            };
         }
 
         private void ShowStaticSharpEngineLogo()
