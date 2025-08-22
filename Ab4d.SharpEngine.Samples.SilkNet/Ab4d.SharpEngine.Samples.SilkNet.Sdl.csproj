@@ -5,7 +5,7 @@
     <RootNamespace>Ab4d.SharpEngine.Samples.CrossPlatform</RootNamespace>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>3.1.9316</Version>
+    <Version>3.2.9364</Version>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>SDL</DefineConstants>
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9316" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9364-beta" />
   </ItemGroup>
 
 <!--

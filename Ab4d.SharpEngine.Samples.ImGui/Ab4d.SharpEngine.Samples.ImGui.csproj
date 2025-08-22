@@ -16,7 +16,7 @@
     </ItemGroup>
 
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-	    <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9316" />
+	    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9364-beta" />
 	</ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />

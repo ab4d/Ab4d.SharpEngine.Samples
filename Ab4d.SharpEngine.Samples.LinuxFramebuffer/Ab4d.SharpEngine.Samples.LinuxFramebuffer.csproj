@@ -5,7 +5,7 @@
         <RootNamespace>Ab4d.SharpEngine.Samples.LinuxFramebuffer</RootNamespace>    
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
-        <Version>3.1.9316</Version>
+        <Version>3.2.9364</Version>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -17,7 +17,7 @@
       <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     </ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-	  <PackageReference Include="Ab4d.SharpEngine" Version="3.1.9316" />
+	  <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9364-beta" />
 	</ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	  <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
