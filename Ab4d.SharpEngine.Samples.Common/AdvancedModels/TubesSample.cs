@@ -29,19 +29,16 @@ public class TubesSample : CommonSample
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 0,  endAngle: 360, zOffset: -150, material: _specularGreenMaterial);
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 45, endAngle: 225, zOffset: -300, material: _specularGreenMaterial);
 
-        if (BitmapIO.IsFileFormatImportSupported("png"))
-        {
-            var textureFileName = base.GetCommonTexturePath("uvchecker2.jpg");
-            var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
+        var textureFileName = base.GetCommonTexturePath("uvchecker2.png");
+        var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
 
-            // Low-segment tubes (to show that segments are correctly handled)
-            CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 600, material: textureMaterial);
-            CreateTubeMeshes(scene: scene, segments: 3, startAngle: 45, endAngle: 225, zOffset: 450, material: textureMaterial);
+        // Low-segment tubes (to show that segments are correctly handled)
+        CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 600, material: textureMaterial);
+        CreateTubeMeshes(scene: scene, segments: 3, startAngle: 45, endAngle: 225, zOffset: 450, material: textureMaterial);
 
-            // High-segment tubes
-            CreateTubeMeshes(scene: scene, segments: 30, startAngle: 0,  endAngle: 360, zOffset: -450, material: textureMaterial);
-            CreateTubeMeshes(scene: scene, segments: 30, startAngle: 45, endAngle: 225, zOffset: -600, material: textureMaterial);
-        }
+        // High-segment tubes
+        CreateTubeMeshes(scene: scene, segments: 30, startAngle: 0,  endAngle: 360, zOffset: -450, material: textureMaterial);
+        CreateTubeMeshes(scene: scene, segments: 30, startAngle: 45, endAngle: 225, zOffset: -600, material: textureMaterial);
 
         if (targetPositionCamera != null)
         {

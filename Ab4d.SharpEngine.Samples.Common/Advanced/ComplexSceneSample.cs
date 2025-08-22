@@ -228,87 +228,90 @@ public class ComplexSceneSample : CommonSample
         scene.RootNode.Add(texturedMaterialGroup);
 
 
-        // Add textured sample when we support reading texture files
-        if (BitmapIO.IsFileFormatImportSupported("jpg") && BitmapIO.IsFileFormatImportSupported("png"))
+        if (gpuDevice != null)
         {
-            if (gpuDevice != null)
+            // Manually load texture with TextureLoader (this way we can set generateMipMaps to false)
+
+            var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
             {
-                // Manually load texture with TextureLoader (this way we can set generateMipMaps to false)
-
-                var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
-                {
-                    Material = StandardMaterials.Gray
-                };
-
-                // Use async method to load texture in background thread and when loaded set that to Material:
-                TextureLoader.CreateTextureAsync(
-                    @"Resources\Textures\10x10-texture.png", gpuDevice, 
-                    textureCreatedCallback: createdGpuImage =>
-                    {
-                        if (!geometryModel7.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
-                            geometryModel7.Material = new StandardMaterial(createdGpuImage);
-                    },
-                    generateMipMaps: false, useGpuDeviceCache: false);
-
-                // We could also use await, but this would wait with executing the code in this method until the texture is loaded
-                //var gpuImage = await TextureLoader.CreateTextureAsync(@"Resources\Textures\10x10-texture.png", gpuDevice, generateMipMaps: false, useGpuDeviceCache: false);
-
-                // Sync code:
-                //var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", gpuDevice, BitmapIO, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
-                //_disposables.Add(textureWithoutMipMaps);
-
-                //var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
-                //{
-                //    Material = new StandardMaterial(textureWithoutMipMaps)
-                //};
-
-                texturedMaterialGroup.Add(geometryModel7);
-            }
-
-            // The most simple way to create texture is to set file name to StandardMaterial constructor (this can also lazy load the texture if currently GpuDevice is not yet set)
-            var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
-            var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
-            {
-                Material = textureMaterial,
+                Material = StandardMaterials.Gray
             };
 
-            texturedMaterialGroup.Add(geometryModel8);
-
-
-            var greenMaskTextureMaterial = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)); // Set color filter to green color only
-
-            var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
-            {
-                Material = greenMaskTextureMaterial
-            };
-
-            texturedMaterialGroup.Add(geometryModel9);
-
-
-            if (gpuDevice != null)
-            {
-                TextureLoader.CreateTextureAsync(
-                    @"Resources\Textures\uvchecker2.jpg", gpuDevice,
-                    textureCreatedCallback: createdGpuImage =>
-                    {
-                        if (!textureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
-                            textureMaterial.DiffuseTexture = createdGpuImage;
-                        
-                        if (!greenMaskTextureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
-                            greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
-                    },
-                    bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
-
-
-                var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
+            // Use async method to load texture in background thread and when loaded set that to Material:
+            TextureLoader.CreateTextureAsync(
+                @"Resources\Textures\10x10-texture.png", gpuDevice, 
+                textureCreatedCallback: createdGpuImage =>
                 {
-                    Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true),
-                };
+                    if (!geometryModel7.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                        geometryModel7.Material = new StandardMaterial(createdGpuImage);
+                },
+                generateMipMaps: false, useGpuDeviceCache: false);
 
-                texturedMaterialGroup.Add(geometryModel10);
-            }
+            // We could also use await, but this would wait with executing the code in this method until the texture is loaded
+            //var gpuImage = await TextureLoader.CreateTextureAsync(@"Resources\Textures\10x10-texture.png", gpuDevice, generateMipMaps: false, useGpuDeviceCache: false);
+
+            // Sync code:
+            //var textureWithoutMipMaps = TextureLoader.CreateTexture(@"Resources\Textures\10x10-texture.png", gpuDevice, BitmapIO, generateMipMaps: false, useGpuDeviceCache: false); // do not cache this special no-mips texture (this would prevent caching 10x10-texture.png that is loaded in a standard way)
+            //_disposables.Add(textureWithoutMipMaps);
+
+            //var geometryModel7 = new BoxModelNode(centerPosition: new Vector3(0, 0, 0), size: new Vector3(80, 80, 40), "Textured box 1 (nomips)")
+            //{
+            //    Material = new StandardMaterial(textureWithoutMipMaps)
+            //};
+
+            texturedMaterialGroup.Add(geometryModel7);
         }
 
+        // The most simple way to create texture is to set file name to StandardMaterial constructor (this can also lazy load the texture if currently GpuDevice is not yet set)
+        var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
+        var geometryModel8 = new BoxModelNode(centerPosition: new Vector3(0, 0, 100), size: new Vector3(80, 80, 40), "Textured box 2")
+        {
+            Material = textureMaterial,
+        };
+
+        texturedMaterialGroup.Add(geometryModel8);
+
+
+        var greenMaskTextureMaterial = new StandardMaterial(new Color3(0.0f, 1f, 0.0f)); // Set color filter to green color only
+
+        var geometryModel9 = new BoxModelNode(centerPosition: new Vector3(0, 0, 200), size: new Vector3(80, 80, 40), "Textured box 3 (reused 2 material with green filter)")
+        {
+            Material = greenMaskTextureMaterial
+        };
+
+        texturedMaterialGroup.Add(geometryModel9);
+
+
+        if (gpuDevice != null)
+        {
+            TextureLoader.CreateTextureAsync(
+                @"Resources\Textures\uvchecker2.png", gpuDevice,
+                textureCreatedCallback: createdGpuImage =>
+                {
+                    if (!textureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                        textureMaterial.DiffuseTexture = createdGpuImage;
+                    
+                    if (!greenMaskTextureMaterial.IsDisposed) // if this sample was not unloaded while the texture was loading in background thread
+                        greenMaskTextureMaterial.DiffuseTexture = createdGpuImage;
+                },
+                bitmapIO: BitmapIO, generateMipMaps: false, useGpuDeviceCache: false);
+
+
+            var geometryModel10 = new BoxModelNode(centerPosition: new Vector3(0, 0, 300), size: new Vector3(80, 80, 40), "Textured box 4")
+            {
+                Material = new StandardMaterial(@"Resources\Textures\uvchecker.png", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true),
+            };
+
+            texturedMaterialGroup.Add(geometryModel10);
+        }
+            
+            
+        // The default BitmapIO class (PngBitmapIO) that comes with SharpEngine supports loading only png files.
+        // If we want to load jpg file, then we need to check if we use another (usually OS based) loader and if it supports loading jpg files, for example:
+        //if (BitmapIO.IsFileFormatImportSupported("jpg"))
+        //    var textureMaterial = new StandardMaterial(@"Resources\Textures\uvchecker2.jpg", BitmapIO, initialDiffuseColor: Colors.Gray, loadInBackground: true);
+
+        
         // TEST crating custom texture
         if (gpuDevice != null)
         {
