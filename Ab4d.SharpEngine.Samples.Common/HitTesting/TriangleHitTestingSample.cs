@@ -127,7 +127,7 @@ public class TriangleHitTestingSample : CommonSample
         // In this sample we use AddedColor to set alpha to 1 so when saving the ID bitmap to local disk, the triangles will be visible.
         // This is used when UseAlphaColorForPrimitiveId is false (by default).
         // When UseAlphaColorForPrimitiveId is true, then alpha color will be also used for triangle index calculation.
-        Color4 addedColor = UseAlphaColorForPrimitiveId ? Color4.TransparentBlack : Color4.White; 
+        Color4 addedColor = UseAlphaColorForPrimitiveId ? Color4.TransparentBlack : Color4.Black; // TransparentBlack: 0x00000000; Black: 0x000000FF (only Alpha is 0xFF)
 
         var material = new PrimitiveIdMaterial
         {
