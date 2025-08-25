@@ -19,7 +19,7 @@ public class TriangleHitTestingSample : CommonSample
     // When we render more than 16 million triangles, then we need to use all 4 color bytes to store the triangle index.
     // But in this sample this is not needed so we can use only red, green and blue color channels to store the triangle index.
     // This preserves the alpha value at 1 so we can see the color in the ID bitmap (otherwise the alpha would be 0 and the rendered bitmap id would appear black).
-    private const bool UseAlphaColorForPrimitiveId = false; 
+    private static readonly bool UseAlphaColorForPrimitiveId = false; 
     
     
     private StandardMesh _torusMesh;
