@@ -7,7 +7,11 @@ using System.Xml;
 namespace Ab4d.SharpEngine.Samples.Common.Utils;
 
 
-// To use RandomSamplesRunner in Avalonia sample add the following code to the end of SamplesWindow.xaml.cs file:
+//
+// Avalonia:
+// To use RandomSamplesRunner in Avalonia sample add the following code to the end of SamplesWindow.xaml.cs file
+// and then call the SetupTestButton from the Constructor.
+//
 
 // private RandomSamplesRunner? _randomSamplesRunner;
 // 
@@ -23,10 +27,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //     if (_randomSamplesRunner == null)
 //     {
 //         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
-//         var samplesXmlNodList = CommonSample.LoadSamples(fileName, uiFramework: "Avalonia", errorMessage => ShowError(errorMessage));
-//         samplesXmlNodList = samplesXmlNodList.Where(n => n.Attributes != null && n.Attributes["Location"] != null).ToList(); // Skip separators because they are not added to SamplesList.Items
+//         var samplesXmlNodeList = CommonSample.LoadSamples(fileName, uiFramework: "Avalonia", errorMessage => ShowError(errorMessage));
+//         samplesXmlNodeList = samplesXmlNodeList.Where(n => n.Attributes != null && n.Attributes["Location"] != null).ToList(); // Skip separators because they are not added to SamplesList.Items
 //         
-//         _randomSamplesRunner = new RandomSamplesRunner(samplesList: samplesXmlNodList,
+//         _randomSamplesRunner = new RandomSamplesRunner(samplesList: samplesXmlNodeList,
 //                                                        sampleSelectorAction: sampleIndex => SamplesList.SelectedIndex = sampleIndex,
 //                                                        beginInvokeAction: action => Dispatcher.UIThread.InvokeAsync(action, DispatcherPriority.ApplicationIdle),
 //                                                        customLogAction: null,
@@ -34,14 +38,22 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //     }
 //             
 //     if (_randomSamplesRunner.IsRunning)
+//     {
 //         _randomSamplesRunner.Stop();
+//     }
 //     else
+//     {
 //         _randomSamplesRunner.Start();
 //         // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
+//     }
 // } 
 
 
-// To use RandomSamplesRunner in WPF sample add the following code to the end of MainWindow.xaml.cs file:
+//
+// WPF:
+// To use RandomSamplesRunner in a WPF sample add the following code to the end of MainWindow.xaml.cs file
+// and then call the SetupTestButton from the Constructor.
+//
 
 // private RandomSamplesRunner? _randomSamplesRunner;
 //
@@ -64,10 +76,52 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils;
 //     }
 //     
 //     if (_randomSamplesRunner.IsRunning)
+//     {
+//         _randomSamplesRunner.Stop();
+//     }
+//     else
+//     {
+//         _randomSamplesRunner.Start();
+//         // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
+//     }
+// }
+
+
+//
+// WinUI:
+// To use RandomSamplesRunner in a WinUI sample add the following code to the end of MainWindow.xaml.cs file
+// and then call the SetupTestButton from the Constructor.
+//
+
+// private RandomSamplesRunner? _randomSamplesRunner;
+
+// private void SetupTestButton()
+// {
+//     var button = new Button() { Content = "TEST" };
+//     button.Click += TestButton_OnClick;
+//     ButtonsPanel.Children.Insert(0, button);
+// }
+
+// private void TestButton_OnClick(object sender, RoutedEventArgs e)
+// {
+//     if (_randomSamplesRunner == null)
+//     {
+//         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
+//         var samplesXmlNodeList = CommonSample.LoadSamples(fileName, uiFramework: "WinUI", errorMessage => ShowError(errorMessage));
+//         samplesXmlNodeList = samplesXmlNodeList.Where(n => n.Attributes != null && n.Attributes["Location"] != null).ToList(); // Skip separators because they are not added to SamplesList.Items
+
+//         _randomSamplesRunner = new RandomSamplesRunner(samplesList: samplesXmlNodeList,
+//                                                        sampleSelectorAction: sampleIndex => SamplesListBox.SelectedIndex = sampleIndex,
+//                                                        beginInvokeAction: action => DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => action()),
+//                                                        customLogAction: null,
+//                                                        showCurrentlyRunningSample: true); // set to false to speed up showing samples
+//     }
+
+//     if (_randomSamplesRunner.IsRunning)
 //         _randomSamplesRunner.Stop();
 //     else
 //         _randomSamplesRunner.Start();
-//         // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
+//     // _randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 100); // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in Immediate window
 // }
 
 public class RandomSamplesRunner
