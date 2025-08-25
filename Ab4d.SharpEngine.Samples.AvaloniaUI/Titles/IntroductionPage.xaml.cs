@@ -28,8 +28,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
 {
     public partial class IntroductionPage : UserControl
     {
-        private bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only Avalonia objects will be shown)
+        private static readonly bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
+        private static readonly bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only Avalonia objects will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
@@ -47,7 +47,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
             
             if (SkipInitializingSharpEngine)
             {
-                MainSceneView.PresentationType = PresentationTypes.None;
+                RootGrid.Children.Remove(MainSceneView); // Remove SharpEngineSceneView before it is loaded to prevent creating any Vulkan resources
 
                 ShowStaticSharpEngineLogo();
                 ShowInfoTextBlock();

@@ -7,7 +7,7 @@
       xmlns:sharpEngine="using:Ab4d.SharpEngine.WinUI"
       mc:Ignorable="d" 
       d:DesignHeight="600" d:DesignWidth="800" >
-    <Grid>
+    <Grid Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="80" /> <!-- we cannot use auto because there is no Hidden Visibility -->

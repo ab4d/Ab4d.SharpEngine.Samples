@@ -13,17 +13,16 @@ using Ab4d.SharpEngine.WinUI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.Titles
 {
     public partial class IntroductionPage : UserControl
     {
-        private const bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private const bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WinUI controls will be shown)
+        private static readonly bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
+        private static readonly bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WinUI controls will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
-
-#pragma warning disable CS0162 // Unreachable code detected
 
         public IntroductionPage()
         {
@@ -31,7 +30,11 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
             
             if (SkipInitializingSharpEngine)
             {
-                MainSceneView.PresentationType = PresentationTypes.None;
+                RootGrid.Children.Remove(MainSceneView); // Remove SharpEngineSceneView before it is loaded to prevent creating any Vulkan resources
+                
+                InfoTextBlock.Visibility = Visibility.Visible;
+                ShowStaticSharpEngineLogo();
+                
                 return;
             }
             
@@ -89,8 +92,24 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
             };
         }
 
-#pragma warning restore CS0162 // Unreachable code detected
+        private void ShowStaticSharpEngineLogo()
+        {
+            string fileName = AppDomain.CurrentDomain.BaseDirectory + @"Resources\Textures\sharp-engine-logo.png";
+            var bitmapImage = new BitmapImage(new Uri(fileName));
 
+            var image = new Image()
+            {
+                Source = bitmapImage,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(30)
+            };
+
+            Grid.SetRow(image, 0);
+
+            RootGrid.Children.Add(image);
+        }
+        
         private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)
         {
             _sharpEngineLogoAnimation?.UpdateAnimation();

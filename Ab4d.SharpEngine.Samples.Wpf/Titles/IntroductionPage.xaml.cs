@@ -20,8 +20,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
 {
     public partial class IntroductionPage : Page
     {
-        private bool PlayAnimationOnStartup = true; // Set to false to prevent automatically playing the animation
-        private bool SkipInitializingSharpEngine = true; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
+        private static readonly bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
+        private static readonly bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only WPF objects will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
@@ -41,7 +41,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
             // then no Ab4d.SharpEngine objects are created - only WPF objects are created.
             if (SkipInitializingSharpEngine || Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                MainSceneView.PresentationType = PresentationTypes.None;
+                RootGrid.Children.Remove(MainSceneView); // Remove SharpEngineSceneView before it is loaded to prevent creating any Vulkan resources
 
                 InfoTextBlock.Visibility = Visibility.Visible;
                 ShowStaticSharpEngineLogo();
