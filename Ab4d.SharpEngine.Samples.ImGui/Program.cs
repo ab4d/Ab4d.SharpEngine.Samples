@@ -292,7 +292,7 @@ internal class Program
         if (_showOtherWindow)
         {
             ImGuiNET.ImGui.Begin("Camera controls info", ref _showOtherWindow);
-            ImGuiNET.ImGui.Text("ROTATE: left mouse button\nMOVE: CTRL + left mouse button\nQUICK ZOOM: left + right mouse button");
+            ImGuiNET.ImGui.Text("ROTATE: left mouse button\nMOVE: CTRL + left mouse button\nZOOM: mouse wheel\nQUICK ZOOM: left + right mouse button");
             ImGuiNET.ImGui.End();
         }
 
