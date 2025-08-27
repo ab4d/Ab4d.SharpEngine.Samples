@@ -450,9 +450,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             {
                 if (_currentSharpEngineSceneView != null)
                 {
-                    _currentSharpEngineSceneView.SceneView.Resize(newMultisampleCount: GlobalSharpEngineSettings.MultisampleCount,
-                                                                  newSupersamplingCount: GlobalSharpEngineSettings.SupersamplingCount,
-                                                                  renderNextFrameAfterResize: false);
+                    _currentSharpEngineSceneView.MultisampleCount = GlobalSharpEngineSettings.MultisampleCount;
+                    _currentSharpEngineSceneView.SupersamplingCount = GlobalSharpEngineSettings.SupersamplingCount;
 
                     // We need to call RenderScene on SharpEngineSceneView and not only on SceneView, otherwise in SharedTexture mode, the shared texture is not updated.
                     _currentSharpEngineSceneView.RenderScene(forceRender: true, forceUpdate: false);
