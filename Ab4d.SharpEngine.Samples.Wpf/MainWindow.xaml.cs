@@ -22,6 +22,7 @@ using System.Xml;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
 using Ab4d.SharpEngine.Samples.Wpf.Settings;
@@ -44,6 +45,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering.
         public const bool EnableStandardValidation = false;
+        
+        public const bool PreventShowingErrorReportWhenDebuggerIsAttached = true; // Set to false to show error report dialog even when debugger is attached
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
@@ -61,7 +64,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         private DiagnosticsWindow? _diagnosticsWindow;
         private bool _automaticallyOpenDiagnosticsWindow;
 
-        private string? _currentSampleXaml;
+        private string? _currentSampleLocation;
         private CommonSample? _currentCommonSample;
 
         public MainWindow()
@@ -76,18 +79,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             // to get system info (with details about graphics card and drivers)
             // in case of exception in SharpEngine.
             // You can use similar code to improve your error reporting data.
-            AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs e)
-            {
-                if (e.ExceptionObject is SharpEngineException)
-                {
-                    // Here we just show a MessageBox with some exception info.
-                    // In a real application it is recommended to report or store full exception and system info (fullSystemInfo)
-                    MessageBox.Show(string.Format("Unhandled {0} occurred while running the sample:\r\n{1}\r\n\r\nIf this is not expected, please report that to support@ab4d.com.",
-                        e.ExceptionObject.GetType().Name,
-                        ((Exception)e.ExceptionObject).Message),
-                        "Ab4d.SharpEngine exception", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            };
+            AppDomain.CurrentDomain.UnhandledException += ReportUnhandledException;
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             
@@ -170,6 +162,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
 
             var sampleLocation = xmlElement.GetAttribute("Location");
+
+            _currentSampleLocation = sampleLocation;
             
             if (string.IsNullOrEmpty(sampleLocation))
                 return; // probably user selected a separator (this can be selected by using keyboard)
@@ -622,6 +616,53 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             ContentFrame.NavigationService.RemoveBackEntry();
         }
 
+                
+        private void ReportUnhandledException(object o, UnhandledExceptionEventArgs e)
+        {
+            if ((System.Diagnostics.Debugger.IsAttached && PreventShowingErrorReportWhenDebuggerIsAttached) || e.ExceptionObject is not Exception ex) // When debugger is attached, let the debugger handle the exception
+                return;
+
+            var errorReport = GetErrorReport(ex, addInnerExceptions: false, addStackTrace: false, addSystemInfo: false, addReportIssueText: true);
+            var message = errorReport + "\nWould you like to save detailed error report with stack trace and system info to a txt file on the desktop?";
+
+            var result = MessageBox.Show(message, "Unhandled exception", MessageBoxButton.YesNo, MessageBoxImage.Error);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                var fullErrorReport = GetErrorReport(ex, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addReportIssueText: true);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SharpEngineSample-error-report.txt"), fullErrorReport);
+            }
+        }
+        
+        private string GetErrorReport(Exception ex, bool addInnerExceptions, bool addStackTrace, bool addSystemInfo, bool addReportIssueText)
+        {
+            var samplesAssemblyName = this.GetType().Assembly.GetName();
+            var sharpEngineAssemblyName = typeof(Ab4d.SharpEngine.Scene).Assembly.GetName();
+            
+            string errorReport = $"Unhandled exception occurred while running\n{samplesAssemblyName.Name} v{samplesAssemblyName.Version} and using Ab4d.SharpEngine v{sharpEngineAssemblyName.Version}:\n\nCurrent sample: {_currentSampleLocation ?? "<null>"}\nException type: {ex.GetType().Name}\nMessage: {ex.Message}\n";
+
+            if (addStackTrace)
+                errorReport += $"Stack trace:\n{ex.StackTrace}\n";
+
+            if (addInnerExceptions)
+            {
+                var innerException = ex.InnerException;
+                while (innerException != null)
+                {
+                    errorReport += $"\nInner exception type: {innerException.GetType().Name}\nMessage: {innerException.Message}\nStack trace:\n{innerException.StackTrace}\n";
+                    innerException = innerException.InnerException;
+                }
+            }
+
+            if (addSystemInfo && _currentSharpEngineSceneView != null && _currentSharpEngineSceneView.Scene.GpuDevice != null)
+                errorReport += "\nSystem info:\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetSystemInfo(_currentSharpEngineSceneView.Scene.GpuDevice);
+            
+            if (addReportIssueText)
+                errorReport += "\n\nPlease report that as an issue on github.com/ab4d/Ab4d.SharpEngine.Samples on use https://www.ab4d.com/Feedback.aspx.\n";
+            
+            return errorReport;
+        }
+        
 
         public void ReloadCurrentSample()
         {

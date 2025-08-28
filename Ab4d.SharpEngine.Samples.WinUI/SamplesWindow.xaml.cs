@@ -27,16 +27,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Xml;
 using Windows.UI;
-using Windows.UI.Text;
 using Microsoft.UI.Text;
-using System.Linq;
 using System.Reflection;
 using Ab4d.SharpEngine.Samples.Common;
 using Microsoft.UI.Input;
 using System.IO;
 using Ab4d.SharpEngine.Samples.WinUI.Diagnostics;
 using Ab4d.SharpEngine.Samples.WinUI.Settings;
-using Microsoft.Graphics.Display;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -57,12 +54,13 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering. 
         public const bool EnableStandardValidation = false;
-
+        
         private bool _applySeparator;
         private TextBlock? _errorTextBlock;
 
         private CommonSample? _currentCommonSample;
         private Control? _currentSampleControl;
+        private string? _currentSampleLocation;
         private CommonWinUISampleUserControl? _commonWinUISampleUserControl;
 
         private CommonTitleUserControl? _commonTitlePage;
@@ -101,6 +99,12 @@ namespace Ab4d.SharpEngine.Samples.WinUI
             Utilities.Log.LogLevel = LogLevels.Warn;
             Utilities.Log.IsLoggingToDebugOutput = true;
 
+            // UnhandledException is not called in WinUI 3 desktop apps
+            //if (SaveErrorReportToDesktop)
+            //    AppDomain.CurrentDomain.UnhandledException += ReportUnhandledException;
+
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            
 
             InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
 
@@ -302,6 +306,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI
 
             var sampleLocation = listBoxItem.Tag as string;
 
+            _currentSampleLocation = sampleLocation;
+            
             if (sampleLocation == null)
                 return;
 

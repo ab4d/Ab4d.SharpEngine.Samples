@@ -39,6 +39,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering.
         public const bool EnableStandardValidation = false;
+        
+        public static readonly bool SaveErrorReportToDesktop = false;
 
         private Dictionary<string, Bitmap>? _resourceBitmaps;
 
@@ -56,6 +58,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private CommonAvaloniaSampleUserControl? _commonAvaloniaSampleUserControl;
         private Control? _currentSampleControl;
         private CommonSample? _currentCommonSample;
+        private string? _currentSampleLocation;
         private bool _isSceneViewInitializedSubscribed;
         private bool _isPresentationTypeChangedSubscribed;
         private bool _isSceneViewSizeChangedSubscribed;
@@ -77,7 +80,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (Application.Current != null)
                 Application.Current.RequestedThemeVariant = ThemeVariant.Light;
 
-
+            if (SaveErrorReportToDesktop)
+                AppDomain.CurrentDomain.UnhandledException += ReportUnhandledException;
+            
             // By default, enable logging of warnings and errors.
             // In case of problems please send the log text with the description of the problem to AB4D company
             Utilities.Log.LogLevel = LogLevels.Warn;
@@ -322,6 +327,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return;
 
             var sampleLocation = listBoxItem.Tag as string;
+            
+            _currentSampleLocation = sampleLocation;
 
             if (sampleLocation == null) 
                 return;
@@ -797,5 +804,43 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 }
             }
         }
+        
+        private void ReportUnhandledException(object o, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is not Exception ex) 
+                return;
+            
+            var fullErrorReport = GetErrorReport(ex, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addReportIssueText: true);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SharpEngineSample-error-report.txt"), fullErrorReport);
+        }
+        
+        private string GetErrorReport(Exception ex, bool addInnerExceptions, bool addStackTrace, bool addSystemInfo, bool addReportIssueText)
+        {
+            var samplesAssemblyName = this.GetType().Assembly.GetName();
+            var sharpEngineAssemblyName = typeof(Ab4d.SharpEngine.Scene).Assembly.GetName();
+            
+            string errorReport = $"Unhandled exception occurred while running\n{samplesAssemblyName.Name} v{samplesAssemblyName.Version} and using Ab4d.SharpEngine v{sharpEngineAssemblyName.Version}:\n\nCurrent sample: {_currentSampleLocation ?? "<null>"}\nException type: {ex.GetType().Name}\nMessage: {ex.Message}\n";
+
+            if (addStackTrace)
+                errorReport += $"Stack trace:\n{ex.StackTrace}\n";
+
+            if (addInnerExceptions)
+            {
+                var innerException = ex.InnerException;
+                while (innerException != null)
+                {
+                    errorReport += $"\nInner exception type: {innerException.GetType().Name}\nMessage: {innerException.Message}\nStack trace:\n{innerException.StackTrace}\n";
+                    innerException = innerException.InnerException;
+                }
+            }
+
+            if (addSystemInfo && _currentSharpEngineSceneView != null && _currentSharpEngineSceneView.Scene.GpuDevice != null)
+                errorReport += "\nSystem info:\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetSystemInfo(_currentSharpEngineSceneView.Scene.GpuDevice);
+            
+            if (addReportIssueText)
+                errorReport += "\n\nPlease report that as an issue on github.com/ab4d/Ab4d.SharpEngine.Samples on use https://www.ab4d.com/Feedback.aspx.\n";
+            
+            return errorReport;
+        }        
     }
 }
