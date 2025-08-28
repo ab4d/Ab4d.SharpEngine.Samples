@@ -120,8 +120,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             // Note that we must not dispose the RootNode without disposing the Scene.
             MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
             
-            MainSceneView.Visibility = Visibility.Collapsed;
-
             _lastInitializedSample = null;
         }
 
@@ -149,9 +147,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             if (_pointerCameraController != null)
                 _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
-
-            // Show MainSceneView - this will also render the scene
-            MainSceneView.Visibility = Visibility.Visible;
             
             _lastInitializedSample = _currentCommonSample;
         }
