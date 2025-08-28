@@ -209,7 +209,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             }
             else
             {
-                _currentSampleXaml = null;
                 _currentCommonSample = null;
             }
         }
