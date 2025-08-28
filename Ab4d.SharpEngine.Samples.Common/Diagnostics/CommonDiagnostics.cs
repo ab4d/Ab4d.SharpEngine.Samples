@@ -754,24 +754,29 @@ PipelineChangesCount: {8:#,##0}",
 
     public string GetEngineSettingsDump(string indent = "")
     {
-        if (SharpEngineSceneView == null)
+        return GetEngineSettingsInfo(SharpEngineSceneView, indent);
+    }
+    
+    public static string GetEngineSettingsInfo(ISharpEngineSceneView? sharpEngineSceneView, string indent = "")
+    {
+        if (sharpEngineSceneView == null)
             return "";
 
         var sb = new StringBuilder();
         
-        if (SharpEngineSceneView.GpuDevice != null)
+        if (sharpEngineSceneView.GpuDevice != null)
         {
-            DumpObjectProperties(SharpEngineSceneView.GpuDevice.CreateOptions, sb, indent);
+            DumpObjectProperties(sharpEngineSceneView.GpuDevice.CreateOptions, sb, indent);
             sb.AppendLine();
             
-            DumpObjectProperties(SharpEngineSceneView.GpuDevice, sb, indent);
+            DumpObjectProperties(sharpEngineSceneView.GpuDevice, sb, indent);
             sb.AppendLine();
             
-            DumpObjectProperties(SharpEngineSceneView.GpuDevice.PhysicalDeviceDetails, sb, indent);
+            DumpObjectProperties(sharpEngineSceneView.GpuDevice.PhysicalDeviceDetails, sb, indent);
             sb.AppendLine();
 
             sb.AppendLine($"{indent}Memory types:");
-            var memoryTypes = SharpEngineSceneView.GpuDevice.PhysicalDeviceDetails.MemoryTypes;
+            var memoryTypes = sharpEngineSceneView.GpuDevice.PhysicalDeviceDetails.MemoryTypes;
             for (var i = 0; i < memoryTypes.Length; i++)
                 sb.AppendLine($"{indent}  [{i}]: heap {memoryTypes[i].HeapIndex}: {memoryTypes[i].PropertyFlags}");
             sb.AppendLine();
@@ -788,19 +793,19 @@ PipelineChangesCount: {8:#,##0}",
             sb.AppendLine();
         }
 
-        DumpObjectProperties(SharpEngineSceneView.Scene, sb, indent);
+        DumpObjectProperties(sharpEngineSceneView.Scene, sb, indent);
         sb.AppendLine();
 
-        DumpObjectProperties(SharpEngineSceneView.SceneView, sb, indent);
+        DumpObjectProperties(sharpEngineSceneView.SceneView, sb, indent);
         sb.AppendLine();
 
-        DumpObjectProperties(SharpEngineSceneView, sb, indent);
+        DumpObjectProperties(sharpEngineSceneView, sb, indent);
         sb.AppendLine();
 
         return sb.ToString();
     }
 
-    private void DumpObjectProperties(object? objectToDump, StringBuilder sb, string indent)
+    private static void DumpObjectProperties(object? objectToDump, StringBuilder sb, string indent)
     {
         if (objectToDump == null)
         {
