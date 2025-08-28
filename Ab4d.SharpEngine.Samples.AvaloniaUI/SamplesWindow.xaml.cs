@@ -17,6 +17,7 @@ using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Settings;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Samples.Common.Diagnostics;
 using Ab4d.SharpEngine.SceneNodes;
 using Avalonia;
 using Avalonia.Controls;
@@ -810,37 +811,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (e.ExceptionObject is not Exception ex) 
                 return;
             
-            var fullErrorReport = GetErrorReport(ex, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addReportIssueText: true);
+            var fullErrorReport = CommonDiagnostics.GetErrorReport(ex, _currentSampleLocation, _currentSharpEngineSceneView, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addEngineSettings: true, addReportIssueText: true);
             System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SharpEngineSample-error-report.txt"), fullErrorReport);
         }
-        
-        private string GetErrorReport(Exception ex, bool addInnerExceptions, bool addStackTrace, bool addSystemInfo, bool addReportIssueText)
-        {
-            var samplesAssemblyName = this.GetType().Assembly.GetName();
-            var sharpEngineAssemblyName = typeof(Ab4d.SharpEngine.Scene).Assembly.GetName();
-            
-            string errorReport = $"Unhandled exception occurred while running\n{samplesAssemblyName.Name} v{samplesAssemblyName.Version} and using Ab4d.SharpEngine v{sharpEngineAssemblyName.Version}:\n\nCurrent sample: {_currentSampleLocation ?? "<null>"}\nException type: {ex.GetType().Name}\nMessage: {ex.Message}\n";
-
-            if (addStackTrace)
-                errorReport += $"Stack trace:\n{ex.StackTrace}\n";
-
-            if (addInnerExceptions)
-            {
-                var innerException = ex.InnerException;
-                while (innerException != null)
-                {
-                    errorReport += $"\nInner exception type: {innerException.GetType().Name}\nMessage: {innerException.Message}\nStack trace:\n{innerException.StackTrace}\n";
-                    innerException = innerException.InnerException;
-                }
-            }
-
-            if (addSystemInfo && _currentSharpEngineSceneView != null && _currentSharpEngineSceneView.Scene.GpuDevice != null)
-                errorReport += "\nSystem info:\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetSystemInfo(_currentSharpEngineSceneView.Scene.GpuDevice);
-            
-            if (addReportIssueText)
-                errorReport += "\n\nPlease report that as an issue on github.com/ab4d/Ab4d.SharpEngine.Samples on use https://www.ab4d.com/Feedback.aspx.\n";
-            
-            return errorReport;
-        }        
     }
 }

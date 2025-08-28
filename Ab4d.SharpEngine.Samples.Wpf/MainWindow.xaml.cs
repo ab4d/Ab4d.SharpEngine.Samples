@@ -627,7 +627,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             if (result == MessageBoxResult.Yes)
             {
-                var fullErrorReport = GetErrorReport(ex, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addReportIssueText: true);
+                var fullErrorReport = CommonDiagnostics.GetErrorReport(ex, _currentSampleLocation, _currentSharpEngineSceneView, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addEngineSettings: true, addReportIssueText: true);
                 System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SharpEngineSample-error-report.txt"), fullErrorReport);
             }
         }
@@ -660,7 +660,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             
             return errorReport;
         }
-        
 
         public void ReloadCurrentSample()
         {

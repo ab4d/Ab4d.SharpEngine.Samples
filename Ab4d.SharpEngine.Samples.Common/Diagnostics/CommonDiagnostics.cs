@@ -1033,6 +1033,46 @@ PipelineChangesCount: {8:#,##0}",
         return sb.ToString();
     }
 
+    public static string GetErrorReport(Exception exception, string? sampleName, ISharpEngineSceneView? sharpEngineSceneView, bool addInnerExceptions, bool addStackTrace, bool addSystemInfo, bool addEngineSettings, bool addReportIssueText)
+    {
+        var entryAssemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName();
+        var sharpEngineAssemblyName = typeof(Ab4d.SharpEngine.Scene).Assembly.GetName();
+
+        string errorReport = $"Unhandled exception occurred ";
+
+        if (entryAssemblyName != null)
+            errorReport += $"while running\n{entryAssemblyName.Name} v{entryAssemblyName.Version} and ";
+     
+        if (exception is TargetInvocationException targetInvocationException && targetInvocationException.InnerException != null) // Avalonia wraps exceptions in TargetInvocationException
+            exception = targetInvocationException.InnerException;
+        
+        errorReport += $"using Ab4d.SharpEngine v{sharpEngineAssemblyName.Version}:\n\nCurrent sample: {sampleName ?? "<null>"}\nException type: {exception.GetType().Name}\nMessage: {exception.Message}\n";
+        
+        if (addStackTrace)
+            errorReport += $"Stack trace:\n{exception.StackTrace}\n";
+
+        if (addInnerExceptions)
+        {
+            var innerException = exception.InnerException;
+            while (innerException != null)
+            {
+                errorReport += $"\nInner exception type: {innerException.GetType().Name}\nMessage: {innerException.Message}\nStack trace:\n{innerException.StackTrace}\n";
+                innerException = innerException.InnerException;
+            }
+        }
+
+        if (addSystemInfo && sharpEngineSceneView?.GpuDevice != null)
+            errorReport += "\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetSystemInfo(sharpEngineSceneView.GpuDevice);
+        
+        if (addEngineSettings && sharpEngineSceneView != null)
+            errorReport += "\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetEngineSettingsInfo(sharpEngineSceneView);
+        
+        if (addReportIssueText)
+            errorReport += "\n\nPlease report that as an issue on github.com/ab4d/Ab4d.SharpEngine.Samples on use https://www.ab4d.com/Feedback.aspx.\n";
+        
+        return errorReport;
+    }
+    
     public string GetCameraDetailsDumpString()
     {
         if (SharpEngineSceneView == null)
