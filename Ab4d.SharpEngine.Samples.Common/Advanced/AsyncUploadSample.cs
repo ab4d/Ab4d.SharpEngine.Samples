@@ -93,7 +93,15 @@ public class AsyncUploadSample : CommonSample
     {
         if (Scene == null || Scene.GpuDevice == null || modelNode == null)
             return;
-
+        
+        if (!Scene.GpuDevice.IsBackgroundImageUploadSupported)
+        {
+            // Background upload is not supported - load texture synchronously
+            LoadTexture(modelNode);
+            return;
+        }
+        
+        
         try
         {
             StandardMaterial textureMaterial;
@@ -199,6 +207,14 @@ public class AsyncUploadSample : CommonSample
         if (Scene == null || Scene.GpuDevice == null || meshModelNode == null)
             return;
 
+        if (!Scene.GpuDevice.IsBackgroundBufferUploadSupported)
+        {
+            // Background upload is not supported - create the mesh synchronously
+            CreateMesh(meshModelNode);
+            return;
+        }
+        
+        
         // Create a complex sphere mesh in the background thread
         StandardMesh? newSphereMesh = null;
         await Task.Run(() =>
@@ -326,6 +342,14 @@ public class AsyncUploadSample : CommonSample
         if (Scene == null || Scene.GpuDevice == null)
             return;
 
+        if (!Scene.GpuDevice.IsBackgroundBufferUploadSupported)
+        {
+            // Background upload is not supported - create the scene nodes synchronously
+            AddManySceneNodes(sceneNodesCount);
+            return;
+        }
+        
+        
         // Create a complex sphere mesh in the background thread
 
         var triangleIndicesCounts = new int[sceneNodesCount];
