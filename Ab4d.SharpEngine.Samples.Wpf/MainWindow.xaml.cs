@@ -180,7 +180,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
                     ContentFrame.Navigate(_commonTitlePage);
 
-                    _currentSampleXaml = sampleLocation;
                     _currentCommonSample = null;
                     return;
                 }
