@@ -887,7 +887,7 @@ PipelineChangesCount: {8:#,##0}",
         return systemInfoText;
     }
 
-    private void AddObjectFields(StringBuilder sb, object objectToDump, bool sortFields)
+    private static void AddObjectFields(StringBuilder sb, object objectToDump, bool sortFields)
     {
         var allFields = objectToDump.GetType().GetFields();
 
@@ -926,8 +926,8 @@ PipelineChangesCount: {8:#,##0}",
             }
         }
     }
-
-    public string GetSystemInfo(VulkanDevice? vulkanDevice)
+    
+    public static string GetSystemInfo(VulkanDevice? vulkanDevice)
     {
         if (vulkanDevice == null)
             return "VulkanDevice is null";
