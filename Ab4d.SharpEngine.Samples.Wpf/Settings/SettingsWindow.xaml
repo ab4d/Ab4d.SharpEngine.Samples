@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -50,8 +51,31 @@
             
             <TextBlock Name="ErrorTextBlock" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 15 0 2" Foreground="Red" TextWrapping="Wrap" Visibility="Collapsed" />
         </Grid>
+        <Expander Name="AdvancedSettingsExander" Grid.Row="2" Header="Advanced options" Margin="0 10 0 0" IsExpanded="false">
+            <StackPanel Orientation="Vertical" Margin="3 10 0 10">
+                <CheckBox Name="UseWritableBitmapCheckBox" Content="Use WritableBitmap" ToolTip="When checked, then for PresentationType the WritableBitmap is always used instead of the SharedTexture" />
+                <CheckBox Name="DisableBackgroundUploadCheckBox" Content="Disable background upload" Margin="0 5 0 0" ToolTip="When checked, then uploading images and buffer in the background thread is disabled"/>
+                <CheckBox Name="DisableMaterialSortingCheckBox" Content="Disable material sorting" Margin="0 5 0 0" ToolTip="When checked, then the objects are not sorted by materials. This renders objects with the same materials one after another to decrease state changes" />
+                <CheckBox Name="DisableTransparencySortingCheckBox" Content="Disable transparency sorting" Margin="0 5 0 0" ToolTip="When checked, then transparent objects are not sorted by their distance to the camera" />
+                <CheckBox Name="PreserveBackBuffersWhenHiddenCheckBox" Content="Preserve BackBuffers when hidden" Margin="0 5 0 0" ToolTip="When unchecked, then the BackBuffer and shared resources are not disposed when the SharpEngineSceneView is hidden" />
+                <CheckBox Name="ShowTestButtonCheckBox" Content="Show samples TEST runner" Margin="0 10 0 0" ToolTip="When checked, then a TEST button is added to the main window. When clicked, this application starts opening new sample as fast as possible (when application is idle)." />
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Height="25" Margin="0 15 0 0">
+                <StackPanel Orientation="Horizontal" Margin="0 15 0 0">
+                    <TextBlock Text="Log level: " Width="75" VerticalAlignment="Center" />
+                    <ComboBox Name="LogLevelComboBox" Width="130" Margin="5 0 0 0" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                    <TextBlock Text="Log file name: " Width="75" VerticalAlignment="Center" />
+                    <TextBox Name="LogFileNameTextBox" Width="130" Margin="5 0 0 0" />
+                </StackPanel>
+                <CheckBox Name="LogToConsoleCheckBox" Content="Log to console" Margin="0 5 0 0" />
+                <CheckBox Name="LogToDebugOutputCheckBox" Content="Log to debug output" Margin="0 5 0 0" />
+
+            </StackPanel>
+        </Expander>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Height="25" Margin="0 15 0 0">
             <Button Name="CancelButton" IsCancel="True" Content="Cancel" Width="80" Click="CancelButton_OnClick" />
             <Button Name="OkButton" IsDefault="True" Content="OK" Margin="10 0 0 0" Width="80" Click="OkButton_OnClick" />
         </StackPanel>

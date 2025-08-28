@@ -96,6 +96,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             sharpEngineSceneView.MultisampleCount   = multiSampleCount;
             sharpEngineSceneView.SupersamplingCount = supersamplingCount;
+            
+            // Apply and advanced settings from the SettingsWindow
+            MainWindow.ConfigureSharpEngineSceneViewAction?.Invoke(sharpEngineSceneView);
 
             if (gpuDevice != null)
                 sharpEngineSceneView.Initialize(gpuDevice);

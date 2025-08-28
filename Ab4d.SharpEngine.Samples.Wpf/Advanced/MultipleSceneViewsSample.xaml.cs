@@ -135,6 +135,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
 
                     var sharpEngineSceneView = new SharpEngineSceneView(_mainScene, $"SceneView_{rowIndex + 1}_{columnIndex + 1}");
 
+                    // Apply and advanced settings from the SettingsWindow
+                    MainWindow.ConfigureSharpEngineSceneViewAction?.Invoke(sharpEngineSceneView);
+                    
                     var (cameraHeading, cameraAttitude, distance, renderingType) = initialCameraSettings[(rowIndex * 2 + columnIndex) % initialCameraSettings.Length];
 
                     SetupPointerCameraController(sharpEngineSceneView, cameraHeading, cameraAttitude, distance);

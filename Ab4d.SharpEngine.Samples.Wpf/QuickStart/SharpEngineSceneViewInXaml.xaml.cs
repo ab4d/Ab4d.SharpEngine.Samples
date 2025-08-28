@@ -55,6 +55,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             MainSceneView.CreateOptions.EnableStandardValidation = MainWindow.EnableStandardValidation;
 
+            // Apply and advanced settings from the SettingsWindow
+            MainWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
+            
             // Logging was already enabled in SamplesWindow constructor
             //Utilities.Log.LogLevel = LogLevels.Warn;
             //Utilities.Log.IsLoggingToDebugOutput = true;

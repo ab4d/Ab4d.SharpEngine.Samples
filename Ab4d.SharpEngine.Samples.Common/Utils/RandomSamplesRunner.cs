@@ -239,7 +239,7 @@ public class RandomSamplesRunner
                 locationAttribute = null;
             }
         }
-        while (isTitleAttribute != null || locationAttribute == null); // skip titles and separators
+        while (isTitleAttribute != null || locationAttribute == null || locationAttribute.Value.EndsWith(".md")); // skip titles and separators
 
         if (_showCurrentlyRunningSample)
             _logAction($"{StartedSamplesCount}  [{selectedIndex}] {locationAttribute.Value}"); // Write which sample is starting

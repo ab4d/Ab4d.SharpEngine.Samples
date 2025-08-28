@@ -63,6 +63,9 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
 
             MainSceneView.CreateOptions.EnableStandardValidation = MainWindow.EnableStandardValidation;
             
+            // Apply and advanced settings from the SettingsWindow
+            MainWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
+            
 
             SetupPointerCameraController();
             CreateTestScene();

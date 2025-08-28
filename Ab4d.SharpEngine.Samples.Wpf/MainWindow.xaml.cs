@@ -4,31 +4,21 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
-using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Samples.Common.Diagnostics;
 using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
 using Ab4d.SharpEngine.Samples.Wpf.Settings;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Wpf;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Wpf
 {
@@ -38,9 +28,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
-        //private string? _startupPage = "HitTesting.MeshOctTreeSample";
         private string? _startupPage = null;
-        
+
         // To enable Vulkan's standard validation, set EnableStandardValidation to true.
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering.
@@ -48,6 +37,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         
         public const bool PreventShowingErrorReportWhenDebuggerIsAttached = true; // Set to false to show error report dialog even when debugger is attached
 
+        public static Action<Ab4d.SharpEngine.Wpf.SharpEngineSceneView>? ConfigureSharpEngineSceneViewAction;
+        
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
         private bool _isPresentationTypeChangedSubscribed;
         private bool _isSceneViewInitializedSubscribed;
@@ -67,6 +58,11 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         private string? _currentSampleLocation;
         private CommonSample? _currentCommonSample;
 
+        private SettingsWindow.AdvancedSharpEngineSettings? _advancedSettings;
+        private RandomSamplesRunner? _randomSamplesRunner;
+        private Button? _testRunnerButton;
+
+        
         public MainWindow()
         {
             // Ab4d.SharpEngine Samples License can be used only for Ab4d.SharpEngine samples.
@@ -82,7 +78,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             AppDomain.CurrentDomain.UnhandledException += ReportUnhandledException;
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            
+
             // By default, enable logging of warnings and errors.
             // In case of problems please send the log text with the description of the problem to AB4D company
             Utilities.Log.LogLevel = LogLevels.Warn;
@@ -90,6 +86,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
 
             InitializeComponent();
+
+            //SetupTestRunnerButton();
 
             // Snap WPF objects to device pixels. This shows sharper image because the rendered 3D scene is not linearly scaled by WPF.
             // See comment in the constructor of QuickStart/AntiAliasingSample.xaml.cs for more info.
@@ -99,7 +97,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             WpfSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
 
-            this.Loaded += delegate(object? sender, RoutedEventArgs args)
+            this.Loaded += delegate (object? sender, RoutedEventArgs args)
             {
                 LoadSamples();
             };
@@ -111,12 +109,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 // When content of ContentFrame is changed, we try to find the SharpEngineSceneView control
                 // that is defined by the newly shown content.
 
-                SharpEngineSceneView? sharpEngineSceneView;
+                Ab4d.SharpEngine.Wpf.SharpEngineSceneView? sharpEngineSceneView;
                 if (_commonWpfSamplePage != null && ReferenceEquals(_commonWpfSamplePage.CurrentCommonSample, _currentCommonSample))
                     sharpEngineSceneView = _commonWpfSamplePage.MainSceneView;
                 else
                     sharpEngineSceneView = FindSharpEngineSceneView(ContentFrame.Content);
-                
+
                 WpfSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
             };
 
@@ -145,8 +143,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 return;
 
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
-            SampleList.ItemsSource = CommonSample.LoadSamples(fileName, 
-                                                              uiFramework: "Wpf", 
+            SampleList.ItemsSource = CommonSample.LoadSamples(fileName,
+                                                              uiFramework: "Wpf",
                                                               errorMessage => MessageBox.Show(errorMessage, "", MessageBoxButton.OK, MessageBoxImage.Exclamation));
         }
 
@@ -160,14 +158,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _currentCommonSample.Dispose();
                 _currentCommonSample = null;
             }
-
+         
+            
             var sampleLocation = xmlElement.GetAttribute("Location");
 
             _currentSampleLocation = sampleLocation;
             
+            
             if (string.IsNullOrEmpty(sampleLocation))
                 return; // probably user selected a separator (this can be selected by using keyboard)
-            
+
 
             if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
@@ -212,7 +212,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _currentCommonSample = null;
             }
         }
-        
+
         private string? GetMarkdownText(string location)
         {
             var markdownText = GetMarkdownText(this.GetType().Assembly, location);
@@ -262,13 +262,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                     _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
                     _isSceneViewInitializedSubscribed = false;
                 }
-                
+
                 if (_isSceneViewSizeChangedSubscribed)
                 {
                     _currentSharpEngineSceneView.ViewSizeChanged -= OnSceneViewOnViewSizeChanged;
                     _isSceneViewSizeChangedSubscribed = false;
                 }
-                
+
                 if (_isPresentationTypeChangedSubscribed)
                 {
                     _currentSharpEngineSceneView.PresentationTypeChanged -= OnPresentationTypeChanged;
@@ -284,7 +284,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         private void UpdateGraphicsCardInfo()
         {
             var sharpEngineSceneView = WpfSamplesContext.Current.CurrentSharpEngineSceneView;
-            
+
             if (sharpEngineSceneView != null && !_isSceneViewSizeChangedSubscribed)
             {
                 sharpEngineSceneView.ViewSizeChanged += OnSceneViewOnViewSizeChanged;
@@ -311,8 +311,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                         sharpEngineSceneView.SceneViewInitialized += OnSceneViewInitialized;
                         _isSceneViewInitializedSubscribed = true;
                     }
-                    
-                    _currentSharpEngineSceneView = sharpEngineSceneView; 
+
+                    _currentSharpEngineSceneView = sharpEngineSceneView;
                 }
 
                 return;
@@ -358,7 +358,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             SelectedGraphicInfoTextBlock.ToolTip = null;
         }
-        
+
         private void UpdateViewSizeInfo(ISharpEngineSceneView sharpEngineSceneView)
         {
             if (sharpEngineSceneView.GpuDevice != null)
@@ -417,16 +417,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _currentSharpEngineSceneView.SceneViewInitialized -= OnSceneViewInitialized;
                 _isSceneViewInitializedSubscribed = true;
             }
-            
+
             UpdateGraphicsCardInfo();
         }
-        
+
 
         private void GraphicsSettingsButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenSettingsWindow();
         }
-        
+
         private void DiagnosticsButton_OnClick(object sender, RoutedEventArgs e)
         {
             OpenDiagnosticsWindow();
@@ -436,6 +436,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         {
             var settingsWindow = new SettingsWindow();
             settingsWindow.Owner = this;
+            
+            settingsWindow.AdvancedSettings = _advancedSettings;
+            settingsWindow.ShowTestRunner = _testRunnerButton != null;
+
             settingsWindow.ShowDialog();
 
             if (settingsWindow.IsChanged)
@@ -451,6 +455,88 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                     UpdateViewSizeInfo(_currentSharpEngineSceneView);
                 }
             }
+            
+            
+            if (settingsWindow.ShowTestRunner && _testRunnerButton == null)
+            {
+                SetupTestRunnerButton();
+            }
+            else if (!settingsWindow.ShowTestRunner && _testRunnerButton != null)
+            {
+                ButtonsPanel.Children.Remove(_testRunnerButton);
+                _testRunnerButton = null;
+                
+                GraphicsSettingsButton.Margin = new Thickness(0, 0, 20, 0);
+                
+                if (_randomSamplesRunner != null && _randomSamplesRunner.IsRunning)
+                    _randomSamplesRunner.Stop();
+            }
+            
+            
+            var newAdvancedSettings = settingsWindow.AdvancedSettings;
+
+            bool isAdvancedSettingsChanged;
+            
+            if (newAdvancedSettings != null)
+            {
+                if (_advancedSettings != null)
+                {
+                    isAdvancedSettingsChanged = newAdvancedSettings.UseWritableBitmap != _advancedSettings.UseWritableBitmap ||
+                                                newAdvancedSettings.DisableBackgroundUpload != _advancedSettings.DisableBackgroundUpload ||
+                                                newAdvancedSettings.DisableMaterialSorting != _advancedSettings.DisableMaterialSorting ||
+                                                newAdvancedSettings.DisableTransparencySorting != _advancedSettings.DisableTransparencySorting ||
+                                                newAdvancedSettings.PreserveBackBuffersWhenHidden != _advancedSettings.PreserveBackBuffersWhenHidden;
+                }
+                else
+                {
+                    isAdvancedSettingsChanged = true;
+                }
+                
+                // Is any settings enabled?
+                if (newAdvancedSettings.UseWritableBitmap ||
+                    newAdvancedSettings.DisableBackgroundUpload ||
+                    newAdvancedSettings.DisableMaterialSorting ||
+                    newAdvancedSettings.DisableTransparencySorting ||
+                    newAdvancedSettings.PreserveBackBuffersWhenHidden)
+                {
+                    _advancedSettings = newAdvancedSettings;
+                }
+                else
+                {
+                    _advancedSettings = null;
+                }
+                
+                if (_advancedSettings != null)
+                    MainWindow.ConfigureSharpEngineSceneViewAction = OnConfigureSharpEngineSceneViewAction;
+                else
+                    MainWindow.ConfigureSharpEngineSceneViewAction = null;
+            }
+            else
+            {
+                isAdvancedSettingsChanged = _advancedSettings != null;
+                _advancedSettings = null;
+            }
+
+            
+            if (isAdvancedSettingsChanged)
+            {
+                _commonWpfSamplePage = null; // Reset the CommonWpfSamplePage so it will be recreated with new settings
+                ReloadCurrentSample();
+            }
+        }
+        
+        // This method is called when we need to apply advanced settings from SettingsWindow - it is called each time a new instance of SharpEngineSceneView is created
+        private void OnConfigureSharpEngineSceneViewAction(Ab4d.SharpEngine.Wpf.SharpEngineSceneView sharpEngineSceneView)
+        {
+            if (_advancedSettings == null)
+                return;
+            
+            sharpEngineSceneView.PresentationType = _advancedSettings.UseWritableBitmap ? PresentationTypes.WriteableBitmap : PresentationTypes.SharedTexture;
+
+            sharpEngineSceneView.EnableBackgroundUpload = !_advancedSettings.DisableBackgroundUpload;
+            sharpEngineSceneView.Scene.IsMaterialSortingEnabled = !_advancedSettings.DisableMaterialSorting;
+            sharpEngineSceneView.Scene.IsTransparencySortingEnabled = !_advancedSettings.DisableTransparencySorting;
+            sharpEngineSceneView.DisposeBackBuffersWhenHidden = !_advancedSettings.PreserveBackBuffersWhenHidden;
         }
 
         private void EnableDiagnosticsButton()
@@ -549,9 +635,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         }
 
         // Searches the logical controls tree and returns the first instance of SharpEngineSceneView if found
-        private SharpEngineSceneView? FindSharpEngineSceneView(object element)
+        private Ab4d.SharpEngine.Wpf.SharpEngineSceneView? FindSharpEngineSceneView(object element)
         {
-            var foundDViewportView = element as SharpEngineSceneView;
+            var foundDViewportView = element as Ab4d.SharpEngine.Wpf.SharpEngineSceneView;
 
             if (foundDViewportView != null)
                 return foundDViewportView;
@@ -620,7 +706,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             if ((System.Diagnostics.Debugger.IsAttached && PreventShowingErrorReportWhenDebuggerIsAttached) || e.ExceptionObject is not Exception ex) // When debugger is attached, let the debugger handle the exception
                 return;
 
-            var errorReport = GetErrorReport(ex, addInnerExceptions: false, addStackTrace: false, addSystemInfo: false, addReportIssueText: true);
+            var errorReport = CommonDiagnostics.GetErrorReport(ex, _currentSampleLocation, _currentSharpEngineSceneView, addInnerExceptions: false, addStackTrace: false, addSystemInfo: false, addEngineSettings: false, addReportIssueText: true);
             var message = errorReport + "\nWould you like to save detailed error report with stack trace and system info to a txt file on the desktop?";
 
             var result = MessageBox.Show(message, "Unhandled exception", MessageBoxButton.YesNo, MessageBoxImage.Error);
@@ -630,35 +716,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 var fullErrorReport = CommonDiagnostics.GetErrorReport(ex, _currentSampleLocation, _currentSharpEngineSceneView, addInnerExceptions: true, addStackTrace: true, addSystemInfo: true, addEngineSettings: true, addReportIssueText: true);
                 System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SharpEngineSample-error-report.txt"), fullErrorReport);
             }
-        }
-        
-        private string GetErrorReport(Exception ex, bool addInnerExceptions, bool addStackTrace, bool addSystemInfo, bool addReportIssueText)
-        {
-            var samplesAssemblyName = this.GetType().Assembly.GetName();
-            var sharpEngineAssemblyName = typeof(Ab4d.SharpEngine.Scene).Assembly.GetName();
-            
-            string errorReport = $"Unhandled exception occurred while running\n{samplesAssemblyName.Name} v{samplesAssemblyName.Version} and using Ab4d.SharpEngine v{sharpEngineAssemblyName.Version}:\n\nCurrent sample: {_currentSampleLocation ?? "<null>"}\nException type: {ex.GetType().Name}\nMessage: {ex.Message}\n";
-
-            if (addStackTrace)
-                errorReport += $"Stack trace:\n{ex.StackTrace}\n";
-
-            if (addInnerExceptions)
-            {
-                var innerException = ex.InnerException;
-                while (innerException != null)
-                {
-                    errorReport += $"\nInner exception type: {innerException.GetType().Name}\nMessage: {innerException.Message}\nStack trace:\n{innerException.StackTrace}\n";
-                    innerException = innerException.InnerException;
-                }
-            }
-
-            if (addSystemInfo && _currentSharpEngineSceneView != null && _currentSharpEngineSceneView.Scene.GpuDevice != null)
-                errorReport += "\nSystem info:\n" + Ab4d.SharpEngine.Samples.Common.Diagnostics.CommonDiagnostics.GetSystemInfo(_currentSharpEngineSceneView.Scene.GpuDevice);
-            
-            if (addReportIssueText)
-                errorReport += "\n\nPlease report that as an issue on github.com/ab4d/Ab4d.SharpEngine.Samples on use https://www.ab4d.com/Feedback.aspx.\n";
-            
-            return errorReport;
         }
 
         public void ReloadCurrentSample()
@@ -712,6 +769,47 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             RightSideBorder.Margin = new Thickness(5);
             RightSideBorder.Padding = new Thickness(10);
+        }
+
+        private void SetupTestRunnerButton()
+        {
+            _testRunnerButton = new Button() { Content = "TEST", Margin = new Thickness(0, 0, 5, 0) };
+            _testRunnerButton.Click += TestButton_OnClick;
+
+            ButtonsPanel.Children.Insert(0, _testRunnerButton);
+
+            GraphicsSettingsButton.Margin = new Thickness(0, 0, 5, 0);
+        }
+
+        private void TestButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_randomSamplesRunner == null)
+            {
+                _randomSamplesRunner = new RandomSamplesRunner(samplesList: (List<System.Xml.XmlNode>)SampleList.ItemsSource,
+                                                               sampleSelectorAction: sampleIndex => SampleList.SelectedIndex = sampleIndex,
+                                                               beginInvokeAction: action => Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action),
+                                                               customLogAction: null, 
+                                                               showCurrentlyRunningSample: false);
+            }
+
+            if (_randomSamplesRunner.IsRunning)
+            {
+                _randomSamplesRunner.Stop();
+                
+                if (_testRunnerButton != null)
+                    _testRunnerButton.Content = "TEST";
+            }
+            else
+            {
+                if (_testRunnerButton != null)
+                    _testRunnerButton.Content = "STOP";
+                
+                _randomSamplesRunner.Start(); // run all samples
+
+                // To run only some samples, use:
+                // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in the Immediate window
+                //_randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 50); 
+            }
         }
     }
 }

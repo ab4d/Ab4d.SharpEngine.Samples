@@ -57,6 +57,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Titles
             MainSceneView.MultisampleCount = 4;
             MainSceneView.SupersamplingCount = 1;
             
+            // Apply and advanced settings from the SettingsWindow
+            MainWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
+            
             var scene = MainSceneView.Scene;
             var sceneView = MainSceneView.SceneView;
 
