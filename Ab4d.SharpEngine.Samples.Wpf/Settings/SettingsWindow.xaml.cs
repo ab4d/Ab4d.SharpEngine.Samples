@@ -31,6 +31,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Settings
         public bool IsAdvancedSettingsChanged { get; private set; }
 
         public bool ShowTestRunner { get; set; }
+        
+        public bool IsStandardValidationEnabled { get; set; }
 
         private readonly float[] _possibleSuperSamplingValues = new float[] { 1, 2, 3, 4, 9, 16 };
         
@@ -90,6 +92,7 @@ Examples:
                     PreserveBackBuffersWhenHiddenCheckBox.IsChecked = AdvancedSettings.PreserveBackBuffersWhenHidden;
                 }
 
+                EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
                 ShowTestButtonCheckBox.IsChecked = ShowTestRunner;
                 
                 AdvancedSettingsExander.IsExpanded = AdvancedSettings != null || ShowTestRunner;
@@ -100,6 +103,7 @@ Examples:
         {
             // Check if VulkanInstance was already created (created when the first VulkanDevice is created).
             VulkanInstance? vulkanInstance = VulkanInstance.FirstVulkanInstance;
+            bool isVulkanInstanceCreated;
 
             if (vulkanInstance == null)
             {
@@ -113,10 +117,16 @@ Examples:
                     MessageBox.Show("Error creating VulkanInstance:\r\n" + ex.Message);
                     return;
                 }
+
+                isVulkanInstanceCreated = true;
+            }
+            else
+            {
+                isVulkanInstanceCreated = false;
             }
 
-            // Enumerate all graphics cards on the system
-            var devicesCount = vulkanInstance.AllPhysicalDeviceDetails.Length;
+                // Enumerate all graphics cards on the system
+                var devicesCount = vulkanInstance.AllPhysicalDeviceDetails.Length;
             for (var i = 0; i < devicesCount; i++)
             {
                 var deviceDetails = vulkanInstance.AllPhysicalDeviceDetails[i];
@@ -142,6 +152,9 @@ Examples:
                     SetupAntialisingComboBoxes(deviceDetails);
                 }
             }
+            
+            if (isVulkanInstanceCreated)
+                vulkanInstance.Dispose();
 
             if (devicesCount > 1)
             {
@@ -264,7 +277,8 @@ Examples:
             Log.LogLevel = Enum.Parse<LogLevels>((string)LogLevelComboBox.SelectedItem);
             
             ShowTestRunner = ShowTestButtonCheckBox.IsChecked ?? false;
-            
+            IsStandardValidationEnabled = EnableStandardValidationCheckBox.IsChecked ?? false;
+
             this.Close();
         }
     }

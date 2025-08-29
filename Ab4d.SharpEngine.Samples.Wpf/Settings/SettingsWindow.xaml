@@ -53,7 +53,8 @@
         </Grid>
         <Expander Name="AdvancedSettingsExander" Grid.Row="2" Header="Advanced options" Margin="0 10 0 0" IsExpanded="false">
             <StackPanel Orientation="Vertical" Margin="3 10 0 10">
-                <CheckBox Name="UseWritableBitmapCheckBox" Content="Use WritableBitmap" ToolTip="When checked, then for PresentationType the WritableBitmap is always used instead of the SharedTexture" />
+                <CheckBox Name="EnableStandardValidationCheckBox" Content="Enable standard validation" />
+                <CheckBox Name="UseWritableBitmapCheckBox" Content="Use WritableBitmap" Margin="0 5 0 0" ToolTip="When checked, then for PresentationType the WritableBitmap is always used instead of the SharedTexture" />
                 <CheckBox Name="DisableBackgroundUploadCheckBox" Content="Disable background upload" Margin="0 5 0 0" ToolTip="When checked, then uploading images and buffer in the background thread is disabled"/>
                 <CheckBox Name="DisableMaterialSortingCheckBox" Content="Disable material sorting" Margin="0 5 0 0" ToolTip="When checked, then the objects are not sorted by materials. This renders objects with the same materials one after another to decrease state changes" />
                 <CheckBox Name="DisableTransparencySortingCheckBox" Content="Disable transparency sorting" Margin="0 5 0 0" ToolTip="When checked, then transparent objects are not sorted by their distance to the camera" />

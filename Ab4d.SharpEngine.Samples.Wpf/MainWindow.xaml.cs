@@ -19,6 +19,7 @@ using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Diagnostics;
 using Ab4d.SharpEngine.Samples.Wpf.Settings;
+using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Wpf
 {
@@ -33,7 +34,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
         // To enable Vulkan's standard validation, set EnableStandardValidation to true.
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering.
-        public const bool EnableStandardValidation = false;
+        public static bool EnableStandardValidation = false;
         
         public const bool PreventShowingErrorReportWhenDebuggerIsAttached = true; // Set to false to show error report dialog even when debugger is attached
 
@@ -439,6 +440,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             
             settingsWindow.AdvancedSettings = _advancedSettings;
             settingsWindow.ShowTestRunner = _testRunnerButton != null;
+            settingsWindow.IsStandardValidationEnabled = EnableStandardValidation;
 
             settingsWindow.ShowDialog();
 
@@ -471,7 +473,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 if (_randomSamplesRunner != null && _randomSamplesRunner.IsRunning)
                     _randomSamplesRunner.Stop();
             }
-            
             
             var newAdvancedSettings = settingsWindow.AdvancedSettings;
 
@@ -517,6 +518,19 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                 _advancedSettings = null;
             }
 
+                        
+            if (EnableStandardValidation != settingsWindow.IsStandardValidationEnabled)
+            {
+                // When EnableStandardValidation is changed, then we need to recreate the Vulkan instance.
+                if (_currentSharpEngineSceneView != null)
+                    _currentSharpEngineSceneView.Dispose();
+                
+                if (VulkanInstance.FirstVulkanInstance != null)
+                    VulkanInstance.FirstVulkanInstance.Dispose();
+                
+                EnableStandardValidation = settingsWindow.IsStandardValidationEnabled;
+                isAdvancedSettingsChanged = true;
+            }
             
             if (isAdvancedSettingsChanged)
             {
