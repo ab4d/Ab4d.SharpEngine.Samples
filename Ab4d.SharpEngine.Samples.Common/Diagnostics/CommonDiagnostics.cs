@@ -1,4 +1,12 @@
-﻿using System;
+﻿using Ab4d.SharpEngine;
+using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
+using Ab4d.SharpEngine.Effects;
+using Ab4d.SharpEngine.Utilities;
+using Ab4d.SharpEngine.Vulkan;
+using Ab4d.Vulkan;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,14 +16,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
-using Ab4d.SharpEngine;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Effects;
-using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
-using Ab4d.Vulkan;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ab4d.SharpEngine.Samples.Common.Diagnostics;
 
@@ -392,7 +393,7 @@ public class CommonDiagnostics
             averageFpsText = "";
         }
 
-        string fpsText = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} FPS{1}", _lastFps, averageFpsText);
+        string fpsText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0} FPS{1}", _lastFps, averageFpsText);
 
 
         string statisticsText;
@@ -979,7 +980,7 @@ PipelineChangesCount: {8:#,##0}",
             {
                 var physicalDeviceDetail = allPhysicalDeviceDetails[i];
 
-                sb.Append($"{i}: {physicalDeviceDetail.DeviceName} ({physicalDeviceDetail.DeviceProperties.DeviceType}, VulkanAPI v{physicalDeviceDetail.DeviceApiVersion}, DeviceId: {physicalDeviceDetail.DeviceProperties.DeviceID}, DeviceLUID: ");
+                sb.Append($"{i}: {physicalDeviceDetail.DeviceName} ({physicalDeviceDetail.DeviceProperties.DeviceType}, VulkanAPI v{physicalDeviceDetail.DeviceApiVersion}, DriverVersion: {physicalDeviceDetail.DeviceProperties.DriverVersion} (0x{physicalDeviceDetail.DeviceProperties.DriverVersion:X}), DriverInfo: {physicalDeviceDetail.DriverInfo}, DeviceId: {physicalDeviceDetail.DeviceProperties.DeviceID}, DeviceLUID: ");
 
                 if (physicalDeviceDetail.IsDeviceLUIDValid)
                     sb.Append(physicalDeviceDetail.DeviceLUID);
