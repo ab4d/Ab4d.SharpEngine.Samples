@@ -37,7 +37,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Settings
         private readonly float[] _possibleSuperSamplingValues = new float[] { 1, 2, 3, 4, 9, 16 };
         
 
-        public record AdvancedSharpEngineSettings(bool UseWritableBitmap, bool DisableBackgroundUpload, bool DisableMaterialSorting, bool DisableTransparencySorting, bool PreserveBackBuffersWhenHidden);
+        public record AdvancedSharpEngineSettings(bool UseWritableBitmap, bool DisableBackgroundUpload, bool DisableMaterialSorting, bool DisableTransparencySorting, bool PreserveBackBuffersWhenHidden, bool AllowDirectTextureSharingForIntelGpu, bool IsUsingSharedTextureForIntegratedIntelGpu);
 
         public AdvancedSharpEngineSettings? AdvancedSettings { get; set; }
         
@@ -85,11 +85,13 @@ Examples:
             {
                 if (AdvancedSettings != null)
                 {
-                    UseWritableBitmapCheckBox.IsChecked             = AdvancedSettings.UseWritableBitmap;
-                    DisableBackgroundUploadCheckBox.IsChecked       = AdvancedSettings.DisableBackgroundUpload;
-                    DisableMaterialSortingCheckBox.IsChecked        = AdvancedSettings.DisableMaterialSorting;
-                    DisableTransparencySortingCheckBox.IsChecked    = AdvancedSettings.DisableTransparencySorting;
-                    PreserveBackBuffersWhenHiddenCheckBox.IsChecked = AdvancedSettings.PreserveBackBuffersWhenHidden;
+                    UseWritableBitmapCheckBox.IsChecked                         = AdvancedSettings.UseWritableBitmap;
+                    DisableBackgroundUploadCheckBox.IsChecked                   = AdvancedSettings.DisableBackgroundUpload;
+                    DisableMaterialSortingCheckBox.IsChecked                    = AdvancedSettings.DisableMaterialSorting;
+                    DisableTransparencySortingCheckBox.IsChecked                = AdvancedSettings.DisableTransparencySorting;
+                    PreserveBackBuffersWhenHiddenCheckBox.IsChecked             = AdvancedSettings.PreserveBackBuffersWhenHidden;
+                    AllowDirectTextureSharingForIntelGpuCheckBox.IsChecked      = AdvancedSettings.AllowDirectTextureSharingForIntelGpu;
+                    IsUsingSharedTextureForIntegratedIntelGpuCheckBox.IsChecked = AdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;
                 }
 
                 EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
@@ -125,8 +127,8 @@ Examples:
                 isVulkanInstanceCreated = false;
             }
 
-                // Enumerate all graphics cards on the system
-                var devicesCount = vulkanInstance.AllPhysicalDeviceDetails.Length;
+            // Enumerate all graphics cards on the system
+            var devicesCount = vulkanInstance.AllPhysicalDeviceDetails.Length;
             for (var i = 0; i < devicesCount; i++)
             {
                 var deviceDetails = vulkanInstance.AllPhysicalDeviceDetails[i];
@@ -150,6 +152,13 @@ Examples:
                 {
                     // We are using the primary graphic card so fill ComboBoxes based on its capabilities
                     SetupAntialisingComboBoxes(deviceDetails);
+                    
+                    if (deviceDetails.DeviceProperties.VendorID == VendorIds.Intel)
+                    {
+                        AllowDirectTextureSharingForIntelGpuCheckBox.Visibility = Visibility.Visible;
+                        if (deviceDetails.DeviceProperties.DeviceType == PhysicalDeviceType.IntegratedGpu)
+                            IsUsingSharedTextureForIntegratedIntelGpuCheckBox.Visibility = Visibility.Visible;
+                    }
                 }
             }
             
@@ -269,7 +278,9 @@ Examples:
                                                                DisableBackgroundUploadCheckBox.IsChecked ?? false,
                                                                DisableMaterialSortingCheckBox.IsChecked ?? false,
                                                                DisableTransparencySortingCheckBox.IsChecked ?? false,
-                                                               PreserveBackBuffersWhenHiddenCheckBox.IsChecked ?? false);
+                                                               PreserveBackBuffersWhenHiddenCheckBox.IsChecked ?? false,
+                                                               AllowDirectTextureSharingForIntelGpuCheckBox.IsChecked ?? false,
+                                                               IsUsingSharedTextureForIntegratedIntelGpuCheckBox.IsChecked ?? false);
             
             Log.IsLoggingToDebugOutput = LogToDebugOutputCheckBox.IsChecked ?? false;
             Log.IsLoggingToConsole = LogToConsoleCheckBox.IsChecked ?? false;

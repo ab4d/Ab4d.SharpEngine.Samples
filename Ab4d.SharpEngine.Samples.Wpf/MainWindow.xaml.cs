@@ -547,10 +547,12 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             
             sharpEngineSceneView.PresentationType = _advancedSettings.UseWritableBitmap ? PresentationTypes.WriteableBitmap : PresentationTypes.SharedTexture;
 
-            sharpEngineSceneView.EnableBackgroundUpload = !_advancedSettings.DisableBackgroundUpload;
-            sharpEngineSceneView.Scene.IsMaterialSortingEnabled = !_advancedSettings.DisableMaterialSorting;
-            sharpEngineSceneView.Scene.IsTransparencySortingEnabled = !_advancedSettings.DisableTransparencySorting;
-            sharpEngineSceneView.DisposeBackBuffersWhenHidden = !_advancedSettings.PreserveBackBuffersWhenHidden;
+            sharpEngineSceneView.EnableBackgroundUpload                    = !_advancedSettings.DisableBackgroundUpload;
+            sharpEngineSceneView.Scene.IsMaterialSortingEnabled            = !_advancedSettings.DisableMaterialSorting;
+            sharpEngineSceneView.Scene.IsTransparencySortingEnabled        = !_advancedSettings.DisableTransparencySorting;
+            sharpEngineSceneView.DisposeBackBuffersWhenHidden              = !_advancedSettings.PreserveBackBuffersWhenHidden;
+            sharpEngineSceneView.AllowDirectTextureSharingForIntelGpu      = _advancedSettings.AllowDirectTextureSharingForIntelGpu;
+            sharpEngineSceneView.IsUsingSharedTextureForIntegratedIntelGpu = _advancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;
         }
 
         private void EnableDiagnosticsButton()
