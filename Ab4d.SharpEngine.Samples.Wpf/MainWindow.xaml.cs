@@ -486,7 +486,9 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                                                 newAdvancedSettings.DisableBackgroundUpload != _advancedSettings.DisableBackgroundUpload ||
                                                 newAdvancedSettings.DisableMaterialSorting != _advancedSettings.DisableMaterialSorting ||
                                                 newAdvancedSettings.DisableTransparencySorting != _advancedSettings.DisableTransparencySorting ||
-                                                newAdvancedSettings.PreserveBackBuffersWhenHidden != _advancedSettings.PreserveBackBuffersWhenHidden;
+                                                newAdvancedSettings.PreserveBackBuffersWhenHidden != _advancedSettings.PreserveBackBuffersWhenHidden ||
+                                                newAdvancedSettings.AllowDirectTextureSharingForIntelGpu != _advancedSettings.AllowDirectTextureSharingForIntelGpu ||
+                                                newAdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu != _advancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;
                 }
                 else
                 {
@@ -498,6 +500,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                     newAdvancedSettings.DisableBackgroundUpload ||
                     newAdvancedSettings.DisableMaterialSorting ||
                     newAdvancedSettings.DisableTransparencySorting ||
+                    newAdvancedSettings.PreserveBackBuffersWhenHidden ||
+                    newAdvancedSettings.AllowDirectTextureSharingForIntelGpu ||
                     newAdvancedSettings.PreserveBackBuffersWhenHidden)
                 {
                     _advancedSettings = newAdvancedSettings;
