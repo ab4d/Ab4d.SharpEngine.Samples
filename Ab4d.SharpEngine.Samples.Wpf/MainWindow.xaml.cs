@@ -442,8 +442,28 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             settingsWindow.ShowTestRunner = _testRunnerButton != null;
             settingsWindow.IsStandardValidationEnabled = EnableStandardValidation;
 
+            SettingsWindow.AdvancedSharpEngineSettings oldSettings;
+            if (_currentSharpEngineSceneView is Ab4d.SharpEngine.Wpf.SharpEngineSceneView wpfSharpEngineSceneView)
+            {
+                oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(
+                    UseWritableBitmap: wpfSharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap,
+                    DisableBackgroundUpload: !wpfSharpEngineSceneView.EnableBackgroundUpload,
+                    DisableMaterialSorting: !wpfSharpEngineSceneView.Scene.IsMaterialSortingEnabled,
+                    DisableTransparencySorting:  !wpfSharpEngineSceneView.Scene.IsTransparencySortingEnabled,
+                    PreserveBackBuffersWhenHidden:  !wpfSharpEngineSceneView.DisposeBackBuffersWhenHidden,
+                    AllowDirectTextureSharingForIntelGpu:  wpfSharpEngineSceneView.AllowDirectTextureSharingForIntelGpu,
+                    IsUsingSharedTextureForIntegratedIntelGpu:  wpfSharpEngineSceneView.IsUsingSharedTextureForIntegratedIntelGpu);
+            }
+            else
+            {
+                oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(false, false, false, false, false, false, IsUsingSharedTextureForIntegratedIntelGpu: true);
+            }
+
+            settingsWindow.AdvancedSettings = oldSettings;
+            
             settingsWindow.ShowDialog();
 
+            
             if (settingsWindow.IsChanged)
             {
                 if (_currentSharpEngineSceneView != null)
@@ -482,13 +502,13 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             {
                 if (_advancedSettings != null)
                 {
-                    isAdvancedSettingsChanged = newAdvancedSettings.UseWritableBitmap != _advancedSettings.UseWritableBitmap ||
-                                                newAdvancedSettings.DisableBackgroundUpload != _advancedSettings.DisableBackgroundUpload ||
-                                                newAdvancedSettings.DisableMaterialSorting != _advancedSettings.DisableMaterialSorting ||
-                                                newAdvancedSettings.DisableTransparencySorting != _advancedSettings.DisableTransparencySorting ||
-                                                newAdvancedSettings.PreserveBackBuffersWhenHidden != _advancedSettings.PreserveBackBuffersWhenHidden ||
-                                                newAdvancedSettings.AllowDirectTextureSharingForIntelGpu != _advancedSettings.AllowDirectTextureSharingForIntelGpu ||
-                                                newAdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu != _advancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;
+                    isAdvancedSettingsChanged = newAdvancedSettings.UseWritableBitmap                         != oldSettings.UseWritableBitmap ||
+                                                newAdvancedSettings.DisableBackgroundUpload                   != oldSettings.DisableBackgroundUpload ||
+                                                newAdvancedSettings.DisableMaterialSorting                    != oldSettings.DisableMaterialSorting ||
+                                                newAdvancedSettings.DisableTransparencySorting                != oldSettings.DisableTransparencySorting ||
+                                                newAdvancedSettings.PreserveBackBuffersWhenHidden             != oldSettings.PreserveBackBuffersWhenHidden ||
+                                                newAdvancedSettings.AllowDirectTextureSharingForIntelGpu      != oldSettings.AllowDirectTextureSharingForIntelGpu ||
+                                                newAdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu != oldSettings.IsUsingSharedTextureForIntegratedIntelGpu;
                 }
                 else
                 {
