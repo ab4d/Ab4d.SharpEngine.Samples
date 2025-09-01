@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -839,6 +840,10 @@ PipelineChangesCount: {8:#,##0}",
                             valueText = "<null>";
                         else if (propertyInfo.PropertyType == typeof(string))
                             valueText = '"' + (string)propertyValue + '"';
+                        else if (propertyValue is IVulkanDispatchableHandle vulkanDispatchableHandle)
+                            valueText = vulkanDispatchableHandle.Handle == 0 ? "<null>" : string.Format(System.Globalization.CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
+                        else if (propertyValue is IVulkanNonDispatchableHandle vulkanNonDispatchableHandle)
+                            valueText = vulkanNonDispatchableHandle.Handle == 0 ? "<null>" : string.Format(System.Globalization.CultureInfo.InvariantCulture, "0x{0:X}", vulkanNonDispatchableHandle.Handle);
                         else
                             valueText = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}", propertyValue);
                     }
@@ -909,27 +914,38 @@ PipelineChangesCount: {8:#,##0}",
 
             var oneValue = fieldInfo.GetValue(objectToDump);
 
+            string valueText;
+            
             if (oneValue == null)
             {
-                sb.AppendFormat("<null>\r\n", oneValue);
+                valueText = "<null>";
             }
             else if (fieldInfo.FieldType.IsArray)
             {
+                valueText = "";
                 var array = (Array)oneValue;
                 for (int i = 0; i < array.Length; i++)
-                    sb.Append(array.GetValue(i)).Append(" ");
-
-                sb.AppendLine();
+                    valueText += (array.GetValue(i)?.ToString() ?? "<null>") + ' ';
             }
             else if (fieldInfo.FieldType == typeof(Bool32))
             {
                 var bool32 = (Bool32)oneValue;
-                sb.AppendFormat("{0}\r\n", bool32.Value == 1 ? "true" : "false");
+                valueText = bool32.Value == 1 ? "true" : "false";
+            }
+            else if (oneValue is IVulkanDispatchableHandle vulkanDispatchableHandle)
+            {
+                valueText = vulkanDispatchableHandle.Handle == 0 ? "<null>" : string.Format(CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
+            }
+            else if (oneValue is IVulkanNonDispatchableHandle vulkanNonDispatchableHandle)
+            {
+                valueText = vulkanNonDispatchableHandle.Handle == 0 ? "<null>" : string.Format(CultureInfo.InvariantCulture, "0x{0:X}", vulkanNonDispatchableHandle.Handle);
             }
             else
             {
-                sb.AppendFormat("{0}\r\n", oneValue);
+                valueText = oneValue.ToString() ?? "";
             }
+            
+            sb.Append(valueText).AppendLine();
         }
     }
     
