@@ -502,7 +502,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                     newAdvancedSettings.DisableTransparencySorting ||
                     newAdvancedSettings.PreserveBackBuffersWhenHidden ||
                     newAdvancedSettings.AllowDirectTextureSharingForIntelGpu ||
-                    newAdvancedSettings.PreserveBackBuffersWhenHidden)
+                    newAdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu)
                 {
                     _advancedSettings = newAdvancedSettings;
                 }
