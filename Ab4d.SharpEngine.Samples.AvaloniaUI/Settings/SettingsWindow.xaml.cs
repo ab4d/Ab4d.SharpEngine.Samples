@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Vulkan;
+using Ab4d.Vulkan;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using System;
+using System.Collections.Generic;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Settings
 {
@@ -20,6 +22,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Settings
 
         private readonly float[] _possibleSuperSamplingValues = new float[] { 1, 2, 3, 4, 9, 16 };
 
+        public bool ShowTestRunner { get; set; }
+        
+        public bool IsStandardValidationEnabled { get; set; }
+        
+        public record AdvancedSharpEngineSettings(bool UseWritableBitmap, bool DisableBackgroundUpload, bool DisableMaterialSorting, bool DisableTransparencySorting, bool PreserveBackBuffersWhenHidden); // The following is available only for WPF: bool AllowDirectTextureSharingForIntelGpu, bool IsUsingSharedTextureForIntegratedIntelGpu);
+
+        public AdvancedSharpEngineSettings? AdvancedSettings { get; set; }
+        
         public SettingsWindow()
         {
             InitializeComponent();
@@ -63,6 +73,36 @@ SceneView.SupersamplingFactor is 2). This requires running the pixel shader 4 ti
 In this case width and height are multiplied by 1.41 = sqrt(2) - SceneView.SupersamplingFactor is 1.41.");
 
             SetupDeviceInfo();
+            SetupLogOptions();
+            
+            this.Loaded += (sender, args) =>
+            {
+                bool isAnySettingChanged;
+                
+                if (AdvancedSettings != null)
+                {
+                    UseWritableBitmapCheckBox.IsChecked             = AdvancedSettings.UseWritableBitmap;
+                    DisableBackgroundUploadCheckBox.IsChecked       = AdvancedSettings.DisableBackgroundUpload;
+                    DisableMaterialSortingCheckBox.IsChecked        = AdvancedSettings.DisableMaterialSorting;
+                    DisableTransparencySortingCheckBox.IsChecked    = AdvancedSettings.DisableTransparencySorting;
+                    PreserveBackBuffersWhenHiddenCheckBox.IsChecked = AdvancedSettings.PreserveBackBuffersWhenHidden;
+
+                    isAnySettingChanged = AdvancedSettings.UseWritableBitmap ||
+                                          AdvancedSettings.DisableBackgroundUpload ||
+                                          AdvancedSettings.DisableMaterialSorting ||
+                                          AdvancedSettings.DisableTransparencySorting ||
+                                          AdvancedSettings.PreserveBackBuffersWhenHidden;
+                }
+                else
+                {
+                    isAnySettingChanged = false;
+                }
+
+                EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
+                ShowTestButtonCheckBox.IsChecked = ShowTestRunner;
+                
+                AdvancedSettingsExpander.IsExpanded = isAnySettingChanged || ShowTestRunner;
+            };            
         }
 
         private void SetupDeviceInfo()
@@ -109,6 +149,13 @@ In this case width and height are multiplied by 1.41 = sqrt(2) - SceneView.Super
                 {
                     // We are using the primary graphic card so fill ComboBoxes based on its capabilities
                     SetupAntialisingComboBoxes(deviceDetails);
+                    
+                    if (deviceDetails.DeviceProperties.VendorID == VendorIds.Intel)
+                    {
+                        AllowDirectTextureSharingForIntelGpuCheckBox.IsVisible = true;
+                        if (deviceDetails.DeviceProperties.DeviceType == PhysicalDeviceType.IntegratedGpu)
+                            IsUsingSharedTextureForIntegratedIntelGpuCheckBox.IsVisible = true;
+                    }                    
                 }
             }
 
@@ -186,6 +233,35 @@ to the main CPU memory and then back to the application's GPU).");
 
             DefaultInfoTextBlock.Text = $"Default values: {defaultMultiSampleCount}xMSAA, {defaultSuperSamplingCount}xSSAA";
         }
+                
+        private void SetupLogOptions()
+        {
+            var enumNames  = Enum.GetNames<LogLevels>();
+            
+#pragma warning disable CS0162 // Unreachable code detected
+            if (Log.MinUsedLogLevel > LogLevels.Trace)
+            {
+                var usedEnumNames = new List<string>();
+                var enumValues = Enum.GetValues<LogLevels>();
+                
+                for (int i = 0; i < enumValues.Length; i++)
+                {
+                    if (i == 0 || enumValues[i] >= Log.MinUsedLogLevel)
+                        usedEnumNames.Add(enumNames[i]);
+                }
+
+                enumNames = usedEnumNames.ToArray();
+            }
+#pragma warning restore CS0162 // Unreachable code detected
+
+
+            LogLevelComboBox.ItemsSource = enumNames;
+            LogLevelComboBox.SelectedItem = Log.LogLevel.ToString();
+            
+            LogToDebugOutputCheckBox.IsChecked = Log.IsLoggingToDebugOutput;
+            LogToConsoleCheckBox.IsChecked = Log.IsLoggingToConsole;
+            LogFileNameTextBox.Text = Log.LogFileName ?? "";
+        }
 
         private void CancelButton_OnClick(object sender, RoutedEventArgs e)
         {
@@ -195,8 +271,8 @@ to the main CPU memory and then back to the application's GPU).");
         private void OkButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Save settings to static class
-            var multiSampleCount   = (int)MultisamplingComboBox.SelectedValue;
-            var superSamplingCount = (float)SuperSamplingComboBox.SelectedValue;
+            var multiSampleCount   = (int)(MultisamplingComboBox.SelectedValue ?? 0);
+            var superSamplingCount = (float)(SuperSamplingComboBox.SelectedValue ?? 0.0f);
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             IsChanged = (multiSampleCount != GlobalSharpEngineSettings.MultisampleCount ||
@@ -207,6 +283,20 @@ to the main CPU memory and then back to the application's GPU).");
                 GlobalSharpEngineSettings.MultisampleCount = multiSampleCount;
                 GlobalSharpEngineSettings.SupersamplingCount = superSamplingCount;
             }
+            
+            AdvancedSettings = new AdvancedSharpEngineSettings(UseWritableBitmapCheckBox.IsChecked ?? false,
+                                                               DisableBackgroundUploadCheckBox.IsChecked ?? false,
+                                                               DisableMaterialSortingCheckBox.IsChecked ?? false,
+                                                               DisableTransparencySortingCheckBox.IsChecked ?? false,
+                                                               PreserveBackBuffersWhenHiddenCheckBox.IsChecked ?? false);
+            
+            Log.IsLoggingToDebugOutput = LogToDebugOutputCheckBox.IsChecked ?? false;
+            Log.IsLoggingToConsole = LogToConsoleCheckBox.IsChecked ?? false;
+            Log.LogFileName = string.IsNullOrEmpty(LogFileNameTextBox.Text) ? null : LogFileNameTextBox.Text;
+            Log.LogLevel = Enum.Parse<LogLevels>((string)(LogLevelComboBox.SelectedItem ?? "Warn"));
+            
+            ShowTestRunner = ShowTestButtonCheckBox.IsChecked ?? false;
+            IsStandardValidationEnabled = EnableStandardValidationCheckBox.IsChecked ?? false;
 
             this.Close();
         }

@@ -45,6 +45,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             };
 
             MainSceneView.SceneView.Camera = _targetPositionCamera;
+            
+            // Apply and advanced settings from the SettingsWindow
+            SamplesWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
 
             // Create GesturesCameraController that is defined in Common folder
             _gesturesCameraController = new GesturesCameraController(MainSceneView)

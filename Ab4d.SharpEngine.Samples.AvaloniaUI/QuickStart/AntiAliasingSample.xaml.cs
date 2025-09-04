@@ -49,6 +49,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
             var sharpEngineSceneView = AddSharpEngineSceneView(gpuDevice: null, columnIndex: 0, rowIndex: 1, multiSampleCount: 1, supersamplingCount: 1);
 
+            // Apply and advanced settings from the SettingsWindow
+            SamplesWindow.ConfigureSharpEngineSceneViewAction?.Invoke(sharpEngineSceneView);
+            
             sharpEngineSceneView.Initialize();
 
             if (sharpEngineSceneView.GpuDevice != null)
