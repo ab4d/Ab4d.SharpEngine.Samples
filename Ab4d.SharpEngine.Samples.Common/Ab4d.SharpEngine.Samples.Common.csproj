@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
@@ -52,36 +52,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Models\dragon_vrip_res3.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Models\dragon_vrip_res3.obj.mtl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Models\dragon_vrip_res3_readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\HeightMaps\europe.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\HeightMaps\europe_height.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\HeightMaps\readme.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\HeightMaps\simpleHeightMap.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Models\house with trees.mtl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Models\house with trees.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Models\teapot-hires.obj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="Resources\HeightMaps\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Resources\Models\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Resources\ScannedImages\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

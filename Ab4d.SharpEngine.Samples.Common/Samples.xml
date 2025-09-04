@@ -62,6 +62,7 @@
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
+  <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering" IsNew="True"/>
 
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
   <Sample Location="Text.VectorTextSample" Title="Vector text from TrueType font"/>
