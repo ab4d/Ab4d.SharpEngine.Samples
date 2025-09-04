@@ -83,6 +83,8 @@ Examples:
 
             this.Loaded += (sender, args) =>
             {
+                bool isAnySettingChanged;
+                
                 if (AdvancedSettings != null)
                 {
                     UseWritableBitmapCheckBox.IsChecked                         = AdvancedSettings.UseWritableBitmap;
@@ -92,12 +94,25 @@ Examples:
                     PreserveBackBuffersWhenHiddenCheckBox.IsChecked             = AdvancedSettings.PreserveBackBuffersWhenHidden;
                     AllowDirectTextureSharingForIntelGpuCheckBox.IsChecked      = AdvancedSettings.AllowDirectTextureSharingForIntelGpu;
                     IsUsingSharedTextureForIntegratedIntelGpuCheckBox.IsChecked = AdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;
+                    
+                    isAnySettingChanged = AdvancedSettings.UseWritableBitmap ||
+                                          AdvancedSettings.DisableBackgroundUpload ||
+                                          AdvancedSettings.DisableMaterialSorting ||
+                                          AdvancedSettings.DisableTransparencySorting ||
+                                          AdvancedSettings.PreserveBackBuffersWhenHidden ||
+                                          AdvancedSettings.AllowDirectTextureSharingForIntelGpu ||
+                                          !AdvancedSettings.IsUsingSharedTextureForIntegratedIntelGpu;   // true by default
+                }
+                else
+                {
+                    isAnySettingChanged = false;
                 }
 
-                EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
+                    EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
                 ShowTestButtonCheckBox.IsChecked = ShowTestRunner;
                 
-                AdvancedSettingsExander.IsExpanded = AdvancedSettings != null || ShowTestRunner;
+                AdvancedSettingsExpander.IsExpanded = isAnySettingChanged || ShowTestRunner;
+                                                      
             };
         }
 
