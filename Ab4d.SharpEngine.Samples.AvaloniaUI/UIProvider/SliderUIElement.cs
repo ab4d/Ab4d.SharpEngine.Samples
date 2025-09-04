@@ -1,11 +1,12 @@
 ﻿using Ab4d.SharpEngine.Samples.Common;
-using System;
-using System.Windows;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using System;
+using System.Globalization;
+using System.Windows;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 
@@ -212,4 +213,23 @@ public class SliderUIElement : AvaloniaUIElement
             throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
         }
     }       
+    
+    public override void SetProperty(string propertyName, string propertyValue)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            _slider.Maximum = double.Parse(propertyValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+        else if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            _slider.Minimum = double.Parse(propertyValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+    }
+    
+    public override string? GetPropertyValue(string propertyName)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            return _slider.Maximum.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        
+        if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            return _slider.Minimum.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        return null;
+    }    
 }

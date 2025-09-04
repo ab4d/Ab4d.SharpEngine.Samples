@@ -1,12 +1,13 @@
 ﻿using Ab4d.SharpEngine.Samples.Common;
-using System;
-using System.Windows;
-using Windows.Foundation;
-using Windows.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
+using System;
+using System.Globalization;
+using System.Windows;
+using Windows.Foundation;
+using Windows.UI;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.UIProvider;
 
@@ -212,5 +213,24 @@ public class SliderUIElement : WinUIElement
         {
             throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
         }
-    }       
+    }    
+    
+    public override void SetProperty(string propertyName, string propertyValue)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            _slider.Maximum = double.Parse(propertyValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+        else if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            _slider.Minimum = double.Parse(propertyValue, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+    }
+    
+    public override string? GetPropertyValue(string propertyName)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            return _slider.Maximum.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        
+        if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            return _slider.Minimum.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        return null;
+    }    
 }

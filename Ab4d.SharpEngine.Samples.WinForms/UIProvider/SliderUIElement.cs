@@ -1,7 +1,8 @@
-﻿using Ab4d.SharpEngine.Samples.Common;
+﻿using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.Common;
 using System;
+using System.Globalization;
 using System.Windows;
-using Ab4d.SharpEngine.Common;
 
 namespace Ab4d.SharpEngine.Samples.WinForms.UIProvider;
 
@@ -230,4 +231,23 @@ public class SliderUIElement : WinFormsUIElement
             throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
         }
     }       
+    
+    public override void SetProperty(string propertyName, string propertyValue)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            _trackBar.Maximum = Int32.Parse(propertyValue);
+        else if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            _trackBar.Minimum = Int32.Parse(propertyValue);
+    }
+    
+    public override string? GetPropertyValue(string propertyName)
+    {
+        if (propertyName.Equals("Maximum", StringComparison.OrdinalIgnoreCase))
+            return _trackBar.Maximum.ToString();
+        
+        if (propertyName.Equals("Minimum", StringComparison.OrdinalIgnoreCase))
+            return _trackBar.Minimum.ToString();
+
+        return null;
+    }    
 }
