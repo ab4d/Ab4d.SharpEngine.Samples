@@ -28,8 +28,6 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Settings
 
         public bool IsChanged { get; private set; }
         
-        public bool IsAdvancedSettingsChanged { get; private set; }
-
         public bool ShowTestRunner { get; set; }
         
         public bool IsStandardValidationEnabled { get; set; }
@@ -108,11 +106,10 @@ Examples:
                     isAnySettingChanged = false;
                 }
 
-                    EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
+                EnableStandardValidationCheckBox.IsChecked = IsStandardValidationEnabled;
                 ShowTestButtonCheckBox.IsChecked = ShowTestRunner;
                 
                 AdvancedSettingsExpander.IsExpanded = isAnySettingChanged || ShowTestRunner;
-                                                      
             };
         }
 

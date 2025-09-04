@@ -829,7 +829,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
                                                                sampleSelectorAction: sampleIndex => SampleList.SelectedIndex = sampleIndex,
                                                                beginInvokeAction: action => Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action),
                                                                customLogAction: null, 
-                                                               showCurrentlyRunningSample: false);
+                                                               showCurrentlyRunningSample: false); // set to true to show current sample in VS Output (this reduces the speed of showing samples)
             }
 
             if (_randomSamplesRunner.IsRunning)
