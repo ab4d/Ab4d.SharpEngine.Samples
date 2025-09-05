@@ -73,6 +73,12 @@ public class WpfSamplesContext : ICommonSamplesContext
         if (CurrentSharpEngineSceneView == null)
             throw new InvalidOperationException("Cannot call GetTextBlockFactory when CurrentSharpEngineSceneView is not yet set.");
 
+        if (_textBlockFactory != null && _textBlockFactory.Scene != CurrentSharpEngineSceneView.Scene)
+        {
+            _textBlockFactory.Dispose();
+            _textBlockFactory = null;
+        }
+        
         if (_textBlockFactory == null)
         {
             // Create TextBlockFactory that will use the default BitmapTextCreator (get by BitmapTextCreator.GetDefaultBitmapTextCreator).
