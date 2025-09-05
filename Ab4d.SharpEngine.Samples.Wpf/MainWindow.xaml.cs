@@ -548,7 +548,10 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             {
                 // When EnableStandardValidation is changed, then we need to recreate the Vulkan instance.
                 if (_currentSharpEngineSceneView != null)
+                {
                     _currentSharpEngineSceneView.Dispose();
+                    _currentSharpEngineSceneView = null;
+                }
                 
                 if (VulkanInstance.FirstVulkanInstance != null)
                     VulkanInstance.FirstVulkanInstance.Dispose();
