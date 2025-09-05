@@ -17,6 +17,7 @@
   <Sample Location="Cameras.{uiFramework}Point3DTo2DSample" Title="Point3DTo2D"/>
   <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
+  <Sample Location="Cameras.OffCenterCameraSample" Title="Off-center scene rendering" IsNew="True"/>
   <Sample Location="Cameras.TwoDimensionalCameraSample" Title="TwoDimensionalCamera"/>
 
   <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
