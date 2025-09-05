@@ -756,14 +756,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             settingsWindow.IsStandardValidationEnabled = EnableStandardValidation;
 
             SettingsWindow.AdvancedSharpEngineSettings oldSettings;
-            if (_currentSharpEngineSceneView is SharpEngineSceneView wpfSharpEngineSceneView)
+            if (_currentSharpEngineSceneView is SharpEngineSceneView sharpEngineSceneView)
             {
                 oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(
-                    UseWritableBitmap: wpfSharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap,
-                    DisableBackgroundUpload: !wpfSharpEngineSceneView.EnableBackgroundUpload,
-                    DisableMaterialSorting: !wpfSharpEngineSceneView.Scene.IsMaterialSortingEnabled,
-                    DisableTransparencySorting:  !wpfSharpEngineSceneView.Scene.IsTransparencySortingEnabled,
-                    PreserveBackBuffersWhenHidden:  !wpfSharpEngineSceneView.DisposeBackBuffersWhenHidden);
+                    UseWritableBitmap: sharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap,
+                    DisableBackgroundUpload: !sharpEngineSceneView.EnableBackgroundUpload,
+                    DisableMaterialSorting: !sharpEngineSceneView.Scene.IsMaterialSortingEnabled,
+                    DisableTransparencySorting:  !sharpEngineSceneView.Scene.IsTransparencySortingEnabled,
+                    PreserveBackBuffersWhenHidden:  !sharpEngineSceneView.DisposeBackBuffersWhenHidden);
             }
             else
             {
@@ -863,7 +863,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             
             if (isAdvancedSettingsChanged)
             {
-                _commonAvaloniaSampleUserControl = null; // Reset the CommonWpfSamplePage so it will be recreated with new settings
+                _commonAvaloniaSampleUserControl = null; // Reset the CommonAvaloniaSamplePage so it will be recreated with new settings
                 ReloadCurrentSample();
             }            
         }
