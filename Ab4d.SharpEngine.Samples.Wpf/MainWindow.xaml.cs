@@ -29,6 +29,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
     public partial class MainWindow : Window
     {
         // Uncomment the _startupPage declaration to always start the samples with the specified page
+        //private string? _startupPage = "Cameras.OffCenterCameraSample";
         private string? _startupPage = null;
 
         // To enable Vulkan's standard validation, set EnableStandardValidation to true.
