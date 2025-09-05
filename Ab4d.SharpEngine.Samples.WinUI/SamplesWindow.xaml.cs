@@ -32,8 +32,11 @@ using System.Reflection;
 using Ab4d.SharpEngine.Samples.Common;
 using Microsoft.UI.Input;
 using System.IO;
+using System.Linq;
+using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Samples.WinUI.Diagnostics;
 using Ab4d.SharpEngine.Samples.WinUI.Settings;
+using Microsoft.UI.Dispatching;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -53,7 +56,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         // To enable Vulkan's standard validation, set EnableStandardValidation to true.
         // Also, you need to install Vulkan SDK from https://vulkan.lunarg.com
         // Using Vulkan validation may reduce the performance of rendering. 
-        public const bool EnableStandardValidation = false;
+        public static bool EnableStandardValidation = false;
+        
+        public static Action<SharpEngineSceneView>? ConfigureSharpEngineSceneViewAction;
         
         private bool _applySeparator;
         private TextBlock? _errorTextBlock;
@@ -80,6 +85,10 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private DiagnosticsWindow? _diagnosticsWindow;
         private bool _automaticallyOpenDiagnosticsWindow;
         private Windows.Graphics.PointInt32 _diagnosticsWindowPosition;
+        
+        private SettingsWindow.AdvancedSharpEngineSettings? _advancedSettings;
+        private RandomSamplesRunner? _randomSamplesRunner;
+        private Button? _testRunnerButton;
 
         private SolidColorBrush _samplesListTextBrush = new SolidColorBrush(Color.FromArgb(255, 204, 204, 204));        // #CCC
         private SolidColorBrush _samplesListHeaderTextBrush = new SolidColorBrush(Color.FromArgb(255, 238, 238, 238));  // #EEE
@@ -744,6 +753,25 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         {
             var settingsWindow = new SettingsWindow();
 
+            settingsWindow.AdvancedSettings = _advancedSettings;
+            settingsWindow.ShowTestRunner = _testRunnerButton != null;
+            settingsWindow.IsStandardValidationEnabled = EnableStandardValidation;
+
+            SettingsWindow.AdvancedSharpEngineSettings oldSettings;
+            if (_currentSharpEngineSceneView is SharpEngineSceneView sharpEngineSceneView)
+            {
+                oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(
+                    UseWritableBitmap: sharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap,
+                    DisableBackgroundUpload: !sharpEngineSceneView.EnableBackgroundUpload,
+                    DisableMaterialSorting: !sharpEngineSceneView.Scene.IsMaterialSortingEnabled,
+                    DisableTransparencySorting: !sharpEngineSceneView.Scene.IsTransparencySortingEnabled,
+                    PreserveBackBuffersWhenHidden: !sharpEngineSceneView.DisposeBackBuffersWhenHidden);
+            }
+            else
+            {
+                oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(false, false, false, false, false);
+            }
+            
             var contentDialog = new ContentDialog()
             {
                 XamlRoot = this.RootGrid.XamlRoot,
@@ -767,7 +795,110 @@ namespace Ab4d.SharpEngine.Samples.WinUI
                     UpdateViewSizeInfo(_currentSharpEngineSceneView);
                 }
             }
+            
+            if (settingsWindow.ShowTestRunner && _testRunnerButton == null)
+            {
+                SetupTestRunnerButton();
+            }
+            else if (!settingsWindow.ShowTestRunner && _testRunnerButton != null)
+            {
+                ButtonsPanel.Children.Remove(_testRunnerButton);
+                _testRunnerButton = null;
+                
+                GraphicsSettingsButton.Margin = new Thickness(0, 0, 20, 0);
+                
+                if (_randomSamplesRunner != null && _randomSamplesRunner.IsRunning)
+                    _randomSamplesRunner.Stop();
+            }
+            
+            var newAdvancedSettings = settingsWindow.AdvancedSettings;
+
+            bool isAdvancedSettingsChanged;
+            
+            if (newAdvancedSettings != null)
+            {
+                if (_advancedSettings != null)
+                {
+                    isAdvancedSettingsChanged = newAdvancedSettings.UseWritableBitmap             != oldSettings.UseWritableBitmap ||
+                                                newAdvancedSettings.DisableBackgroundUpload       != oldSettings.DisableBackgroundUpload ||
+                                                newAdvancedSettings.DisableMaterialSorting        != oldSettings.DisableMaterialSorting ||
+                                                newAdvancedSettings.DisableTransparencySorting    != oldSettings.DisableTransparencySorting ||
+                                                newAdvancedSettings.PreserveBackBuffersWhenHidden != oldSettings.PreserveBackBuffersWhenHidden;
+                }
+                else
+                {
+                    isAdvancedSettingsChanged = true;
+                }
+                
+                // Is any settings enabled?
+                if (newAdvancedSettings.UseWritableBitmap ||
+                    newAdvancedSettings.DisableBackgroundUpload ||
+                    newAdvancedSettings.DisableMaterialSorting ||
+                    newAdvancedSettings.DisableTransparencySorting ||
+                    newAdvancedSettings.PreserveBackBuffersWhenHidden)
+                {
+                    _advancedSettings = newAdvancedSettings;
+                }
+                else
+                {
+                    _advancedSettings = null;
+                }
+                
+                if (_advancedSettings != null)
+                    SamplesWindow.ConfigureSharpEngineSceneViewAction = OnConfigureSharpEngineSceneViewAction;
+                else
+                    SamplesWindow.ConfigureSharpEngineSceneViewAction = null;
+            }
+            else
+            {
+                isAdvancedSettingsChanged = _advancedSettings != null;
+                _advancedSettings = null;
+            }
+
+                        
+            if (EnableStandardValidation != settingsWindow.IsStandardValidationEnabled)
+            {
+                // When EnableStandardValidation is changed, then we need to recreate the Vulkan instance.
+                if (_currentSharpEngineSceneView != null)
+                    _currentSharpEngineSceneView.Dispose();
+                
+                if (VulkanInstance.FirstVulkanInstance != null)
+                    VulkanInstance.FirstVulkanInstance.Dispose();
+                
+                EnableStandardValidation = settingsWindow.IsStandardValidationEnabled;
+                isAdvancedSettingsChanged = true;
+            }
+            
+            if (isAdvancedSettingsChanged)
+            {
+                _commonWinUISampleUserControl = null; // Reset the CommonWpfSamplePage so it will be recreated with new settings
+                ReloadCurrentSample();
+            }            
         }
+        
+        public void ReloadCurrentSample()
+        {
+            var savedItem = SamplesListBox.SelectedItem;
+
+            SamplesListBox.SelectedItem = null;
+
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => SamplesListBox.SelectedItem = savedItem);
+        }
+        
+        // This method is called when we need to apply advanced settings from SettingsWindow - it is called each time a new instance of SharpEngineSceneView is created
+        private void OnConfigureSharpEngineSceneViewAction(SharpEngineSceneView sharpEngineSceneView)
+        {
+            if (_advancedSettings == null)
+                return;
+            
+            sharpEngineSceneView.PresentationType = _advancedSettings.UseWritableBitmap ? PresentationTypes.WriteableBitmap : PresentationTypes.SharedTexture;
+
+            sharpEngineSceneView.EnableBackgroundUpload                    = !_advancedSettings.DisableBackgroundUpload;
+            sharpEngineSceneView.Scene.IsMaterialSortingEnabled            = !_advancedSettings.DisableMaterialSorting;
+            sharpEngineSceneView.Scene.IsTransparencySortingEnabled        = !_advancedSettings.DisableTransparencySorting;
+            sharpEngineSceneView.DisposeBackBuffersWhenHidden              = !_advancedSettings.PreserveBackBuffersWhenHidden;
+        }
+        
 
         private void GraphicsSettingsButton_OnClick(object sender, RoutedEventArgs e)
         {
@@ -782,6 +913,51 @@ namespace Ab4d.SharpEngine.Samples.WinUI
         private void SamplesListBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ShowSelectedSample(e);
+        }
+
+        private void SetupTestRunnerButton()
+        {
+            _testRunnerButton = new Button() { Content = "TEST", Margin = new Thickness(0, 0, 5, 0), Padding = new Thickness(3, 3, 3, 3) };
+            _testRunnerButton.Click += TestButton_OnClick;
+
+            ButtonsPanel.Children.Insert(0, _testRunnerButton);
+
+            DiagnosticsButton.Margin = new Thickness(5, 0, 0, 0);            
+        }
+
+        private void TestButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_randomSamplesRunner == null)
+            {
+                string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
+                var samplesXmlNodeList = CommonSample.LoadSamples(fileName, uiFramework: "WinUI", errorMessage => ShowError(errorMessage));
+                samplesXmlNodeList = samplesXmlNodeList.Where(n => n.Attributes != null && n.Attributes["Location"] != null).ToList(); // Skip separators because they are not added to SamplesList.Items
+
+                _randomSamplesRunner = new RandomSamplesRunner(samplesList: samplesXmlNodeList,
+                                                               sampleSelectorAction: sampleIndex => SamplesListBox.SelectedIndex = sampleIndex,
+                                                               beginInvokeAction: action => DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () => action()),
+                                                               customLogAction: null,
+                                                               showCurrentlyRunningSample: false); // set to true to show current sample in VS Output (this reduces the speed of showing samples)
+            }
+
+            if (_randomSamplesRunner.IsRunning)
+            {
+                _randomSamplesRunner.Stop();
+                
+                if (_testRunnerButton != null)
+                    _testRunnerButton.Content = "TEST";
+            }
+            else
+            {
+                if (_testRunnerButton != null)
+                    _testRunnerButton.Content = "STOP";
+                
+                _randomSamplesRunner.Start(); // run all samples
+
+                // To run only some samples, use:
+                // To get the indexes of the samples run _randomSamplesRunner.DumpAllSamples() in the Immediate window
+                //_randomSamplesRunner.Start(startSampleIndex: 10, endSampleIndex: 50); 
+            }
         }
     }
 }

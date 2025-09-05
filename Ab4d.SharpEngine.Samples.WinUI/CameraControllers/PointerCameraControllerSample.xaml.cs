@@ -55,6 +55,9 @@ namespace Ab4d.SharpEngine.Samples.WinUI.CameraControllers
             // To enable Vulkan's standard validation, set EnableStandardValidation and install Vulkan SDK (this may slightly reduce performance)
             MainSceneView.CreateOptions.EnableStandardValidation = SamplesWindow.EnableStandardValidation;
             
+            // Apply and advanced settings from the SettingsWindow
+            SamplesWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
+            
 
             ToolTipService.SetToolTip(ZoomModeInfoControl,
 @"ViewCenter: Zooms into the center of the SceneView.

@@ -45,13 +45,16 @@ namespace Ab4d.SharpEngine.Samples.WinUI.Titles
             MainSceneView.MultisampleCount = 4;
             MainSceneView.SupersamplingCount = 1;
 
+            // Apply and advanced settings from the SettingsWindow
+            SamplesWindow.ConfigureSharpEngineSceneViewAction?.Invoke(MainSceneView);
+            
             var scene = MainSceneView.Scene;
             var sceneView = MainSceneView.SceneView;
 
             var bitmapIO = new WinUIBitmapIO(); // _bitmapIO provides a cross-platform way to read bitmaps - in this sample we use WinUI as backend
 
             _sharpEngineLogoAnimation = new SharpEngineLogoAnimation(scene, bitmapIO);
-
+            
             scene.RootNode.Add(_sharpEngineLogoAnimation.LogoPlaneModel);
             scene.RootNode.Add(_sharpEngineLogoAnimation.HashModel);
 
