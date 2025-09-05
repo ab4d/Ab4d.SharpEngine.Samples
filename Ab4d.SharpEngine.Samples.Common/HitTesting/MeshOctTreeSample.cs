@@ -119,7 +119,7 @@ public class MeshOctTreeSample : CommonSample
         {
             // Write node statistics to the debug output
             var nodeStatistics = _meshOctTree.GetNodeStatistics();
-            System.Diagnostics.Debug.WriteLine(nodeStatistics);
+            System.Diagnostics.Debug.WriteLine("OctTree statics:\n" + nodeStatistics);
         }
     }
 
