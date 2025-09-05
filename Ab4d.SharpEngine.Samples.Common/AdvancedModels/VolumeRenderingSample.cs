@@ -112,6 +112,8 @@ public class VolumeRenderingSample : CommonSample
             // NOTES:
             // - PointerCameraController.RotateAroundPointerPosition must be false.
             // - RotationCenterPosition is supported only by TargetPositionCamera and by FreeCamera.
+            // - To change the camera's Heading and Attitude from code (not by user interaction) and use RotationCenterPosition,
+            //   call the SetCameraRotation method instead of changing Heading and Attitude properties.
             targetPositionCamera.TargetPosition = new Vector3(50, 10, 0);
             targetPositionCamera.RotationCenterPosition = new Vector3(0, 0, 0);
 
