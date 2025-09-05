@@ -13,3 +13,4 @@ The following are some of those objects:
 - **Pixels** can be rendered by using a PixelsNode. It is also possible to render each pixel as a 2D texture to create **billboards**.
 - **Planar shadows** are special 3D objects that are collapsed onto a 2D plane and rendered as a solid color dark object to create an illusion of a shadow.
 - **Sprites** can be rendered on top or below the 3D scene and can show 2D images or text that is not affected by the camera and lights.
+- **Volume rendering** shows how to render 3D model from 2D slice images, such as CT or MRI scans.
