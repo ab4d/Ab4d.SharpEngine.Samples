@@ -55,7 +55,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 public class MeshOctTreeSample : CommonSample
 {
     public override string Title => "Mesh OctTree sample";
-    public override string? Subtitle => "MeshOctTree is used to significantly improve hit-testing performance.\nSee the comments in the code behind how each level of oct tree divides the space into 8 segments and how this reduces the number of preformed ray hit tests.";
+    public override string? Subtitle => "MeshOctTree is used to significantly improve hit-testing performance.\nSee the comments in the code behind how each level of oct tree divides the space into 8 segments and how this reduces the number of performed ray hit tests.";
 
     private const int MaxNodeLevels = 4; // This should be determined by the number of triangles (more triangles bigger max level)
     
