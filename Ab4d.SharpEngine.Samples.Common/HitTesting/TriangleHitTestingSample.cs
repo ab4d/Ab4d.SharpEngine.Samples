@@ -112,7 +112,8 @@ public class TriangleHitTestingSample : CommonSample
         _bitmapIdSceneView.Initialize(sceneView.Width, sceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
         _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
 
-        // We also need to create a new TargetPositionCamera that will be synced with the original TargetPositionCamera (before rendering the ID bitmap).
+        // It is not allowed to use the same camera object on more than one SceneView
+        // Therefore, we need to create a new TargetPositionCamera that will be synced with the original TargetPositionCamera (before rendering the ID bitmap).
         _bitmapIdCamera = new TargetPositionCamera("BitmapIdCamera");
         _bitmapIdSceneView.Camera = _bitmapIdCamera;
         
