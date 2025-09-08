@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.Vulkan;
 using Ab4d.SharpEngine.Core;
@@ -27,6 +28,7 @@ public class OutlinesOverObjectsSample: CommonSample
     
     private GpuImage? _overlayPanelGpuImage;
     private SpriteBatch? _spriteBatch;
+    private TargetPositionCamera? _outlineObjectsCamera;
 
     public OutlinesOverObjectsSample(ICommonSamplesContext context)
         : base(context)
@@ -190,15 +192,16 @@ public class OutlinesOverObjectsSample: CommonSample
         
         // When parentSceneView is resized, we also need to resize the _outlineObjectsSceneView
         parentSceneView.ViewResized += SceneViewOnViewResized;
-
-        // Also, when the camera is changed, we need to update the outlines.
-        if (parentSceneView.Camera != null)
+        
+        // It is not allowed to use the same camera object on more than one SceneView
+        // Therefore, we need to create a new TargetPositionCamera that will be synced with the original TargetPositionCamera (before rendering the ID bitmap).
+        if (targetPositionCamera != null)
         {
-            _outlineObjectsSceneView.Camera = parentSceneView.Camera;
-
-            parentSceneView.Camera.CameraChanged += (sender, args) => UpdateOutlines();
+            _outlineObjectsCamera = new TargetPositionCamera("OutlineObjectsCamera");
+            _outlineObjectsSceneView.Camera = _outlineObjectsCamera;
+            
+            targetPositionCamera.CameraChanged += (sender, args) => UpdateOutlines();
         }
-
         
         // Create SpriteBatch that will render the outlines.
         // See also the CustomOverlayPanelSample for more info 
@@ -214,6 +217,17 @@ public class OutlinesOverObjectsSample: CommonSample
 
     private void UpdateOutlines()
     {
+        // Sync the camera with the original TargetPositionCamera
+        if (targetPositionCamera != null && _outlineObjectsCamera != null)
+        {
+            _outlineObjectsCamera.Heading                = targetPositionCamera.Heading;
+            _outlineObjectsCamera.Attitude               = targetPositionCamera.Attitude;
+            _outlineObjectsCamera.Bank                   = targetPositionCamera.Bank;
+            _outlineObjectsCamera.Distance               = targetPositionCamera.Distance;
+            _outlineObjectsCamera.TargetPosition         = targetPositionCamera.TargetPosition;
+            _outlineObjectsCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+        }
+        
         // When the result of an object filter function (assigned to renderObjectsRenderingStep.FilterObjectsFunction) 
         // is changed, then we need to call NotifyChange with SceneViewDirtyFlags.ObjectsFilterChanged to recreate the rendering commands.
         _outlineObjectsSceneView?.NotifyChange(SceneViewDirtyFlags.ObjectsFilterChanged);
