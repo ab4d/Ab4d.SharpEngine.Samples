@@ -83,6 +83,11 @@ public partial class MainPage : ContentPage
             ZoomMode = CameraZoomMode.PointerPosition,
         };
 
+        // On mobile OS show info label on top to prevent drawing it over the buttons
+        if (OperatingSystem.IsIOS() || OperatingSystem.IsAndroid())
+            InfoLabel2.VerticalOptions = LayoutOptions.Start;
+        
+
         // On Windows set camera move condition to left mouse button + Control key; on other platforms use both left and right mouse buttons
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             _mauiCameraController.MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
