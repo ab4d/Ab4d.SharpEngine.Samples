@@ -759,7 +759,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             if (_currentSharpEngineSceneView is SharpEngineSceneView sharpEngineSceneView)
             {
                 oldSettings = new SettingsWindow.AdvancedSharpEngineSettings(
-                    UseWritableBitmap: sharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap,
+                    UseWritableBitmap: sharpEngineSceneView.PresentationType == PresentationTypes.WriteableBitmap && sharpEngineSceneView.IsPresentationTypeSupported(PresentationTypes.SharedTexture),
                     DisableBackgroundUpload: !sharpEngineSceneView.EnableBackgroundUpload,
                     DisableMaterialSorting: !sharpEngineSceneView.Scene.IsMaterialSortingEnabled,
                     DisableTransparencySorting:  !sharpEngineSceneView.Scene.IsTransparencySortingEnabled,
