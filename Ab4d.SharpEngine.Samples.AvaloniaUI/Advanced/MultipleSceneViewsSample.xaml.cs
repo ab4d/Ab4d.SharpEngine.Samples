@@ -328,7 +328,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
                 Attitude = cameraAttitude,
                 Distance = distance,
                 TargetPosition = new Vector3(0, 0, 0),
-                ShowCameraLight = ShowCameraLightType.Never // If there are no other light in the Scene, then add a camera light that illuminates the scene from the camera's position
+                ShowCameraLight = ShowCameraLightType.Never
             };
 
             sharpEngineSceneView.SceneView.Camera = camera;
