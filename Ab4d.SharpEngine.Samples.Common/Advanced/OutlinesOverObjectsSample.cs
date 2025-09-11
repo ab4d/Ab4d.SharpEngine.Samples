@@ -1,7 +1,5 @@
-﻿using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.Vulkan;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.PostProcessing;
@@ -9,6 +7,9 @@ using Ab4d.SharpEngine.RenderingLayers;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
+using Ab4d.Vulkan;
+using System.Numerics;
+using System.Reflection;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -110,6 +111,12 @@ public class OutlinesOverObjectsSample: CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged -= UpdateOutlines;
+        
+        if (SceneView != null)
+            SceneView.ViewResized += SceneViewOnViewResized;
+        
         if (_outlineObjectsSceneView != null)
         {
             _outlineObjectsSceneView.PostProcesses.Clear();
@@ -124,9 +131,6 @@ public class OutlinesOverObjectsSample: CommonSample
 
             _outlineObjectsSceneView.Dispose();
         }
-        
-        if (SceneView != null)
-            SceneView.ViewResized += SceneViewOnViewResized;
         
         base.OnDisposed();
     }
@@ -200,7 +204,7 @@ public class OutlinesOverObjectsSample: CommonSample
             _outlineObjectsCamera = new TargetPositionCamera("OutlineObjectsCamera");
             _outlineObjectsSceneView.Camera = _outlineObjectsCamera;
             
-            targetPositionCamera.CameraChanged += (sender, args) => UpdateOutlines();
+            targetPositionCamera.CameraChanged += UpdateOutlines;
         }
         
         // Create SpriteBatch that will render the outlines.
@@ -215,6 +219,11 @@ public class OutlinesOverObjectsSample: CommonSample
         UpdateOutlines();
     }
 
+    private void UpdateOutlines(object? sender, EventArgs? args)
+    {
+        UpdateOutlines();
+    }
+    
     private void UpdateOutlines()
     {
         // Sync the camera with the original TargetPositionCamera
