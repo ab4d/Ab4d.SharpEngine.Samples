@@ -1,4 +1,4 @@
-﻿#define DEBUG // DEBUG is defined to enable debug logging
+﻿#define DEBUG // DEBUG is defined to enable debug logging in the DumpAllSamples method below
 
 using System.Diagnostics;
 using System.Text;
@@ -27,6 +27,15 @@ public class RandomSamplesRunner
 
     public bool SkipGarbageCollectAfterEachSample { get; set; } = true;
     private bool savedCollectGarbageAfterEachSample;
+    
+    // CustomActions list can be used to add special custom actions that are executed after each sample is started,
+    // for example, the following resizes the window:
+    // _randomSamplesRunner.CustomActions = new List<Action>();
+    // _randomSamplesRunner.CustomActions.Add(() => this.Width += 100);
+    // _randomSamplesRunner.CustomActions.Add(() => this.Width += 100);
+    // _randomSamplesRunner.CustomActions.Add(() => this.Width -= 200);
+    public List<Action>? CustomActions { get; set; }
+    public int CustomActionIndex { get; private set; } = -1;
     
     public RandomSamplesRunner(List<System.Xml.XmlNode> samplesList, 
                                Action<int> sampleSelectorAction, 
@@ -100,6 +109,26 @@ public class RandomSamplesRunner
         if (StartedSamplesCount == 0)
             return;
 
+        if (CustomActionIndex >= 0)
+        {
+            if (CustomActions != null && CustomActionIndex < CustomActions.Count)
+            {
+                var customAction = CustomActions[CustomActionIndex];
+                customAction();
+
+                CustomActionIndex++;
+                
+                _beginInvokeAction(SelectNewRandomTest);
+                return;
+            }
+            else
+            {
+                // Stop executing custom actions and select a new sample
+                CustomActionIndex = -1;
+            }
+        }
+        
+        
         int selectedIndex;
         XmlAttribute? isTitleAttribute;
         XmlAttribute? locationAttribute;
@@ -129,7 +158,10 @@ public class RandomSamplesRunner
         _sampleSelectorAction(selectedIndex);
 
         StartedSamplesCount++;
-            
+        
+        if (CustomActionIndex == -1 && CustomActions != null && CustomActions.Count > 0)
+            CustomActionIndex = 0; // This will start the first custom action on the next run of SelectNewRandomTest
+
         _beginInvokeAction(SelectNewRandomTest);
     }   
     
