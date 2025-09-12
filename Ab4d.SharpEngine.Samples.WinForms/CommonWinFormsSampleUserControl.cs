@@ -64,7 +64,7 @@ public class CommonWinFormsSampleUserControl : UserControl
         // IMPORTANT:
         // We need to add SharpEngineSceneView to Controls after other controls were added,
         // otherwise other controls would not be visible on top of the MainSceneView.
-        MainSceneView = new SharpEngineSceneView(PresentationTypes.OverlayTexture);
+        MainSceneView = new SharpEngineSceneView(PresentationTypes.SharedTexture);
         MainSceneView.Dock = DockStyle.Fill;
 
         // By default, enable Vulkan's standard validation (this may slightly reduce performance)
