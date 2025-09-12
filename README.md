@@ -19,7 +19,8 @@ The following features are supported by the current version:
 - Effects: StandardEffect, SolidColorEffect, VertexColorEffect, ThickLineEffect
 - Improved visual quality with super-sampling and multi-sampling
 - Render vector and bitmap text
-- Included reader and writer for .obj and .stl files.
+- Render CT and MRI scans by using Volume rendering
+- Included reader and writer for .obj and .stl files
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a third-party library to import 3D models from almost any file format
 
