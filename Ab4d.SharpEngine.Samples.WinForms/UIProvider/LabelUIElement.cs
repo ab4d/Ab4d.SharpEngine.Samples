@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Samples.Common;
+﻿using Ab4d.SharpEngine.Lights;
+using Ab4d.SharpEngine.Samples.Common;
 using System;
 
 namespace Ab4d.SharpEngine.Samples.WinForms.UIProvider;
@@ -21,13 +22,9 @@ public class LabelUIElement : WinFormsUIElement
 
         if (width > 0 || height > 0)
         {
-            _label.AutoSize = false;
-
-            if (width > 0)
-                _label.Width = (int)(width * winFormsUIProvider.UIScale);
-
-            if (height > 0)
-                _label.Height = (int)(height * winFormsUIProvider.UIScale);
+            // See https://stackoverflow.com/questions/1204804/word-wrap-for-a-label-in-windows-forms
+            _label.AutoSize = true;
+            _label.MaximumSize = new Size((int)(width * winFormsUIProvider.UIScale), (int)(height * winFormsUIProvider.UIScale));
         }
         else
         {

@@ -5,19 +5,37 @@ namespace Ab4d.SharpEngine.Samples.WinForms.UIProvider;
 
 public class TextBoxUIElement : WinFormsUIElement
 {
+    private readonly float _width;
+    private readonly float _height;
     private TextBox _textBox;
     private Action<string>? _textChangedAction;
 
     public TextBoxUIElement(WinFormsUIProvider winFormsUIProvider, float width, float height, string? initialText, Action<string>? textChangedAction)
         : base(winFormsUIProvider)
     {
+        _width = width;
+        _height = height;
+        
         _textBox = new TextBox()
         {
             Text = initialText,
             Font = winFormsUIProvider.Font,
         };
 
-        bool isMultiline = height > 0 || (initialText != null && initialText.Contains('\n'));
+        UpdateTextSize(initialText);
+        
+        if (textChangedAction != null)
+        {
+            _textChangedAction = textChangedAction;
+            _textBox.TextChanged += (sender, args) => _textChangedAction?.Invoke(_textBox.Text ?? "");;
+        }
+
+        WinFormsControl = _textBox;
+    }
+    
+    private void UpdateTextSize(string? text)
+    {
+        bool isMultiline = _height > 0 || (text != null && text.Contains('\n'));
         _textBox.Multiline = isMultiline;
 
         if (isMultiline)
@@ -27,12 +45,12 @@ public class TextBoxUIElement : WinFormsUIElement
         }
 
         Size textSize;
-        if (!string.IsNullOrEmpty(initialText))
-            textSize = TextRenderer.MeasureText(initialText, winFormsUIProvider.Font);
+        if (!string.IsNullOrEmpty(text))
+            textSize = TextRenderer.MeasureText(text, winFormsUIProvider.Font);
         else
             textSize = Size.Empty;
 
-        if (width == 0 && height == 0)
+        if (_width == 0 && _height == 0)
         {
             if (textSize.IsEmpty)
             {
@@ -49,25 +67,16 @@ public class TextBoxUIElement : WinFormsUIElement
         {
             _textBox.AutoSize = false;
             
-            if (width > 0)
-                _textBox.Width = (int)(width * winFormsUIProvider.UIScale);
+            if (_width > 0)
+                _textBox.Width = (int)(_width * winFormsUIProvider.UIScale);
             else
                 _textBox.Width = textSize.Width;
 
-            if (height > 0)
-                _textBox.Height = (int)(height * winFormsUIProvider.UIScale);
+            if (_height > 0)
+                _textBox.Height = (int)(_height * winFormsUIProvider.UIScale);
             else
                 _textBox.Height = textSize.Height + 8;
         }
-
-
-        if (textChangedAction != null)
-        {
-            _textChangedAction = textChangedAction;
-            _textBox.TextChanged += (sender, args) => _textChangedAction?.Invoke(_textBox.Text ?? "");;
-        }
-
-        WinFormsControl = _textBox;
     }
 
     public override string? GetText() => _textBox.Text;
@@ -75,6 +84,7 @@ public class TextBoxUIElement : WinFormsUIElement
     public override ICommonSampleUIElement SetText(string? text)
     {
         _textBox.Text = text;
+        UpdateTextSize(text);
         return this;
     }
     
