@@ -114,7 +114,7 @@ public class WinFormsManualInputEventsSample : ManualInputEventsSample
 
         float textBoxHeight;
         if (winFormsUIProvider.BaseWinFormsPanel.PreferredSize.Height > 500)
-            textBoxHeight = winFormsUIProvider.BaseWinFormsPanel.PreferredSize.Height - 100;
+            textBoxHeight = (winFormsUIProvider.BaseWinFormsPanel.PreferredSize.Height / winFormsUIProvider.UIScale) - 100;
         else
             textBoxHeight = 400;
 
