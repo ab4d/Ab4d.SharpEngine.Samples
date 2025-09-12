@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.WinUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.WinUI</RootNamespace>    
     <OutputType>WinExe</OutputType>
-    <Version>3.2.9364</Version>   
+    <Version>3.2.9386</Version>   
     <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -21,9 +21,9 @@
     <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
    </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9364-beta" />
-    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="3.2.9364-beta" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9364-beta" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine.WinUI" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9386" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
