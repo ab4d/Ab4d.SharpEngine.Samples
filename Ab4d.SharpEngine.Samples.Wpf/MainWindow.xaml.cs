@@ -573,7 +573,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf
             if (_advancedSettings == null)
                 return;
             
-            sharpEngineSceneView.PresentationType = _advancedSettings.UseWritableBitmap ? PresentationTypes.WriteableBitmap : PresentationTypes.SharedTexture;
+            if (_advancedSettings.UseWritableBitmap)
+                sharpEngineSceneView.PresentationType = PresentationTypes.WriteableBitmap;
 
             sharpEngineSceneView.EnableBackgroundUpload                    = !_advancedSettings.DisableBackgroundUpload;
             sharpEngineSceneView.Scene.IsMaterialSortingEnabled            = !_advancedSettings.DisableMaterialSorting;
