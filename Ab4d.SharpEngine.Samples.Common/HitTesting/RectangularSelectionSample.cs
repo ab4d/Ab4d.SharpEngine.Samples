@@ -54,7 +54,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 // - Cannot select objects that are behind other objects (only the objects that are shown on a rendered scene can be detected).    
 
 
-public abstract class RectangularSelectionSample : CommonSample
+public class RectangularSelectionSample : CommonSample
 {
     public override string Title => "Rectangular selection";
     
@@ -106,7 +106,7 @@ public abstract class RectangularSelectionSample : CommonSample
     private TargetPositionCamera? _bitmapIdCamera;
 
 
-    protected RectangularSelectionSample(ICommonSamplesContext context)
+    public RectangularSelectionSample(ICommonSamplesContext context)
         : base(context)
     {
         RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
@@ -116,13 +116,13 @@ public abstract class RectangularSelectionSample : CommonSample
         _selectedLineColor = Colors.Red;
     }
 
-    protected abstract void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView);
+    protected virtual void SubscribeMouseEvents(ISharpEngineSceneView sharpEngineSceneView) {}
 
-    protected abstract void CreateOverlaySelectionRectangle(ICommonSampleUIProvider ui);
+    protected virtual void CreateOverlaySelectionRectangle(ICommonSampleUIProvider ui) {}
 
-    protected abstract void ShowSelectionRectangle(Vector2 startPosition, Vector2 endPosition);
+    protected virtual void ShowSelectionRectangle(Vector2 startPosition, Vector2 endPosition) {}
 
-    protected abstract void HideSelectionRectangle();
+    protected virtual void HideSelectionRectangle() {}
 
 
     #region Create test scene
