@@ -495,7 +495,11 @@ public class HitTestingWithIdBitmapSample : CommonSample
 
         ui.CreateCheckBox("Increase color difference (?):When checked the indexes in the ID bitmap are multiplied by 8 so that it is easier to see the different colors for different objects.",
             isInitiallyChecked: false,
-            isChecked => _idToColorMultiplier = isChecked ? 8 : 1);
+            isChecked =>
+            {
+                _idToColorMultiplier = isChecked ? 8 : 1;
+                RenderIdBitmap();
+            });
         
         // Subscribe to mouse (pointer) moved
         ui.RegisterPointerMoved(ProcessPointerMove);
