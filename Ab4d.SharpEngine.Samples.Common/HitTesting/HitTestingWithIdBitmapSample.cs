@@ -238,8 +238,9 @@ public class HitTestingWithIdBitmapSample : CommonSample
                 _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
                 _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
 
-                // SharpEngine >= v3.2.9386 does not allow re-using a camera in a different scene view, so we need to
-                // create a new instance, and sync its properties on each render pass.
+                // Create a new TargetPositionCamera that will be used to render _bitmapIdSceneView.
+                // This camera is sync with the main targetPositionCamera on each render pass (see code below).
+                // Note that we cannot use one camera object on two different SceneView objects.
                 _bitmapIdCamera = new TargetPositionCamera();
                 _bitmapIdSceneView.Camera = _bitmapIdCamera;
             }
