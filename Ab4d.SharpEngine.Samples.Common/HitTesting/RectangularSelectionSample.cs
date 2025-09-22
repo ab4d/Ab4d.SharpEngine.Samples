@@ -1,12 +1,13 @@
-﻿using Ab4d.SharpEngine.Common;
-using System.Numerics;
+﻿using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using System.Diagnostics;
 using Ab4d.Vulkan;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
@@ -102,6 +103,7 @@ public abstract class RectangularSelectionSample : CommonSample
     private DateTime _lastCameraChangedTime;
 
     private SceneView? _bitmapIdSceneView;
+    private TargetPositionCamera? _bitmapIdCamera;
 
 
     protected RectangularSelectionSample(ICommonSamplesContext context)
@@ -613,13 +615,28 @@ public abstract class RectangularSelectionSample : CommonSample
                 _bitmapIdSceneView = new SceneView(Scene, "BitmapID-SceneView");
                 _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
                 _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+
+                // Create a new TargetPositionCamera that will be used to render _bitmapIdSceneView.
+                // This camera is sync with the main targetPositionCamera on each render pass (see code below).
+                // Note that we cannot use one camera object on two different SceneView objects.
+                _bitmapIdCamera = new TargetPositionCamera();
+                _bitmapIdSceneView.Camera = _bitmapIdCamera;
             }
             else if (_bitmapIdSceneView.Width != SceneView.Width || _bitmapIdSceneView.Height != SceneView.Height)
             {
                 _bitmapIdSceneView.Resize(SceneView.Width, SceneView.Height, renderNextFrameAfterResize: false);
             }
 
-            _bitmapIdSceneView.Camera = SceneView.Camera; // Use the same camera
+            // Sync the camera with the original TargetPositionCamera
+            if (targetPositionCamera != null && _bitmapIdCamera != null)
+            {
+                _bitmapIdCamera.Heading = targetPositionCamera.Heading;
+                _bitmapIdCamera.Attitude = targetPositionCamera.Attitude;
+                _bitmapIdCamera.Bank = targetPositionCamera.Bank;
+                _bitmapIdCamera.Distance = targetPositionCamera.Distance;
+                _bitmapIdCamera.TargetPosition = targetPositionCamera.TargetPosition;
+                _bitmapIdCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+            }
 
             usedBitmapIdSceneView = _bitmapIdSceneView;
         }
