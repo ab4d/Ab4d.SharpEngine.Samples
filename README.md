@@ -63,6 +63,9 @@ To get a trial license for your own projects (not needed for the sample projects
   - AvaloniaUI with SharpEngineSceneView control (Ab4d.SharpEngine.AvaloniaUI library). It requires the MoltenVK library. See "Building for macOS and iOS" below.
   - Using MAUI - requires MoltenVK library - see "Building for macOS and iOS" below.
 
+**Browser:**
+  - Browser is not supported by Ab4d.SharpEngine (because Vulkan does not work in the browser) and requires [Ab4d.SharpEngine.Web](https://www.nuget.org/packages/Ab4d.SharpEngine.Web) library (currently in beta) that uses WebGL. See browser sample for the Ab4d.SharpEngine.Web on its [GitHub page](https://github.com/ab4d/Ab4d.SharpEngine.Samples.Web).
+
 
 Online help:
 [Online Ab4d.SharpEngine Reference help](https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm)
@@ -406,7 +409,6 @@ See https://www.ab4d.com/SharpEngine-history.aspx.
 - Shadows
 - Multi-threaded rendering
 - Simplified creation of custom effects
-- Add support for WebGL so that the SharpEngine can work with Blazor WebAssembly in a web browser (first alpha version is planned for August 2025).
 
 
 ### Notice:
