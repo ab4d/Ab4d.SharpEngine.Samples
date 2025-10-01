@@ -113,6 +113,7 @@
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method" />
   <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
   <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap" IsNew="True"/>
+  <Sample Location="HitTesting.PointCloudHitTestingSample" Title="Point-cloud hit testing" IsNew="True"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample" IsNew="True"/>
   <Sample IsSeparator="True" />
@@ -142,7 +143,7 @@
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
   <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" />
-  <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" />
+  <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" IsNew="True" />
   <Sample Location="Advanced.DepthPrePassSample" Title="Depth pre-pass rendering" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />
