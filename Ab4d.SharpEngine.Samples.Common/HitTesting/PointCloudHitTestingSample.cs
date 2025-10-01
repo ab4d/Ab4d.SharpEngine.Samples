@@ -35,9 +35,9 @@ public class PointCloudHitTestingSample : CommonSample
     // This preserves the alpha value at 1 so we can see the color in the ID bitmap (otherwise the alpha would be 0 and the rendered bitmap id would appear black).
     private static readonly bool UseAlphaColorForIdBitmap = false; 
 
-    private static readonly bool ShowPixelIndexColors = false; // Set to true to see the 3D scene rendered with pixel index colors
+    private static bool ShowPixelIndexColors = false; // Set to true to see the 3D scene rendered with pixel index colors
 
-    private readonly string _initialFileName = @"Resources\PointClouds\14 Ladybrook Road 10 - cropped.ply";
+    private readonly string _pointCloudFileName = @"Resources\PointClouds\14 Ladybrook Road 10 - cropped.ply";
     
     private float _pixelSize = 2;
     
@@ -77,8 +77,7 @@ public class PointCloudHitTestingSample : CommonSample
 
     protected override void OnCreateScene(Scene scene)
     {
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
-        LoadPointCloud(fileName);
+        LoadPointCloud();
 
         _hitPositionWireCross = new WireCrossNode(position: new Vector3(0, 0, 0), lineColor: Colors.Red, lineLength: 0.2f, lineThickness: 2)
         {
@@ -251,13 +250,15 @@ public class PointCloudHitTestingSample : CommonSample
         base.OnDisposed();
     }   
 
-    private void LoadPointCloud(string? fileName)
+    private void LoadPointCloud()
     {
-        if (Scene == null || fileName == null)
+        if (Scene == null)
             return;
 
         Scene.RootNode.Clear();
 
+        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _pointCloudFileName);
+        
         try
         {
             // See Importers/PointCloudImporterSample.cs for more details about loading point clouds
