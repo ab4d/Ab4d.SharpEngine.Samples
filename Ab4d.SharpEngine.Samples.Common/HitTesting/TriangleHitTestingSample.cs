@@ -35,9 +35,9 @@ public class TriangleHitTestingSample : CommonSample
 
     private Stopwatch _renderStopwatch = new Stopwatch();
 
-    private Scene? _bitmapIdScene;
-    private SceneView? _bitmapIdSceneView;
-    private TargetPositionCamera? _bitmapIdCamera;
+    private Scene? _idBitmapScene;
+    private SceneView? _idBitmapSceneView;
+    private TargetPositionCamera? _idBitmapCamera;
 
     private Vector3[] _selectedTriangleLinePositions;
     private MultiLineNode? _selectedTriangleLinesNode;
@@ -85,7 +85,7 @@ public class TriangleHitTestingSample : CommonSample
             targetPositionCamera.Distance = 330;
 
             // On each camera change, we need to render the ID bitmap again
-            targetPositionCamera.CameraChanged += TargetPositionCameraOnCameraChanged;
+            targetPositionCamera.CameraChanged += OnTargetPositionCameraChanged;
         }
     }
 
@@ -103,23 +103,23 @@ public class TriangleHitTestingSample : CommonSample
         // IMPORTANT:
         // To reuse the same torus mesh (and its vertex and index buffers), we need to create the Scene with the same GpuDevice as the initial Scene.
         
-        _bitmapIdScene = new Scene(scene.GpuDevice, "BitmapIdScene");
+        _idBitmapScene = new Scene(scene.GpuDevice, "BitmapIdScene");
 
         // The SceneView is created with the same size as the original SceneView bit without any multi-sampling or supersampling.
         // Using multi-sampling or supersampling would create smooth pixels that would blend id colors and produce invalid triangle indices.
-        _bitmapIdSceneView = new SceneView(_bitmapIdScene, "BitmapIdSceneView");
+        _idBitmapSceneView = new SceneView(_idBitmapScene, "BitmapIdSceneView");
         
-        _bitmapIdSceneView.Initialize(sceneView.Width, sceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
-        _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+        _idBitmapSceneView.Initialize(sceneView.Width, sceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
+        _idBitmapSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
 
         // It is not allowed to use the same camera object on more than one SceneView
         // Therefore, we need to create a new TargetPositionCamera that will be synced with the original TargetPositionCamera (before rendering the ID bitmap).
-        _bitmapIdCamera = new TargetPositionCamera("BitmapIdCamera");
-        _bitmapIdSceneView.Camera = _bitmapIdCamera;
+        _idBitmapCamera = new TargetPositionCamera("BitmapIdCamera");
+        _idBitmapSceneView.Camera = _idBitmapCamera;
         
-        sceneView.ViewResized += SceneViewOnViewResized;
+        sceneView.ViewResized += OnSceneViewResized;
 
-        // Add torus mesh to the _bitmapIdScene and use PrimitiveIdMaterial
+        // Add torus mesh to the _idBitmapScene and use PrimitiveIdMaterial
         // This will render the triangles with colors that are calculated from the triangle index.
 
         // The PrimitiveIdMaterial defines AddedColor property that can be used to add a color to the calculated primitive id color.
@@ -137,24 +137,24 @@ public class TriangleHitTestingSample : CommonSample
         };
 
         var torusKnotModelNode = new MeshModelNode(_torusMesh, material);
-        _bitmapIdScene.RootNode.Add(torusKnotModelNode);
+        _idBitmapScene.RootNode.Add(torusKnotModelNode);
         
         
         base.OnSceneViewInitialized(sceneView);
     }
 
-    private void TargetPositionCameraOnCameraChanged(object? sender, EventArgs e)
+    private void OnTargetPositionCameraChanged(object? sender, EventArgs e)
     {
         _isIdBitmapDirty = true;
         ProcessPointerMove(_lastMousePosition); // This will render the ID bitmap
     }
     
-    private void SceneViewOnViewResized(object sender, ViewSizeChangedEventArgs e)
+    private void OnSceneViewResized(object sender, ViewSizeChangedEventArgs e)
     {
-        if (_bitmapIdSceneView == null || this.SceneView == null)
+        if (_idBitmapSceneView == null || this.SceneView == null)
             return;
 
-        _bitmapIdSceneView.Resize(e.ViewPixelSize.Width, e.ViewPixelSize.Height, renderNextFrameAfterResize: false);
+        _idBitmapSceneView.Resize(e.ViewPixelSize.Width, e.ViewPixelSize.Height, renderNextFrameAfterResize: false);
         _isIdBitmapDirty = true;
     }
 
@@ -162,21 +162,21 @@ public class TriangleHitTestingSample : CommonSample
     protected override void OnDisposed()
     {
         if (targetPositionCamera != null)
-            targetPositionCamera.CameraChanged -= TargetPositionCameraOnCameraChanged;
+            targetPositionCamera.CameraChanged -= OnTargetPositionCameraChanged;
         
         if (SceneView != null)
-            SceneView.ViewResized -= SceneViewOnViewResized;
+            SceneView.ViewResized -= OnSceneViewResized;
         
-        if (_bitmapIdSceneView != null)
+        if (_idBitmapSceneView != null)
         {
-            _bitmapIdSceneView.Dispose();
-            _bitmapIdSceneView = null;
+            _idBitmapSceneView.Dispose();
+            _idBitmapSceneView = null;
         }
         
-        if (_bitmapIdScene != null)
+        if (_idBitmapScene != null)
         {
-            _bitmapIdScene.Dispose();
-            _bitmapIdScene = null;
+            _idBitmapScene.Dispose();
+            _idBitmapScene = null;
         }
 
         base.OnDisposed();
@@ -296,33 +296,33 @@ public class TriangleHitTestingSample : CommonSample
     
     private void RenderIdBitmap()
     {
-        if (_bitmapIdSceneView == null)
+        if (_idBitmapSceneView == null)
             return;
 
 
         // Sync the camera with the original TargetPositionCamera
-        if (targetPositionCamera != null && _bitmapIdCamera != null)
+        if (targetPositionCamera != null && _idBitmapCamera != null)
         {
-            _bitmapIdCamera.Heading                = targetPositionCamera.Heading;
-            _bitmapIdCamera.Attitude               = targetPositionCamera.Attitude;
-            _bitmapIdCamera.Bank                   = targetPositionCamera.Bank;
-            _bitmapIdCamera.Distance               = targetPositionCamera.Distance;
-            _bitmapIdCamera.TargetPosition         = targetPositionCamera.TargetPosition;
-            _bitmapIdCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+            _idBitmapCamera.Heading                = targetPositionCamera.Heading;
+            _idBitmapCamera.Attitude               = targetPositionCamera.Attitude;
+            _idBitmapCamera.Bank                   = targetPositionCamera.Bank;
+            _idBitmapCamera.Distance               = targetPositionCamera.Distance;
+            _idBitmapCamera.TargetPosition         = targetPositionCamera.TargetPosition;
+            _idBitmapCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
         }
         
         _renderStopwatch.Restart();
         
         // Recreate _rawRenderedBitmap when size is changed
-        if (_rawRenderedBitmap != null && (_rawRenderedBitmap.Width != _bitmapIdSceneView.Width || _rawRenderedBitmap.Height != _bitmapIdSceneView.Height))
+        if (_rawRenderedBitmap != null && (_rawRenderedBitmap.Width != _idBitmapSceneView.Width || _rawRenderedBitmap.Height != _idBitmapSceneView.Height))
             _rawRenderedBitmap = null; 
 
         
         // Render the updated scene to the RawImageData object
         if (_rawRenderedBitmap == null)
-            _rawRenderedBitmap = _bitmapIdSceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
+            _rawRenderedBitmap = _idBitmapSceneView.RenderToRawImageData(renderNewFrame: true, preserveGpuBuffer: true);
         else
-            _bitmapIdSceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
+            _idBitmapSceneView.RenderToRawImageData(_rawRenderedBitmap, renderNewFrame: true, preserveGpuBuffer: true);
         
         
         _isIdBitmapDirty = false; // Mark ID Bitmap as correct
