@@ -6,7 +6,7 @@ Welcome to the Samples for Ab4d.SharpEngine.
 
 **Ab4d.SharpEngine is a cross-platform Vulkan based 3D rendering engine for desktop and mobile .Net applications.**
 
-Vulkan is a high performance graphics and cross-platform API that is similar to DirectX 12 but can run on multiple platforms.
+Vulkan is a high performance and cross-platform graphics API that is similar to DirectX 12 but can run on multiple platforms.
 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
@@ -172,21 +172,27 @@ The following Visual Studio solutions are available:
 
 ## Quick Start
 
-The two main objects in SharpEngine are:
-- **Scene** object that defines the 3D scene with a hierarchy of 3D objects that are added to the RootNode object.
-  It also defines the Lights collection.
-- **SceneView** object is used to show the objects that are defined by the Scene object. SceneView also defines the Camera and provides the size of the view.
+The three main objects in Ab4d.SharpEngine are:
+- **Scene** object that defines the 3D scene with a hierarchy of 3D objects that are added to the `RootNode` object.
+  It also defines the `Lights` collection.
+- **SceneView** object is used to show the objects that are defined by the Scene object. SceneView also defines the `Camera` and provides the size of the view.
+- **VulkanDevice** object (many times named as `GpuDevice` property or parameter) provides the connection with the graphics card by using the Vulkan API.
 
-When using WPF, Avalonia, WinUI or WinForms, then Scene and SceneView are created by the **SharpEngineSceneView control**.
+When using Avalonia, WPF, WinUI or WinForms, then VulkanDevice, Scene and SceneView are created by the **SharpEngineSceneView control**.
 
-3D objects are defined in the SceneNodes namespace, for example: BoxModelNode, SphereModelNode, LineNode, MeshModelNode, etc.
+3D objects are defined in the SceneNodes namespace, for example: `BoxModelNode`, `SphereModelNode`, `LineNode`, `MeshModelNode`, etc.
 
-Common materials are defined by using StandardMaterial object. 
-For each color there are predefined StandardMaterials, for example StandardMaterials.Blue.
+Common materials are defined by using `StandardMaterial` object. 
+For each color there are predefined `StandardMaterials`, for example, `StandardMaterials.Blue`.
 
-Use ReaderObj to read 3D models from obj files.
-To read 3D models from glTF files use Ab4d.SharpEngine.glTF libray. For other file formats, use AssimpImporter.
+Use `ObjImported` or `StlImporter` to read 3D models from obj or stl files.
+To read 3D models from glTF files use `gltfImporter` from the Ab4d.SharpEngine.glTF library. For other file formats, use `AssimpImporter` from Ab4d.SharpEngine.Assimp library.
 
+### Step-by-step guide to use Ab4d.SharpEngine in your project
+1. Generate the **Trial license** from [Trail license generator](https://www.ab4d.com/SharpEngineLicense.aspx). This is required to use the Ab4d.SharpEngine in your own project.
+2. Create a **new project** in Visual Studio, any other IDE or CLI. Copy the **SharpEngine initialization code** from the sample project. When using Avalonia, WPF or WinUI, use the initialization code from QuickStart/SharpEngineSceneViewInXaml or QuickStart/SharpEngineSceneViewInCode files (depends on whether you want to define the `SharpEngineSceneView` control in XAML or in the code). For other UI frameworks copy the initialization code from the appropriate sample. In some cases, you will first need to initialize the `VulkanDevice` and then use that to initialize the `Scene` and `SceneView` objects (when using `SharpEngineSceneView` control, then `VulkanDevice` is created automatically).
+3. Add the call to the **`SetLicense`** method by using your trial license code. Note that the `SetLicense` method must be called before the SharpEngine is initialized (for example, before calling `InitializeComponent`).
+4. Define the **3D scene** by adding scene node objects to the `scene.RootNode`. Add code to support **user interaction** with the 3D scene. To do this quickly, run the Samples project and identify the parts you need for your applications. Then copy the code from the Ab4d.SharpEngine.Samples.Common project to your project (to get which source file is showing a particular sample, check the Samples.xml file).
 
 
 ### Migration guide for Ab3d.PowerToys and Ab3d.DXEngine users
@@ -224,10 +230,9 @@ In my opinion, if you already have a complex application that is built by using 
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.8.
 
 Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
-The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v3.0; this is not the full list):
-- Effects: PhysicallyBasedRendering, XRay, multi-map material, environment map and face color effect
+The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v3.2; this is not the full list):
+- Effects: PhysicallyBasedRendering, XRay, environment map and face color effect
 - Shadows
-- Post-processing
 
 
 ### Advantages of Ab4d.SharpEngine
