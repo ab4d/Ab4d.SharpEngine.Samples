@@ -102,8 +102,8 @@ public class RectangularSelectionSample : CommonSample
 
     private DateTime _lastCameraChangedTime;
 
-    private SceneView? _bitmapIdSceneView;
-    private TargetPositionCamera? _bitmapIdCamera;
+    private SceneView? _idBitmapSceneView;
+    private TargetPositionCamera? _idBitmapCamera;
 
 
     public RectangularSelectionSample(ICommonSamplesContext context)
@@ -183,10 +183,10 @@ public class RectangularSelectionSample : CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
-        if (_bitmapIdSceneView != null)
+        if (_idBitmapSceneView != null)
         {
-            _bitmapIdSceneView.Dispose();
-            _bitmapIdSceneView = null;
+            _idBitmapSceneView.Dispose();
+            _idBitmapSceneView = null;
         }
 
         base.OnDisposed();
@@ -610,37 +610,37 @@ public class RectangularSelectionSample : CommonSample
         if (SceneView.MultisampleCount > 1 || SceneView.SupersamplingCount > 1)
         {
             // To disable MSAA and SSAA we create another SceneView without any multi-sampling and super-sampling.
-            if (_bitmapIdSceneView == null)
+            if (_idBitmapSceneView == null)
             {
-                _bitmapIdSceneView = new SceneView(Scene, "BitmapID-SceneView");
-                _bitmapIdSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
-                _bitmapIdSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
+                _idBitmapSceneView = new SceneView(Scene, "BitmapID-SceneView");
+                _idBitmapSceneView.Initialize(SceneView.Width, SceneView.Height, dpiScaleX: 1, dpiScaleY: 1, multisampleCount: 1, supersamplingCount: 1);
+                _idBitmapSceneView.BackgroundColor = Color4.TransparentBlack; // Set BackgroundColor to (0,0,0,0) so it will be different from actual objects that will have alpha set to 1.
 
                 // Create a new TargetPositionCamera that will be used to render _bitmapIdSceneView.
                 // This camera is sync with the main targetPositionCamera on each render pass (see code below).
                 // Note that we cannot use one camera object on two different SceneView objects.
-                _bitmapIdCamera = new TargetPositionCamera();
-                _bitmapIdSceneView.Camera = _bitmapIdCamera;
+                _idBitmapCamera = new TargetPositionCamera();
+                _idBitmapSceneView.Camera = _idBitmapCamera;
             }
-            else if (_bitmapIdSceneView.Width != SceneView.Width || _bitmapIdSceneView.Height != SceneView.Height)
+            else if (_idBitmapSceneView.Width != SceneView.Width || _idBitmapSceneView.Height != SceneView.Height)
             {
-                _bitmapIdSceneView.Resize(SceneView.Width, SceneView.Height, renderNextFrameAfterResize: false);
+                _idBitmapSceneView.Resize(SceneView.Width, SceneView.Height, renderNextFrameAfterResize: false);
             }
 
             // Sync the camera with the original TargetPositionCamera
-            if (targetPositionCamera != null && _bitmapIdCamera != null)
+            if (targetPositionCamera != null && _idBitmapCamera != null)
             {
-                _bitmapIdCamera.Heading                = targetPositionCamera.Heading;
-                _bitmapIdCamera.Attitude               = targetPositionCamera.Attitude;
-                _bitmapIdCamera.Bank                   = targetPositionCamera.Bank;
-                _bitmapIdCamera.Distance               = targetPositionCamera.Distance;
-                _bitmapIdCamera.TargetPosition         = targetPositionCamera.TargetPosition;
-                _bitmapIdCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
-                _bitmapIdCamera.ViewWidth              = targetPositionCamera.ViewWidth;
-                _bitmapIdCamera.ProjectionType         = targetPositionCamera.ProjectionType;
+                _idBitmapCamera.Heading                = targetPositionCamera.Heading;
+                _idBitmapCamera.Attitude               = targetPositionCamera.Attitude;
+                _idBitmapCamera.Bank                   = targetPositionCamera.Bank;
+                _idBitmapCamera.Distance               = targetPositionCamera.Distance;
+                _idBitmapCamera.TargetPosition         = targetPositionCamera.TargetPosition;
+                _idBitmapCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+                _idBitmapCamera.ViewWidth              = targetPositionCamera.ViewWidth;
+                _idBitmapCamera.ProjectionType         = targetPositionCamera.ProjectionType;
             }
 
-            usedBitmapIdSceneView = _bitmapIdSceneView;
+            usedBitmapIdSceneView = _idBitmapSceneView;
         }
         else
         {
@@ -666,7 +666,7 @@ public class RectangularSelectionSample : CommonSample
 
 
         // Revert back BackgroundColor (when rendering to the current SceneView)
-        if (_bitmapIdSceneView == null)
+        if (_idBitmapSceneView == null)
             SceneView.BackgroundColor = savedBackground;
 
         // Revert back materials
