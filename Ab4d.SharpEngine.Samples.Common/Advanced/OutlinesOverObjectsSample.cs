@@ -235,6 +235,8 @@ public class OutlinesOverObjectsSample: CommonSample
             _outlineObjectsCamera.Distance               = targetPositionCamera.Distance;
             _outlineObjectsCamera.TargetPosition         = targetPositionCamera.TargetPosition;
             _outlineObjectsCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+            _outlineObjectsCamera.ViewWidth              = targetPositionCamera.ViewWidth;
+            _outlineObjectsCamera.ProjectionType         = targetPositionCamera.ProjectionType;
         }
         
         // When the result of an object filter function (assigned to renderObjectsRenderingStep.FilterObjectsFunction) 

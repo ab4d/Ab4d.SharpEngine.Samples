@@ -630,12 +630,14 @@ public class RectangularSelectionSample : CommonSample
             // Sync the camera with the original TargetPositionCamera
             if (targetPositionCamera != null && _bitmapIdCamera != null)
             {
-                _bitmapIdCamera.Heading = targetPositionCamera.Heading;
-                _bitmapIdCamera.Attitude = targetPositionCamera.Attitude;
-                _bitmapIdCamera.Bank = targetPositionCamera.Bank;
-                _bitmapIdCamera.Distance = targetPositionCamera.Distance;
-                _bitmapIdCamera.TargetPosition = targetPositionCamera.TargetPosition;
+                _bitmapIdCamera.Heading                = targetPositionCamera.Heading;
+                _bitmapIdCamera.Attitude               = targetPositionCamera.Attitude;
+                _bitmapIdCamera.Bank                   = targetPositionCamera.Bank;
+                _bitmapIdCamera.Distance               = targetPositionCamera.Distance;
+                _bitmapIdCamera.TargetPosition         = targetPositionCamera.TargetPosition;
                 _bitmapIdCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+                _bitmapIdCamera.ViewWidth              = targetPositionCamera.ViewWidth;
+                _bitmapIdCamera.ProjectionType         = targetPositionCamera.ProjectionType;
             }
 
             usedBitmapIdSceneView = _bitmapIdSceneView;

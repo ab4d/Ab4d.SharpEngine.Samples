@@ -252,12 +252,14 @@ public class HitTestingWithIdBitmapSample : CommonSample
             // Sync the camera with the original TargetPositionCamera
             if (targetPositionCamera != null && _idBitmapCamera != null)
             {
-                _idBitmapCamera.Heading = targetPositionCamera.Heading;
-                _idBitmapCamera.Attitude = targetPositionCamera.Attitude;
-                _idBitmapCamera.Bank = targetPositionCamera.Bank;
-                _idBitmapCamera.Distance = targetPositionCamera.Distance;
-                _idBitmapCamera.TargetPosition = targetPositionCamera.TargetPosition;
+                _idBitmapCamera.Heading                = targetPositionCamera.Heading;
+                _idBitmapCamera.Attitude               = targetPositionCamera.Attitude;
+                _idBitmapCamera.Bank                   = targetPositionCamera.Bank;
+                _idBitmapCamera.Distance               = targetPositionCamera.Distance;
+                _idBitmapCamera.TargetPosition         = targetPositionCamera.TargetPosition;
                 _idBitmapCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+                _idBitmapCamera.ViewWidth              = targetPositionCamera.ViewWidth;
+                _idBitmapCamera.ProjectionType         = targetPositionCamera.ProjectionType;
             }
 
             usedBitmapIdSceneView = _idBitmapSceneView;

@@ -194,6 +194,8 @@ public class PointCloudHitTestingSample : CommonSample
             _idBitmapCamera.Distance               = targetPositionCamera.Distance;
             _idBitmapCamera.TargetPosition         = targetPositionCamera.TargetPosition;
             _idBitmapCamera.RotationCenterPosition = targetPositionCamera.RotationCenterPosition;
+            _idBitmapCamera.ViewWidth              = targetPositionCamera.ViewWidth;
+            _idBitmapCamera.ProjectionType         = targetPositionCamera.ProjectionType;
         }
         
         // Recreate _rawRenderedBitmap when size is changed
