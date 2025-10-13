@@ -366,42 +366,44 @@ To get **better error diagnostics when running dotnet build**, add the following
 
 ## Troubleshooting
 
-If you get build errors on Windows (for example 'project.assets.json' not found) than maybe the total path length is larger than max path (260 chars). Move the samples solution to a folder with a shorter path and try compiling again.
+- To solve some unusual build errors, sometimes it helps to close the Visual Studio (or some other IDE), delete the obj folder, open Visual Studio again and then try to recompile the solution (this works better than selecting "Clean" option in Visual Studio).
 
-The latest version of branches that start with "version/" may not compile with the latest published NuGet package and require the latest development version of the engine. If you need a feature from that branch, you can contact support to get the pre-release version.
+- Use the latest version of the **'main' branch**. This version works with the latest published NuGet package. The latest source from the **'development' branch** may require the latest development version of the engine that is not publicly available. If you need a feature from that branch, you can contact support to get the pre-release version.
 
-When using `dotnet build` command and you get an error message that you do not understand, it is possible to get additional error details by adding the following parameters: `-v diag /p:WarningLevel=4 --tl:off`.
+- When using `dotnet build` command and you get an error message that you do not understand, it is possible to get additional error details by adding the following parameters: `-v diag /p:WarningLevel=4 --tl:off`.
 
-Some Intel graphics cards may not work with shared texture in WPF's SharpEngineSceneView control (WritableBitmap is used instead, but this is slower).
+- If you get build errors on Windows (for example, 'project.assets.json' not found), then maybe the total path length is larger than the maximum path length (260 chars). Move the sample solution to a folder with a shorter path and try compiling again.
 
-To enable Vulkan validation, install the Vulkan SDK from: https://vulkan.lunarg.com/
-When Vulkan validation is installed and enabled by the SharpEngine (EnableStandardValidation is set to true when creating the engine),
-then each Vulkan call is checked by the validation error and this can give much better error reports
-(all Vulkan validation reports are logged at Warn log level).
+- If the 3D scene is not correctly rendered, the Ab4d.SharpEngine may write warning or error messages about the reasons for the problems. Those messages can be shown by enabling **logging**. To do that, use the following code:
+  ```
+  Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
+  ```
 
-To enable logging use the following code:
-```
-Ab4d.SharpEngine.Utilities.Log.LogLevel = LogLevels.Warn;
-```
+  Then you have multiple options to display or save log messages:
+  ```
+  // Write log messages to the output window (for example, Visual Studio Debug window) 
+  // Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
 
+  // Write log to a file
+  Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
+   
+  // Write to a local StringBuilder
+  private System.Text.StringBuilder _logStringBuilder;
+  Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
+  ```
 
-Then you have multiple options to display or save log messages:
-```
-// Write log to file
-Ab4d.SharpEngine.Utilities.Log.LogFileName = @"c:\SharpEngine.log";
-  
-// Write log messages to the output window (for example, Visual Studio Debug window) 
-// Ab4d.SharpEngine.Utilities.Log.IsLoggingToDebugOutput = true; 
-  
-// Write to local StringBuilder
-private System.Text.StringBuilder _logStringBuilder;
-Ab4d.SharpEngine.Utilities.Log.AddLogListener((logLevel, message) => _logStringBuilder.AppendLine(message));
-```
+  To get simplified log messages (without timestamp, thread ID and some other details) you can use:
+  ```
+  Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true;
+  ```
 
-To get simplified log messages (without timestamp, thread ID and some other details) you can use:
-```
-Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true;
-```
+- An advanced runtime diagnostic is provided by the **DiagnosticsWindow** that is available for Avalonia, WPF and WinUI samples. The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing valuable insight into the engine's performance. It also provides menu items to quickly get details about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data. It is recommended that for the **DEBUG build**, you add the DiagnosticsWindow to your application and provide a way to show it. To do this, copy the `DiagnosticsWindow.xaml` and `DiagnosticsWindow.xaml.cs` files from the Avalonia, WPF or WinUI samples project to your project. Then also copy the `CommonDiagnostics.cs` file from the `Ab4d.SharpEngine.Samples.Common` project. Before showing the DiagnosticsWindow, set the `SharpEngineSceneView` property to your instance of the SharpEngineSceneView object. See the `OpenDiagnosticsWindow` method for an example code.
+
+- Some **Intel graphics cards** may not work with shared texture in WPF's SharpEngineSceneView control (`WritableBitmap` is used instead, but this is slower).
+
+- To enable **Vulkan validation**, install the Vulkan SDK from: https://vulkan.lunarg.com/
+  When Vulkan validation is installed and enabled by the Ab4d.SharpEngine (`EngineCreateOptions.EnableStandardValidation` is set to true when creating the engine),
+  then each Vulkan call is checked by the validation layer and this can give much better error reports (all Vulkan validation reports are logged at Warn log level).
 
 
 ## Change log
