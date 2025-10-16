@@ -50,6 +50,10 @@
                     <MenuFlyoutItem Name="GarbageCollectMenuItem" Text="Garbage collect" Margin="0 -2" Click="GarbageCollectMenuItem_OnTapped" Tapped="GarbageCollectMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Name="ShowWireframeMenuItem" Text="Show wireframe" Click="ShowWireframeMenuItem_OnTapped" Tapped="ShowWireframeMenuItem_OnTapped"/>
+                    <MenuFlyoutItem Name="ChangeMaterialsMenuItem" Text="Materials to Green (front) and Red (back)" Click="ChangeMaterialsMenuItem_OnTapped" Tapped="ChangeMaterialsMenuItem_OnTapped"/>
+
+                    <MenuFlyoutSeparator />
                     <MenuFlyoutItem Name="StartStopCameraRotationMenuItem" Text="Toggle camera rotation" Margin="0 -2" Click="StartStopCameraRotationMenuItem_OnTapped" Tapped="StartStopCameraRotationMenuItem_OnTapped"/>
 
                     <MenuFlyoutSeparator Name="FullLoggingSeparator" />

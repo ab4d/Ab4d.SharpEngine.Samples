@@ -392,6 +392,38 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Diagnostics
             _commonDiagnostics.GarbageCollect();
         }
         
+        private void ShowWireframeMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            _commonDiagnostics.ChangeAllMaterials(useLineMaterial: true);
+
+            if (_commonDiagnostics.HasSavedMaterials)
+            {
+                ShowWireframeMenuItem.Header = "Restore original solid models";
+                ChangeMaterialsMenuItem.IsEnabled = false; // Disable ChangeMaterialsMenuItem because we first need to restore the original materials before we can call ChangeAllMaterials
+            }
+            else
+            {
+                ShowWireframeMenuItem.Header = "Show wireframe";
+                ChangeMaterialsMenuItem.IsEnabled = true;
+            }
+        }
+        
+        private void ChangeMaterialsMenuItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            _commonDiagnostics.ChangeAllMaterials(useLineMaterial: false);
+
+            if (_commonDiagnostics.HasSavedMaterials)
+            {
+                ChangeMaterialsMenuItem.Header = "Restore original materials";
+                ShowWireframeMenuItem.IsEnabled = false;  // Disable ShowWireframeMenuItem because we first need to restore the original materials before we can call ChangeAllMaterials
+            }
+            else
+            {
+                ChangeMaterialsMenuItem.Header = "Materials to Green (front) and Red (back)";
+                ShowWireframeMenuItem.IsEnabled = true;
+            }
+        }
+        
         private void LogWarningsPanel_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (_logMessagesWindow != null)

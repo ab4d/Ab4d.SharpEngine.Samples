@@ -58,6 +58,10 @@
                 <MenuItem Name="GarbageCollectMenuItem" Header="Garbage collect" Click="GarbageCollectMenuItem_OnClick"/>
                 
                 <Separator />
+                <MenuItem Name="ShowWireframeMenuItem" Header="Show wireframe" Click="ShowWireframeMenuItem_OnClick"/>
+                <MenuItem Name="ChangeMaterialsMenuItem" Header="Materials to Green (front) and Red (back)" Click="ChangeMaterialsMenuItem_OnClick"/>
+
+                <Separator />
                 <MenuItem Name="StartStopCameraRotationMenuItem" Header="Toggle camera rotation" Click="StartStopCameraRotationMenuItem_OnClick"/>
 
                 <Separator />

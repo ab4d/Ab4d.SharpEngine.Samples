@@ -1,25 +1,40 @@
-﻿using Ab4d.SharpEngine;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.SceneNodes;
 
 namespace Ab4d.SharpEngine.Samples.Common.Diagnostics;
+
+// DiagnosticsWindow provides advanced rendering diagnostics for Ab4d.SharpEngine.
+// It is available for Avalonia, WPF and WinUI apps.
+//
+// The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing
+// valuable insight into the engine's performance. It also provides menu items to quickly get details
+// about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data.
+//
+// It is recommended that for the DEBUG build, you add the DiagnosticsWindow to your application.
+// The following are the steps to add the DiagnosticsWindow to your project:
+// 
+// - Create a new Diagnostics folder in your project.
+// - Copy the DiagnosticsWindow.xaml, DiagnosticsWindow.xaml.cs, LogMessagesWindow.xaml and LogMessagesWindow.xaml.cs files from the Diagnostics folder in the Avalonia, WPF or WinUI samples project to the Diagnostics folder in your project.
+// - Copy the CommonDiagnostics.cs file from the Ab4d.SharpEngine.Samples.Common project to the Diagnostics folder in your project.
+// - Open csproj file of your project and add the following to remove Diagnostics files from the Release build (leave this step if you want to preserve the diagnostics window in the Release build):
+//   <ItemGroup Condition="'$(Configuration)'=='Release'">
+//     <Compile Remove="Diagnostics\*.cs" />
+//     <Page Remove="Diagnostics\*.xaml" />  <!--use AvaloniaXaml instead of Page for Avalonia UI app-->
+//   </ItemGroup>
+// - In your application use "#if DEBUG" to add a button or some other way for the user of your application to open the Diagnostics window. In the button event handler, create an instance of the DiagnosticsWindow and set the SharpEngineSceneView property to your instance of the SharpEngineSceneView object. Then show the DiagnosticsWindow. See the OpenDiagnosticsWindow method for an example code.
 
 // This class provides the common UI independent code that is used for DiagnosticsWindow in specific UI project
 public class CommonDiagnostics
@@ -449,6 +464,113 @@ public class CommonDiagnostics
         GC.WaitForFullGCComplete();
         GC.WaitForPendingFinalizers();
         GC.Collect();
+    }
+
+    private Dictionary<ModelNode, Material?>? _savedMaterials;
+    private Dictionary<ModelNode, Material?>? _savedBackMaterials;
+
+    public bool HasSavedMaterials => _savedMaterials != null;
+
+    public void ChangeAllMaterials(bool useLineMaterial)
+    {
+        if (SharpEngineSceneView == null)
+            return;
+
+        if (_savedMaterials == null)
+        {
+            // Set all materials to Green (front) and Red (back):
+
+            _savedMaterials = new Dictionary<ModelNode, Material?>();
+            _savedBackMaterials = new Dictionary<ModelNode, Material?>();
+
+            Material? frontMaterial = StandardMaterials.Green;
+            Material? backMaterial = StandardMaterials.Red;
+
+            SharpEngineSceneView.Scene.RootNode.ForEachChild<ModelNode>(modelNode =>
+            {
+                _savedMaterials[modelNode] = modelNode.Material;
+                _savedBackMaterials[modelNode] = modelNode.BackMaterial;
+                
+                if (useLineMaterial)
+                {
+                    var material = modelNode.Material ?? modelNode.BackMaterial;
+                    Color3 lineColor;
+                    if (material is StandardMaterialBase standardMaterial)
+                        lineColor = standardMaterial.DiffuseColor;
+                    else
+                        lineColor = Color3.Black;
+
+                    frontMaterial = new LineMaterial(lineColor, 1);
+                    backMaterial = null;
+                }
+
+                modelNode.Material = frontMaterial;
+                modelNode.BackMaterial = backMaterial;
+            });
+
+            // We could also do the following (but then we would not save the current materials):
+            //Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(SharpEngineSceneView.Scene.RootNode, StandardMaterials.Green);
+            //Ab4d.SharpEngine.Utilities.ModelUtils.ChangeBackMaterial(SharpEngineSceneView.Scene.RootNode, StandardMaterials.Red);
+        }
+        else
+        {
+            // Restore saved materials:
+
+            foreach (var nodeMaterialPair in _savedMaterials)
+                nodeMaterialPair.Key.Material = nodeMaterialPair.Value;
+
+            foreach (var nodeMaterialPair in _savedBackMaterials!)
+                nodeMaterialPair.Key.BackMaterial = nodeMaterialPair.Value;
+
+            _savedMaterials = null;
+            _savedBackMaterials = null;
+        }
+    }
+    
+    public void ChangeAllMaterials()
+    {
+        if (SharpEngineSceneView == null)
+            return;
+
+        if (_savedMaterials == null)
+        {
+            // Set all materials to Green (front) and Red (back):
+
+            _savedMaterials = new Dictionary<ModelNode, Material?>();
+            _savedBackMaterials = new Dictionary<ModelNode, Material?>();
+
+            //var frontMaterial = StandardMaterials.Green;
+            //var backMaterial = StandardMaterials.Red;
+            
+            var frontMaterial = new LineMaterial(Colors.Green, 1);
+            Material backMaterial = null;// StandardMaterials.Red;
+
+            SharpEngineSceneView.Scene.RootNode.ForEachChild<ModelNode>(modelNode =>
+            {
+                _savedMaterials[modelNode] = modelNode.Material;
+                _savedBackMaterials[modelNode] = modelNode.BackMaterial;
+
+                modelNode.Material = frontMaterial;
+                modelNode.BackMaterial = backMaterial;
+            });
+
+            // We could also do the following (but then we would not save the current materials):
+            //Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(SharpEngineSceneView.Scene.RootNode, StandardMaterials.Green);
+            //Ab4d.SharpEngine.Utilities.ModelUtils.ChangeBackMaterial(SharpEngineSceneView.Scene.RootNode, StandardMaterials.Red);
+        }
+        else
+        {
+            // Restore saved materials:
+
+            foreach (var nodeMaterialPair in _savedMaterials)
+                nodeMaterialPair.Key.Material = nodeMaterialPair.Value;
+
+            foreach (var nodeMaterialPair in _savedBackMaterials!)
+                nodeMaterialPair.Key.BackMaterial = nodeMaterialPair.Value;
+
+            _savedMaterials = null;
+            _savedBackMaterials = null;
+        }
     }
 
     private string GetRenderingStatisticsDetails(RenderingStatistics renderingStatistics, string? fpsText)
