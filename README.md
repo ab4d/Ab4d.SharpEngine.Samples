@@ -397,7 +397,20 @@ To get **better error diagnostics when running dotnet build**, add the following
   Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true;
   ```
 
-- An advanced runtime diagnostic is provided by the **DiagnosticsWindow** that is available for Avalonia, WPF and WinUI samples. The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing valuable insight into the engine's performance. It also provides menu items to quickly get details about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data. It is recommended that for the **DEBUG build**, you add the DiagnosticsWindow to your application and provide a way to show it. To do this, copy the `DiagnosticsWindow.xaml` and `DiagnosticsWindow.xaml.cs` files from the Avalonia, WPF or WinUI samples project to your project. Then also copy the `CommonDiagnostics.cs` file from the `Ab4d.SharpEngine.Samples.Common` project. Before showing the DiagnosticsWindow, set the `SharpEngineSceneView` property to your instance of the SharpEngineSceneView object. See the `OpenDiagnosticsWindow` method for an example code.
+- **DiagnosticsWindow** provides advanced rendering diagnostics for Ab4d.SharpEngine. It is available for Avalonia, WPF and WinUI apps. The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing valuable insight into the engine's performance. It also provides menu items to quickly get details about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data. It is recommended that for the DEBUG build, you add the DiagnosticsWindow to your application.
+
+  The following are the steps to add the DiagnosticsWindow to your project:
+  - Create a new Diagnostics folder in your project.
+  - Copy the `DiagnosticsWindow.xaml`, `DiagnosticsWindow.xaml.cs`, `LogMessagesWindow.xaml` and `LogMessagesWindow.xaml.cs` files from the Diagnostics folder in the Avalonia, WPF or WinUI samples project to the Diagnostics folder in your project.
+  - Copy the `CommonDiagnostics.cs` file from the `Ab4d.SharpEngine.Samples.Common` project to the Diagnostics folder in your project.
+  - Open csproj file of your project and add the following to remove Diagnostics files from the Release build (leave this step if you want to preserve the diagnostics window in the Release build):
+    ```
+    <ItemGroup Condition="'$(Configuration)'=='Release'">
+      <Compile Remove="Diagnostics\*.cs" />
+      <Page Remove="Diagnostics\*.xaml" />  <!--use AvaloniaXaml instead of Page for Avalonia UI app-->
+    </ItemGroup>
+    ```
+  - In your application use "#if DEBUG" to add a button or some other way for the user of your application to open the Diagnostics window. In the button event handler, create an instance of the `DiagnosticsWindow` and set the `SharpEngineSceneView` property to your instance of the SharpEngineSceneView object. Then show the DiagnosticsWindow. See the `OpenDiagnosticsWindow` method for an example code.
 
 - Some **Intel graphics cards** may not work with shared texture in WPF's SharpEngineSceneView control (`WritableBitmap` is used instead, but this is slower).
 
