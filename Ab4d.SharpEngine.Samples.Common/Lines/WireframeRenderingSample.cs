@@ -196,7 +196,7 @@ public class WireframeRenderingSample : CommonSample
             (sceneNode, transformMatrix) =>
             {
                 if (sceneNode is ModelNode modelNode &&
-                    modelNode.Material is StandardMaterial standardMaterial)
+                    modelNode.Material is StandardMaterialBase standardMaterial) // StandardMaterialBase is used for StandardMaterial and SolidColorMaterial
                 {
                     var mesh = modelNode.GetMesh();
 
