@@ -543,7 +543,7 @@ public class CommonDiagnostics
             //var backMaterial = StandardMaterials.Red;
             
             var frontMaterial = new LineMaterial(Colors.Green, 1);
-            Material backMaterial = null;// StandardMaterials.Red;
+            Material? backMaterial = null;// StandardMaterials.Red;
 
             SharpEngineSceneView.Scene.RootNode.ForEachChild<ModelNode>(modelNode =>
             {
@@ -963,7 +963,7 @@ PipelineChangesCount: {8:#,##0}",
                         else if (propertyInfo.PropertyType == typeof(string))
                             valueText = '"' + (string)propertyValue + '"';
                         else if (propertyValue is IVulkanDispatchableHandle vulkanDispatchableHandle)
-                            valueText = vulkanDispatchableHandle.Handle == 0 ? "<null>" : string.Format(System.Globalization.CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
+                            valueText = vulkanDispatchableHandle.Handle == (nint)0 ? "<null>" : string.Format(System.Globalization.CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
                         else if (propertyValue is IVulkanNonDispatchableHandle vulkanNonDispatchableHandle)
                             valueText = vulkanNonDispatchableHandle.Handle == 0 ? "<null>" : string.Format(System.Globalization.CultureInfo.InvariantCulture, "0x{0:X}", vulkanNonDispatchableHandle.Handle);
                         else
@@ -1056,7 +1056,7 @@ PipelineChangesCount: {8:#,##0}",
             }
             else if (oneValue is IVulkanDispatchableHandle vulkanDispatchableHandle)
             {
-                valueText = vulkanDispatchableHandle.Handle == 0 ? "<null>" : string.Format(CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
+                valueText = vulkanDispatchableHandle.Handle == (nint)0 ? "<null>" : string.Format(CultureInfo.InvariantCulture, "0x{0:X}", vulkanDispatchableHandle.Handle);
             }
             else if (oneValue is IVulkanNonDispatchableHandle vulkanNonDispatchableHandle)
             {
