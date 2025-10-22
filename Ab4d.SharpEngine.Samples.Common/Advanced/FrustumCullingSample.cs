@@ -71,6 +71,13 @@ public class FrustumCullingSample : CommonSample
             targetPositionCamera.Distance = 180;
             targetPositionCamera.CameraChanged += OnCameraChanged;
         }
+
+
+        // When the scene is grouped into GroupNodes and visibility of those GroupNodes is checked
+        // by using frustum culling, it is possible to further improve update performance by
+        // disabling calling Update method on child SceneNodes of hidden GroupNodes.
+        // This is done by the following:
+        //scene.UpdateHiddenGroupNodes = false;
     }
 
     private void OnCameraChanged(object? sender, EventArgs args)
