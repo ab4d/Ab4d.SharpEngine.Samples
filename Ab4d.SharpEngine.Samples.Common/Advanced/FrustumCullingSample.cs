@@ -102,10 +102,6 @@ public class FrustumCullingSample : CommonSample
 
         bool hasChanges = false;
 
-        float minDistance = float.MaxValue;
-        var corners = new Vector3[8];
-        var cameraPos = SceneView.Camera.GetCameraPosition();
-
         foreach (var modelNode in _culledObjectsGroup.OfType<ModelNode>())        
         {
             var newVisibility = boundingFrustum.Contains(modelNode.WorldBoundingBox);
@@ -120,18 +116,7 @@ public class FrustumCullingSample : CommonSample
 
             hasChanges |= modelNode.Material != newMaterial;
             modelNode.Material = newMaterial; // This is a noop when we are setting the material to the same material
-
-            modelNode.WorldBoundingBox.GetCorners(corners);
-            foreach (var corner in corners)
-            {
-                var dist = (cameraPos - corner).Length();
-                if (dist < minDistance)
-                    minDistance = dist;
-            }
         }
-
-        System.Diagnostics.Debug.WriteLine($"CameraPos: {SceneView.Camera.GetCameraPosition()}; Near: {SceneView.Camera.NearPlaneDistance};  MinDist: {minDistance}");
-
 
         if (hasChanges)
             UpdateStatistics();
@@ -153,9 +138,9 @@ public class FrustumCullingSample : CommonSample
                 _notVisibleCount++;
         }
 
-        _visibleLabel.UpdateValue();
-        _partiallyVisibleLabel.UpdateValue();
-        _notVisibleLabel.UpdateValue();
+        _visibleLabel?.UpdateValue();
+        _partiallyVisibleLabel?.UpdateValue();
+        _notVisibleLabel?.UpdateValue();
     }
 
     /// <inheritdoc />
