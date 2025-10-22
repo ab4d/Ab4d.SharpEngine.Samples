@@ -144,6 +144,7 @@
   <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
   <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" />
   <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" IsNew="True" />
+  <Sample Location="Advanced.FrustumCullingSample" Title="Frustum culling" IsNew="True" />
   <Sample Location="Advanced.DepthPrePassSample" Title="Depth pre-pass rendering" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />

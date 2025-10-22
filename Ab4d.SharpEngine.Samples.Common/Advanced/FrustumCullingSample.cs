@@ -1,0 +1,182 @@
+﻿using System.Numerics;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.SceneNodes;
+
+namespace Ab4d.SharpEngine.Samples.Common.Advanced;
+
+public class FrustumCullingSample : CommonSample
+{
+    public override string Title => "Frustum culling";
+    public override string Subtitle => "Frustum culling can be used to determine is object is visible by the current camera.\n\nInstead of checking individual objects (that can take a long time), it is recommended to group objects into GroupNodes and then check only the visibility of GroupNodes.";
+
+    private bool _isFrustumCullingEnabled = true;
+
+    private GroupNode _culledObjectsGroup = new GroupNode("CulledObjects");
+
+    private Material _fullyVisibleMaterial;
+    private Material _partiallyVisibleMaterial;
+    private Material _hiddenMaterial;
+    
+    private int _visibleCount;
+    private int _partiallyVisibleCount;
+    private int _notVisibleCount;
+
+    private ICommonSampleUIElement? _visibleLabel;
+    private ICommonSampleUIElement? _partiallyVisibleLabel;
+    private ICommonSampleUIElement? _notVisibleLabel;
+
+    public FrustumCullingSample(ICommonSamplesContext context)
+        : base(context)
+    {
+        _fullyVisibleMaterial     = StandardMaterials.Green;
+        _partiallyVisibleMaterial = StandardMaterials.Orange;
+        _hiddenMaterial           = StandardMaterials.Red.SetOpacity(0.3f);
+    }
+
+    protected override void OnCreateScene(Scene scene)
+    {
+        var halfBoxSize = 5;
+        var boxSize = new Vector3(halfBoxSize * 2, halfBoxSize * 2, halfBoxSize * 2);
+
+        for (int x = 0; x < 10; x++)
+        {
+            for (int z = 0; z < 10; z++)
+            {
+                for (int y = 0; y < 4; y++)
+                {
+                    var centerPosition = new Vector3(-200 + 40 * x, y * 40, -200 + 40 * z);
+
+                    var boxModelNode = new BoxModelNode(centerPosition, boxSize, _fullyVisibleMaterial);
+                    _culledObjectsGroup.Add(boxModelNode);
+                }
+            }
+        }
+
+        scene.RootNode.Add(_culledObjectsGroup);
+
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged += OnCameraChanged;
+    }
+
+    private void OnCameraChanged(object? sender, EventArgs args)
+    {
+        UpdateVisibleBoxes();
+    }
+
+    ///// <inheritdoc />
+    //protected override void OnSceneViewInitialized(SceneView sceneView)
+    //{
+    //    base.OnSceneViewInitialized(sceneView);
+    //}
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged -= OnCameraChanged;
+
+        base.OnDisposed();
+    }
+
+    private void UpdateVisibleBoxes()
+    {
+        if (!_isFrustumCullingEnabled || Scene == null || SceneView?.Camera == null)
+            return;
+
+
+        SceneView.Camera.Update();
+        SceneView.UpdateCameraNearAndFarPlanes();
+        
+        //
+        // IMPORTANT TIP:
+        //
+        // When you have many 3D objects, do not check each object if it is visible or not.
+        // Instead, group the objects into lower number of groups (into GroupNode objects).
+        // Then calculate the bounding box of each group and hide the GroupNodes that are not visible.
+
+        // Create BoundingFrustum from the current camera
+        // BoundingFrustum is a struct, so we do not create a new object that would add pressure to GC
+        var boundingFrustum = BoundingFrustum.FromCamera(SceneView.Camera, Scene.IsRightHandedCoordinateSystem);
+
+
+        bool hasChanges = false;
+
+        float minDistance = float.MaxValue;
+        var corners = new Vector3[8];
+        var cameraPos = SceneView.Camera.GetCameraPosition();
+
+        foreach (var modelNode in _culledObjectsGroup.OfType<ModelNode>())        
+        {
+            var newVisibility = boundingFrustum.Contains(modelNode.WorldBoundingBox);
+
+            var newMaterial = newVisibility switch
+            {
+                ContainmentType.Disjoint   => _hiddenMaterial,
+                ContainmentType.Contains   => _fullyVisibleMaterial,
+                ContainmentType.Intersects => _partiallyVisibleMaterial,
+                _ => null
+            };
+
+            hasChanges |= modelNode.Material != newMaterial;
+            modelNode.Material = newMaterial; // This is a noop when we are setting the material to the same material
+
+            modelNode.WorldBoundingBox.GetCorners(corners);
+            foreach (var corner in corners)
+            {
+                var dist = (cameraPos - corner).Length();
+                if (dist < minDistance)
+                    minDistance = dist;
+            }
+        }
+
+        System.Diagnostics.Debug.WriteLine($"CameraPos: {SceneView.Camera.GetCameraPosition()}; Near: {SceneView.Camera.NearPlaneDistance};  MinDist: {minDistance}");
+
+
+        if (hasChanges)
+            UpdateStatistics();
+    }
+
+    private void UpdateStatistics()
+    {
+        _visibleCount = 0;
+        _partiallyVisibleCount = 0;
+        _notVisibleCount = 0;
+
+        foreach (var modelNode in _culledObjectsGroup.OfType<ModelNode>())        
+        {
+            if (modelNode.Material == _fullyVisibleMaterial)
+                _visibleCount++;
+            else if (modelNode.Material == _partiallyVisibleMaterial)
+                _partiallyVisibleCount++;
+            else if (modelNode.Material == _hiddenMaterial)
+                _notVisibleCount++;
+        }
+
+        _visibleLabel.UpdateValue();
+        _partiallyVisibleLabel.UpdateValue();
+        _notVisibleLabel.UpdateValue();
+    }
+
+    /// <inheritdoc />
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateCheckBox("Is frustum culling enabled", _isFrustumCullingEnabled, isChecked =>
+        {
+            _isFrustumCullingEnabled = isChecked;
+            if (isChecked)
+                UpdateVisibleBoxes();
+        });
+
+        ui.AddSeparator();
+
+        ui.CreateLabel("Statistics:");
+        _visibleLabel          = ui.CreateKeyValueLabel("Visible:", () => _visibleCount.ToString(), 150).SetColor(Colors.Green);
+        _partiallyVisibleLabel = ui.CreateKeyValueLabel("Partially visible:", () => _partiallyVisibleCount.ToString(), 150).SetColor(Colors.Orange);
+        _notVisibleLabel       = ui.CreateKeyValueLabel("Not visible:", () => _notVisibleCount.ToString(), 150).SetColor(Colors.Red);
+
+        UpdateStatistics();
+    }
+}
