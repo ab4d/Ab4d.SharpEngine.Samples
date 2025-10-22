@@ -8,7 +8,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 public class FrustumCullingSample : CommonSample
 {
     public override string Title => "Frustum culling";
-    public override string Subtitle => "Frustum culling can be used to determine is object is visible by the current camera.\n\nInstead of checking individual objects (that can take a long time), it is recommended to group objects into GroupNodes and then check only the visibility of GroupNodes.";
+    public override string Subtitle => "Frustum culling can be used to determine if object is visible by the current camera.\n\nInstead of checking individual objects (as done in this sample, but when thousand of objects are checked, that can take a long time), it is recommended to group objects into GroupNodes and then check only the visibility of GroupNodes.";
 
     private bool _isFrustumCullingEnabled = true;
 
@@ -21,10 +21,12 @@ public class FrustumCullingSample : CommonSample
     private int _visibleCount;
     private int _partiallyVisibleCount;
     private int _notVisibleCount;
+    private int _allObjectsCount;
 
     private ICommonSampleUIElement? _visibleLabel;
     private ICommonSampleUIElement? _partiallyVisibleLabel;
     private ICommonSampleUIElement? _notVisibleLabel;
+    
 
     public FrustumCullingSample(ICommonSamplesContext context)
         : base(context)
@@ -53,6 +55,8 @@ public class FrustumCullingSample : CommonSample
             }
         }
 
+        _allObjectsCount = _culledObjectsGroup.Count;
+
         scene.RootNode.Add(_culledObjectsGroup);
 
         // Manually call scene.Update. This will calculate WorldBoundingBox for each SceneNode.
@@ -60,7 +64,13 @@ public class FrustumCullingSample : CommonSample
         scene.Update();
 
         if (targetPositionCamera != null)
+        {
+            targetPositionCamera.TargetPosition = new Vector3(-26, 113, -22);
+            targetPositionCamera.Heading = -100;
+            targetPositionCamera.Attitude = -11;
+            targetPositionCamera.Distance = 180;
             targetPositionCamera.CameraChanged += OnCameraChanged;
+        }
     }
 
     private void OnCameraChanged(object? sender, EventArgs args)
@@ -108,9 +118,15 @@ public class FrustumCullingSample : CommonSample
             // it may take significant amount of time to do this check for thousands of objects.
             // In this case it is highly recommended to group object into GroupNodes and
             // then only check the visibilities of the GroupNodes.
-            var newVisibility = boundingFrustum.Contains(modelNode.WorldBoundingBox);
+            var frustumVisibility = boundingFrustum.Contains(modelNode.WorldBoundingBox);
 
-            var newMaterial = newVisibility switch
+            // NOTE:
+            // Usually you would set Visibility of the modelNode based on frustumVisibility (see commented line below).
+            // But in this sample we just change the material, so when you uncheck the "Is frustum culling enabled", 
+            // you can see which objects would be hidden.
+            // modelNode.Visibility = frustumVisibility != ContainmentType.Disjoint ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+
+            var newMaterial = frustumVisibility switch
             {
                 ContainmentType.Disjoint   => _hiddenMaterial,
                 ContainmentType.Contains   => _fullyVisibleMaterial,
@@ -147,24 +163,24 @@ public class FrustumCullingSample : CommonSample
         _notVisibleLabel?.UpdateValue();
     }
 
+    private string GetCountWithPercent(int count) => $"{count} ({((count * 100) / _allObjectsCount):N0}%)";
+
     /// <inheritdoc />
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateCheckBox("Is frustum culling enabled", _isFrustumCullingEnabled, isChecked =>
+        ui.CreateCheckBox("Is frustum culling enabled (?):Uncheck and then zoom out the camera to see which objects\nwere not visible in the frustum (have red material).", _isFrustumCullingEnabled, isChecked =>
         {
             _isFrustumCullingEnabled = isChecked;
             if (isChecked)
                 UpdateVisibleBoxes();
         });
 
-        ui.AddSeparator();
-
-        ui.CreateLabel("Statistics:");
-        _visibleLabel          = ui.CreateKeyValueLabel("Visible:", () => _visibleCount.ToString(), 150).SetColor(Colors.Green);
-        _partiallyVisibleLabel = ui.CreateKeyValueLabel("Partially visible:", () => _partiallyVisibleCount.ToString(), 150).SetColor(Colors.Orange);
-        _notVisibleLabel       = ui.CreateKeyValueLabel("Not visible:", () => _notVisibleCount.ToString(), 150).SetColor(Colors.Red);
+        ui.CreateLabel("Statistics:", isHeader: true);
+        _visibleLabel          = ui.CreateKeyValueLabel("Visible:",           () => GetCountWithPercent(_visibleCount), 120).SetColor(Colors.Green);
+        _partiallyVisibleLabel = ui.CreateKeyValueLabel("Partially visible:", () => GetCountWithPercent(_partiallyVisibleCount), 120).SetColor(Colors.Orange);
+        _notVisibleLabel       = ui.CreateKeyValueLabel("Not visible:",       () => GetCountWithPercent(_notVisibleCount), 120).SetColor(Colors.Red);
 
         UpdateStatistics();
     }
