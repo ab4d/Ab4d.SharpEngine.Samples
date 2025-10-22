@@ -55,6 +55,10 @@ public class FrustumCullingSample : CommonSample
 
         scene.RootNode.Add(_culledObjectsGroup);
 
+        // Manually call scene.Update. This will calculate WorldBoundingBox for each SceneNode.
+        // This is needed for correct frustum checks.
+        scene.Update();
+
         if (targetPositionCamera != null)
             targetPositionCamera.CameraChanged += OnCameraChanged;
     }
@@ -63,12 +67,6 @@ public class FrustumCullingSample : CommonSample
     {
         UpdateVisibleBoxes();
     }
-
-    ///// <inheritdoc />
-    //protected override void OnSceneViewInitialized(SceneView sceneView)
-    //{
-    //    base.OnSceneViewInitialized(sceneView);
-    //}
 
     /// <inheritdoc />
     protected override void OnDisposed()
@@ -85,7 +83,8 @@ public class FrustumCullingSample : CommonSample
             return;
 
 
-        SceneView.Camera.Update();
+        // Before creating the BoundingFrustum we need to update the near and far planes so that 
+        // the frustum will already incorporate the camera changes.
         SceneView.UpdateCameraNearAndFarPlanes();
         
         //
@@ -96,7 +95,7 @@ public class FrustumCullingSample : CommonSample
         // Then calculate the bounding box of each group and hide the GroupNodes that are not visible.
 
         // Create BoundingFrustum from the current camera
-        // BoundingFrustum is a struct, so we do not create a new object that would add pressure to GC
+        // BoundingFrustum is a struct, so here we do not create any new objects that would add pressure to GC
         var boundingFrustum = BoundingFrustum.FromCamera(SceneView.Camera, Scene.IsRightHandedCoordinateSystem);
 
 
@@ -104,6 +103,11 @@ public class FrustumCullingSample : CommonSample
 
         foreach (var modelNode in _culledObjectsGroup.OfType<ModelNode>())        
         {
+            // Check if the modelNode is visible in the boundingFrustum.
+            // Note that Contains method needs to perform any operations and because of this
+            // it may take significant amount of time to do this check for thousands of objects.
+            // In this case it is highly recommended to group object into GroupNodes and
+            // then only check the visibilities of the GroupNodes.
             var newVisibility = boundingFrustum.Contains(modelNode.WorldBoundingBox);
 
             var newMaterial = newVisibility switch
