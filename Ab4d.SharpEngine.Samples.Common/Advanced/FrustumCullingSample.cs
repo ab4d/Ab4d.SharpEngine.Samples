@@ -106,7 +106,7 @@ public class FrustumCullingSample : CommonSample
 
         // Create BoundingFrustum from the current camera
         // BoundingFrustum is a struct, so here we do not create any new objects that would add pressure to GC
-        var boundingFrustum = BoundingFrustum.FromCamera(SceneView.Camera, Scene.IsRightHandedCoordinateSystem);
+        var boundingFrustum = BoundingFrustum.FromCamera(SceneView.Camera);
 
 
         bool hasChanges = false;
