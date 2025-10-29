@@ -15,9 +15,8 @@ public class MaterialsSample : CommonSample
     public override string Subtitle => "See code behind to see different ways to assign each material type";
 
     private GroupNode? _testModelsGroup;
-    private StandardMesh? _sphereMesh;
-    private StandardMesh? _boxMesh;
     private MeshModelNode? _vertexColorModelNode;
+    private StandardMesh[] _meshes = new StandardMesh[3];
 
 
     public MaterialsSample(ICommonSamplesContext context)
@@ -29,8 +28,13 @@ public class MaterialsSample : CommonSample
     {
         int sphereRadius = 30;
 
-        _sphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: sphereRadius);
-        _boxMesh    = MeshFactory.CreateBoxMesh(new Vector3(0, 0, 0), new Vector3(60, 25, 50));
+        var sphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: sphereRadius);
+        var boxMesh    = MeshFactory.CreateBoxMesh(new Vector3(0, 0, 0), new Vector3(60, 25, 50));
+        var planeMesh  = MeshFactory.CreatePlaneMesh(new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 0), 60, 50);
+
+        _meshes[0] = sphereMesh;
+        _meshes[1] = boxMesh;
+        _meshes[2] = planeMesh;
 
         // Set VertexColors to meshes so that we can use VertexColorMaterial to render those two meshes
         
@@ -42,11 +46,14 @@ public class MaterialsSample : CommonSample
         // boxMesh.UpdateDataChannel(MeshDataChannelTypes.VertexColors);
         // after changing the data for the changes to take effect.
 
-        var vertexColors = GetSphereVertexColors(_sphereMesh, sphereRadius);
-        _sphereMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
+        var vertexColors = GetSphereVertexColors(sphereMesh, sphereRadius);
+        sphereMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
 
-        vertexColors = GetBoxVertexColors(_boxMesh);
-        _boxMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
+        vertexColors = GetBoxVertexColors(boxMesh);
+        boxMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
+        
+        vertexColors = GetBoxVertexColors(planeMesh);
+        planeMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
 
 
         var textBlockFactory = context.GetTextBlockFactory();
@@ -86,7 +93,7 @@ public class MaterialsSample : CommonSample
         //material1 = new StandardMaterial(Color3.FromByteRgb(red: 255, green: 165, blue: 0));
 
 
-        var modelNode1 = new MeshModelNode(_sphereMesh, material1, "DiffuseMaterialModel")
+        var modelNode1 = new MeshModelNode(sphereMesh, material1, "DiffuseMaterialModel")
         {
             Transform = new TranslateTransform(-250, 0, 0)
         };
@@ -121,7 +128,7 @@ public class MaterialsSample : CommonSample
         //    SpecularPower = 32
         //};
 
-        var modelNode2 = new MeshModelNode(_sphereMesh, material2, "SpecularMaterialModel")
+        var modelNode2 = new MeshModelNode(sphereMesh, material2, "SpecularMaterialModel")
         {
             Transform = new TranslateTransform(-150, 0, 0)
         };
@@ -216,7 +223,7 @@ public class MaterialsSample : CommonSample
         //}, this.BitmapIO);
 
 
-        var modelNode3 = new MeshModelNode(_sphereMesh, material3, "TextureMaterialModel")
+        var modelNode3 = new MeshModelNode(sphereMesh, material3, "TextureMaterialModel")
         {
             Transform = new TranslateTransform(-50, 0, 0)
         };
@@ -248,9 +255,21 @@ public class MaterialsSample : CommonSample
         //    Opacity = 0.5f
         //};
 
-        var modelNode4 = new MeshModelNode(_sphereMesh, material4, "SemiTransparentModel")
+        var modelNode4 = new MeshModelNode(sphereMesh, material4, "SemiTransparentModel")
         {
-            BackMaterial = material4, // Because we can see inside the Model, we also set the BackMaterial that will render the back sides of the triangles
+            // Because we can see inside the Model, we also set the BackMaterial that will render the back sides of the triangles.
+            // Note that this renders this object two times:
+            // 1) back material is rendered
+            // 2) front material is rendered
+            // Note that this produces different result compared to using only front material that has IsTwoSided set to true.
+            // In that case both front and back sides are rendered at the same time so the order of triangles is important
+            // and determines when the back side will be visible through the front side.
+            //
+            // So, it is twice faster to set only front material with IsTwoSided = true, but in some cases
+            // the results are more correct when setting both front and back material to the same material.
+            // To see that, compare the initial rendering of SemiTransparentModel with the rendering when using 
+            // TwoSidedMaterial (in this case rotate the camera around to see when the inner triangles are visible and when not).
+            BackMaterial = material4, 
             Transform = new TranslateTransform(50, 0, 0)
         };
 
@@ -281,20 +300,26 @@ public class MaterialsSample : CommonSample
         //var positionColors = GetSphereVertexColors(_sphereMesh, sphereRadius);
         //var vertexColorMaterial = new VertexColorMaterial(positionColors, "SphereVertexColorMaterial");
 
+        // By default, the VertexColorMaterial is rendered as a solid color material where the colors are defined for each vertex.
+        // This does not use any light shading (dimming the pixels based on the light direction).
+        // Also, specular effects are not rendered.
+        // To use light shading and render specular effects, set IsSolidColor to false (and SpecularPower to some value > 0).
+        // Uncomment the IsSolidColor and SpecularPower below, to test that.
+
         // When using transparent colors (alpha < 1) for VertexColorMaterial,
         // then the HasTransparency property on the VertexColorMaterial must be set to true.
         //
         // By default, the colors are not pre-multiplied by alpha value,
         // but if you want to use alpha pre-multiplied colors, then set the IsPreMultiplyAlpha property on VertexColorMaterial to true.
 
-        var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial");
+        var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial")
+        {
+            //HasTransparency = true, // Set HasTransparency to true when vertex colors have alpha < 1
+            //IsSolidColor = false,   // Set to false to enable light shading
+            //SpecularPower = 12,     // Set SpecularPower > 0 to enable specular highlights. IsSolidColor must also be set to false.
+        };
 
-        // NOTE:
-        // VertexColorMaterial also supports IsTwoSided property.
-        // When it is true, the front and back triangles are rendered with one draw call.
-        //vertexColorMaterial.IsTwoSided = true;
-        
-        _vertexColorModelNode = new MeshModelNode(_sphereMesh, vertexColorMaterial, "VertexColorModel")
+        _vertexColorModelNode = new MeshModelNode(sphereMesh, vertexColorMaterial, "VertexColorModel")
         {
             Transform = new TranslateTransform(150, 0, 0)
         };
@@ -321,12 +346,7 @@ public class MaterialsSample : CommonSample
 
         var solidColorMaterial = new SolidColorMaterial(Colors.Orange, "SolidColorMaterial");
 
-        // NOTE:
-        // SolidColorMaterial also supports IsTwoSided property.
-        // When it is true, the front and back triangles are rendered with one draw call.
-        //solidColorMaterial.IsTwoSided = true;
-
-        var modelNode6 = new MeshModelNode(_sphereMesh, solidColorMaterial, "SolidColorModel")
+        var modelNode6 = new MeshModelNode(sphereMesh, solidColorMaterial, "SolidColorModel")
         {
             Transform = new TranslateTransform(250, 0, 0)
         };
@@ -411,7 +431,7 @@ public class MaterialsSample : CommonSample
             float blue = (position.Z - boxBounds.Minimum.Z) / boxBounds.SizeZ;
 
             // Set Color this position
-            positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
+            positionColors[i] = new Color4(red, green, blue, alpha: 0.3f);
 
             // When using transparent colors (alpha < 1) for VertexColorMaterial,
             // then the HasTransparency property on the VertexColorMaterial must be set to true.
@@ -423,22 +443,25 @@ public class MaterialsSample : CommonSample
         return positionColors;
     }
 
-    private void UpdateMesh(bool isSphereMesh)
+    private void UpdateMesh(int meshIndex)
     {
-        if (_testModelsGroup == null || _sphereMesh == null || _boxMesh == null)
+        if (_testModelsGroup == null)
             return;
 
         foreach (var sceneNode in _testModelsGroup)
         {
             if (sceneNode is MeshModelNode meshModelNode)
-                meshModelNode.Mesh = isSphereMesh ? _sphereMesh : _boxMesh;
+                meshModelNode.Mesh = _meshes[meshIndex];
         }
     }
     
-    private void UpdateFrontBackMaterial(bool isFrontMaterial)
+    private void UpdateFrontBackMaterial(bool isTwoSided, bool isFrontMaterial)
     {
         if (_testModelsGroup == null)
             return;
+
+        if (isTwoSided)
+            isFrontMaterial = true; // When we set the material to be two-sided, then we just set the material to the Material property and set BackMaterial to null.
 
         foreach (var sceneNode in _testModelsGroup)
         {
@@ -446,33 +469,29 @@ public class MaterialsSample : CommonSample
             {
                 var material = modelNode.Material ?? modelNode.BackMaterial;
 
+                if (material is ITwoSidedMaterial twoSidedMaterial)
+                    twoSidedMaterial.IsTwoSided = isTwoSided;
+
                 if (isFrontMaterial)
                 {
-                    modelNode.Material     = material;
+                    modelNode.Material = material;
                     modelNode.BackMaterial = null;
-
                 }
                 else
                 {
-                    modelNode.Material     = null;
+                    modelNode.Material = null;
                     modelNode.BackMaterial = material;
                 }
             }
         }
-        
-        // NOTE:
-        // SolidColorMaterial supports IsTwoSided property.
-        // When it is true, the front and back triangles are rendered with one draw call.
-        // This is the same as Material and BackMaterial are set to the same material, but it renders twice as fast.
-        //solidColorMaterial.IsTwoSided = true;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateRadioButtons(new string[] { "Sphere", "Box" }, 
-            (selectedIndex, selectedText) => UpdateMesh(isSphereMesh: selectedIndex == 0), 
+        ui.CreateRadioButtons(new string[] { "Sphere", "Box", "Plane" }, 
+            (selectedIndex, selectedText) => UpdateMesh(meshIndex: selectedIndex), 
             selectedItemIndex: 0);
 
         ui.AddSeparator();
@@ -480,9 +499,10 @@ public class MaterialsSample : CommonSample
         ui.CreateRadioButtons(new string[]
             {
                 "Set front material (?):Sets the material to the Material property that shows the material on the front side of the triangles.", 
-                "Set back material (?):Sets the material to the BackMaterial property that shows the material on the back side of the triangles."
+                "Set back material (?):Sets the material to the BackMaterial property that shows the material on the back side of the triangles.",
+                "Two sided material (?):Renders both front and back side of the material with one draw call."
             }, 
-            (selectedIndex, selectedText) => UpdateFrontBackMaterial(isFrontMaterial: selectedIndex == 0), 
+            (selectedIndex, selectedText) => UpdateFrontBackMaterial(isTwoSided: selectedIndex == 2, isFrontMaterial: selectedIndex == 0), 
             selectedItemIndex: 0);
     }
 }
