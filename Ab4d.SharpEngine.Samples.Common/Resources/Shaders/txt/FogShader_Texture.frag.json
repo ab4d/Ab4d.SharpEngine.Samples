@@ -88,7 +88,7 @@
                 }
             ]
         },
-        "_68" : {
+        "_97" : {
             "name" : "sceneUniformBuffer",
             "members" : [
                 {
@@ -154,7 +154,7 @@
                 }
             ]
         },
-        "_94" : {
+        "_121" : {
             "name" : "Light",
             "members" : [
                 {
@@ -195,7 +195,7 @@
                 }
             ]
         },
-        "_97" : {
+        "_124" : {
             "name" : "Light",
             "members" : [
                 {
@@ -245,12 +245,12 @@
                 }
             ]
         },
-        "_99" : {
+        "_126" : {
             "name" : "AllLightsBuffer",
             "members" : [
                 {
                     "name" : "allLights",
-                    "type" : "_97",
+                    "type" : "_124",
                     "array" : [
                         0
                     ],
@@ -265,6 +265,11 @@
     },
     "inputs" : [
         {
+            "type" : "vec2",
+            "name" : "inUV",
+            "location" : 2
+        },
+        {
             "type" : "vec3",
             "name" : "inNormalW",
             "location" : 1
@@ -273,11 +278,6 @@
             "type" : "vec3",
             "name" : "inPosW",
             "location" : 0
-        },
-        {
-            "type" : "vec2",
-            "name" : "inUV",
-            "location" : 2
         }
     ],
     "outputs" : [
@@ -285,6 +285,14 @@
             "type" : "vec4",
             "name" : "outColor",
             "location" : 0
+        }
+    ],
+    "textures" : [
+        {
+            "type" : "sampler2D",
+            "name" : "samplerDiffuseTexture",
+            "set" : 3,
+            "binding" : 1
         }
     ],
     "ssbos" : [
@@ -297,7 +305,7 @@
             "binding" : 0
         },
         {
-            "type" : "_99",
+            "type" : "_126",
             "name" : "AllLightsBuffer",
             "readonly" : true,
             "block_size" : 0,
@@ -307,7 +315,7 @@
     ],
     "ubos" : [
         {
-            "type" : "_68",
+            "type" : "_97",
             "name" : "sceneUniformBuffer",
             "block_size" : 132,
             "set" : 0,

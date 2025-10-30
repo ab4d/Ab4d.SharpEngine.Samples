@@ -70,6 +70,7 @@ setup_directories
 
 compile_shader "FogShader" "vert" "" ""
 compile_shader "FogShader" "frag" "" ""
+compile_shader "FogShader" "frag" "Texture" "-DUSE_DIFFUSE_TEXTURE"
 compile_shader "HsvColorPostProcessShader" "frag" "" ""
 
 read -p "Press enter to continue"

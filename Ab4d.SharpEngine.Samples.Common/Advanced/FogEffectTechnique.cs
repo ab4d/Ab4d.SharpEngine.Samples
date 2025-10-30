@@ -109,9 +109,9 @@ public class FogEffectTechnique : EffectTechnique
     {
         // Set default values
         InputAssemblyState        = CommonStatesManager.TriangleListInputAssemblyState;
-        RasterizationState        = CommonStatesManager.CullClockwise;
-        ColorBlendAttachmentState = CommonStatesManager.OpaqueAttachmentState;
-        DepthStencilState         = CommonStatesManager.DepthReadWrite;
+        RasterizationState        = scene.DefaultRasterizerState; // CommonStatesManager.CullCounterClockwise;
+        ColorBlendAttachmentState = scene.DefaultBlendState; // CommonStatesManager.OpaqueAttachmentState;
+        DepthStencilState         = scene.DefaultOpaqueDepthStencilState; //CommonStatesManager.DepthReadWrite;
 
         TessellationState = new PipelineTessellationStateCreateInfo()
         {

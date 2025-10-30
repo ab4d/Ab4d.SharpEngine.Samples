@@ -1,7 +1,8 @@
 Entry points:
-  main (vertex)
+  main (fragment)
 
 Execution modes:
+  OriginUpperLeft
 
 subpass inputs
 =============
@@ -11,22 +12,21 @@ subpass inputs
 inputs
 =============
 
- ID 031 : inPosition (Location : 0)
- ID 058 : inNormal (Location : 1)
- ID 070 : inUV (Location : 2)
+ ID 061 : inUV (Location : 2)
+ ID 090 : inNormalW (Location : 1)
+ ID 103 : inPosW (Location : 0)
 =============
 
 outputs
 =============
 
- ID 053 : outWorldPos (Location : 0)
- ID 056 : outNormal (Location : 1)
- ID 068 : outUV (Location : 2)
+ ID 211 : outColor (Location : 0)
 =============
 
 textures
 =============
 
+ ID 057 : samplerDiffuseTexture (Set : 3) (Binding : 1)
 =============
 
 separate images
@@ -47,19 +47,20 @@ images
 ssbos
 =============
 
- ID 014 : modelMatricesBuffer (Set : 2) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 64 bytes)
+ ID 029 : FogMaterialsBuffer (Set : 3) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 48 bytes)
+ ID 128 : AllLightsBuffer (Set : 1) (Binding : 0) readonly (BlockSize : 0 bytes) (Unsized array stride: 80 bytes)
 =============
 
 ubos
 =============
 
- ID 045 : sceneUniformBuffer (Set : 0) (Binding : 0) (BlockSize : 132 bytes)
+ ID 099 : sceneUniformBuffer (Set : 0) (Binding : 0) (BlockSize : 132 bytes)
 =============
 
 push
 =============
 
- ID 019 : pushConstants
+ ID 011 : pushConstants
 =============
 
 counters
@@ -90,13 +91,12 @@ builtin inputs
 builtin outputs
 =============
 
-Builtin Position (float4) (active: yes).
 =============
 
 Active members in buffer: pushConstants
 ==================
 
-Member #  0 (matrixIndex): Offset:    0, Range:    4
+Member #  0 (materialIndex): Offset:    4, Range:    4
 ==================
 
 Specialization constants

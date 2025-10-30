@@ -59,11 +59,18 @@ struct FogMaterial
 	float fogStart;
 	float fogFullColorStart;
 	vec3 fogColor;
+
+	float alphaClipThreshold;
 };
 
 layout(set = 3, binding = 0) readonly buffer FogMaterialsBuffer {
   FogMaterial materials[];
 } materialsBuffer;
+
+
+#ifdef USE_DIFFUSE_TEXTURE
+layout (set = 3, binding = 1) uniform sampler2D samplerDiffuseTexture;
+#endif
 
 
 layout(push_constant) uniform indexSetup {
@@ -96,15 +103,29 @@ void main()
 	int materialIndex = pushConstants.materialIndex;
     int usedMaterialIndex = abs(materialIndex);
 	FogMaterial material = materialsBuffer.materials[usedMaterialIndex];
+
 	
-		// When pushConstants.materialIndex is negative, we need to multiply normal by minus 1.
+	// Start with color from the material
+	vec4 diffuseColor = material.diffuseColor; 
+
+#ifdef USE_DIFFUSE_TEXTURE
+	// When using textures discard the pixel (when using alphaClipThreshold) before any lighting calculations
+	diffuseColor *= texture(samplerDiffuseTexture, inUV);
+
+	// It may seem that the next if is redundant 
+	// but if the alphaClipThreshold is 0, we want to always write to depth buffer even if alpha is 0.
+	// Without this if, the depth buffer would not be changed if pixel is clipped.
+	if (material.alphaClipThreshold > 0 && diffuseColor.a < material.alphaClipThreshold)
+		discard; 
+#endif
+
+	
+	// When pushConstants.materialIndex is negative, we need to multiply normal by minus 1.
 	float multiplyNormal = sign(materialIndex); // sign returns -1 or +1
 
 	// Interpolating normal can unnormalize it, so normalize it; then we multiply by multiplyNormal
 	vec3 normal = normalize(inNormalW) * multiplyNormal;
 
-	
-	vec4 diffuseColor = material.diffuseColor;
 	
 	vec3 toEye = normalize(scene.eyePosW - inPosW);	
 	

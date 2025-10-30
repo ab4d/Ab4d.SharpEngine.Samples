@@ -20,11 +20,14 @@ public class FogEffect : Effect
 
     private FogEffectTechnique? _standardTechnique;
 
-    // All possible techniques for this effect: normal, transparent, back-face, back-face transparent
-    private readonly FogEffectTechnique?[] _effectTechniques = new FogEffectTechnique[4];
+    // All possible techniques for this effect - see GetEffectTechniqueIndex to get the max possible index
+    private readonly FogEffectTechnique?[] _effectTechniques = new FogEffectTechnique[16];
 
     private PipelineShaderStageCreateInfo[]? _pipelineShaderStages;
+    private PipelineShaderStageCreateInfo[]? _texturePipelineShaderStages;
     private PipelineLayout _pipelineLayout;
+    private PipelineLayout _texturedPipelineLayout;
+
     private VertexBufferDescription? _vertexBufferDescription;
 
     private VulkanDescriptorSetFactory? _standardDescriptorPoolFactory;
@@ -33,6 +36,9 @@ public class FogEffect : Effect
     private GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>? _materialsDataBlockPool;
     private DisposeToken _materialsDataBlockPoolDisposeToken;
     private DescriptorSetLayout _fogMaterialsDescriptorSetLayout;
+
+    private DescriptorSetsCache? _textureDescriptorSetsCache;
+
     private int _swapChainImageIndex;
 
 
@@ -53,7 +59,7 @@ public class FogEffect : Effect
         public Color3 FogColor;
 
         [FieldOffset(44)]
-        private float _dummy; // added to align the size to 16 bytes
+        public float AlphaClipThreshold;
 
         public const int SizeInBytes = 48;
     }
@@ -191,17 +197,12 @@ public class FogEffect : Effect
             UpdateMaterialData(fogMaterial);
     }
 
+    // NOTE: This may be called on another thread when called from destructor
+    /// <inheritdoc />
     public override void DisposeMaterial(Material material)
     {
-        lock (this) // lock access because this may be modified from another thread when DisposeMaterial is called from destructor
-        {
-            EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
-            _materialsDataBlockPool.FreeMaterialMemoryBlocks(material);
-
-            this.Scene.NotifyChange(SceneDirtyFlags.MaterialDisposed);
-        }
-
-        Log.Trace?.Write(LogArea, Id, "Material disposed id: {0} (name: {1})", material.Id, material.Name ?? "");
+        // Use helper DisposeMaterial method that will free the memory blocks and clear descriptor sets from _textureDescriptorSetsCache
+        DisposeMaterial(material, _materialsDataBlockPool, _textureDescriptorSetsCache);
     }
 
     public override void ApplyRenderingItemMaterial(RenderingItem renderingItem, Material material, RenderingContext renderingContext)
@@ -214,15 +215,40 @@ public class FogEffect : Effect
 
         CheckIfDisposed();
 
+        var gpuDevice = renderingContext.GpuDevice;
+
         bool hasTransparency = false;
+        bool hasTexture = false;
+        bool isPreMultipliedAlpha = true;
+        GpuImage? diffuseTexture = null;
+        GpuSampler? diffuseTextureSampler = null;
 
         bool isFrontClockwise = (renderingItem.Flags & RenderingItemFlags.IsBackFaceMaterial) != 0;
         if (!renderingContext.Scene.IsRightHandedCoordinateSystem)
             isFrontClockwise = !isFrontClockwise;
 
+        if (material is IDiffuseTextureMaterial diffuseTextureMaterial)
+        {
+            diffuseTexture = diffuseTextureMaterial.DiffuseTexture;
+
+            if (diffuseTexture != null)
+            {
+                isPreMultipliedAlpha = diffuseTexture.IsPreMultipliedAlpha; 
+
+                diffuseTextureSampler = diffuseTextureMaterial.DiffuseTextureSampler;
+                if (diffuseTextureSampler == null && diffuseTextureMaterial.DiffuseTextureSamplerType != CommonSamplerTypes.Other)
+                {
+                    // Get texture sampler from DiffuseTextureSamplerType
+                    diffuseTextureSampler = gpuDevice.SamplerFactory.GetSampler(diffuseTextureMaterial.DiffuseTextureSamplerType);
+                }
+
+                hasTexture = diffuseTextureSampler != null;
+            }
+        }
+
         // Different Vulkan Pipeline objects are required for different values of hasTransparency, isFrontCounterClockwise
         // The GetEffectTechnique gets or creates the required EffectTechnique.
-        var effectTechnique = GetEffectTechnique(hasTransparency, isFrontClockwise, renderingContext, out var techniqueIndex);
+        var effectTechnique = GetEffectTechnique(hasTransparency, isFrontClockwise, hasTexture, isPreMultipliedAlpha, renderingContext, out var techniqueIndex);
 
         if (effectTechnique != null && effectTechnique.Pipeline.IsNull())
             effectTechnique.CreatePipeline(renderingContext, PipelineCreateFlags.AllowDerivatives, effectTechnique.Name);
@@ -239,11 +265,18 @@ public class FogEffect : Effect
 
         var materialDataBlock = _materialsDataBlockPool.GetMemoryBlockOrDefault(dataBlockIndex, materialDataIndex);
 
-        if (materialDataBlock != null)
-            descriptorSets = materialDataBlock.DescriptorSets;
+        if (diffuseTexture != null && diffuseTextureSampler != null && materialDataBlock != null && _textureDescriptorSetsCache != null) // "if (hasTexture)" would be used, this would get a compiler warning that diffuseTexture may be null
+        {
+            descriptorSets = _textureDescriptorSetsCache.GetDescriptorSets(materialDataBlock.GpuBuffers, diffuseTexture, diffuseTextureSampler);
+        }
         else
-            descriptorSets = null;
-            
+        {
+            if (materialDataBlock != null)
+                descriptorSets = materialDataBlock.DescriptorSets;
+            else
+                descriptorSets = null;
+        }
+
         renderingItem.MaterialDescriptorSets = descriptorSets;
 
 
@@ -292,7 +325,14 @@ public class FogEffect : Effect
         EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
 
         // Dispose empty memory blocks
-        _materialsDataBlockPool.Cleanup(increaseFrameNumber, freeEmptyMemoryBlocks, memoryBlockDisposedCallback: null);
+        _materialsDataBlockPool.Cleanup(increaseFrameNumber, freeEmptyMemoryBlocks, OnMemoryBlockDisposed);
+    }
+
+    // Clears the _textureDescriptorSets after a memory block was disposed
+    private void OnMemoryBlockDisposed(int disposedMemoryBlockIndex, GpuBuffer[] disposedGpuBuffers)
+    {
+        if (_textureDescriptorSetsCache != null)
+            _textureDescriptorSetsCache.FreeDescriptorSetsForDataBuffers(disposedGpuBuffers);
     }
 
     private void EnsureStandardTechniqueWithPipeline(RenderingContext renderingContext)
@@ -304,11 +344,9 @@ public class FogEffect : Effect
         {
             _standardTechnique = new FogEffectTechnique(Scene, "FogEffect-StandardTechnique")
             {
-                VertexInputStatePtr                         = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
-                ShaderStages                                = _pipelineShaderStages,
-                PipelineLayout                              = _pipelineLayout,
-                ColorBlendAttachmentState                   = CommonStatesManager.OpaqueAttachmentState,
-                RasterizationState                          = CommonStatesManager.CullClockwise,
+                VertexInputStatePtr = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
+                ShaderStages = _pipelineShaderStages,
+                PipelineLayout = _pipelineLayout,
                 UseNegativeMaterialIndexForBackFaceMaterial = true
             };
 
@@ -320,7 +358,7 @@ public class FogEffect : Effect
         _standardTechnique.PipelineLayout = _pipelineLayout;
     }
 
-    private FogEffectTechnique? GetEffectTechnique(bool hasTransparency, bool isFrontClockwise, RenderingContext renderingContext, out int techniqueIndex)
+    private FogEffectTechnique? GetEffectTechnique(bool hasTransparency, bool isFrontClockwise, bool hasTexture, bool isPreMultipliedAlpha, RenderingContext renderingContext, out int techniqueIndex)
     {
         if (_vertexBufferDescription == null)
         {
@@ -336,7 +374,7 @@ public class FogEffect : Effect
         EnsureStandardTechniqueWithPipeline(renderingContext);
 
 
-        techniqueIndex = GetEffectTechniqueIndex(hasTransparency, isFrontClockwise);
+        techniqueIndex = GetEffectTechniqueIndex(hasTransparency, isFrontClockwise, hasTexture, isPreMultipliedAlpha);
         var effectTechnique = _effectTechniques[techniqueIndex];
         
         if (effectTechnique == null)
@@ -349,24 +387,44 @@ public class FogEffect : Effect
             {
                 string techniqueName = (hasTransparency ? "Transparent" : "") +
                                        (isFrontClockwise ? "FrontClockwise" : "") +
+                                       (hasTexture ? "Texture" : "") +
+                                       (hasTexture && !isPreMultipliedAlpha ? "NonPreMultipliedAlpha" : "") +
                                        "Technique";
 
                 Log.Trace?.Write(LogArea, Id, "Creating EffectTechnique: FogEffect-{0} (index: {1})", techniqueName, techniqueIndex);
 
+
+                PipelineShaderStageCreateInfo[]? shaderStages;
+                PipelineLayout pipelineLayout;
+
+                if (hasTexture)
+                {
+                    EnsureTexturedLayout();
+                    shaderStages   = _texturePipelineShaderStages;
+                    pipelineLayout = _texturedPipelineLayout;
+                }
+                else
+                {
+                    shaderStages   = _pipelineShaderStages;
+                    pipelineLayout = _pipelineLayout;
+                }
+
                 effectTechnique = new FogEffectTechnique(this.Scene, "FogEffect-" + techniqueName)
                 {
-                    VertexInputStatePtr                         = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
-                    ShaderStages                                = _pipelineShaderStages,
-                    PipelineLayout                              = _pipelineLayout,
+                    VertexInputStatePtr = _vertexBufferDescription.PipelineVertexInputStateCreateInfoPtr,
+                    ShaderStages = shaderStages,
+                    PipelineLayout = pipelineLayout,
                     UseNegativeMaterialIndexForBackFaceMaterial = true
                 };
 
                 if (hasTransparency)
                 {
-                    //if (isPreMultipliedAlpha)
+                    if (isPreMultipliedAlpha)
                         effectTechnique.ColorBlendAttachmentState = CommonStatesManager.PremultipliedAlphaBlendAttachmentState;
-                    //else
-                    //    effectTechnique.ColorBlendAttachmentState = CommonStatesManager.NonPremultipliedAlphaBlendAttachmentState;
+                    else
+                        effectTechnique.ColorBlendAttachmentState = CommonStatesManager.NonPremultipliedAlphaBlendAttachmentState;
+
+                    effectTechnique.DepthStencilState = Scene.DefaultTransparentDepthStencilState;
                 }
                 
                 if (isFrontClockwise)
@@ -388,11 +446,13 @@ public class FogEffect : Effect
         return effectTechnique;
     }
 
-    private int GetEffectTechniqueIndex(bool hasTransparency, bool isFrontCounterClockwise)
+    private int GetEffectTechniqueIndex(bool hasTransparency, bool isFrontCounterClockwise, bool hasTexture, bool isPreMultipliedAlpha)
     {
         // 0 is _standardTechnique
         return (hasTransparency ? 1 : 0) +
-               (isFrontCounterClockwise ? 2 : 0); // is back material
+               (isFrontCounterClockwise ? 2 : 0) + // is back material
+               (hasTexture ? 4 : 0) +
+               ((isPreMultipliedAlpha && hasTexture) ? 8 : 0);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -418,6 +478,42 @@ public class FogEffect : Effect
         // MinBlockSize and MaxBlockSize are by default set to:
         //_materialsDataBlockPool.MinBlockSize = 4096;  // 4 Kb
         //_materialsDataBlockPool.MaxBlockSize = 65536; // 64 Kb
+    }
+
+    [MemberNotNull(nameof(_texturePipelineShaderStages))]
+    private void EnsureTexturedLayout()
+    {
+        if (_texturePipelineShaderStages != null)
+            return;
+        
+        CheckIfInitialized();
+        var gpuDevice = Scene.GpuDevice!;
+
+        _textureDescriptorSetsCache = new DescriptorSetsCache(
+            gpuDevice,
+            descriptorTypes: new[] { DescriptorType.StorageBuffer, DescriptorType.CombinedImageSampler },
+            stageFlags: ShaderStageFlags.Fragment,
+            initialPoolCapacity: 8,
+            name: "FogEffectTextureDescriptorSet");
+
+
+        _texturedPipelineLayout = gpuDevice.CreatePipelineLayout(
+            descriptorSetLayout: new[] { Scene.SceneDescriptorSetLayout,
+                                         Scene.AllLightsDescriptorSetLayout,
+                                         Scene.AllWorldMatricesDescriptorSetLayout,
+                                         _textureDescriptorSetsCache.DescriptorSetLayout },
+            vertexPushConstantsSize: Scene.StandardVertexShaderPushConstantsSize,     // = 4
+            fragmentPushConstantsSize: Scene.StandardFragmentShaderPushConstantsSize, // = 4
+            name: "FogEffect-TexturedPipelineLayout");       
+        
+
+        var fragmentShaderStageInfo = gpuDevice.ShadersManager.GetOrCreatePipelineShaderStage("FogShader_Texture.frag.spv", ShaderStageFlags.Fragment, "main");
+
+        _texturePipelineShaderStages = new[]
+        {
+            _pipelineShaderStages![0], // = vertexShaderStageInfo from OnInitializeDeviceResources
+            fragmentShaderStageInfo
+        };            
     }
 
     private void UpdateMaterialData(FogMaterial fogMaterial)
@@ -460,9 +556,29 @@ public class FogEffect : Effect
         blockData[materialDataIndex].FogStart           = fogMaterial.FogStart;
         blockData[materialDataIndex].FogFullColorStart  = fogMaterial.FogFullColorStart;
         blockData[materialDataIndex].FogColor           = fogMaterial.FogColor;
+        
+        blockData[materialDataIndex].AlphaClipThreshold = fogMaterial.AlphaClipThreshold;
 
         // Mark that we need to copy the _materialsData to the _materialUniformBuffers
         materialDataBlock.MarkDataChanged();
+    }
+
+    // NOTE: This may be called on another thread when called from destructor
+    /// <summary>
+    /// Disposes the descriptor set that was created by GetDescriptorSetForTexture method.
+    /// </summary>
+    /// <param name="materialBlockIndex">materialBlockIndex</param>
+    /// <param name="diffuseTexture">GpuTexture</param>
+    /// <param name="diffuseTextureSampler">GpuSampler</param>
+    public void DisposeDescriptorSetForTexture(int materialBlockIndex, GpuImage diffuseTexture, GpuSampler diffuseTextureSampler)
+    {
+        if (_materialsDataBlockPool == null || _textureDescriptorSetsCache == null)
+            return;
+            
+        var materialDataBlock = _materialsDataBlockPool.GetMemoryBlockOrDefault(materialBlockIndex);
+            
+        if (materialDataBlock != null)
+            _textureDescriptorSetsCache.FreeDescriptorSets(materialDataBlock.GpuBuffers, diffuseTexture, diffuseTextureSampler);
     }
 
     /// <inheritdoc />
@@ -508,6 +624,12 @@ public class FogEffect : Effect
             {
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_fogMaterialsDescriptorSetLayout.Handle, typeof(DescriptorSetLayout));
                 _fogMaterialsDescriptorSetLayout = DescriptorSetLayout.Null;
+            }
+
+            if (_textureDescriptorSetsCache != null)
+            {
+                _textureDescriptorSetsCache.Dispose();
+                _textureDescriptorSetsCache = null;
             }
 
             if (_materialsDataBlockPool != null)

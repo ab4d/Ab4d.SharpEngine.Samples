@@ -31,7 +31,6 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 //
 // - Using Vulkan is much more complicated than OpenGL (WebGL) or DirectX.
 //   Please try to understand how Vulkan rendering works before start doing any bigger changed to this sample.
-//   Please do not ask me to help you with writing Vulkan code. This would take too much of my time.
 //
 // - Simple changes can be done by changing the fragment shader (Resources/Shaders/FogShader.frag.glsl)
 //   You can add additional code to the shader and add new properties to the FogMaterial.
@@ -39,26 +38,28 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 //   Based on that update the FogMaterialUniformBuffer struct in FogEffect.
 //   Then add new properties to FogMaterial and then update the FogEffect.UpdateMaterialData method.
 //   Such changes can be done quite easily.
-//   Adding textures support or some other bigger pipeline changes are much harder to implement and
-//   require good knowledge of Vulkan programming.
 //  
 // - For simple debugging of the shaders update the fragment shader to write fixed colors values or
 //   color values based on some properties (for example normal vector).
 //
 // - For advanced debugging Use RenderDoc application (free and available from https://renderdoc.org/).
-//   You will need to use WPF or Generic SDL / Gltf (Ab4d.SharpEngine.Samples.CrossPlatform.sln) to 
-//   debug the Vulkan shaders. Using Avalonia will not work because Avalonia is using OpenGL to render its UI.
+//   You will need to use WPF, Avalonia with Vulkan backend or SDL / Gltf project to 
+//   debug the Vulkan shaders. Using standard Avalonia will not work because Avalonia is using OpenGL to render its UI.
 //   To start debugging, start your application from RenderDoc.
-//   When using WPF's SharpEngineSceneView, then the easiest way to capture a frame is to use 
-//   OverlayTexture as PresentationType. This will allow RenderDoc to capture any frame by pressing F12 or PrintScreen.
-//   When using SharedTexture or WritableBitmap presentation type, you will need to call the SceneView.CaptureNextFrameInRenderDoc() method
-//   to capture the frame. This can be also done by using the Diagnostics window - select the "Capture next frame in RenderDoc" menu item.
+//
+//   When using WPF's SharpEngineSceneView, then the easiest way to capture a frame is to use OverlayTexture as PresentationType.
+//   This will allow RenderDoc to capture any frame by pressing F12 or PrintScreen.
+//   When using SDL / Gltf project, then you can also use F12 or PrintScreen to capture any frame.
+//
+//   When using Avalonia with SharedTexture or WritableBitmap presentation type, you will need to call the SceneView.CaptureNextFrame() method
+//   to capture the frame. This can be also done by using the Diagnostics window - when the app is strat from RenderDoc, there is a camera icon on the main window.
+//   Click it to capture the next frame.
 //   
 // - It is possible to purchase source code of some SharpEngine effects and shaders.
 //   This can show you how the existing effects are implemented. Contact support (https://www.ab4d.com/Feedback.aspx) for more info.
 //
 
-// To get another example of a more complex custom effect, see the VertexColorPlusEffect that created by zacfromaustinpowder:
+// To get another example of a more complex custom effect, see the VertexColorPlusEffect that was created by zacfromaustinpowder:
 // https://github.com/zacfromaustinpowder/Ab4d.SharpEngine.Samples/tree/customEffect2
 //
 // NOTE: This custom effect was not fully tested by AB4D company. Also, we do not offer any support for that.
@@ -125,8 +126,22 @@ public class CustomFogEffectSample : CommonSample
             FogColor          = _fogColor
         };
         
+
+        var textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
+
+        var textureFogMaterial = new FogMaterial()
+        {
+            DiffuseColor      = Colors.Orange,
+            Opacity           = 1, // no transparency,
+            FogStart          = _fogStart,
+            FogFullColorStart = _fogStart + _fogDistance,
+            FogColor          = _fogColor,
+            DiffuseTexture    = textureImage,
+        };
+        
         _allFogMaterials.Add(bottomFogMaterial);
         _allFogMaterials.Add(sphereFogMaterial);
+        _allFogMaterials.Add(textureFogMaterial);
 
         
         var bottomBoxNode = new BoxModelNode(new Vector3(0, -2, 0), new Vector3(200, 4, 100), "BottomBox")
@@ -144,7 +159,7 @@ public class CustomFogEffectSample : CommonSample
             for (int y = 0; y < 3; y++)
             {
                 var position = new Vector3(-80 + 30 * x, 10, -30 + 30 * y);
-                var fogSphere = new SphereModelNode(position, radius: 10, sphereFogMaterial, $"FogSphere_{x}_{y}");
+                var fogSphere = new SphereModelNode(position, radius: 10, y == 0 ? textureFogMaterial : sphereFogMaterial, $"FogSphere_{x}_{y}");
 
                 scene.RootNode.Add(fogSphere);
             }
