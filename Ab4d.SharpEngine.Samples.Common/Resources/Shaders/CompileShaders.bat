@@ -14,7 +14,7 @@ rem -Od         disables optimization; may cause illegal SPIR-V for HLSL
 rem -m          memory leak mode
 
 set DEBUG_PARAMS=
-if [%1%] == [debug] set DEBUG_PARAMS=-g -O0
+if [%1%] == [debug] set DEBUG_PARAMS=-gVS
 
 del spv\*.spv /Q
 del txt\*.txt /Q
@@ -30,9 +30,10 @@ echo #### Start compiling %SHADER_NAME% shaders ####
 set IN_FILE_NAME=%SHADER_NAME%.vert
 set OUT_FILE_NAME=%IN_FILE_NAME%
 
-rem We use glslc instead of glslangvalidator because glslc supports include
-rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt 
-glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
+rem Using glslang instead of glslc becasue this supports -gVS that is requried by RenderDoc
+rem To use #include with glslang, add "#extension GL_ARB_shading_language_include : require" after #version
+    
+glslang %IN_FILE_NAME%.glsl -V100 %DEBUG_PARAMS% --quiet --target-env vulkan1.0 -o spv/%OUT_FILE_NAME%.spv
 if errorlevel 1 goto onError
 echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
 
@@ -46,7 +47,7 @@ set IN_FILE_NAME=%SHADER_NAME%.frag
 set OUT_FILE_NAME=%IN_FILE_NAME%
 
 rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt
-glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
+glslang %IN_FILE_NAME%.glsl -V100 %DEBUG_PARAMS% --quiet --target-env vulkan1.0 -o spv/%OUT_FILE_NAME%.spv
 if errorlevel 1 goto onError
 echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
 
@@ -58,7 +59,7 @@ set IN_FILE_NAME=%SHADER_NAME%.frag
 set OUT_FILE_NAME=%SHADER_NAME%_Texture.frag
 
 rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt
-glslc %IN_FILE_NAME%.glsl -DUSE_DIFFUSE_TEXTURE -o spv\%OUT_FILE_NAME%.spv
+glslang %IN_FILE_NAME%.glsl -DUSE_DIFFUSE_TEXTURE -V100 %DEBUG_PARAMS% --quiet --target-env vulkan1.0 -o spv/%OUT_FILE_NAME%.spv
 if errorlevel 1 goto onError
 echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
 
@@ -77,7 +78,7 @@ set IN_FILE_NAME=%SHADER_NAME%.frag
 set OUT_FILE_NAME=%IN_FILE_NAME%
 
 rem glslangvalidator %IN_FILE_NAME%.glsl -o spv\%IN_FILE_NAME%.spv -V > txt\%IN_FILE_NAME%.txt
-glslc %IN_FILE_NAME%.glsl -o spv\%OUT_FILE_NAME%.spv
+glslang %IN_FILE_NAME%.glsl -V100 %DEBUG_PARAMS% --quiet --target-env vulkan1.0 -o spv/%OUT_FILE_NAME%.spv
 if errorlevel 1 goto onError
 echo Compiled %IN_FILE_NAME% into %OUT_FILE_NAME%
 
