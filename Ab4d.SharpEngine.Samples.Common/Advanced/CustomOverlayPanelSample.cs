@@ -28,6 +28,8 @@ public sealed class CustomOverlayPanelSample : CommonSample
     private GpuImage? _overlayPanelGpuImage;
     private RawImageData? _rawImageData;
 
+    private bool _isSpriteBatchDirty = true;
+
     private SceneView? _subscribedSceneView;
     
     public CustomOverlayPanelSample(ICommonSamplesContext context) 
@@ -212,12 +214,25 @@ public sealed class CustomOverlayPanelSample : CommonSample
 
         // Render _overlayPanelGpuImage as Sprite to the lower left corner
 
-        _spriteBatch.Begin(useAbsoluteCoordinates: true);
-        _spriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
-    
-        _spriteBatch.SetSpriteTexture(_overlayPanelGpuImage);
-        _spriteBatch.DrawSprite(topLeftPosition: new Vector2(30, 286), spriteSize: new Vector2(256, 256));
-    
-        _spriteBatch.End();
+        if (_isSpriteBatchDirty)
+        {
+            // Redraw the sprite batch. This will require new command buffers to be generated.
+            // We need to call Begin/End when the position of the sprite is changed.
+
+            _spriteBatch.Begin(useAbsoluteCoordinates: true);
+            _spriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
+
+            _spriteBatch.SetSpriteTexture(_overlayPanelGpuImage);
+            _spriteBatch.DrawSprite(topLeftPosition: new Vector2(30, 286), spriteSize: new Vector2(256, 256));
+
+            _spriteBatch.End();
+
+            _isSpriteBatchDirty = false;
+        }
+        else
+        {
+            // Only inform the Scene that we need to render another frame, but we do not need to regenerate command buffers
+            _spriteBatch.NotifyTextureChange();
+        }
     }
 }

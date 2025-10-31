@@ -13,7 +13,11 @@ public class SpritesSample : CommonSample
     private GpuImage? _uvCheckerTexture;
     private GpuImage? _treeTexture;
 
+    private bool _isAnimatingSprite = true;
     private SpriteBatch? _animatedSpriteBatch;
+    
+    private SpriteBatch? _sceneViewSpriteBatch;
+    private GpuImage? _gradientTexture;
 
     public SpritesSample(ICommonSamplesContext context)
         : base(context)
@@ -56,37 +60,37 @@ public class SpritesSample : CommonSample
             return;
 
         // Create SpriteBatch on the SceneView object (note that there we CAN use absolute coordinates - set when calling Begin method)
-        var sceneViewSpriteBatch = sceneView.CreateOverlaySpriteBatch("SceneViewOverlaySpriteBatch");
+        _sceneViewSpriteBatch = sceneView.CreateOverlaySpriteBatch("SceneViewOverlaySpriteBatch");
 
-        sceneViewSpriteBatch.Begin(useAbsoluteCoordinates: true); // use absolute coordinates for all following Draw calls
+        _sceneViewSpriteBatch.Begin(useAbsoluteCoordinates: true); // use absolute coordinates for all following Draw calls
 
         // To switch to using relative coordinates, set IsUsingAbsoluteCoordinates to false
         // All following draw calls will use relative coordinates.
         //sceneViewSpriteBatch.IsUsingAbsoluteCoordinates = false;
 
 
-        sceneViewSpriteBatch.DrawBitmapText("Absolute coordinates\nwith color mask:", new Vector2(100, 350), fontSize: 20, Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("Absolute coordinates\nwith color mask:", new Vector2(100, 350), fontSize: 20, Color4.Black);
 
-        sceneViewSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
+        _sceneViewSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // Use color mask
-        sceneViewSpriteBatch.DrawSprite(new Vector2(100, 400), new Vector2(50, 50), colorMask: Colors.Red);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(160, 400), new Vector2(50, 50), colorMask: Colors.Green);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(220, 400), new Vector2(50, 50), colorMask: Colors.Blue);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(100, 400), new Vector2(50, 50), colorMask: Colors.Red);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(160, 400), new Vector2(50, 50), colorMask: Colors.Green);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(220, 400), new Vector2(50, 50), colorMask: Colors.Blue);
 
 
         // Draw rectangles
-        sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(100, 490), fontSize: 20, Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(100, 490), fontSize: 20, Color4.Black);
 
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(100, 520), new Vector2(40, 40), Colors.Red);
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(160, 520), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
-        sceneViewSpriteBatch.DrawRectangle(new Vector2(220, 520), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(100, 520), new Vector2(40, 40), Colors.Red);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(160, 520), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(220, 520), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
 
 
         // Advanced draw text with background and margin
-        sceneViewSpriteBatch.DrawBitmapText("Rotated text", new Vector2(700, 200), fontSize: 20, textColor: Color4.Black, rotationAngleDegrees: 90);
-        sceneViewSpriteBatch.DrawBitmapText("Text with background", new Vector2(500, 150), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen);
-        sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(500, 200), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
+        _sceneViewSpriteBatch.DrawBitmapText("Rotated text", new Vector2(700, 200), fontSize: 20, textColor: Color4.Black, rotationAngleDegrees: 90);
+        _sceneViewSpriteBatch.DrawBitmapText("Text with background", new Vector2(500, 150), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen);
+        _sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(500, 200), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
                                             marginLeft: 10, marginRight: 10, marginTop: 10, marginBottom: 10);
 
         if (sceneView.GpuDevice != null)
@@ -102,43 +106,43 @@ public class SpritesSample : CommonSample
                 new GradientStop(Colors.Red,        offset: 1.0f),
             };
 
-            var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureSize: 256);
+            _gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureSize: 256);
 
             // If we only need from two colors, we can also use startColor and endColor instead of gradientStops:
             //var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, startColor: Colors.DeepSkyBlue, endColor: Colors.Yellow, textureWidth: 256);
 
-            sceneViewSpriteBatch.SetSpriteTexture(gradientTexture);
-            sceneViewSpriteBatch.DrawSprite(new Vector2(870, 90), new Vector2(100, 200), rotationAngleDegrees: 90);
+            _sceneViewSpriteBatch.SetSpriteTexture(_gradientTexture);
+            _sceneViewSpriteBatch.DrawSprite(new Vector2(870, 90), new Vector2(100, 200), rotationAngleDegrees: 90);
 
-            sceneViewSpriteBatch.DrawBitmapText("Sprite with\ngradient", new Vector2(850, 170), fontSize: 20, textColor: Color4.Black);
+            _sceneViewSpriteBatch.DrawBitmapText("Sprite with\ngradient", new Vector2(850, 170), fontSize: 20, textColor: Color4.Black);
         }
 
 
         // Change texture
-        sceneViewSpriteBatch.SetSpriteTexture(_treeTexture);
+        _sceneViewSpriteBatch.SetSpriteTexture(_treeTexture);
 
         // Use SetCoordinateCenter to align to bottom or right corners
         // When center position is horizontally set to Left or Center, then horizontal axis is pointing to the right.
         // When Right is used, then horizontal axis is pointing to the left (to define the distance from the right border).
         // When center position is vertically set to Top, then vertical axis is pointing down (distance from the top).
         // When Center or Bottom is used, then vertical axis is pointing Up (distance from the bottom or center).
-        sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomRight);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(60, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
-        sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomRight", new Vector2(125, 180), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomRight);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(60, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomRight", new Vector2(125, 180), fontSize: 20, textColor: Color4.Black);
 
-        sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopRight);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(60, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
-        sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nTopRight", new Vector2(125, 110), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopRight);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(60, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nTopRight", new Vector2(125, 110), fontSize: 20, textColor: Color4.Black);
 
-        sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
-        sceneViewSpriteBatch.DrawSprite(new Vector2(10, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
-        sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomLeft", new Vector2(10, 180), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(10, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomLeft", new Vector2(10, 180), fontSize: 20, textColor: Color4.Black);
 
         // Hide top-left sprite so that the title of the sample is visible
         // sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopLeft);
         // sceneViewSpriteBatch.Draw(new Vector2(10, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
 
-        sceneViewSpriteBatch.End();
+        _sceneViewSpriteBatch.End();
 
 
         // Create a new SpriteBatch that will use dpi scaled coordinates and sizes (dpi scale is get for window's dpi scale setting).
@@ -178,7 +182,7 @@ public class SpritesSample : CommonSample
 
     private void UpdateAnimatedSpriteBatch(float elapsedSeconds)
     {
-        if (_animatedSpriteBatch == null || _uvCheckerTexture == null || SceneView == null)
+        if (!_isAnimatingSprite || _animatedSpriteBatch == null || _uvCheckerTexture == null || SceneView == null)
             return;
 
         var animatedAngle = (elapsedSeconds * 90f) % 360f;
@@ -207,5 +211,38 @@ public class SpritesSample : CommonSample
         SceneView?.RemoveAllSpriteBatches();
 
         base.OnDisposed();
+    }
+    
+    private void ChangeGradientTexture()
+    {
+        if (_gradientTexture == null || _sceneViewSpriteBatch == null)
+            return;
+
+        // Create a new random gradient texture data
+        var rawImageData = TextureFactory.CreateGradientRawImageData(GetRandomHsvColor3(), GetRandomHsvColor3(), _gradientTexture.Width);
+
+        // Copy the new data to the existing gradient texture
+        _gradientTexture.CopyDataToImage(rawImageData.Data, transitionImageToShaderReadOnlyOptimalLayout: true);
+
+        // Instead of recreating the sprite batch by calling Begin and End methods,
+        // we can just notify the SceneView that the texture has changed.
+        // This renders a new frame without recreating the command buffers.
+        _sceneViewSpriteBatch.NotifyTextureChange();
+    }
+
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateCheckBox("Animate sprite", _isAnimatingSprite, isChecked =>
+        {
+            _isAnimatingSprite = isChecked;
+        });
+        
+        ui.AddSeparator();
+
+        ui.CreateButton(
+            "Change sprite texture (?):When we only change the texture of the sprite,\nthen SharpEngine does not need to record a new command buffer,\nbut can only render a new frame.\n\nTo test this, open the Diagnostics window (note that when the animation\nis running a new command buffer is recorder on each frame),\nstop the animation and click on this button - a new frame\nwill be rendered but the previous command buffer will be reused.",
+            () => ChangeGradientTexture());
     }
 }

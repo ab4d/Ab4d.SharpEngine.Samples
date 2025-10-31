@@ -62,7 +62,7 @@
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
-  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
+  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites" IsUpdated="True" UpdateInfo="Added NotifyTextureChange method to SpriteBatch that can be used\nto render a new frame without recreating the command buffers."/>
   <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering" IsNew="True"/>
 
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
@@ -141,7 +141,7 @@
   <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" />
   <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
-  <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
+  <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" IsUpdated="True" UpdateInfo="Improved performance of rendering when only overlay texture is changed:\ncalling spriteBatch.NotifyTextureChange instead of spriteBatch.Begin / End." />
   <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" />
   <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" IsNew="True" />
   <Sample Location="Advanced.FrustumCullingSample" Title="Frustum culling" IsNew="True" />
