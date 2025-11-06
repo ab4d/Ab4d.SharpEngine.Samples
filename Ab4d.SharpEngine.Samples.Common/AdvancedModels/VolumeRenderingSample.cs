@@ -316,8 +316,8 @@ public class VolumeRenderingSample : CommonSample
         // Here we create a one-dimensional (horizontal) texture where the x position (u) represents the slice value.
         // 
         // It is also possible to create a two-dimensional texture.
-        // In this case the y position (v) represent the gradient value (when GradientFactor > 0) or slice index (when GradientFactor == 0).
-        // This can be used for finer control and more sophisticated visualization (see GPU GEMS article in the link at the begging of this file).
+        // In this case, the y position (v) represents the gradient value (when GradientFactor > 0) or slice index (when GradientFactor == 0).
+        // This can be used for finer control and more sophisticated visualization (see GPU GEMS article in the link at the beginning of this file).
         _transferFunctionTexture = TextureFactory.CreateGradientTexture(gpuDevice, _gradientStops, textureSize: 512, isColorAlphaPremultiplied: false, isHorizontal: true);
     }
 
