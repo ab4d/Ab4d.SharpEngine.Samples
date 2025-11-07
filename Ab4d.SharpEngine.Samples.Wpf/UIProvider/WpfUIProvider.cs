@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Reflection.PortableExecutable;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using System.Xml.Linq;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 

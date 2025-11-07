@@ -1,5 +1,4 @@
 ﻿using Ab4d.SharpEngine.Samples.Common;
-using Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
+namespace Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 
 public class RadioButtonsUIElement : WpfUIElement
 {
