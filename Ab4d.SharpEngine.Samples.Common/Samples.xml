@@ -129,6 +129,7 @@
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
   <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
   <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
+  <Sample Location="Animations.CustomAnimationSample" Title="Custom animation" IsNew="True"/>
 
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
   <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia"/>
