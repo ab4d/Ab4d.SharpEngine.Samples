@@ -314,9 +314,11 @@ public class MaterialsSample : CommonSample
 
         var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial")
         {
-            //HasTransparency = true, // Set HasTransparency to true when vertex colors have alpha < 1
-            //IsSolidColor = false,   // Set to false to enable light shading
-            //SpecularPower = 12,     // Set SpecularPower > 0 to enable specular highlights. IsSolidColor must also be set to false.
+            //HasTransparency = true,     // Set HasTransparency to true when vertex colors have alpha < 1
+            //IsSolidColor = false,       // Set to false to enable light shading
+            //SpecularPower = 12,         // Set SpecularPower > 0 to enable specular highlights. IsSolidColor must also be set to false.
+            //Opacity = 0.7f,             // Opacity is multiplied by alpha values of the per-vertex colors (by default, set to 1 to preserve the per-vertex alpha values)
+            //DiffuseColor = Colors.Blue, // DiffuseColor is multiplied by the per-vertex colors (by default, set to White to preserve the per-vertex colors)
         };
 
         _vertexColorModelNode = new MeshModelNode(sphereMesh, vertexColorMaterial, "VertexColorModel")
