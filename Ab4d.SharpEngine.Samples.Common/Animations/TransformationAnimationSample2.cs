@@ -15,7 +15,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
 public class TransformationAnimationSample2 : CommonSample
 {
-    public override string Title => "TransformationAnimation sample";
+    public override string Title => "Transformation animation sample";
     public override string? Subtitle => null;
 
     private ICommonSampleUIProvider? _uiProvider;
@@ -33,6 +33,7 @@ public class TransformationAnimationSample2 : CommonSample
     public TransformationAnimationSample2(ICommonSamplesContext context)
         : base(context)
     {
+        ShowCameraAxisPanel = true;
     }
 
     private void CreateAnimationTests(Scene scene)
@@ -52,7 +53,7 @@ public class TransformationAnimationSample2 : CommonSample
         
 
         var description =
-            @"Animation steps:
+@"Animation steps:
 TranslateY, ScaleY
 TranslateZ, RotateY
 TranslateY, ScaleY,
@@ -162,10 +163,6 @@ TranslateZ, RotateY";
         _animatedObjectsGroup = new GroupNode("AnimatedObjectsGroup");
         scene.RootNode.Add(_animatedObjectsGroup);
 
-
-        // Show Axes (red = x, green = y, blue = z)
-        var axisLineNode = new AxisLineNode();
-        scene.RootNode.Add(axisLineNode);
 
         CreateAnimationTests(scene);
         SetupPlanarShadow(scene);

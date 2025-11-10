@@ -15,7 +15,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
 public class TransformationAnimationSample : CommonSample
 {
-    public override string Title => "TransformationAnimation sample";
+    public override string Title => "Transformation animation sample";
     public override string? Subtitle => null;
 
     private ICommonSampleUIProvider? _uiProvider;
@@ -34,6 +34,8 @@ public class TransformationAnimationSample : CommonSample
         : base(context)
     {
         _animations = new List<IAnimation>();
+
+        ShowCameraAxisPanel = true;
     }
 
     private void CreateAnimationTests(Scene scene)
@@ -43,7 +45,7 @@ public class TransformationAnimationSample : CommonSample
             animation.Set(TransformationAnimatedProperties.TranslateY, propertyValue: 50);
         });
 
-        AddAnimationSample(scene, new Vector3(0, 0, -100), "TranslateY\r\nTranslateX", delegate (TransformationAnimation animation)
+        AddAnimationSample(scene, new Vector3(0, 0, -100), "TranslateY\nTranslateX", delegate (TransformationAnimation animation)
         {
             animation.Set(TransformationAnimatedProperties.TranslateY, propertyValue: 50);
             animation.Set(TransformationAnimatedProperties.TranslateX, propertyValue: 50);
@@ -55,7 +57,7 @@ public class TransformationAnimationSample : CommonSample
         });
 
 
-        AddAnimationSample(scene, new Vector3(-200, 0, 100), "ScaleY\r\nTranslateY", delegate (TransformationAnimation animation)
+        AddAnimationSample(scene, new Vector3(-200, 0, 100), "ScaleY\nTranslateY", delegate (TransformationAnimation animation)
         {
             animation.Set(TransformationAnimatedProperties.ScaleY, propertyValue: 2);
             animation.Set(TransformationAnimatedProperties.TranslateY, propertyValue: 50);
@@ -66,14 +68,28 @@ public class TransformationAnimationSample : CommonSample
             animation.Set(TransformationAnimatedProperties.RotateY, propertyValue: 180);
         });
 
-        AddAnimationSample(scene, new Vector3(200, 0, 100), "RotateY\r\nScale\r\nTranslateY", delegate (TransformationAnimation animation)
+        AddAnimationSample(scene, new Vector3(200, 0, 100), "Quaternion\nrotation", delegate (TransformationAnimation animation)
         {
-            animation.Set(TransformationAnimatedProperties.RotateY, propertyValue: 90);
-            animation.Set(TransformationAnimatedProperties.ScaleY, propertyValue: 0.5f);
-            animation.Set(TransformationAnimatedProperties.ScaleX, propertyValue: 1.4f); // when y is reduced to 50%, we need to scale x and z by 1.4 to preserve the volume
-            animation.Set(TransformationAnimatedProperties.ScaleZ, propertyValue: 1.4f);
-            animation.Set(TransformationAnimatedProperties.TranslateY, propertyValue: 50);
+            animation.SetRotate(new Quaternion(0, 0.707f, 0, 0.707f)); // rotate by 90 degrees around the y-axis
+            animation.SetRotate(Quaternion.Identity);                  // then animate to no rotation
+            animation.SetRotate(new Quaternion(0.707f, 0, 0, 0.707f)); // and then 90 degrees around the x-axis
+            animation.SetRotate(Quaternion.Identity);                  // and back to no rotation
+
+            // Instead of calling animation.SetRotate, we could also set individual properties:
+            //animation.Set(TransformationAnimatedProperties.QuaternionY, propertyValue: 0.707f);
+            //animation.Set(TransformationAnimatedProperties.QuaternionW, propertyValue: 0.707f);
         });
+        
+
+        // Another sample with multiple animations (there is not place in 4x2 samples to show that):
+        //AddAnimationSample(scene, new Vector3(200, 0, 100), "RotateY\r\nScale\r\nTranslateY", delegate (TransformationAnimation animation)
+        //{
+        //    animation.Set(TransformationAnimatedProperties.RotateY, propertyValue: 90);
+        //    animation.Set(TransformationAnimatedProperties.ScaleY, propertyValue: 0.5f);
+        //    animation.Set(TransformationAnimatedProperties.ScaleX, propertyValue: 1.4f); // when y is reduced to 50%, we need to scale x and z by 1.4 to preserve the volume
+        //    animation.Set(TransformationAnimatedProperties.ScaleZ, propertyValue: 1.4f);
+        //    animation.Set(TransformationAnimatedProperties.TranslateY, propertyValue: 50);
+        //});
 
 
         // Start all animations
@@ -157,10 +173,6 @@ public class TransformationAnimationSample : CommonSample
         _animatedObjectsGroup = new GroupNode("AnimatedObjectsGroup");
         scene.RootNode.Add(_animatedObjectsGroup);
 
-
-        // Show Axes (red = x, green = y, blue = z)
-        var axisLineNode = new AxisLineNode();
-        scene.RootNode.Add(axisLineNode);
 
         CreateAnimationTests(scene);
         SetupPlanarShadow(scene);

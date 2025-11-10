@@ -122,8 +122,8 @@
   <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
-  <Sample Location="Animations.TransformationAnimationSample" Title="TransformationAnimation 1"/>
-  <Sample Location="Animations.TransformationAnimationSample2" Title="TransformationAnimation 2"/>
+  <Sample Location="Animations.TransformationAnimationSample" Title="Transformation animation 1"/>
+  <Sample Location="Animations.TransformationAnimationSample2" Title="Transformation animation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
