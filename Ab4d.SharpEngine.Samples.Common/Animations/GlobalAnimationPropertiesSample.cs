@@ -14,7 +14,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 public class GlobalAnimationPropertiesSample : CommonSample
 {
     public override string Title => "Global Animation properties";
-    public override string? Subtitle => null;
+    public override string? Subtitle => "This sample demonstrates the usage of Delay, Duration, EndDelay and Direction properties.";
 
     private ICommonSampleUIProvider? _uiProvider;
 
