@@ -21,6 +21,7 @@ public class StlImporterExporterSample : CommonSample
 
     private bool _isTwoSidedMaterials = true;
     private bool _convertToYUp = true;
+    private bool _calculateNormals = true;
     
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
@@ -111,12 +112,15 @@ public class StlImporterExporterSample : CommonSample
         var stlImporter = new StlImporter()
         {
             UseTwoSidedMaterials = _isTwoSidedMaterials,
-            ConvertToYUp = _convertToYUp
+            ConvertToYUp = _convertToYUp,
+            CalculateNormals = _calculateNormals
         };
 
         try
         {
             // Import the 3D model from the file into MeshModelNode
+            stlImporter.ConvertToYUp = true;
+
             _importedMeshModelNode = stlImporter.Import(fileName);
             
             // To import from a stream, use:
@@ -296,6 +300,13 @@ public class StlImporterExporterSample : CommonSample
         ui.CreateCheckBox("Convert to Y-up (?):The models in stl files are usually defined in Z-up coordinate system.\nThis checkbox sets ConvertToYUp property to true to convert the model to Y-up coordinate system.", _convertToYUp, isChecked =>
         {
             _convertToYUp = isChecked;
+            if (_importedFileName != null)
+                ImportFile(_importedFileName);
+        });
+        
+        ui.CreateCheckBox("Calculate normals (?):When checked then the of the model are not read from the\nfile but calculated from the orientation of the triangles.\nThis can fix the invalid normals direction in many stl files\nthat lead to invalid shading of the model.", _calculateNormals, isChecked =>
+        {
+            _calculateNormals = isChecked;
             if (_importedFileName != null)
                 ImportFile(_importedFileName);
         });
