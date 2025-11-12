@@ -103,7 +103,7 @@
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
 
   <Sample Location="Titles.GraphsTitle.md" IsTitle="True" Title="Graphs"/>
-  <Sample Location="Graphs.AxisWith3DLabelsSamples" Title="AxisWith3DLabels" IsNew="True"/>
+  <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels" IsNew="True"/>
   <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode" IsNew="True"/>
 
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>

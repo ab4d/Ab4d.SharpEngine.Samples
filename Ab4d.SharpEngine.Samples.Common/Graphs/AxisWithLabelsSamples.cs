@@ -12,7 +12,7 @@ using Camera = Ab4d.SharpEngine.Cameras.Camera;
 
 namespace Ab4d.SharpEngine.Samples.Common.Graphs;
 
-public class AxisWith3DLabelsSamples : CommonSample
+public class AxisWithLabelsSamples : CommonSample
 {
     public override string Title => "AxisWithLabelsNode";
     //public override string Subtitle => "";
@@ -21,49 +21,21 @@ public class AxisWith3DLabelsSamples : CommonSample
     private bool _adjustFirstLabelPosition = false;
     private bool _adjustLastLabelPosition = false;
     
-    public AxisWith3DLabelsSamples(ICommonSamplesContext context)
+    public AxisWithLabelsSamples(ICommonSamplesContext context)
         : base(context)
     {
     }
 
     protected override void OnCreateScene(Scene scene)
     {
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 25;
-            targetPositionCamera.Attitude = -30;
-            targetPositionCamera.Distance = 430;
-            targetPositionCamera.TargetPosition = new Vector3(-12, 16, -11);
-        }
-    }
-
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        ShowDemoAxes(sceneView);
-        base.OnSceneViewInitialized(sceneView);
-    }
-
-    private void ShowDemoAxes(SceneView sceneView)
-    {
-        var scene = sceneView.Scene;
-        
-        scene.RootNode.Clear();
-        
-        var defaultAxis = new AxisWithLabelsNode(sceneView)
-        {
-            AxisStartPosition = new Vector3(120, 0, 0),
-            AxisEndPosition = new Vector3(120, 100, 0),
-            AxisTitle = "Default axis",
-        };
-
+                var defaultAxis = new AxisWithLabelsNode(axisStartPosition: new Vector3(120, 0, 0), axisEndPosition: new Vector3(120, 100, 0), axisTitle: "Default axis");
         scene.RootNode.Add(defaultAxis);
 
 
-        var changedValuesRangeAxis = new AxisWithLabelsNode(sceneView)
+        var changedValuesRangeAxis = new AxisWithLabelsNode(axisTitle: "Changed range and ticks step")
         {
             AxisStartPosition = new Vector3(60, 0, 0),
             AxisEndPosition = new Vector3(60, 100, 0),
-            AxisTitle = "Changed range and ticks step",
             MinimumValue = -50,
             MaximumValue = 50,
             MajorTicksStep = 10,
@@ -73,11 +45,10 @@ public class AxisWith3DLabelsSamples : CommonSample
         scene.RootNode.Add(changedValuesRangeAxis);
 
 
-        var changedTicksAxis = new AxisWithLabelsNode(sceneView)
+        var changedTicksAxis = new AxisWithLabelsNode(axisTitle: "Changed display format")
         {
             AxisStartPosition = new Vector3(0, 0, 0),
             AxisEndPosition = new Vector3(0, 100, 0),
-            AxisTitle = "Changed display format",
             MinimumValue = 0,
             MaximumValue = 100,
             MajorTicksStep = 20,
@@ -91,11 +62,10 @@ public class AxisWith3DLabelsSamples : CommonSample
         scene.RootNode.Add(changedTicksAxis);
 
 
-        var customValuesLabelsAxis = new AxisWithLabelsNode(sceneView)
+        var customValuesLabelsAxis = new AxisWithLabelsNode(axisTitle: "Custom value labels")
         {
             AxisStartPosition = new Vector3(-60, 0, 0),
             AxisEndPosition = new Vector3(-60, 100, 0),
-            AxisTitle = "Custom value labels",
             MinimumValue = 1,
             MaximumValue = 5,
             MajorTicksStep = 1,
@@ -110,34 +80,13 @@ public class AxisWith3DLabelsSamples : CommonSample
         customValuesLabelsAxis.SetCustomValueLabels(new string[] { "lowest", "low", "normal", "high", "highest" });
         customValuesLabelsAxis.SetCustomValueColors(new Color4[] { Colors.DarkBlue, Colors.Blue, Colors.Green, Colors.Orange, Colors.Red });
 
-        // TODO:
-        //customValuesLabelsAxis.CustomizeValueLabelAction = (valueLabelIndex, textBlockNode) =>
-        //{
-        //    if (valueLabelIndex == 0)
-        //        textBlockNode.Background = Brushes.White;
-
-        //    if (valueLabelIndex < 2)
-        //        textBlockNode.FontFamily = new FontFamily("Courier New");
-
-        //    if (valueLabelIndex == 2)
-        //    {
-        //        textBlockNode.Background = Brushes.White;
-        //        textBlockNode.BorderBrush = Brushes.Yellow;
-        //        textBlockNode.BorderThickness = new Thickness(0, 0, 0, 2);
-        //    }
-
-        //    if (valueLabelIndex > 2)
-        //        textBlockNode.FontWeight = FontWeights.Bold;
-        //};
-
         scene.RootNode.Add(customValuesLabelsAxis);
 
 
-        var customValuesAxis = new AxisWithLabelsNode(sceneView)
+        var customValuesAxis = new AxisWithLabelsNode(axisTitle: "Logarithmic scale")
         {
             AxisStartPosition = new Vector3(-120, 0, 0),
             AxisEndPosition = new Vector3(-120, 100, 0),
-            AxisTitle = "Logarithmic scale",
             MinimumValue = 0,
             MaximumValue = 100,
             MinorTicksStep = 0, // Hide minor ticks
@@ -158,13 +107,12 @@ public class AxisWith3DLabelsSamples : CommonSample
         scene.RootNode.Add(customValuesAxis);
 
 
-        var horizontalAxis1 = new AxisWithLabelsNode(sceneView)
+        var horizontalAxis1 = new AxisWithLabelsNode(axisTitle: "Horizontal axis")
         {
             AxisStartPosition = new Vector3(0, 0, 80),
             AxisEndPosition   = new Vector3(-100, 0, 80),
             RightDirectionVector = new Vector3(0, 0, -1), // RightDirectionVector3 is the direction in which the text is drawn. By default, RightDirectionVector3 points to the right (1, 0, 0). We need to change that because this is also this axis direction.
             IsRenderingOnRightSideOfAxis = true,
-            AxisTitle = "Horizontal axis",
         };
 
         scene.RootNode.Add(horizontalAxis1);
@@ -172,61 +120,76 @@ public class AxisWith3DLabelsSamples : CommonSample
         scene.RootNode.Add(new AxisLineNode());
 
 
-        // TODO:
         // Clone the axis
         var offsetVector = new Vector3(0, 0, 20);
 
-        var horizontalAxis2 = horizontalAxis1.Clone();
+        var horizontalAxis2 = horizontalAxis1.Clone(clonedAxisTitle: "Cloned and flipped horizontal axis");
         horizontalAxis2.AxisStartPosition += offsetVector;
         horizontalAxis2.AxisEndPosition += offsetVector;
-        horizontalAxis2.AxisTitle = "Cloned and flipped horizontal axis";
         horizontalAxis2.IsRenderingOnRightSideOfAxis = !horizontalAxis1.IsRenderingOnRightSideOfAxis; // flip side on which the ticks and labels are rendered
 
         scene.RootNode.Add(horizontalAxis2);
 
         
-        var upsideDown = new AxisWithLabelsNode(sceneView)
+        var upsideDown = new AxisWithLabelsNode(axisTitle: "Upside down axis")
         {
             AxisStartPosition = new Vector3(160, 100, 0),
             AxisEndPosition = new Vector3(160, 0, 0),
-            AxisTitle = "Upside down axis",
         };
 
         scene.RootNode.Add(upsideDown);
 
         
-        var defaultAxis2 = new AxisWithLabelsNode(sceneView)
+        var defaultAxis2 = new AxisWithLabelsNode(axisTitle: "RS: Default")
         {
             AxisStartPosition = new Vector3(200, 0, 0),
             AxisEndPosition = new Vector3(200, 100, 0),
             IsRenderingOnRightSideOfAxis = true,
-            AxisTitle = "RS: Default",
         };
 
         scene.RootNode.Add(defaultAxis2);
 
         
-        var upsideDown2 = new AxisWithLabelsNode(sceneView)
+        var upsideDown2 = new AxisWithLabelsNode(axisTitle: "RS: Upside down axis")
         {
             AxisStartPosition = new Vector3(240, 100, 0),
             AxisEndPosition = new Vector3(240, 0, 0),
             IsRenderingOnRightSideOfAxis = true,
-            AxisTitle = "RS: Upside down axis",
         };
 
         scene.RootNode.Add(upsideDown2);
 
-
-
+        
         UpdateAdjustFirstAndLastLabelPosition();
-
-
-
 
         // NOTE:
         // Many additional customizations are possible by deriving your class from AxisWithLabelsNode
-        // and by overriding the virtual methods. The derived class can also access many protected properties
-        // and change the shown TextBlockNode and TextBlock and line objects.
+        // and by overriding the virtual methods. The derived class can also access many protected properties.
+
+
+        _freeCamera ??= new FreeCamera()
+        {
+            CameraPosition = new Vector3(0, 100, 500)
+        };
+
+        scene.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
+        {
+            axisNode.Camera = _freeCamera;
+        });
+
+
+        //if (targetPositionCamera != null)
+        //{
+        //    targetPositionCamera.Heading = 25;
+        //    targetPositionCamera.Attitude = -30;
+        //    targetPositionCamera.Distance = 430;
+        //    targetPositionCamera.TargetPosition = new Vector3(-12, 16, -11);
+
+        //    scene.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
+        //    {
+        //        axisNode.Camera = targetPositionCamera;
+        //    });
+        //}
     }
     
     private void UpdateAdjustFirstAndLastLabelPosition()
@@ -238,14 +201,17 @@ public class AxisWith3DLabelsSamples : CommonSample
         });
     }
 
+
+    private FreeCamera? _freeCamera;
+
     protected override Camera OnCreateCamera()
     {
-        var freeCamera = new FreeCamera()
+        _freeCamera ??= new FreeCamera()
         {
             CameraPosition = new Vector3(0, 100, 500)
         };
 
-        return freeCamera;
+        return _freeCamera;
     }
 
 
@@ -253,11 +219,27 @@ public class AxisWith3DLabelsSamples : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
+        ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the first label is moved up.\nThis can prevent overlapping the first label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
+            _adjustFirstLabelPosition, 
+            isChecked =>
+            {
+                _adjustFirstLabelPosition = isChecked;
+                UpdateAdjustFirstAndLastLabelPosition();
+            });
+        
+        ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the last label is moved down.\nThis can prevent overlapping the last label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
+            _adjustLastLabelPosition, 
+            isChecked =>
+            {
+                _adjustLastLabelPosition = isChecked;
+                UpdateAdjustFirstAndLastLabelPosition();
+            });
+
         ui.CreateButton("UPDATE", () =>
         {
             Scene?.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
             {
-                axisNode.UpdateTextDirections();
+                axisNode.UpdateTextDirections(SceneView.Camera);
             });
         });
     }

@@ -32,7 +32,7 @@ public class AxesBoxNodeSample : CommonSample
 
     private void ShowDemoAxes(SceneView sceneView)
     {
-        var axesBox = new AxesBoxNode(sceneView)
+        var axesBox = new AxesBoxNode()
         {
             CenterPosition = new Vector3(0, 0, 0),
             Size = new Vector3(100, 100, 100),
