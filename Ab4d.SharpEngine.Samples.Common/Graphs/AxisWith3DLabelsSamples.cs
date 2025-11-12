@@ -1,0 +1,264 @@
+﻿using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
+using Ab4d.SharpEngine.glTF.Schema;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
+using System.Drawing;
+using System.Numerics;
+using Ab4d.SharpEngine.Cameras;
+using Ab4d.Vulkan;
+using Camera = Ab4d.SharpEngine.Cameras.Camera;
+
+namespace Ab4d.SharpEngine.Samples.Common.Graphs;
+
+public class AxisWith3DLabelsSamples : CommonSample
+{
+    public override string Title => "AxisWithLabelsNode";
+    //public override string Subtitle => "";
+    
+    
+    private bool _adjustFirstLabelPosition = false;
+    private bool _adjustLastLabelPosition = false;
+    
+    public AxisWith3DLabelsSamples(ICommonSamplesContext context)
+        : base(context)
+    {
+    }
+
+    protected override void OnCreateScene(Scene scene)
+    {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -30;
+            targetPositionCamera.Distance = 430;
+            targetPositionCamera.TargetPosition = new Vector3(-12, 16, -11);
+        }
+    }
+
+    protected override void OnSceneViewInitialized(SceneView sceneView)
+    {
+        ShowDemoAxes(sceneView);
+        base.OnSceneViewInitialized(sceneView);
+    }
+
+    private void ShowDemoAxes(SceneView sceneView)
+    {
+        var scene = sceneView.Scene;
+        
+        scene.RootNode.Clear();
+        
+        var defaultAxis = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(120, 0, 0),
+            AxisEndPosition = new Vector3(120, 100, 0),
+            AxisTitle = "Default axis",
+        };
+
+        scene.RootNode.Add(defaultAxis);
+
+
+        var changedValuesRangeAxis = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(60, 0, 0),
+            AxisEndPosition = new Vector3(60, 100, 0),
+            AxisTitle = "Changed range and ticks step",
+            MinimumValue = -50,
+            MaximumValue = 50,
+            MajorTicksStep = 10,
+            MinorTicksStep = 5
+        };
+
+        scene.RootNode.Add(changedValuesRangeAxis);
+
+
+        var changedTicksAxis = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(0, 0, 0),
+            AxisEndPosition = new Vector3(0, 100, 0),
+            AxisTitle = "Changed display format",
+            MinimumValue = 0,
+            MaximumValue = 100,
+            MajorTicksStep = 20,
+            MinorTicksStep = 2.5f,             // to hide minor ticks set MinorTicksStep to 0
+            ValueDisplayFormatString = "$0.0M" // Change format to always display 2 decimals. Default value is "#,##0".
+        };
+
+        // You can also set custom culture to format the values:
+        changedTicksAxis.ValueDisplayCulture = System.Globalization.CultureInfo.InvariantCulture;
+
+        scene.RootNode.Add(changedTicksAxis);
+
+
+        var customValuesLabelsAxis = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(-60, 0, 0),
+            AxisEndPosition = new Vector3(-60, 100, 0),
+            AxisTitle = "Custom value labels",
+            MinimumValue = 1,
+            MaximumValue = 5,
+            MajorTicksStep = 1,
+            MinorTicksStep = 0, // Hide minor ticks; we could also call: customValuesLabelsAxis.SetCustomMinorTickValues(null);
+        };
+
+        // one value label is shown for each major tick
+        // So set the same number of string as there is the number of ticks.
+        // You can get the count by:
+        //var majorTicks = customValuesLabelsAxis.GetMajorTickValues();
+
+        customValuesLabelsAxis.SetCustomValueLabels(new string[] { "lowest", "low", "normal", "high", "highest" });
+        customValuesLabelsAxis.SetCustomValueColors(new Color4[] { Colors.DarkBlue, Colors.Blue, Colors.Green, Colors.Orange, Colors.Red });
+
+        // TODO:
+        //customValuesLabelsAxis.CustomizeValueLabelAction = (valueLabelIndex, textBlockNode) =>
+        //{
+        //    if (valueLabelIndex == 0)
+        //        textBlockNode.Background = Brushes.White;
+
+        //    if (valueLabelIndex < 2)
+        //        textBlockNode.FontFamily = new FontFamily("Courier New");
+
+        //    if (valueLabelIndex == 2)
+        //    {
+        //        textBlockNode.Background = Brushes.White;
+        //        textBlockNode.BorderBrush = Brushes.Yellow;
+        //        textBlockNode.BorderThickness = new Thickness(0, 0, 0, 2);
+        //    }
+
+        //    if (valueLabelIndex > 2)
+        //        textBlockNode.FontWeight = FontWeights.Bold;
+        //};
+
+        scene.RootNode.Add(customValuesLabelsAxis);
+
+
+        var customValuesAxis = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(-120, 0, 0),
+            AxisEndPosition = new Vector3(-120, 100, 0),
+            AxisTitle = "Logarithmic scale",
+            MinimumValue = 0,
+            MaximumValue = 100,
+            MinorTicksStep = 0, // Hide minor ticks
+        };
+
+        // Create custom major tick values (this will position the major ticks along the axis)
+        // But we will display custom values for each major tick - see below.
+        customValuesAxis.SetCustomMajorTickValues(new float[] { 0.0f, 33.3f, 66.6f, 100.0f });
+        customValuesAxis.SetCustomValueLabels(new string[] { "1", "10", "100", "1000" });
+
+        // Set minor ticks to show log values from 1 to 10
+        var minorValues = new List<float>();
+        for (int i = 0; i <= 10; i++)
+            minorValues.Add(MathF.Log10(i) * 33.3f); // multiply by 33.3 as this is the "position" of the value 10 on the axis (see code a few lines back)
+
+        customValuesAxis.SetCustomMinorTickValues(minorValues.ToArray());
+
+        scene.RootNode.Add(customValuesAxis);
+
+
+        var horizontalAxis1 = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(0, 0, 80),
+            AxisEndPosition   = new Vector3(-100, 0, 80),
+            RightDirectionVector = new Vector3(0, 0, -1), // RightDirectionVector3 is the direction in which the text is drawn. By default, RightDirectionVector3 points to the right (1, 0, 0). We need to change that because this is also this axis direction.
+            IsRenderingOnRightSideOfAxis = true,
+            AxisTitle = "Horizontal axis",
+        };
+
+        scene.RootNode.Add(horizontalAxis1);
+
+        scene.RootNode.Add(new AxisLineNode());
+
+
+        // TODO:
+        // Clone the axis
+        var offsetVector = new Vector3(0, 0, 20);
+
+        var horizontalAxis2 = horizontalAxis1.Clone();
+        horizontalAxis2.AxisStartPosition += offsetVector;
+        horizontalAxis2.AxisEndPosition += offsetVector;
+        horizontalAxis2.AxisTitle = "Cloned and flipped horizontal axis";
+        horizontalAxis2.IsRenderingOnRightSideOfAxis = !horizontalAxis1.IsRenderingOnRightSideOfAxis; // flip side on which the ticks and labels are rendered
+
+        scene.RootNode.Add(horizontalAxis2);
+
+        
+        var upsideDown = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(160, 100, 0),
+            AxisEndPosition = new Vector3(160, 0, 0),
+            AxisTitle = "Upside down axis",
+        };
+
+        scene.RootNode.Add(upsideDown);
+
+        
+        var defaultAxis2 = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(200, 0, 0),
+            AxisEndPosition = new Vector3(200, 100, 0),
+            IsRenderingOnRightSideOfAxis = true,
+            AxisTitle = "RS: Default",
+        };
+
+        scene.RootNode.Add(defaultAxis2);
+
+        
+        var upsideDown2 = new AxisWithLabelsNode(sceneView)
+        {
+            AxisStartPosition = new Vector3(240, 100, 0),
+            AxisEndPosition = new Vector3(240, 0, 0),
+            IsRenderingOnRightSideOfAxis = true,
+            AxisTitle = "RS: Upside down axis",
+        };
+
+        scene.RootNode.Add(upsideDown2);
+
+
+
+        UpdateAdjustFirstAndLastLabelPosition();
+
+
+
+
+        // NOTE:
+        // Many additional customizations are possible by deriving your class from AxisWithLabelsNode
+        // and by overriding the virtual methods. The derived class can also access many protected properties
+        // and change the shown TextBlockNode and TextBlock and line objects.
+    }
+    
+    private void UpdateAdjustFirstAndLastLabelPosition()
+    {
+        Scene?.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
+        {
+            axisNode.AdjustFirstLabelPosition = _adjustFirstLabelPosition;
+            axisNode.AdjustLastLabelPosition = _adjustLastLabelPosition;
+        });
+    }
+
+    protected override Camera OnCreateCamera()
+    {
+        var freeCamera = new FreeCamera()
+        {
+            CameraPosition = new Vector3(0, 100, 500)
+        };
+
+        return freeCamera;
+    }
+
+
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateButton("UPDATE", () =>
+        {
+            Scene?.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
+            {
+                axisNode.UpdateTextDirections();
+            });
+        });
+    }
+}
