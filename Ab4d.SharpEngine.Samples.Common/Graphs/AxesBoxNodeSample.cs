@@ -6,7 +6,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Graphs;
 public class AxesBoxNodeSample : CommonSample
 {
     public override string Title => "AxesBoxNode";
-    //public override string Subtitle => "";
+    public override string Subtitle => "TODO";
     
     
     public AxesBoxNodeSample(ICommonSamplesContext context)
@@ -39,7 +39,7 @@ public class AxesBoxNodeSample : CommonSample
 
             AxisShowingStrategy = AxesBoxNode.AxisShowingStrategies.FrontFacingPlanes,
 
-            
+            Camera = sceneView.Camera,
 
 
         };

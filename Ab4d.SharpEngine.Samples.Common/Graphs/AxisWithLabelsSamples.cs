@@ -1,246 +1,307 @@
-﻿using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Core;
+﻿using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.glTF.Schema;
-using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using System.Drawing;
 using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.Vulkan;
-using Camera = Ab4d.SharpEngine.Cameras.Camera;
 
 namespace Ab4d.SharpEngine.Samples.Common.Graphs;
 
 public class AxisWithLabelsSamples : CommonSample
 {
     public override string Title => "AxisWithLabelsNode";
-    //public override string Subtitle => "";
+    public override string Subtitle => "AxisWithLabelsNode can render highly customizable axis with title, value labels and line ticks";
     
-    
-    private bool _adjustFirstLabelPosition = false;
-    private bool _adjustLastLabelPosition = false;
-    
+    private AxisWithLabelsNode _axisNode;
+
+    private bool _isCustomBitmapTextCreator;
+    private Vector2? _savedAxisPanelPosition;
+    private ICommonSampleUIElement? _customTextCreatorButton;
+    private ICommonSampleUIElement? _axisTitleColorComboBox;
+
     public AxisWithLabelsSamples(ICommonSamplesContext context)
         : base(context)
     {
+        // Define _axisNode here so we do not need to define it as nullable 
+        // // and then do null checks in the UI event handler
+        _axisNode = new AxisWithLabelsNode(axisStartPosition: new Vector3(0, -50, 0), 
+                                           axisEndPosition: new Vector3(0, 50, 0), 
+                                           axisTitle: "AxisWithLabelsNode");
+
+
+        ShowCameraAxisPanel = true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (_savedAxisPanelPosition != null && CameraAxisPanel != null)
+            CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
+
+        base.OnDisposed();
     }
 
     protected override void OnCreateScene(Scene scene)
     {
-                var defaultAxis = new AxisWithLabelsNode(axisStartPosition: new Vector3(120, 0, 0), axisEndPosition: new Vector3(120, 100, 0), axisTitle: "Default axis");
-        scene.RootNode.Add(defaultAxis);
+        // _axisNode is created in constructor, so we do not need to define it as nullable 
+        // and then do null checks in the UI event handler
 
+        scene.RootNode.Add(_axisNode);
 
-        var changedValuesRangeAxis = new AxisWithLabelsNode(axisTitle: "Changed range and ticks step")
-        {
-            AxisStartPosition = new Vector3(60, 0, 0),
-            AxisEndPosition = new Vector3(60, 100, 0),
-            MinimumValue = -50,
-            MaximumValue = 50,
-            MajorTicksStep = 10,
-            MinorTicksStep = 5
-        };
-
-        scene.RootNode.Add(changedValuesRangeAxis);
-
-
-        var changedTicksAxis = new AxisWithLabelsNode(axisTitle: "Changed display format")
-        {
-            AxisStartPosition = new Vector3(0, 0, 0),
-            AxisEndPosition = new Vector3(0, 100, 0),
-            MinimumValue = 0,
-            MaximumValue = 100,
-            MajorTicksStep = 20,
-            MinorTicksStep = 2.5f,             // to hide minor ticks set MinorTicksStep to 0
-            ValueDisplayFormatString = "$0.0M" // Change format to always display 2 decimals. Default value is "#,##0".
-        };
-
-        // You can also set custom culture to format the values:
-        changedTicksAxis.ValueDisplayCulture = System.Globalization.CultureInfo.InvariantCulture;
-
-        scene.RootNode.Add(changedTicksAxis);
-
-
-        var customValuesLabelsAxis = new AxisWithLabelsNode(axisTitle: "Custom value labels")
-        {
-            AxisStartPosition = new Vector3(-60, 0, 0),
-            AxisEndPosition = new Vector3(-60, 100, 0),
-            MinimumValue = 1,
-            MaximumValue = 5,
-            MajorTicksStep = 1,
-            MinorTicksStep = 0, // Hide minor ticks; we could also call: customValuesLabelsAxis.SetCustomMinorTickValues(null);
-        };
-
-        // one value label is shown for each major tick
-        // So set the same number of string as there is the number of ticks.
-        // You can get the count by:
-        //var majorTicks = customValuesLabelsAxis.GetMajorTickValues();
-
-        customValuesLabelsAxis.SetCustomValueLabels(new string[] { "lowest", "low", "normal", "high", "highest" });
-        customValuesLabelsAxis.SetCustomValueColors(new Color4[] { Colors.DarkBlue, Colors.Blue, Colors.Green, Colors.Orange, Colors.Red });
-
-        scene.RootNode.Add(customValuesLabelsAxis);
-
-
-        var customValuesAxis = new AxisWithLabelsNode(axisTitle: "Logarithmic scale")
-        {
-            AxisStartPosition = new Vector3(-120, 0, 0),
-            AxisEndPosition = new Vector3(-120, 100, 0),
-            MinimumValue = 0,
-            MaximumValue = 100,
-            MinorTicksStep = 0, // Hide minor ticks
-        };
-
-        // Create custom major tick values (this will position the major ticks along the axis)
-        // But we will display custom values for each major tick - see below.
-        customValuesAxis.SetCustomMajorTickValues(new float[] { 0.0f, 33.3f, 66.6f, 100.0f });
-        customValuesAxis.SetCustomValueLabels(new string[] { "1", "10", "100", "1000" });
-
-        // Set minor ticks to show log values from 1 to 10
-        var minorValues = new List<float>();
-        for (int i = 0; i <= 10; i++)
-            minorValues.Add(MathF.Log10(i) * 33.3f); // multiply by 33.3 as this is the "position" of the value 10 on the axis (see code a few lines back)
-
-        customValuesAxis.SetCustomMinorTickValues(minorValues.ToArray());
-
-        scene.RootNode.Add(customValuesAxis);
-
-
-        var horizontalAxis1 = new AxisWithLabelsNode(axisTitle: "Horizontal axis")
-        {
-            AxisStartPosition = new Vector3(0, 0, 80),
-            AxisEndPosition   = new Vector3(-100, 0, 80),
-            RightDirectionVector = new Vector3(0, 0, -1), // RightDirectionVector3 is the direction in which the text is drawn. By default, RightDirectionVector3 points to the right (1, 0, 0). We need to change that because this is also this axis direction.
-            IsRenderingOnRightSideOfAxis = true,
-        };
-
-        scene.RootNode.Add(horizontalAxis1);
-
-        scene.RootNode.Add(new AxisLineNode());
-
-
-        // Clone the axis
-        var offsetVector = new Vector3(0, 0, 20);
-
-        var horizontalAxis2 = horizontalAxis1.Clone(clonedAxisTitle: "Cloned and flipped horizontal axis");
-        horizontalAxis2.AxisStartPosition += offsetVector;
-        horizontalAxis2.AxisEndPosition += offsetVector;
-        horizontalAxis2.IsRenderingOnRightSideOfAxis = !horizontalAxis1.IsRenderingOnRightSideOfAxis; // flip side on which the ticks and labels are rendered
-
-        scene.RootNode.Add(horizontalAxis2);
-
-        
-        var upsideDown = new AxisWithLabelsNode(axisTitle: "Upside down axis")
-        {
-            AxisStartPosition = new Vector3(160, 100, 0),
-            AxisEndPosition = new Vector3(160, 0, 0),
-        };
-
-        scene.RootNode.Add(upsideDown);
-
-        
-        var defaultAxis2 = new AxisWithLabelsNode(axisTitle: "RS: Default")
-        {
-            AxisStartPosition = new Vector3(200, 0, 0),
-            AxisEndPosition = new Vector3(200, 100, 0),
-            IsRenderingOnRightSideOfAxis = true,
-        };
-
-        scene.RootNode.Add(defaultAxis2);
-
-        
-        var upsideDown2 = new AxisWithLabelsNode(axisTitle: "RS: Upside down axis")
-        {
-            AxisStartPosition = new Vector3(240, 100, 0),
-            AxisEndPosition = new Vector3(240, 0, 0),
-            IsRenderingOnRightSideOfAxis = true,
-        };
-
-        scene.RootNode.Add(upsideDown2);
-
-        
-        UpdateAdjustFirstAndLastLabelPosition();
+        // Assign a Camera so the AxisWithLabelsNode is subscribed (because _axisNode.UpdateOnCameraChanges is true)
+        // to camera changes and this automatically updates text directions for different camera angles.
+        _axisNode.Camera = targetPositionCamera;
 
         // NOTE:
         // Many additional customizations are possible by deriving your class from AxisWithLabelsNode
         // and by overriding the virtual methods. The derived class can also access many protected properties.
 
 
-        _freeCamera ??= new FreeCamera()
+        if (targetPositionCamera != null)
         {
-            CameraPosition = new Vector3(0, 100, 500)
-        };
-
-        scene.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
-        {
-            axisNode.Camera = _freeCamera;
-        });
-
-
-        //if (targetPositionCamera != null)
-        //{
-        //    targetPositionCamera.Heading = 25;
-        //    targetPositionCamera.Attitude = -30;
-        //    targetPositionCamera.Distance = 430;
-        //    targetPositionCamera.TargetPosition = new Vector3(-12, 16, -11);
-
-        //    scene.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
-        //    {
-        //        axisNode.Camera = targetPositionCamera;
-        //    });
-        //}
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -30;
+            targetPositionCamera.Distance = 430;
+        }
     }
-    
-    private void UpdateAdjustFirstAndLastLabelPosition()
+
+    private void ChangeBitmapTextCreator()
     {
-        Scene?.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
+        if (Scene == null)
+            return;
+
+        if (_isCustomBitmapTextCreator)
         {
-            axisNode.AdjustFirstLabelPosition = _adjustFirstLabelPosition;
-            axisNode.AdjustLastLabelPosition = _adjustLastLabelPosition;
-        });
-    }
+            // Reset BitmapTextCreator to default bitmap text
+            var defaultBitmapTextCreator = BitmapTextCreator.GetDefaultBitmapTextCreator(Scene);
 
+            _axisNode.TitleBitmapTextCreator = defaultBitmapTextCreator;
+            _axisNode.LabelsBitmapTextCreator = defaultBitmapTextCreator;
 
-    private FreeCamera? _freeCamera;
+            _axisTitleColorComboBox?.SetValue(0); // Change color back to Black
 
-    protected override Camera OnCreateCamera()
-    {
-        _freeCamera ??= new FreeCamera()
+            _customTextCreatorButton?.SetText("Use custom BitmapTextCreator");
+            _isCustomBitmapTextCreator = false;
+        }
+        else
         {
-            CameraPosition = new Vector3(0, 100, 500)
-        };
+            string fontFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\roboto_black_with_outline_128.fnt");
 
-        return _freeCamera;
+            if (System.IO.File.Exists(fontFile))
+            {
+                var bitmapFont = new BitmapFont(fontFile);
+                var bitmapTextCreator = new BitmapTextCreator(Scene, bitmapFont, BitmapIO);
+
+                _axisNode.TitleBitmapTextCreator = bitmapTextCreator;
+                _axisTitleColorComboBox?.SetValue(2); // Change color from Black to Green color so that the outline is visible
+            }
+
+
+            fontFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\roboto_black_128.fnt");
+
+            if (System.IO.File.Exists(fontFile))
+            {
+                var bitmapFont = new BitmapFont(fontFile);
+                var bitmapTextCreator = new BitmapTextCreator(Scene, bitmapFont, BitmapIO);
+
+                _axisNode.LabelsBitmapTextCreator = bitmapTextCreator;
+            }
+
+            _customTextCreatorButton?.SetText("Use default BitmapTextCreator");
+            _isCustomBitmapTextCreator = true;
+        }
     }
-
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left);
+
+        var comboBoxWidth = 80;
+        var keyTextWidth = 165;
+
+        
+        var possibleLineThicknesses = new float[] { 0.5f, 1, 2, 3 };
+        var possibleLineThicknessesTexts = possibleLineThicknesses.Select(v => v.ToString("G")).ToArray();
+        
+        var possibleColors = new Color4[] { Colors.Black, Colors.Red, Colors.Green, Colors.Blue };
+        var possibleColorsTexts = possibleColors.Select(c => c.ToKnownColorString()).ToArray();
+
+        var possibleOrientations = new Vector3[] { Vector3.UnitX, Vector3.UnitY, Vector3.UnitZ };
+        var possibleOrientationTexts = new string[] { "X Axis", "Y Axis", "Z Axis" };
+        
+        var possibleFontSizes = new float[] { 4, 6, 10, 12 };
+        var possibleFontSizeTexts = possibleFontSizes.Select(v => v.ToString("N0")).ToArray();
+        
+        var possiblePaddings = new float[] { -10, -5, 0, 3, 10, 20, 30 };
+        var possiblePaddingTexts = possiblePaddings.Select(v => v.ToString("N0")).ToArray();
+        
+        var possibleValues = new float[] { -10, 0, 5, 10, 20, 22 };
+        var possibleValueTexts = possibleValues.Select(v => v.ToString("N0")).ToArray();
+        
+        var possibleTickSteps = new float[] { 0.5f, 1, 2, 5, 10 };
+        var possibleTickStepsTexts = possibleTickSteps.Select(v => v.ToString("G")).ToArray();
+        
+        var possibleTicksLengths = new float[] { 0, 1, 2.5f, 5, 10, 20 };
+        var possibleTicksLengthsTexts = possibleTicksLengths.Select(v => v == 0 ? "0 (hidden)" : v.ToString("G")).ToArray();
+
+
+        ui.CreateComboBox(possibleFontSizeTexts,
+            (selectedIndex, selectedText) => _axisNode.AxisTitleFontSize = possibleFontSizes[selectedIndex], 
+            selectedItemIndex: Array.IndexOf(possibleFontSizes, _axisNode.AxisTitleFontSize),
+            comboBoxWidth, keyText: "AxisTitleFontSize:", keyTextWidth);
+
+        _axisTitleColorComboBox = ui.CreateComboBox(possibleColorsTexts, 
+            (selectedIndex, selectedText) => _axisNode.AxisTitleColor = possibleColors[selectedIndex],
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "AxisTitleColor:", keyTextWidth);
+        
+        ui.CreateComboBox(possiblePaddingTexts, 
+            (selectedIndex, selectedText) => _axisNode.AxisTitlePadding = possiblePaddings[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possiblePaddings, _axisNode.AxisTitlePadding),
+            comboBoxWidth, keyText: "AxisTitlePadding:", keyTextWidth);
+
+
+        ui.CreateComboBox(possibleOrientationTexts,
+            (selectedIndex, selectedText) =>
+            {
+                _axisNode.AxisStartPosition = possibleOrientations[selectedIndex] * -50;
+                _axisNode.AxisEndPosition = possibleOrientations[selectedIndex] * 50;
+            }, 
+            selectedItemIndex: 1,
+            comboBoxWidth, keyText: "Orientation:", keyTextWidth);
+
+        ui.CreateComboBox(possibleOrientationTexts,
+            (selectedIndex, selectedText) => _axisNode.RightDirectionVector = possibleOrientations[selectedIndex], 
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "RightDirectionVector:", keyTextWidth);
+
+        ui.CreateComboBox(possibleLineThicknessesTexts, 
+            (selectedIndex, selectedText) => _axisNode.AxisLineThickness = possibleLineThicknesses[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleLineThicknesses, _axisNode.AxisLineThickness),
+            comboBoxWidth, keyText: "AxisLineThickness:", keyTextWidth);
+        
+        ui.CreateComboBox(possibleColorsTexts, 
+            (selectedIndex, selectedText) => _axisNode.AxisLineColor = possibleColors[selectedIndex],
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "AxisLineColor:", keyTextWidth);
+
+   
+        ui.CreateComboBox(possibleValueTexts, 
+            (selectedIndex, selectedText) => _axisNode.MinimumValue = possibleValues[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleValues, _axisNode.MinimumValue),
+            comboBoxWidth, keyText: "MinimumValue:", keyTextWidth);
+
+        ui.CreateComboBox(possibleValueTexts, 
+            (selectedIndex, selectedText) => _axisNode.MaximumValue = possibleValues[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleValues, _axisNode.MaximumValue),
+            comboBoxWidth, keyText: "MaximumValue:", keyTextWidth);
+
+
+        var possibleFormatStrings = new string[] { "#,##0", "N2", "$ 0.00" };
+
+        ui.CreateComboBox(possibleFormatStrings,
+            (selectedIndex, selectedText) => _axisNode.ValueDisplayFormatString = selectedText!, 
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "ValueDisplayFormatString:", keyTextWidth);
+
+
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("IsRenderingOnRightSideOfAxis",
+            _axisNode.IsRenderingOnRightSideOfAxis,
+            (isChecked) => _axisNode.IsRenderingOnRightSideOfAxis = isChecked);
+        
+        ui.CreateCheckBox("IsRightToLeftText",
+            _axisNode.IsRightToLeftText,
+            (isChecked) => _axisNode.IsRightToLeftText = isChecked);
+
+
+        ui.AddSeparator();
+
+        _customTextCreatorButton = ui.CreateButton("Use custom BitmapTextCreator", ChangeBitmapTextCreator);
+
+
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the first label is moved up.\nThis can prevent overlapping the first label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
-            _adjustFirstLabelPosition, 
-            isChecked =>
-            {
-                _adjustFirstLabelPosition = isChecked;
-                UpdateAdjustFirstAndLastLabelPosition();
-            });
-        
-        ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the last label is moved down.\nThis can prevent overlapping the last label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
-            _adjustLastLabelPosition, 
-            isChecked =>
-            {
-                _adjustLastLabelPosition = isChecked;
-                UpdateAdjustFirstAndLastLabelPosition();
-            });
+        keyTextWidth = 130;
 
-        ui.CreateButton("UPDATE", () =>
+
+        ui.CreateComboBox(possibleFontSizeTexts,
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsFontSize = possibleFontSizes[selectedIndex], 
+            selectedItemIndex: Array.IndexOf(possibleFontSizes, _axisNode.ValueLabelsFontSize),
+            comboBoxWidth, keyText: "ValueLabelsFontSize:", keyTextWidth);
+
+        ui.CreateComboBox(possibleColorsTexts, 
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsColor = possibleColors[selectedIndex],
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "ValueLabelsColor:", keyTextWidth);
+
+
+
+        ui.CreateComboBox(possiblePaddingTexts, 
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsPadding = possiblePaddings[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possiblePaddings, _axisNode.ValueLabelsPadding),
+            comboBoxWidth, keyText: "ValueLabelsPadding:", keyTextWidth);
+
+
+        ui.AddSeparator();
+
+        ui.CreateComboBox(possibleTickStepsTexts, 
+            (selectedIndex, selectedText) => _axisNode.MajorTicksStep = possibleTickSteps[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleTickSteps, _axisNode.MajorTicksStep),
+            comboBoxWidth, keyText: "MajorTicksStep:", keyTextWidth);
+        
+        ui.CreateComboBox(possibleTickStepsTexts, 
+            (selectedIndex, selectedText) => _axisNode.MinorTicksStep = possibleTickSteps[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleTickSteps, _axisNode.MinorTicksStep),
+            comboBoxWidth, keyText: "MinorTicksStep:", keyTextWidth);
+
+
+        ui.AddSeparator();
+
+
+        ui.CreateComboBox(possibleTicksLengthsTexts, 
+            (selectedIndex, selectedText) => _axisNode.MajorTicksLength = possibleTicksLengths[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleTicksLengths, _axisNode.MajorTicksLength),
+            comboBoxWidth, keyText: "MajorTicksLength:", keyTextWidth);
+        
+        ui.CreateComboBox(possibleTicksLengthsTexts, 
+            (selectedIndex, selectedText) => _axisNode.MinorTicksLength = possibleTicksLengths[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleTicksLengths, _axisNode.MinorTicksLength),
+            comboBoxWidth, keyText: "MinorTicksLength:", keyTextWidth);
+                
+        ui.CreateComboBox(possibleLineThicknessesTexts, 
+            (selectedIndex, selectedText) => _axisNode.TicksLineThickness = possibleLineThicknesses[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possibleLineThicknesses, _axisNode.TicksLineThickness),
+            comboBoxWidth, keyText: "TicksLineThickness:", keyTextWidth);
+        
+        ui.CreateComboBox(possibleColorsTexts, 
+            (selectedIndex, selectedText) => _axisNode.TicksLineColor = possibleColors[selectedIndex],
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "TicksLineColor:", keyTextWidth);
+
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the first label is moved up.\nThis can prevent overlapping the first label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
+            _axisNode.AdjustFirstLabelPosition, 
+            isChecked => _axisNode.AdjustFirstLabelPosition = isChecked);
+        
+        ui.CreateCheckBox("AdjustLastLabelPosition (?):When checked, then the last label is moved down.\nThis can prevent overlapping the last label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
+            _axisNode.AdjustLastLabelPosition, 
+            isChecked => _axisNode.AdjustLastLabelPosition = isChecked);
+
+
+        ui.AddSeparator();
+
+        ui.CreateCheckBox("Updating on camera changes (?):When checked, then the text directions are updated on camera changes so that text is correctly shown.", 
+            true,
+            isChecked => _axisNode.UpdateOnCameraChanges = isChecked);
+
+
+        if (CameraAxisPanel != null)
         {
-            Scene?.RootNode.ForEachChild<AxisWithLabelsNode>(axisNode =>
-            {
-                axisNode.UpdateTextDirections(SceneView.Camera);
-            });
-        });
+            _savedAxisPanelPosition = CameraAxisPanel.Position;
+            CameraAxisPanel.Position = new Vector2(400, 10); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
+        }
     }
 }
