@@ -121,7 +121,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             
             var msaaComboBox = new ComboBox() { ItemsSource = _possibleMultiSamplingValues, VerticalAlignment = VerticalAlignment.Top };
             msaaComboBox.SelectedIndex = Array.IndexOf(_possibleMultiSamplingValues, multiSampleCount);
-            msaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.MultisampleCount = (int)msaaComboBox.SelectedItem;
+            msaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.MultisampleCount = (int)(msaaComboBox.SelectedItem ?? 1);
             stackPanel.Children.Add(msaaComboBox);
             
             var saaTextBlock = new TextBlock() { Text = "SSAA: ", FontWeight = FontWeights.Bold, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(10, 4, 0, 0) };
@@ -129,7 +129,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             
             var ssaaComboBox = new ComboBox() { ItemsSource = _possibleSuperSamplingValues, VerticalAlignment = VerticalAlignment.Top };
             ssaaComboBox.SelectedIndex = Array.IndexOf(_possibleSuperSamplingValues, supersamplingCount);
-            ssaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.SupersamplingCount = (float)ssaaComboBox.SelectedItem;
+            ssaaComboBox.SelectionChanged += (sender, args) => sharpEngineSceneView.SupersamplingCount = (float)(ssaaComboBox.SelectedItem ?? 1f);
             stackPanel.Children.Add(ssaaComboBox);
 
 
@@ -412,7 +412,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
             if (!this.IsLoaded)
                 return;
 
-            float newLineThickness = (float)LineThicknessComboBox.SelectedValue;
+            float newLineThickness = (float)(LineThicknessComboBox.SelectedValue ?? 1f);
 
             foreach (var sharpEngineSceneView in _sharpEngineSceneViews)
             {
