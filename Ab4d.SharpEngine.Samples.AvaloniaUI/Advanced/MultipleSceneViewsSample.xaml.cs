@@ -174,7 +174,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
                     comboBox.ItemsSource   = RenderingTypeStrings;
                     comboBox.SelectedIndex = (int)renderingType;
 
-                    comboBox.SelectionChanged += delegate(object sender, SelectionChangedEventArgs args)
+                    comboBox.SelectionChanged += delegate(object? sender, SelectionChangedEventArgs args)
                     {
                         var newRenderingType = (RenderingTypes)comboBox.SelectedIndex;
                         SetSpecialRenderingType(sharpEngineSceneView, newRenderingType);
