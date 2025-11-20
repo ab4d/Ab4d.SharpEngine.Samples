@@ -39,13 +39,6 @@ public class CustomAnimationSample : CommonSample
     protected override void OnDisposed()
     {
         StopAnimation();
-
-        if (_textBlockFactory != null)
-        {
-            _textBlockFactory.Dispose();
-            _textBlockFactory = null;
-        }
-
         base.OnDisposed();
     }
 
