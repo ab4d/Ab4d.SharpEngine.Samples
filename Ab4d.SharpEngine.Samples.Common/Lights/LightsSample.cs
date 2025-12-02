@@ -113,20 +113,23 @@ public class LightsSample : CommonSample
         SetAmbientLight(0);
 
 
-        _directionalLight1 ??= new DirectionalLight(new Vector3(-1, -0.3f, 0));
+        _directionalLight1 ??= new DirectionalLight(direction: new Vector3(-1, -0.3f, 0)); // this value will be normalized by the engine
 
         if (!Scene.Lights.Contains(_directionalLight1))
             Scene.Lights.Add(_directionalLight1);
 
 
         //_pointLight1 ??= new PointLight(new Vector3(100, 0, -100), range: 10000) { Attenuation = new Vector3(1, 0, 0) };
-        _pointLight1 ??= new PointLight(new Vector3(100, 0, -100));
+        _pointLight1 ??= new PointLight(position: new Vector3(100, 0, -100));
 
         if (!Scene.Lights.Contains(_pointLight1))
             Scene.Lights.Add(_pointLight1);
 
 
-        _spotLight1 ??= new SpotLight(new Vector3(300, 0, 200), new Vector3(-1, -0.3f, 0));
+        _spotLight1 ??= new SpotLight(position: new Vector3(300, 0, 200), 
+                                      direction: new Vector3(-1, -0.3f, 0), // this value will be normalized by the engine
+                                      innerConeAngle: 20,  // 40 by default
+                                      outerConeAngle: 30); // 50 by default
 
         if (!Scene.Lights.Contains(_spotLight1))
             Scene.Lights.Add(_spotLight1);
