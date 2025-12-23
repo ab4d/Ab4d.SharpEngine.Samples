@@ -145,6 +145,7 @@ public class FogEffect : Effect
 
         // Assign DescriptorSets to each created memory block
         _materialsDataBlockPool.CreateDescriptorSetsAction = gpuBuffers => _standardDescriptorPoolFactory?.CreateDescriptorSets(gpuBuffers);
+        _materialsDataBlockPool.FreeDescriptorSetsAction = descriptorSets => _standardDescriptorPoolFactory?.FreeDescriptorSets(descriptorSets);
 
         // IMPORTANT:
         // Because material index is also used to tell if we need to multiply normal by -1,
@@ -469,6 +470,7 @@ public class FogEffect : Effect
 
         // Assign DescriptorSets to each created memory block
         _materialsDataBlockPool.CreateDescriptorSetsAction = gpuBuffers => _standardDescriptorPoolFactory?.CreateDescriptorSets(gpuBuffers);
+        _materialsDataBlockPool.FreeDescriptorSetsAction = descriptorSets => _standardDescriptorPoolFactory?.FreeDescriptorSets(descriptorSets);
 
         // IMPORTANT:
         // Because material index is also used to tell if we need to multiply normal by -1,
