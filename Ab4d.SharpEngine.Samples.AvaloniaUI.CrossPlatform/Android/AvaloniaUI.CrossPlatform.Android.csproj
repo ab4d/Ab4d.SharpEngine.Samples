@@ -22,6 +22,10 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" Version="11.3.5" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.16" />
+
+    <!-- Add support for Android 16KB page size - see https://avaloniaui.net/blog/preparing-your-avalonia-apps-for-android-s-16-kb-page-size-requirement -->
+    <PackageReference Include="SkiaSharp" Version="3.119.1" />
+    <PackageVersion Include="SkiaSharp.HarfBuzz" Version="3.119.0" />
   </ItemGroup>
 
   <ItemGroup>
