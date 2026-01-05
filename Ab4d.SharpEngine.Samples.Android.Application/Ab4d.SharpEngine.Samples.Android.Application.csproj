@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Android.Application</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Android.Application</RootNamespace>    
     <TargetFramework>net9.0-android</TargetFramework>
-    <Version>3.2.9386</Version>
+    <Version>3.2.9501</Version>
     <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion> <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features do not work so it is recommended to use Vulkan 1.1 -->
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />

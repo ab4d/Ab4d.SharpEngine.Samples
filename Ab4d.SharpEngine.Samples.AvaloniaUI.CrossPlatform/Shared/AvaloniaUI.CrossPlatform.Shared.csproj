@@ -22,8 +22,8 @@
   </ItemGroup>
   
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.2.9501" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
