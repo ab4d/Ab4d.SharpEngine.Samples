@@ -46,13 +46,13 @@ public class AxesBoxNodeSample : CommonSample
 
         // Set axes names:
         axesBox.XAxis1.AxisTitle = "XAxis1";
-        axesBox.XAxis2.AxisTitle = null;
+        axesBox.XAxis2.AxisTitle = "";
 
         axesBox.YAxis1.AxisTitle = "YAxis1";
-        axesBox.YAxis2.AxisTitle = null;
+        axesBox.YAxis2.AxisTitle = "";
 
         axesBox.ZAxis1.AxisTitle = "ZAxis1";
-        axesBox.ZAxis2.AxisTitle = null;
+        axesBox.ZAxis2.AxisTitle = "";
 
         sceneView.Scene.RootNode.Add(axesBox);
 
