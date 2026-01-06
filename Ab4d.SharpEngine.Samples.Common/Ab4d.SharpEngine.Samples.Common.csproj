@@ -11,19 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
+    <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
     <PackageReference Include="Openize.Drako" Version="1.4.3" /> <!-- Required only to read Draco compressed glTF file -->
   </ItemGroup>
-  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+  <ItemGroup>
     <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9501" />  
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9502" />  
     <PackageReference Include="Ab4d.SharpEngine.glTF" Version="3.2.9501" />  
   </ItemGroup>
-  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+  <!--<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Assimp\Ab4d.SharpEngine.Assimp.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF\Ab4d.SharpEngine.glTF.csproj" />
-  </ItemGroup>    
+  </ItemGroup>-->    
 
   <ItemGroup>
     <None Remove="Resources\Shaders\spv\*.spv" />
