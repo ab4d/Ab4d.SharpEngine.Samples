@@ -21,8 +21,8 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3296.44" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9386" />
-    <PackageReference Include="Ab4d.SharpEngine.WinForms" Version="3.2.9386" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
+    <PackageReference Include="Ab4d.SharpEngine.WinForms" Version="3.2.9501" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
