@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Wpf</AssemblyName>
@@ -16,12 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.Assimp" Version="1.1.8770" />
+    <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
     <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
     <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="3.2.9501" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9501" />    
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9502" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
