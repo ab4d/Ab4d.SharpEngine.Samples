@@ -112,13 +112,30 @@ public class SamplesXmlReader
 
         var xmlLines = samplesXmlContent.Split("\n");
 
+        bool isComment = false;
+
         foreach (var rawLine in xmlLines)
         {
             var line = rawLine.Trim();
 
-            // Skip empty lines and comments
-            if (line.Length == 0 || line.StartsWith("<!--"))
+            if (line.Length == 0)
                 continue;
+
+            if (isComment)
+            {
+                if (line.EndsWith("-->")) 
+                    isComment = false;
+
+                continue;
+            }
+
+            if (line.StartsWith("<!--"))
+            {
+                if (!line.EndsWith("-->"))
+                    isComment = true;
+
+                continue;
+            }
 
             // Only parse <Sample ... />
             if (!line.StartsWith("<Sample ")) // skip "<Samples"
