@@ -18,7 +18,7 @@ public interface ICommonSampleUIElement
     string? GetToolTip();
     ICommonSampleUIElement SetToolTip(string tooltip);
 
-    (double, double, double, double) GetMargin();
+    (double left, double top, double right, double bottom) GetMargin();
     ICommonSampleUIElement SetMargin(double left, double top, double right, double bottom);
 
     void SetProperty(string propertyName, string propertyValue);

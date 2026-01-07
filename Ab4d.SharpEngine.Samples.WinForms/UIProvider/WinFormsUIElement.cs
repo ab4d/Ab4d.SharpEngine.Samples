@@ -77,7 +77,7 @@ public abstract class WinFormsUIElement : ICommonSampleUIElement
     /// Returns margin (left, top, right, bottom)
     /// </summary>
     /// <returns>margin (left, top, right, bottom)</returns>
-    public virtual (double, double, double, double) GetMargin() => (WinFormsControl.Margin.Left, WinFormsControl.Margin.Top, WinFormsControl.Margin.Right, WinFormsControl.Margin.Bottom);
+    public virtual (double left, double top, double right, double bottom) GetMargin() => (WinFormsControl.Margin.Left, WinFormsControl.Margin.Top, WinFormsControl.Margin.Right, WinFormsControl.Margin.Bottom);
 
     public virtual ICommonSampleUIElement SetMargin(double left, double top, double right, double bottom)
     {

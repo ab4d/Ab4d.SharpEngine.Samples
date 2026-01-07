@@ -77,7 +77,7 @@ public abstract class WpfUIElement : ICommonSampleUIElement
     /// Returns margin (left, top, right, bottom)
     /// </summary>
     /// <returns>margin (left, top, right, bottom)</returns>
-    public virtual (double, double, double, double) GetMargin() => (WpfElement.Margin.Left, WpfElement.Margin.Top, WpfElement.Margin.Right, WpfElement.Margin.Bottom);
+    public virtual (double left, double top, double right, double bottom) GetMargin() => (WpfElement.Margin.Left, WpfElement.Margin.Top, WpfElement.Margin.Right, WpfElement.Margin.Bottom);
 
     public virtual ICommonSampleUIElement SetMargin(double left, double top, double right, double bottom)
     {

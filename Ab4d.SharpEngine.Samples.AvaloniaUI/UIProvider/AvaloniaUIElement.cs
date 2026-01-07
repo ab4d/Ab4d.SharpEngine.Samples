@@ -80,7 +80,7 @@ public abstract class AvaloniaUIElement : ICommonSampleUIElement
     /// Returns margin (left, top, right, bottom)
     /// </summary>
     /// <returns>margin (left, top, right, bottom)</returns>
-    public virtual (double, double, double, double) GetMargin() => (AvaloniaControl.Margin.Left, AvaloniaControl.Margin.Top, AvaloniaControl.Margin.Right, AvaloniaControl.Margin.Bottom);
+    public virtual (double left, double top, double right, double bottom) GetMargin() => (AvaloniaControl.Margin.Left, AvaloniaControl.Margin.Top, AvaloniaControl.Margin.Right, AvaloniaControl.Margin.Bottom);
 
     public virtual ICommonSampleUIElement SetMargin(double left, double top, double right, double bottom)
     {
