@@ -30,7 +30,6 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
@@ -135,31 +134,32 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 return;
 
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
-            var samplesXmlNodList = CommonSample.LoadSamples(fileName, uiFramework: "Avalonia", errorMessage => ShowError(errorMessage));
+
+            if (!System.IO.File.Exists(fileName))
+            {
+                ShowError("Cannot find Samples.xml file");
+                return;
+            }
+
+            var samplesXml = System.IO.File.ReadAllText(fileName);
+            var sampleItems = SamplesXmlReader.ParseXml(samplesXml);
 
             var listBoxItems = new List<ListBoxItem>();
 
             int selectedIndex = 0;
-            foreach (XmlNode xmlNode in samplesXmlNodList)
+            foreach (SamplesXmlReader.SampleItem sampleItem in sampleItems)
             {
-                try
-                {
-                    var listBoxItem = CreateListBoxItem(xmlNode);
+                var listBoxItem = CreateListBoxItem(sampleItem);
 
-                    if (listBoxItem != null)
+                if (listBoxItem != null)
+                {
+                    listBoxItems.Add(listBoxItem);
+
+                    if (listBoxItem.IsSelected)
                     {
-                        listBoxItems.Add(listBoxItem);
-
-                        if (listBoxItem.IsSelected)
-                        {
-                            selectedIndex = listBoxItems.Count - 1;
-                            listBoxItem.IsSelected = false;
-                        }
+                        selectedIndex = listBoxItems.Count - 1;
+                        listBoxItem.IsSelected = false;
                     }
-                }
-                catch
-                {
-                    Debug.WriteLine("Error parsing sample xml for " + xmlNode.OuterXml);
                 }
             }
 
@@ -169,55 +169,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 SamplesList.SelectedIndex = selectedIndex;
         }
 
-        private ListBoxItem? CreateListBoxItem(XmlNode xmlNode)
+        private ListBoxItem? CreateListBoxItem(SamplesXmlReader.SampleItem sampleItem)
         {
-            if (xmlNode.Attributes == null)
-                return null;
-
-            bool isSeparator = false;
-            bool isTitle = false;
-            bool isNew = false;
-            bool isUpdated = false;
-            string? updateInfo = null;
-
-            string? location = null;
-            string? title = null;
-            
-            foreach (XmlAttribute attribute in xmlNode.Attributes)
-            {
-                switch (attribute.Name.ToLower())
-                {
-                    case "location":
-                        location = attribute.Value;
-                        break;
-                    
-                    case "title":
-                        title = attribute.Value;
-                        break;
-                    
-                    case "isseparator":
-                        isSeparator = true;
-                        break;
-                    
-                    case "istitle":
-                        isTitle = true;
-                        break;
-                    
-                    case "isnew":
-                        isNew = true;
-                        break;
-                    
-                    case "isupdated":
-                        isUpdated = true;
-                        break;
-                    
-                    case "updateinfo":
-                        updateInfo = attribute.Value.Replace("\\n", "\n");
-                        break;
-                }
-            }
-
-            if (isSeparator)
+            if (sampleItem.IsSeparator)
             {
                 _applySeparator = true;
                 return null;
@@ -227,14 +181,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             var textBlock = new TextBlock()
             {
-                Text = title,
+                Text = sampleItem.Title,
                 FontSize = 14
             };
 
             double topMargin;
             double bottomMargin;
 
-            if (isTitle)
+            if (sampleItem.IsTitle)
             {
                 textBlock.FontWeight = FontWeight.Bold;
                 textBlock.Foreground = _samplesListHeaderTextBrush;
@@ -254,11 +208,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _applySeparator = false;
             }
 
-            textBlock.Margin = new Thickness(isTitle ? 4 : 10, topMargin, 0, bottomMargin);
+            textBlock.Margin = new Thickness(sampleItem.IsTitle ? 4 : 10, topMargin, 0, bottomMargin);
             
             stackPanel.Children.Add(textBlock);
 
-            if (isNew)
+            if (sampleItem.IsNew)
             {
                 _newBitmap ??= new Bitmap(AssetLoader.Open(new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/Resources/new_icon.png")));
                 var newImage = new Image()
@@ -275,7 +229,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 stackPanel.Children.Add(newImage);
             }
 
-            if (isUpdated)
+            if (sampleItem.IsUpdated)
             {
                 _updatedBitmap ??= new Bitmap(AssetLoader.Open(new Uri("avares://Ab4d.SharpEngine.Samples.AvaloniaUI/Resources/updated_icon.png")));
                 var updatedImage = new Image()
@@ -287,7 +241,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                ToolTip.SetTip(updatedImage, updateInfo ?? "Updated sample");
+                ToolTip.SetTip(updatedImage, sampleItem.UpdateInfo ?? "Updated sample");
 
                 stackPanel.Children.Add(updatedImage);
             }
@@ -295,10 +249,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             var listBoxItem = new ListBoxItem()
             {
                 Content = stackPanel,
-                Tag = location,
+                Tag = sampleItem.Location,
             };
 
-            if (_startupPage != null && _startupPage == location)
+            if (_startupPage != null && _startupPage == sampleItem.Location)
                 listBoxItem.IsSelected = true;
 
             return listBoxItem;
