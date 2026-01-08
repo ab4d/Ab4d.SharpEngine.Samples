@@ -2,10 +2,17 @@
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Lights;
-using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
 using System.Numerics;
+
+#if VULKAN
+using Ab4d.SharpEngine.Vulkan;
+using Ab4d.SharpEngine.OverlayPanels;
+using GpuDevice = Ab4d.SharpEngine.Vulkan.VulkanDevice;
+#elif WEB_GL
+using Ab4d.SharpEngine.WebGL;
+using GpuDevice = Ab4d.SharpEngine.WebGL.WebGLDevice;
+#endif
 
 namespace Ab4d.SharpEngine.Samples.Common;
 
@@ -17,7 +24,7 @@ public abstract class CommonSample
     
     protected ICommonSamplesContext context;
 
-    protected VulkanDevice? GpuDevice => context.GpuDevice;
+    protected GpuDevice? GpuDevice => context.GpuDevice;
 
     protected IBitmapIO BitmapIO => context.BitmapIO;
 
@@ -66,6 +73,7 @@ public abstract class CommonSample
         get => _showCameraAxisPanel;
         set
         {
+#if VULKAN
             if (!value && CameraAxisPanel != null)
             {
                 CameraAxisPanel.Dispose(); // Remove it from SceneView
@@ -77,11 +85,15 @@ public abstract class CommonSample
                 CameraAxisPanel = CreateCameraAxisPanel(SceneView.Camera);
 
             _showCameraAxisPanel = value; // If SceneView is not yet initialized, then we will create CameraAxisPanel in InitializeSceneView
+#else
+            Ab4d.SharpEngine.Utilities.Log.Warn?.Write("CommonSample", "CameraAxisPanel is not yet supported in Ab4d.SharpEngine for the browser.");
+#endif
         }
     }
 
+#if VULKAN
     public CameraAxisPanel? CameraAxisPanel { get; private set; }
-
+#endif
     
     protected CommonSample(ICommonSamplesContext context)
     {
@@ -243,6 +255,10 @@ public abstract class CommonSample
 
         OnCreateScene(scene);
         OnCreateLights(scene);
+
+        var task = OnCreateSceneAsync(scene); // call async method from sync context
+        if (task.IsFaulted)
+            throw task.Exception;
     }
     
     public void InitializeSceneView(SceneView sceneView)
@@ -251,8 +267,10 @@ public abstract class CommonSample
 
         sceneView.Camera = _createdCamera;
 
+#if VULKAN
         if (ShowCameraAxisPanel && _createdCamera != null)
             CameraAxisPanel = CreateCameraAxisPanel(_createdCamera);
+#endif
 
         // If SubscribeSceneUpdating was called before the SceneView was initialized, then we need to subscribe to SceneUpdating event
         if (_subscribedSceneUpdatingAction != null && _subscribedSceneView == null)
@@ -267,6 +285,7 @@ public abstract class CommonSample
         OnInputEventsManagerInitialized(inputEventsManager);
     }
 
+#if VULKAN
     public virtual CameraAxisPanel CreateCameraAxisPanel(ICamera camera)
     {
         if (SceneView == null)
@@ -289,12 +308,20 @@ public abstract class CommonSample
             CameraAxisPanel.Alignment = PositionTypes.BottomLeft;
         }
     }
+#endif
 
     protected virtual void OnSceneViewInitialized(SceneView sceneView)
     {
     }
 
-    protected abstract void OnCreateScene(Scene scene);
+    protected virtual void OnCreateScene(Scene scene)
+    {
+    }
+
+    protected virtual Task OnCreateSceneAsync(Scene scene)
+    {
+        return Task.CompletedTask; // Nothing to do if not overridden
+    }
 
     /// <summary>
     /// OnInputEventsManagerInitialized can be overridden to initialize the InputEventsManager.
@@ -379,16 +406,19 @@ public abstract class CommonSample
 
     public void Dispose()
     {
+        UnsubscribeSceneUpdatingEvent();
+
+#if VULKAN
         if (CameraAxisPanel != null)
         {
             CameraAxisPanel.Dispose();
             CameraAxisPanel = null;
         }
-
-        UnsubscribeSceneUpdatingEvent();
+        
         SceneView?.RemoveAllSpriteBatches();
 
         ResetCameraAxisPanel(); // Reset position of CameraAxisPanel - it may be changed, for example in AssimpImporterSample when FileLoad panel is shown in bottom left
+#endif
 
         IsDisposed = true;
         OnDisposed();
@@ -418,6 +448,7 @@ public abstract class CommonSample
 
     public GpuImage GetCommonTexture(string textureName, Scene? scene)
     {
+#if VULKAN
         ArgumentNullException.ThrowIfNull(scene);
 
         if (scene.GpuDevice != null)
@@ -428,16 +459,23 @@ public abstract class CommonSample
         var textureImage = TextureLoader.CreateTexture(fileName, scene, BitmapIO, useSceneCache: true);
         
         return textureImage;
+#else
+        throw new NotSupportedException();
+#endif
     }
     
-    public GpuImage GetCommonTexture(string textureName, VulkanDevice? gpuDevice)
+    public GpuImage GetCommonTexture(string textureName, GpuDevice? gpuDevice)
     {
+#if VULKAN
         ArgumentNullException.ThrowIfNull(gpuDevice);
 
         string fileName = GetCommonTexturePath(textureName);
         var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO, useGpuDeviceCache: true);
         
         return textureImage;
+#else
+        throw new NotSupportedException();
+#endif
     }
 
     protected void ShowErrorMessage(string errorMessage)
