@@ -8,6 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks> <!--This is required for FogEffect -->
+    <DefineConstants>VULKAN</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
