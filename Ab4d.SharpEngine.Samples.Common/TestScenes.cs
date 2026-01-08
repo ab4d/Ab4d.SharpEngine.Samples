@@ -1,7 +1,6 @@
 ﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
 using System.Numerics;
 using Ab4d.SharpEngine.Meshes;
 
@@ -25,14 +24,61 @@ public static class TestScenes
         "dragon_vrip_res3.obj"
     };
 
+    public static async Task<GroupNode> GetTestSceneAsync(Scene scene, StandardTestScenes testScene)
+    {
+        var testSceneFileName = _standardTestScenesFileNames[(int)testScene];
+
+        string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models", testSceneFileName);
+
+#if VULKAN
+        var objImporter = new ObjImporter();
+        var readGroupNode = await Task.Run(() => objImporter.Import(fileName));
+#else
+        var objImporter = new ObjImporter(scene);
+        var readGroupNode = await objImporter.ImportAsync(fileName);
+#endif
+
+        return readGroupNode;
+    }
+    
+    public static async Task<GroupNode> GetTestSceneAsync(Scene scene, StandardTestScenes testScene, Vector3 finalSize)
+    {
+        return await GetTestSceneAsync(scene, testScene, Vector3.Zero, PositionTypes.Center, finalSize);
+    }
+    
+    public static async Task<GroupNode> GetTestSceneAsync(Scene scene, 
+                                                          StandardTestScenes testScene,
+                                                          Vector3 position,
+                                                          PositionTypes positionType,
+                                                          Vector3 finalSize,
+                                                          bool preserveAspectRatio = true,
+                                                          bool preserveCurrentTransformation = true)
+    {
+        var readGroupNode = await GetTestSceneAsync(scene, testScene);
+
+        ModelUtils.PositionAndScaleSceneNode(readGroupNode,
+                                             position,
+                                             positionType,
+                                             finalSize,
+                                             preserveAspectRatio,
+                                             preserveCurrentTransformation);
+
+        return readGroupNode;
+    }
+
     public static GroupNode GetTestScene(StandardTestScenes testScene)
     {
         var testSceneFileName = _standardTestScenesFileNames[(int)testScene];
 
         string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models", testSceneFileName);
 
+#if VULKAN
         var objImporter = new ObjImporter();
         var readGroupNode = objImporter.Import(fileName);
+#else
+        var readGroupNode = new GroupNode();
+        throw new NotSupportedException();
+#endif
 
         return readGroupNode;
     }
