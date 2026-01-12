@@ -4,9 +4,10 @@
 
 Welcome to the Samples for Ab4d.SharpEngine.
 
-**Ab4d.SharpEngine is a cross-platform Vulkan based 3D rendering engine for desktop and mobile .Net applications.**
+**Ab4d.SharpEngine is a cross-platform 3D rendering engine for desktop, mobile and browser .Net applications.**
 
-Vulkan is a high performance and cross-platform graphics API that is similar to DirectX 12 but can run on multiple platforms.
+The samples in this repository demonstrate the usage of the engine on **desktop and mobile devices**.
+To see samples for the **browser**, see the [Ab4d.SharpEngine.Samples.Web samples](https://github.com/ab4d/Ab4d.SharpEngine.Samples.Web).
 
 The following features are supported by the current version:
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
