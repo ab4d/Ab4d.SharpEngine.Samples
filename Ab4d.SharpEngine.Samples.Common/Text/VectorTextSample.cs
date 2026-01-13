@@ -37,6 +37,7 @@ public class VectorTextSample : CommonSample
     private TextPositionTypes _selectedPositionType = TextPositionTypes.Baseline;
     private Vector3 _textDirection = new Vector3(1, 0, 0);
     private Vector3 _upDirection = new Vector3(0, 1, 0);
+    private TextAlignment _textAlignment = TextAlignment.Left;
     private float _lineHeight = 1.0f;
     private float _charSpacing = 0f;
     private float _fontStretch = 1.0f;
@@ -174,7 +175,8 @@ public class VectorTextSample : CommonSample
                                                                         _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
                                                                         textDirection: _textDirection,
                                                                         upDirection: _upDirection,
-                                                                        fontSize: _fontSize);
+                                                                        fontSize: _fontSize,
+                                                                        textAlignment: _textAlignment);
 
                 if (textMesh != null)
                 {
@@ -198,7 +200,8 @@ public class VectorTextSample : CommonSample
                                                                                                                         _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
                                                                                                                         textDirection: _textDirection,
                                                                                                                         upDirection: _upDirection,
-                                                                                                                        fontSize: _fontSize);
+                                                                                                                        fontSize: _fontSize,
+                                                                                                                        textAlignment: _textAlignment);
 
                 var colorHue = 0;
                 int trianglesCount = 0;
@@ -236,7 +239,8 @@ public class VectorTextSample : CommonSample
                                                                                     _selectedPositionType, // NOTE that this takes TextPositionTypes that also defines the Baseline value
                                                                                     textDirection: _textDirection,
                                                                                     upDirection: _upDirection,
-                                                                                    fontSize: _fontSize);
+                                                                                    fontSize: _fontSize,
+                                                                                    textAlignment: _textAlignment);
 
             // To get original character outline 2D positions, use the following code:
             //List<(int, char, Vector2[])> individualTextOutlinePositions = _currentVectorFontFactory.CreateIndividualTextOutlinePositions(_textToShow, _fontSize);
@@ -270,7 +274,7 @@ public class VectorTextSample : CommonSample
 
 
         // Update the text info label
-        _infoLabel?.UpdateValue(); 
+        _infoLabel?.UpdateValue();
 
 
         // Get the bounding rectangle of the text
@@ -347,7 +351,7 @@ public class VectorTextSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateTextBox(width: 240, height: 123, 
+        ui.CreateTextBox(width: 240, height: 88, 
             initialText: _textToShow,
             textChangedAction: (newText) =>
             {
@@ -431,7 +435,21 @@ public class VectorTextSample : CommonSample
                 _selectedPositionType = allPositionTypesInSample[selectedIndex];
                 RecreateText();
             }, 
-            0, 130, "PositionType:", 0);
+            0, width: 130, "PositionType:", keyTextWidth: 100);
+
+        
+        var textAlignments = Enum.GetNames(typeof(TextAlignment));
+        ui.CreateComboBox(textAlignments, 
+            (selectedIndex, selectedText) =>
+            {
+                _textAlignment = (TextAlignment)selectedIndex;
+                RecreateText();
+            }, selectedItemIndex: (int)_textAlignment, 
+            width: 130, 
+            keyText: "Text alignment:", keyTextWidth: 100);
+
+        
+        ui.AddSeparator();
 
         ui.CreateLabel("TextDirection: (1, 0, 0)");
         ui.CreateLabel("UpDirection: (0, 1, 0)");
