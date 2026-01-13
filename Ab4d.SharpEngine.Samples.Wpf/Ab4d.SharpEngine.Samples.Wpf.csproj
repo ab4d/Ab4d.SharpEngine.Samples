@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Wpf</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Wpf</RootNamespace>
-    <Version>3.2.9501</Version>
+    <Version>3.2.9509</Version>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -19,8 +19,8 @@
     <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
-    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="3.2.9501" />
+    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9509" />
+    <PackageReference Include="Ab4d.SharpEngine.Wpf" Version="3.2.9509" />
     <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9502" />    
   </ItemGroup>
   <!--<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
