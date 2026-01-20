@@ -169,7 +169,9 @@ public class SamplesXmlReader
         if (end < 0)
             return null;
 
-        return line.Substring(start, end - start);
+        var attributeText = line.Substring(start, end - start);
+        attributeText = attributeText.Replace("&amp", "&").Replace("&quot;", "\"");
+        return attributeText;
     }
 
     private static bool GetBoolAttribute(string line, string name)
