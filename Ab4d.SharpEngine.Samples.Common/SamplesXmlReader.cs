@@ -170,7 +170,7 @@ public class SamplesXmlReader
             return null;
 
         var attributeText = line.Substring(start, end - start);
-        attributeText = attributeText.Replace("&amp", "&").Replace("&quot;", "\"");
+        attributeText = attributeText.Replace("&amp;", "&").Replace("&quot;", "\"");
         return attributeText;
     }
 
