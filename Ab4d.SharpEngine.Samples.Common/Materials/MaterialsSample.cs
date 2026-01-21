@@ -433,7 +433,7 @@ public class MaterialsSample : CommonSample
             float blue = (position.Z - boxBounds.Minimum.Z) / boxBounds.SizeZ;
 
             // Set Color this position
-            positionColors[i] = new Color4(red, green, blue, alpha: 0.3f);
+            positionColors[i] = new Color4(red, green, blue, alpha: 1.0f);
 
             // When using transparent colors (alpha < 1) for VertexColorMaterial,
             // then the HasTransparency property on the VertexColorMaterial must be set to true.
