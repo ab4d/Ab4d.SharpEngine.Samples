@@ -30,11 +30,11 @@ public static class TestScenes
 
         string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models", testSceneFileName);
 
-#if VULKAN
         var objImporter = new ObjImporter();
-        var readGroupNode = await Task.Run(() => objImporter.Import(fileName));
+        
+#if VULKAN
+        var readGroupNode = await objImporter.ImportAsync(scene, fileName);
 #else
-        var objImporter = new ObjImporter(scene);
         var readGroupNode = await objImporter.ImportAsync(fileName);
 #endif
 
