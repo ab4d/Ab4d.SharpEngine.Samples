@@ -52,7 +52,7 @@ public abstract class CommonSample
     public virtual string? Subtitle { get; }
 
     public bool IsDisposed { get; private set; }
-
+    
     public PointerAndKeyboardConditions RotateCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed;
     public PointerAndKeyboardConditions MoveCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     public PointerAndKeyboardConditions QuickZoomConditions { get; set; } = PointerAndKeyboardConditions.Disabled;
@@ -256,9 +256,20 @@ public abstract class CommonSample
         OnCreateScene(scene);
         OnCreateLights(scene);
 
-        var task = OnCreateSceneAsync(scene); // call async method from sync context
-        if (task.IsFaulted)
-            throw task.Exception;
+        _ = OnCreateSceneAsync(scene); // call async method from sync context
+    }
+    
+    public async Task InitializeSceneAsync(Scene scene)
+    {
+        Scene = scene;
+
+        _createdCamera = OnCreateCamera();
+        targetPositionCamera = _createdCamera as TargetPositionCamera;
+
+        OnCreateScene(scene);
+        OnCreateLights(scene);
+
+        await OnCreateSceneAsync(scene);
     }
     
     public void InitializeSceneView(SceneView sceneView)
@@ -318,9 +329,8 @@ public abstract class CommonSample
     {
     }
 
-    protected virtual Task OnCreateSceneAsync(Scene scene)
+    protected virtual async Task OnCreateSceneAsync(Scene scene)
     {
-        return Task.CompletedTask; // Nothing to do if not overridden
     }
 
     /// <summary>
