@@ -4,7 +4,6 @@ using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.Samples.Common.Utils;
 using Avalonia.Controls;
 using Avalonia.Media;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 

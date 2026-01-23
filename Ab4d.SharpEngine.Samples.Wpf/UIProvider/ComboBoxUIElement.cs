@@ -3,7 +3,6 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.UIProvider;
 

@@ -5,7 +5,6 @@ using Windows.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.UIProvider;
 

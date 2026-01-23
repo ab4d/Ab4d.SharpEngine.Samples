@@ -4,7 +4,6 @@ using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.WinUI;
 using Microsoft.UI.Xaml.Controls;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.UIProvider;
 
