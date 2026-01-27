@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
@@ -52,6 +53,8 @@ public class InstancedArrowsSample : CommonSample
     private SceneView? _subscribedSceneView;
 
     private string? _totalPositionText;
+    private string? _performanceWarningText;
+
     private string? _performanceText;
     private StandardMesh? _arrowMesh;
     private ICommonSampleUIElement? _totalPositionLabel;
@@ -60,6 +63,9 @@ public class InstancedArrowsSample : CommonSample
     public InstancedArrowsSample(ICommonSamplesContext context)
         : base(context)
     {
+#if WEB_GL
+    _selectedArrowsCount = 50; // WASM in browser does not support multi-threading so lower the number of arrows
+#endif
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -70,7 +76,7 @@ public class InstancedArrowsSample : CommonSample
         _arrowsLength = 30;
 
         _sphereStartPosition = new Vector3(0, 200, 0);
-
+        _spherePosition = _sphereStartPosition;
 
         // Min and max distance will be used to get the color from the current arrow distance
         _minDistance = _sphereStartPosition.Y;
@@ -124,6 +130,8 @@ public class InstancedArrowsSample : CommonSample
             targetPositionCamera.Attitude = -20;
             targetPositionCamera.Distance = 2500;
         }
+
+        UpdatePerformanceWarningText();
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
@@ -159,7 +167,7 @@ public class InstancedArrowsSample : CommonSample
             double averageUpdateTime = _updateDataSamplesCount > 0 ? _totalUpdateDataTime / (double) _updateDataSamplesCount : 0;
             double averageRenderTime = _renderingTimeSamplesCount > 0 ? _totalRenderingTime / (double)_renderingTimeSamplesCount : 0;
 
-            _performanceText = $"Performance:\nUpdate InstanceData: {averageUpdateTime:#,##0.00} ms\nRender time: {averageRenderTime:#,##0.00} ms";
+            _performanceText = $"Performance:\nUpdate InstanceData: {averageUpdateTime:#,##0.00} ms\nRender time: {averageRenderTime:#,##0.00} ms{_performanceWarningText}";
 
             _performanceLabel?.UpdateValue();
 
@@ -269,6 +277,7 @@ public class InstancedArrowsSample : CommonSample
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private void UpdateInstanceData_Optimized()
     {
         var instancedData = _instanceData;
@@ -413,6 +422,7 @@ public class InstancedArrowsSample : CommonSample
     }
 
     #region Unoptimized version
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private void UpdateInstanceData_Unoptimized()
     {
         var instancedData = _instanceData;
@@ -609,6 +619,32 @@ public class InstancedArrowsSample : CommonSample
         }
     }
     
+    private void UpdatePerformanceWarningText()
+    {
+        var isDebuggerAttached = System.Diagnostics.Debugger.IsAttached;
+        
+#if DEBUG
+        var isDebugBuild = true;
+#else
+        var isDebugBuild = false;
+#endif
+
+        if (isDebuggerAttached || isDebugBuild)
+        {
+            _performanceWarningText = "\n\nPerformance warning(s):";
+
+            if (isDebugBuild)
+                _performanceWarningText += "\n- Debug build";
+
+            if (isDebuggerAttached)
+                _performanceWarningText += "\n- Debugger attached";
+        }
+        else
+        {
+            _performanceWarningText = "";
+        }
+    }
+
     protected override void OnDisposed()
     {
         if (_subscribedSceneView != null)
@@ -630,6 +666,8 @@ public class InstancedArrowsSample : CommonSample
         ui.AddSeparator();
 
         ui.CreateLabel("Number of arrows:");
+
+#if VULKAN
         var arrowNumberOptions = new string[]
         {
             "10 x 10 (100)",
@@ -637,6 +675,16 @@ public class InstancedArrowsSample : CommonSample
             "300 x 300 (90.000)",
             "1000 x 1000 (1.000.000)",
         };
+#elif WEB_GL
+        // Limit number of instances because Blazor WASM does not support multi-threading
+        var arrowNumberOptions = new string[]
+        {
+            "10 x 10 (100)",
+            "50 x 50 (2.500)",
+            "100 x 100 (10.000)",
+            "200 x 200 (40.000)",
+        };
+#endif
         ui.CreateComboBox(arrowNumberOptions, (selectedIndex, selectedText) => SelectedArrowNumberChanged(selectedText), selectedItemIndex: 1);
 
         ui.AddSeparator();
