@@ -4,6 +4,10 @@ using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.SceneNodes;
+
+using Ab4d.SharpEngine.Transformations;
 
 #if VULKAN
 using Ab4d.SharpEngine.Vulkan;
@@ -20,8 +24,50 @@ public abstract class CommonSample
 {
     // When true, the GC.Collect is called after each sample is disposed (in the Dispose method below).
     public static bool CollectGarbageAfterEachSample = true;
+
+    private const string ModelsBaseFolder = "Resources\\Models";
     
+    public enum CommonMeshes
+    {
+        Teapot = 0,
+        TeapotLowResolution,
+        Dragon
+    }
+
+    private static string[] _commonMeshesFileNames = new string[]
+    {
+        "teapot-hires.obj",
+        "Teapot.obj",
+        "dragon_vrip_res3.obj"
+    };
+
     
+    public enum CommonScenes
+    {
+        HouseWithTrees = 0,
+    }
+
+    private static string[] _commonScenesFileNames = new string[]
+    {
+        "house with trees.obj",
+    };
+
+    private Dictionary<CommonScenes, GroupNode> _commonScenesCache;
+
+    private GroupNode? _currentlyShownCommonScene;
+
+
+    public enum CommonTextures
+    {
+        Tree = 0,
+    }
+
+    private static string[] _commonTexturesFileNames = new string[]
+    {
+        "TreeTexture.png",
+    };
+
+
     protected ICommonSamplesContext context;
 
     protected GpuDevice? GpuDevice => context.GpuDevice;
@@ -175,21 +221,30 @@ public abstract class CommonSample
 
     public static object? CreateSampleObject(string uiFramework, string sampleLocation, object commonSamplesContext, Action<string>? showErrorAction)
     {
-        sampleLocation = sampleLocation.Replace("{uiFramework}", uiFramework);
+        Type? sampleType;
 
-        string assemblyName = uiFramework;
-        if (assemblyName == "Avalonia")
-            assemblyName += "UI"; // Assembly name has AvaloniaUI and not just Avalonia
+        if (uiFramework == "Blazor")
+        {
+            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common.Blazor", throwOnError: false);
+        }
+        else
+        {
+            sampleLocation = sampleLocation.Replace("{uiFramework}", uiFramework);
 
-        // Try to create common sample type from page attribute
-        var sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.{assemblyName}.{sampleLocation}, Ab4d.SharpEngine.Samples.{assemblyName}", throwOnError: false);
+            string assemblyName = uiFramework;
+            if (assemblyName == "Avalonia")
+                assemblyName += "UI"; // Assembly name has AvaloniaUI and not just Avalonia
 
-        if (sampleType == null)
-            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+            // Try to create common sample type from page attribute
+            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.{assemblyName}.{sampleLocation}, Ab4d.SharpEngine.Samples.{assemblyName}", throwOnError: false);
+
+            if (sampleType == null)
+                sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common", throwOnError: false);
+        }
 
         if (sampleType == null)
         {
-            showErrorAction?.Invoke("Sample not found: " + Environment.NewLine + sampleLocation);
+            showErrorAction?.Invoke("Sample not found: " + sampleLocation);
             return null;
         }
 
@@ -430,11 +485,19 @@ public abstract class CommonSample
         ResetCameraAxisPanel(); // Reset position of CameraAxisPanel - it may be changed, for example in AssimpImporterSample when FileLoad panel is shown in bottom left
 #endif
 
+        // Remove _currentlyShownCommonScene from the scene, so it is not going to be disposed and we can use it for the next sample
+        if (_currentlyShownCommonScene != null && _currentlyShownCommonScene.Parent != null)
+        {
+            _currentlyShownCommonScene.Parent.Remove(_currentlyShownCommonScene);
+            _currentlyShownCommonScene = null;
+        }
+
         IsDisposed = true;
         OnDisposed();
 
         if (Scene != null)
             Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+
 
         if (CollectGarbageAfterEachSample)
         {
@@ -448,46 +511,7 @@ public abstract class CommonSample
     {
 
     }
-
-    public string GetCommonTexturePath(string textureName)
-    {
-        // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
-        // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
-        return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
-    }
-
-    public GpuImage GetCommonTexture(string textureName, Scene? scene)
-    {
-#if VULKAN
-        ArgumentNullException.ThrowIfNull(scene);
-
-        if (scene.GpuDevice != null)
-            return GetCommonTexture(textureName, scene.GpuDevice); // Use GpuDevice so the image is also cached on GpuDevice
-
-        // else, cache on Scene object:
-        string fileName = GetCommonTexturePath(textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, scene, BitmapIO, useSceneCache: true);
-        
-        return textureImage;
-#else
-        throw new NotSupportedException();
-#endif
-    }
     
-    public GpuImage GetCommonTexture(string textureName, GpuDevice? gpuDevice)
-    {
-#if VULKAN
-        ArgumentNullException.ThrowIfNull(gpuDevice);
-
-        string fileName = GetCommonTexturePath(textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO, useGpuDeviceCache: true);
-        
-        return textureImage;
-#else
-        throw new NotSupportedException();
-#endif
-    }
-
     protected void ShowErrorMessage(string errorMessage)
     {
         ShowErrorMessage(errorMessage, showTimeMs: 0);
@@ -612,8 +636,6 @@ public abstract class CommonSample
         _subscribedSceneView = null;
     }
 
-    
-
     protected void ClearErrorMessage()
     {
         if (_errorMessagePanel != null)
@@ -621,6 +643,325 @@ public abstract class CommonSample
 
         _errorMessageToShow = null;
     }
+
+
+    #region GetCommonTexture, GetCommonTexturePath
+    public string GetCommonTexturePath(CommonTextures textureType)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        return GetCommonTexturePath(textureName);
+    }
+
+    public GpuImage GetCommonTexture(CommonTextures textureType, Scene? scene)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        return GetCommonTexture(textureName, scene);
+    }
+
+    public GpuImage GetCommonTexture(CommonTextures textureType, GpuDevice? gpuDevice)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        return GetCommonTexture(textureName, gpuDevice);
+    }
+
+    public async Task<GpuImage> GetCommonTextureAsync(CommonTextures textureType, Scene? scene)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        return await GetCommonTextureAsync(textureName, scene);
+    }
+
+    public async Task<GpuImage> GetCommonTextureAsync(CommonTextures textureType, GpuDevice? gpuDevice)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        return await GetCommonTextureAsync(textureName, gpuDevice);
+    }
+
+    public void GetCommonTexture(CommonTextures textureType, Scene? scene, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
+    {
+        var textureName = _commonTexturesFileNames[(int)textureType];
+        GetCommonTexture(textureName, scene, textureCreatedCallback, textureCreationFailedCallback);
+    }
+
+    public string GetCommonTexturePath(string textureName)
+    {
+        // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
+        // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
+        return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
+    }
+
+    public GpuImage GetCommonTexture(string textureName, Scene? scene)
+    {
+#if VULKAN
+        ArgumentNullException.ThrowIfNull(scene);
+
+        if (scene.GpuDevice != null)
+            return GetCommonTexture(textureName, scene.GpuDevice); // Use GpuDevice so the image is also cached on GpuDevice
+
+        // else, cache on Scene object:
+        string fileName = GetCommonTexturePath(textureName);
+        var textureImage = TextureLoader.CreateTexture(fileName, scene, BitmapIO, useSceneCache: true);
+        
+        return textureImage;
+#else
+        throw new NotSupportedException();
+#endif
+    }
+    
+    public GpuImage GetCommonTexture(string textureName, GpuDevice? gpuDevice)
+    {
+#if VULKAN
+        ArgumentNullException.ThrowIfNull(gpuDevice);
+
+        string fileName = GetCommonTexturePath(textureName);
+        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO, useGpuDeviceCache: true);
+        
+        return textureImage;
+#else
+        throw new NotSupportedException();
+#endif
+    }
+    
+    public async Task<GpuImage> GetCommonTextureAsync(string textureName, Scene? scene)
+    {
+        var tcs = new TaskCompletionSource<GpuImage>();
+
+        GetCommonTexture(
+            textureName, scene, 
+            textureCreatedCallback: rawImageData => tcs.SetResult(rawImageData),
+            textureCreationFailedCallback: exception => tcs.SetException(exception));
+
+        return await tcs.Task;
+    }
+    
+    public async Task<GpuImage> GetCommonTextureAsync(string textureName, GpuDevice? gpuDevice)
+    {
+        var tcs = new TaskCompletionSource<GpuImage>();
+
+        GetCommonTexture(
+            textureName, gpuDevice, 
+            textureCreatedCallback: rawImageData => tcs.SetResult(rawImageData),
+            textureCreationFailedCallback: exception => tcs.SetException(exception));
+
+        return await tcs.Task;
+    }
+
+    public void GetCommonTexture(string textureName, Scene? scene, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
+    {
+        ArgumentNullException.ThrowIfNull(scene);
+
+#if WEB_GL
+        if (textureCreationFailedCallback == null)
+            textureCreationFailedCallback = ex => Console.WriteLine($"Error reading common texture '{textureName}': {ex.Message}");
+#endif
+
+        string fileName = GetCommonTexturePath(textureName);
+        TextureLoader.CreateTexture(fileName, scene, textureCreatedCallback, generateMipMaps: true, useSceneCache: true, textureCreationFailedCallback: textureCreationFailedCallback);
+    }
+    
+    public void GetCommonTexture(string textureName, GpuDevice? gpuDevice, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
+    {
+        ArgumentNullException.ThrowIfNull(gpuDevice);
+        
+        string fileName = GetCommonTexturePath(textureName);
+        TextureLoader.CreateTexture(fileName, gpuDevice, textureCreatedCallback, generateMipMaps: true, useGpuDeviceCache: true, textureCreationFailedCallback: textureCreationFailedCallback);
+    }
+    #endregion
+
+    #region GetCommonMesh
+
+    public void GetCommonMesh(Scene scene, CommonMeshes meshType, Action<StandardMesh> meshCreatedCallback, bool cacheCommonMesh = true)
+    {
+        GetCommonMesh(scene, meshType, Vector3.Zero, PositionTypes.Center, finalSize: new Vector3(100, 100, 100), meshCreatedCallback, cacheCommonMesh: cacheCommonMesh, preserveAspectRatio: true);
+    }
+    
+    public void GetCommonMesh(Scene scene, CommonMeshes meshType, Vector3 finalSize, Action<StandardMesh> meshCreatedCallback, bool cacheCommonMesh = true)
+    {
+        GetCommonMesh(scene, meshType, Vector3.Zero, PositionTypes.Center, finalSize, meshCreatedCallback, cacheCommonMesh: cacheCommonMesh, preserveAspectRatio: true);
+    }
+
+    public void GetCommonMesh(Scene scene,
+                              CommonMeshes meshType,
+                              Vector3 position,
+                              PositionTypes positionType,
+                              Vector3 finalSize,
+                              Action<StandardMesh> meshCreatedCallback,
+                              bool cacheCommonMesh = true,
+                              bool preserveAspectRatio = true)
+    {
+        _ = GetCommonMeshAsync(scene, meshType, position, positionType, finalSize, cacheCommonMesh, preserveAspectRatio)
+            .ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                    throw task.Exception;
+                 
+                var readMesh = task.Result;
+                meshCreatedCallback(readMesh);
+            }, TaskScheduler.FromCurrentSynchronizationContext()); // Continue on UI thread
+    }
+
+
+    public async Task<StandardMesh> GetCommonMeshAsync(Scene scene, CommonMeshes meshType, bool cacheCommonMesh = true)
+    {
+        return await GetCommonMeshAsync(scene, meshType, Vector3.Zero, PositionTypes.Center, finalSize: new Vector3(100, 100, 100), cacheCommonMesh: cacheCommonMesh, preserveAspectRatio: true);
+    }
+    
+    public async Task<StandardMesh> GetCommonMeshAsync(Scene scene, CommonMeshes meshType, Vector3 finalSize, bool cacheCommonMesh = true)
+    {
+        return await GetCommonMeshAsync(scene, meshType, Vector3.Zero, PositionTypes.Center, finalSize, cacheCommonMesh: cacheCommonMesh, preserveAspectRatio: true);
+    }
+
+    public async Task<StandardMesh> GetCommonMeshAsync(Scene scene,
+                                                       CommonMeshes meshType,
+                                                       Vector3 position,
+                                                       PositionTypes positionType,
+                                                       Vector3 finalSize,
+                                                       bool cacheCommonMesh = true,
+                                                       bool preserveAspectRatio = true)
+    {
+        StandardMesh? commonMesh;
+
+        string? commonMeshCacheKey;
+        if (cacheCommonMesh)
+        {
+            commonMeshCacheKey = GetCommonMeshCacheKey(meshType);
+            commonMesh = scene.GetCachedObject<StandardMesh>(commonMeshCacheKey);
+
+            if (commonMesh != null && commonMesh.IsDisposed)
+                commonMesh = null;
+        }
+        else
+        {
+            commonMeshCacheKey = null;
+            commonMesh = null;
+        }
+
+
+        if (commonMesh == null)
+        {
+            var commonMeshFileName = _commonMeshesFileNames[(int)meshType];
+            string fullFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ModelsBaseFolder, commonMeshFileName); // ModelsBaseFolder: "Resources\\Models"
+            
+            var objImporter = new ObjImporter(scene);
+            var readGroupNode = await objImporter.ImportAsync(fullFileName);
+
+            if (readGroupNode.Count > 0 && readGroupNode[0] is MeshModelNode singeMeshModelNode)
+            {
+                if (singeMeshModelNode.Mesh is StandardMesh standardMesh)
+                {
+                    if (cacheCommonMesh)
+                        scene.CacheObject(commonMeshCacheKey!, standardMesh);
+
+                    commonMesh = standardMesh;
+                }
+            }
+        }
+
+        if (commonMesh == null)
+            throw new Exception("Cannot get common mesh from " + meshType.ToString());
+
+
+        var (translateVector, scaleVector) = ModelUtils.GetPositionAndScaleTransform(commonMesh.BoundingBox,
+                                                                                     position,
+                                                                                     positionType,
+                                                                                     finalSize,
+                                                                                     preserveAspectRatio);
+
+        var transformGroup = new TransformGroup();
+        transformGroup.Add(new ScaleTransform(scaleVector));
+        transformGroup.Add(new TranslateTransform(translateVector));
+
+        var transformedMesh = MeshUtils.TransformMesh(commonMesh, transformGroup);
+        return transformedMesh;
+    }
+
+    private string GetCommonMeshCacheKey(CommonMeshes meshType) => meshType.ToString() + "_CommonMesh";
+
+    #endregion
+    
+    #region GetCommonScene, ShowCommonScene
+
+    public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, bool cacheSceneNode = true)
+    {
+        var commonScene = await GetCommonSceneAsync(scene, sceneType,
+                                                    position: new Vector3(0, -10, 0),
+                                                    positionType: PositionTypes.Bottom | PositionTypes.Center,
+                                                    finalSize: new Vector3(400, 400, 400), cacheSceneNode: cacheSceneNode);
+
+        if (!this.IsDisposed && !scene.IsDisposing && !scene.IsDisposed)
+            scene.RootNode.Add(commonScene);
+    }
+
+    public async Task<GroupNode> GetCommonSceneAsync(Scene scene, CommonScenes sceneType, bool cacheSceneNode = true)
+    {
+        string? commonSceneCacheKey;
+        if (cacheSceneNode)
+        {
+            commonSceneCacheKey = GetCommonSceneCacheKey(sceneType);
+            var cachedGroupNode = scene.GetCachedObject<GroupNode>(commonSceneCacheKey);
+
+            if (cachedGroupNode != null && !cachedGroupNode.IsDisposed)
+            {
+                _currentlyShownCommonScene = cachedGroupNode;
+                return cachedGroupNode;
+            }
+        }
+        else
+        {
+            commonSceneCacheKey = null;
+        }
+
+
+        var testSceneFileName = _commonScenesFileNames[(int)sceneType];
+        string fullFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ModelsBaseFolder, testSceneFileName); // ModelsBaseFolder: "Resources\\Models"
+        
+        var objImporter = new ObjImporter(scene);
+        var readGroupNode = await objImporter.ImportAsync(fullFileName);
+
+        if (cacheSceneNode)
+            scene.CacheObject(commonSceneCacheKey!, readGroupNode);
+
+        _currentlyShownCommonScene = readGroupNode;
+        
+        return readGroupNode;
+    }
+    
+    public async Task<GroupNode> GetCommonSceneAsync(Scene scene, CommonScenes sceneType, Vector3 finalSize, bool cacheSceneNode = true)
+    {
+        return await GetCommonSceneAsync(scene, sceneType, Vector3.Zero, PositionTypes.Center, finalSize, cacheSceneNode: cacheSceneNode);
+    }
+    
+    public async Task<GroupNode> GetCommonSceneAsync(Scene scene, 
+                                                     CommonScenes sceneType,
+                                                     Vector3 position,
+                                                     PositionTypes positionType,
+                                                     Vector3 finalSize,
+                                                     bool cacheSceneNode = true,
+                                                     bool preserveAspectRatio = true)
+    {
+        var importedGroupNode = await GetCommonSceneAsync(scene, sceneType, cacheSceneNode);
+
+        // When we have custom position and size, we add the loaded scene to a new GroupNode.
+        // But first disconnect from any previous GroupNode, if any.
+        if (importedGroupNode.Parent != null)
+            importedGroupNode.Parent.Remove(importedGroupNode);
+
+        var finalGroupNode = new GroupNode(sceneType.ToString());
+        finalGroupNode.Add(importedGroupNode);
+
+        ModelUtils.PositionAndScaleSceneNode(finalGroupNode,
+                                             position,
+                                             positionType,
+                                             finalSize,
+                                             preserveAspectRatio);
+
+        _currentlyShownCommonScene = finalGroupNode;
+
+        return finalGroupNode;
+    }
+
+    private string GetCommonSceneCacheKey(CommonScenes sceneType) => sceneType.ToString() + "_CommonScene";
+
+    #endregion
 
     #region GetRandom... methods
     private Random _rnd = new Random();
