@@ -306,10 +306,16 @@ public class InstancedMeshNodeSample : CommonSample
         {
             Color4 baseColor = _isUsingTexture ? Colors.White : Colors.Orange;
 
+
+
             if (_instancedMeshNode.UseAlphaBlend)
-                _instancedMeshNode.UseSingleObjectColor(baseColor.SetAlpha(0.5f)); // all instances will be rendered by White or Orange color
-            else
-                _instancedMeshNode.UseSingleObjectColor(baseColor); // all instances will be rendered by White or Orange color
+            {
+                baseColor = baseColor.SetAlpha(0.5f);
+                baseColor.Premultiply(); // alpha-premultiply the color (we need to do that because we set instancedMeshNode.IsPreMultipliedAlphaColor to true in ChangeTransparency)
+            }
+
+            // all instances will be rendered by the baseColor
+            _instancedMeshNode.UseSingleObjectColor(baseColor); 
         }
         else
         {
