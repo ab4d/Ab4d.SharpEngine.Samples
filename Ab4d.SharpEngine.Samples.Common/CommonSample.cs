@@ -644,6 +644,18 @@ public abstract class CommonSample
         _errorMessageToShow = null;
     }
 
+    // This is used from automated tests so that samples do not wait for the resources to load
+    public async Task LoadAllResourcesAsync(Scene scene)
+    {
+        foreach (var commonMesh in Enum.GetValues<CommonMeshes>())
+            await GetCommonMeshAsync(scene, commonMesh);
+
+        foreach (var commonScene in Enum.GetValues<CommonScenes>())
+            await GetCommonSceneAsync(scene, commonScene);
+        
+        foreach (var commonTexture in Enum.GetValues<CommonTextures>())
+            await GetCommonTextureAsync(scene, commonTexture);
+    }
 
     #region GetCommonTexture, GetCommonTexturePath
     public string GetCommonTexturePath(CommonTextures textureType)
@@ -652,31 +664,31 @@ public abstract class CommonSample
         return GetCommonTexturePath(textureName);
     }
 
-    public GpuImage GetCommonTexture(CommonTextures textureType, Scene? scene)
+    public GpuImage GetCommonTexture(Scene? scene, CommonTextures textureType)
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         return GetCommonTexture(textureName, scene);
     }
 
-    public GpuImage GetCommonTexture(CommonTextures textureType, GpuDevice? gpuDevice)
+    public GpuImage GetCommonTexture(GpuDevice? gpuDevice, CommonTextures textureType)
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         return GetCommonTexture(textureName, gpuDevice);
     }
 
-    public async Task<GpuImage> GetCommonTextureAsync(CommonTextures textureType, Scene? scene)
+    public async Task<GpuImage> GetCommonTextureAsync(Scene? scene, CommonTextures textureType)
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         return await GetCommonTextureAsync(textureName, scene);
     }
 
-    public async Task<GpuImage> GetCommonTextureAsync(CommonTextures textureType, GpuDevice? gpuDevice)
+    public async Task<GpuImage> GetCommonTextureAsync(GpuDevice? gpuDevice, CommonTextures textureType)
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         return await GetCommonTextureAsync(textureName, gpuDevice);
     }
 
-    public void GetCommonTexture(CommonTextures textureType, Scene? scene, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
+    public void GetCommonTexture(Scene? scene, CommonTextures textureType, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         GetCommonTexture(textureName, scene, textureCreatedCallback, textureCreationFailedCallback);
@@ -788,6 +800,23 @@ public abstract class CommonSample
                               bool cacheCommonMesh = true,
                               bool preserveAspectRatio = true)
     {
+        // Before starting the async operation, try to get the common mesh from the cache
+        // so the if we have a cached value, we can immediately use that.
+        // This is needed in automated tests to prevent waiting for the async operation to complete.
+        if (cacheCommonMesh)
+        {
+            var commonMeshCacheKey = GetCommonMeshCacheKey(meshType);
+            var commonMesh = scene.GetCachedObject<StandardMesh>(commonMeshCacheKey);
+
+            if (commonMesh != null && !commonMesh.IsDisposed)
+            {
+                var transformedMesh = PositionAndScaleMesh(commonMesh, position, positionType, finalSize, preserveAspectRatio);
+                meshCreatedCallback(transformedMesh);
+                return;
+            }
+        }
+
+
         _ = GetCommonMeshAsync(scene, meshType, position, positionType, finalSize, cacheCommonMesh, preserveAspectRatio)
             .ContinueWith(task =>
             {
@@ -860,17 +889,23 @@ public abstract class CommonSample
             throw new Exception("Cannot get common mesh from " + meshType.ToString());
 
 
-        var (translateVector, scaleVector) = ModelUtils.GetPositionAndScaleTransform(commonMesh.BoundingBox,
-                                                                                     position,
-                                                                                     positionType,
-                                                                                     finalSize,
-                                                                                     preserveAspectRatio);
+        return PositionAndScaleMesh(commonMesh, position, positionType, finalSize, preserveAspectRatio);
+    }
+
+    private StandardMesh PositionAndScaleMesh(StandardMesh mesh, Vector3 position, PositionTypes positionType, Vector3 finalSize, bool preserveAspectRatio)
+    {
+        var (translateVector, scaleVector) = ModelUtils.GetPositionAndScaleTransform(
+            mesh.BoundingBox,
+            position,
+            positionType,
+            finalSize,
+            preserveAspectRatio);
 
         var transformGroup = new TransformGroup();
         transformGroup.Add(new ScaleTransform(scaleVector));
         transformGroup.Add(new TranslateTransform(translateVector));
 
-        var transformedMesh = MeshUtils.TransformMesh(commonMesh, transformGroup);
+        var transformedMesh = MeshUtils.TransformMesh(mesh, transformGroup);
         return transformedMesh;
     }
 
