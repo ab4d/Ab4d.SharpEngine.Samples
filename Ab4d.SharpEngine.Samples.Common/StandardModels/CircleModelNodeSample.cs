@@ -77,7 +77,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             LineThickness = 3,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, _directionLinesLength, 0),
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor
+#endif
         };
 
         scene.RootNode.Add(_normalLine);
@@ -88,7 +90,9 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             LineThickness = 3,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, 0, -_directionLinesLength),
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor
+#endif
         };
 
         scene.RootNode.Add(_upDirectionLine);
@@ -180,6 +184,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
                 return _gradientMaterial2;
             }
+#if VULKAN
             case 3:
             {
                 if (_gradientMaterial3 == null)
@@ -191,6 +196,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
                 return _gradientMaterial3;
             }
+#endif
         }
 
         return null;
@@ -317,7 +323,18 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             keyText: "TextureMapping:",
             keyTextWidth: 110);
 
-        _textureImageComboBox = ui.CreateComboBox(new string[] { "10x10 grid", "Red to Transparent gradient", "Red circles", "Saturn rings" },
+
+        var textureImages = new string[]
+        {
+            "10x10 grid", 
+            "Red to Transparent gradient", 
+            "Red circles",
+#if VULKAN
+            "Saturn rings"
+#endif
+        };
+
+        _textureImageComboBox = ui.CreateComboBox(textureImages,
             (selectedIndex, selectedText) =>
             {
                 selectedTextureIdx = selectedIndex;

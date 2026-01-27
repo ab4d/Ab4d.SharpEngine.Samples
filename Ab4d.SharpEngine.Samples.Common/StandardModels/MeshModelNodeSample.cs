@@ -4,7 +4,6 @@ using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
@@ -31,6 +30,8 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
     private MeshModelNode? _meshModelNode;
     private ICommonSampleUIElement? _triangleIndicesTextBox;
 
+    private TextBlockFactory? _textBlockFactory;
+    
 
     public MeshModelNodeSample(ICommonSamplesContext context)
         : base(context)
@@ -139,16 +140,17 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
         return _meshModelNode;
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        base.OnCreateScene(scene);
-
+        await base.OnCreateSceneAsync(scene);
+        
+        
         // Show position index as 3D text
-        var textBlockFactory = context.GetTextBlockFactory();
-        textBlockFactory.FontSize = 6;
-        textBlockFactory.BackgroundColor = Colors.Transparent; // no background
-        textBlockFactory.BorderThickness = 0;
-
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.FontSize = 6;
+        _textBlockFactory.BackgroundColor = Colors.Transparent; // no background
+        _textBlockFactory.BorderThickness = 0;
+        
         if (_standardMesh != null)
         {
             var positions = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
@@ -156,7 +158,7 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
             {
                 for (var i = 0; i < positions.Length; i++)
                 {
-                    var textNode1 = textBlockFactory.CreateTextBlock(i.ToString(), positions[i] + new Vector3(0, 0.5f, 0)); // Add position index text slightly above the model
+                    var textNode1 = _textBlockFactory.CreateTextBlock(i.ToString(), positions[i] + new Vector3(0, 0.5f, 0)); // Add position index text slightly above the model
                     scene.RootNode.Add(textNode1);
                 }
             }

@@ -56,7 +56,9 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
             LineThickness = 2,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, _directionLinesLength, 0),
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor
+#endif
         };
 
         scene.RootNode.Add(_normalLine);
@@ -67,7 +69,9 @@ public class PlaneModelNodeSample : StandardModelsSampleBase
             LineThickness = 2,
             StartPosition = new Vector3(0, 0, 0),
             EndPosition = new Vector3(0, 0, -_directionLinesLength),
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor
+#endif
         };
 
         scene.RootNode.Add(_heightDirectionLine);

@@ -3,11 +3,14 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using System.Numerics;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 
 public class PositionAndScaleSample: CommonSample
 {
+    private TextBlockFactory? _textBlockFactory;
+    
     public override string Title => "Position and scale 3D models with PositionAndScaleSceneNode method";
     public override string Subtitle => "Easily position any SceneNode by providing final position and position type and set SceneNode's final size.\nPosition is shown by a red cross.\nSize is shown by a green wire-box.";
 
@@ -17,12 +20,18 @@ public class PositionAndScaleSample: CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
-                                                position: new Vector3(0, 0, 0),
-                                                positionType: PositionTypes.Bottom | PositionTypes.Center,
-                                                finalSize: new Vector3(60, 60, 60));
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.BackgroundColor = Colors.LightYellow;
+        _textBlockFactory.BorderThickness = 1;
+        _textBlockFactory.BorderColor = Colors.DimGray;
+        _textBlockFactory.FontSize = 6;
+        
+        var teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot,
+                                                       position: new Vector3(0, 0, 0),
+                                                       positionType: PositionTypes.Bottom | PositionTypes.Center,
+                                                       finalSize: new Vector3(60, 60, 60));
 
         AddSceneNode(teapotMesh, scene, new Vector3(-120, 0, 0), PositionTypes.Bottom,                   new Vector3(80, 80, 80));
         AddSceneNode(teapotMesh, scene, new Vector3(-40, 60, 0), PositionTypes.Left | PositionTypes.Top, new Vector3(80, 60, 80));
@@ -106,23 +115,20 @@ public class PositionAndScaleSample: CommonSample
         scene.RootNode.Add(wireBoxNode);
 
 
-        // Finally we add TextBlockVisual3D to show position and size information for this model
-        // Note that the TextBlockVisual3D is added to the TransparentObjectsVisual3D.
-        // The reason for this is that TextBlockVisual3D uses semi-transparent background.
-        // To correctly show other object through semi-transparent, the semi-transparent must be added to the scene after solid objects.
-        var infoText = $"Position: ({position.X}, {position.Y}, {position.Z})\nPositionType: {positionType}\nSize: ({size.X}, {size.Y}, {size.Z})";
-        if (!preserveAspectRatio)
-            infoText += "\npreserveAspectRatio: false";
+        if (_textBlockFactory != null)
+        {
+            var textPosition = new Vector3(teapotModel.GetLocalBoundingBox().GetCenterPosition().X, -15, 55); // Show so that X center position is the same as model center position
 
-        var textBlockFactory = context.GetTextBlockFactory();
-        textBlockFactory.BackgroundColor = Colors.LightYellow;
-        textBlockFactory.BorderThickness = 1;
-        textBlockFactory.BorderColor = Colors.DimGray;
-        textBlockFactory.FontSize = 6;
+            // Finally we add TextBlockVisual3D to show position and size information for this model
+            // Note that the TextBlockVisual3D is added to the TransparentObjectsVisual3D.
+            // The reason for this is that TextBlockVisual3D uses semi-transparent background.
+            // To correctly show other object through semi-transparent, the semi-transparent must be added to the scene after solid objects.
+            var infoText = $"Position: ({position.X}, {position.Y}, {position.Z})\nPositionType: {positionType}\nSize: ({size.X}, {size.Y}, {size.Z})";
+            if (!preserveAspectRatio)
+                infoText += "\npreserveAspectRatio: false";
 
-        var textPosition = new Vector3(teapotModel.GetLocalBoundingBox().GetCenterPosition().X, -15, 55); // Show so that X center position is the same as model center position
-
-        var textNode = textBlockFactory.CreateTextBlock(infoText, textPosition, textAttitude: 30);
-        scene.RootNode.Add(textNode);
+            var textNode = _textBlockFactory.CreateTextBlock(infoText, textPosition, textAttitude: 30);
+            scene.RootNode.Add(textNode);
+        }
     }
 }

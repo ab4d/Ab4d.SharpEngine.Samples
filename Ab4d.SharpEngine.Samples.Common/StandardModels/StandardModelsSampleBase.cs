@@ -47,13 +47,18 @@ public abstract class StandardModelsSampleBase : CommonSample
     protected ICommonSampleUIElement? isSemiTransparentCheckBox;
     protected ICommonSampleUIElement? isTextureCheckBox;
 
+    private GpuImage? _commonTexture;
+    
+
     public StandardModelsSampleBase(ICommonSamplesContext context)
         : base(context)
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        _commonTexture = await base.GetCommonTextureAsync("10x10-texture.png", scene.GpuDevice);
+        
         ShowCameraAxisPanel = true;
 
         modelNode = CreateModelNode();
@@ -133,7 +138,9 @@ public abstract class StandardModelsSampleBase : CommonSample
 
         var lineMaterial = new LineMaterial(Colors.Orange, normalsLineThickness)
         {
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor
+#endif
         };
 
         normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, lineMaterial, "NormalLines");
@@ -251,12 +258,9 @@ public abstract class StandardModelsSampleBase : CommonSample
             modelMaterial = standardMaterial;
         }
 
-        if (isTextureMaterialChecked)
+        if (isTextureMaterialChecked && _commonTexture != null)
         {
-            if (textureImage == null || textureImage.IsDisposed || textureImage.GpuDevice != this.GpuDevice)
-                textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
-
-            standardMaterial.DiffuseTexture = textureImage;
+            standardMaterial.DiffuseTexture = _commonTexture;
             standardMaterial.DiffuseColor = Color3.White; // When using DiffuseTexture, then DiffuseColor is used as a filter (it is multiplies by each color in the texture)
         }
         else

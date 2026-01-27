@@ -1,12 +1,10 @@
 ﻿using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
+using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 
@@ -20,6 +18,8 @@ public class TransformationsSample : CommonSample
     
     private StandardMaterial _teapotMaterial = StandardMaterials.Orange;
     private StandardMesh? _teapotMesh;
+    
+    private TextBlockFactory? _textBlockFactory;
 
     private int _modelIndex;
 
@@ -28,8 +28,20 @@ public class TransformationsSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.BackgroundColor = Colors.LightYellow;
+        _textBlockFactory.BorderThickness = 1;
+        _textBlockFactory.BorderColor = Colors.DimGray;
+        _textBlockFactory.FontSize = 8;
+        
+        _teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot,
+                                                    position: new Vector3(0, 0, 0),
+                                                    positionType: PositionTypes.Bottom | PositionTypes.Center,
+                                                    finalSize: new Vector3(60, 60, 60));
+    
+
         var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -5, 50), size: new Vector3(700, 10, 300), "BaseBoxNode")
         {
             Material = StandardMaterials.Silver
@@ -105,10 +117,8 @@ public class TransformationsSample : CommonSample
 
     private void AddTeapot(Scene scene, Transform? transform, string text, string name)
     {
-        _teapotMesh ??= TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
-                                               position: new Vector3(0, 0, 0),
-                                               positionType: PositionTypes.Bottom | PositionTypes.Center,
-                                               finalSize: _modelSize);
+        if (_teapotMesh == null)
+            return;
 
         // Create TransformGroup so 
         var transformGroup = new TransformGroup();
@@ -124,16 +134,6 @@ public class TransformationsSample : CommonSample
 
         scene.RootNode.Add(teapotModel);
 
-        var textBlockFactory = context.GetTextBlockFactory();
-        textBlockFactory.BackgroundColor = Colors.LightYellow;
-        textBlockFactory.BorderThickness = 1;
-        textBlockFactory.BorderColor = Colors.DimGray;
-        textBlockFactory.FontSize = 8;
-
-        var textZPos = (_modelIndex % 2 == 0) ? 150 : 100;
-        var textNode1 = textBlockFactory.CreateTextBlock(text, _currentPosition + new Vector3(0, 20, textZPos), textAttitude: 30);
-        scene.RootNode.Add(textNode1);
-
 
         var rectangleNode = new RectangleNode(name: name + "Rectangle")
         {
@@ -146,6 +146,15 @@ public class TransformationsSample : CommonSample
         };
 
         scene.RootNode.Add(rectangleNode);
+        
+        
+        if (_textBlockFactory != null)
+        {
+            var textZPos = (_modelIndex % 2 == 0) ? 150 : 100;
+            var textNode1 = _textBlockFactory.CreateTextBlock(text, _currentPosition + new Vector3(0, 20, textZPos), textAttitude: 30);
+            scene.RootNode.Add(textNode1);
+        }
+        
 
         _modelIndex++;
         _currentPosition += new Vector3(_modelSize.X * 1.5f, 0, 0);

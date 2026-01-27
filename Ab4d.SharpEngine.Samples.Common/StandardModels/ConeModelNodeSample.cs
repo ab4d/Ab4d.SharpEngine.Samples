@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 

@@ -102,7 +102,7 @@ public class InstancedMeshNodeSample : CommonSample
 
     private void ChangeMesh(int selectedIndex)
     {
-        if (_instancedMeshNode == null || _instancesData == null)
+        if (_instancedMeshNode == null || _instancesData == null || Scene == null)
             return;
         
         _instancedMeshNode.SetDiffuseTexture(null); // disable texture if it was set before
@@ -119,26 +119,22 @@ public class InstancedMeshNodeSample : CommonSample
         }
         else if (selectedIndex == 2)
         {
-            if (_teapotMesh == null)
+            if (_teapotMesh != null)
             {
-                var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
-
-                var objImporter = new ObjImporter();
-                var teapotNode = objImporter.Import(teapotFileName);
-
-                if (teapotNode.Count > 0 && teapotNode[0] is MeshModelNode teapotMeshModelNode)
-                {
-                    if (teapotMeshModelNode.Mesh is StandardMesh teapotMesh)
-                    {
-                        Ab4d.SharpEngine.Utilities.ModelUtils.PositionAndScaleSceneNode(teapotMeshModelNode, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center, finalSize: new Vector3(20, 20, 20));
-                        teapotMesh = Ab4d.SharpEngine.Utilities.MeshUtils.TransformMesh(teapotMesh, teapotMeshModelNode.Transform);
-
-                        _teapotMesh = teapotMesh;
-                    }
-                }
+                _instancedMeshNode.Mesh = _teapotMesh;
             }
+            else
+            {
+                _instancedMeshNode.Mesh = null;
 
-            _instancedMeshNode.Mesh = _teapotMesh;
+                base.GetCommonMesh(Scene, CommonMeshes.Teapot, finalSize: new Vector3(20, 20, 20), meshCreatedCallback: (teapotMesh) =>
+                {
+                    _teapotMesh = teapotMesh;
+                    _instancedMeshNode.Mesh = _teapotMesh;
+
+                    _totalPositionsLabel?.UpdateValue();
+                });
+            }
         }
         else if (selectedIndex == 3)
         {
@@ -150,11 +146,23 @@ public class InstancedMeshNodeSample : CommonSample
                                                        widthSegments: 1, 
                                                        heightSegments: 1);
 
-            if (_treeGpuImage == null && Scene != null)
-                _treeGpuImage = base.GetCommonTexture("TreeTexture.png", Scene);
-            
             _instancedMeshNode.Mesh = _planeMesh;
-            _instancedMeshNode.SetDiffuseTexture(_treeGpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values
+
+            if (_treeGpuImage != null)
+            {
+                _instancedMeshNode.SetDiffuseTexture(_treeGpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values
+            }
+            else
+            {
+                if (Scene != null)
+                {
+                    base.GetCommonTexture(CommonTextures.Tree, Scene, gpuImage =>
+                    {
+                        _instancedMeshNode.SetDiffuseTexture(gpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values
+                        _treeGpuImage = gpuImage;
+                    });
+                }
+            }
 
             // Other overloads of SetDiffuseTexture:
             //_instancedMeshNode.SetDiffuseTexture(_treeGpuImage, colorMask: Colors.Red, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Set color mask
@@ -309,15 +317,16 @@ public class InstancedMeshNodeSample : CommonSample
         }
     }
 
-    private void ChangeTransparency(bool isChecked)
+    private void ChangeTransparency(bool useTransparency)
     {
-        _useTransparency = isChecked;
+        _useTransparency = useTransparency;
 
         if (_instancedMeshNode == null || _instancesData == null)
             return;
 
         // When using transparent colors (Alpha < 1), we need to enable alpha-blending
-        _instancedMeshNode.UseAlphaBlend = isChecked;
+        _instancedMeshNode.UseAlphaBlend = useTransparency;
+        _instancedMeshNode.IsPreMultipliedAlphaColor = true;
 
         // By default, the instance colors and color set in UseSingleObjectColor method are not alpha pre-multiplied.
         // But if we want to use alpha pre-multiplied colors, then we can set IsPreMultipliedAlphaColor to true.
@@ -327,7 +336,7 @@ public class InstancedMeshNodeSample : CommonSample
         {
             Color4 baseColor = _isUsingTexture ? Colors.White : Colors.Orange;
             
-            if (isChecked)
+            if (useTransparency)
                 _instancedMeshNode.UseSingleObjectColor(baseColor.SetAlpha(0.5f));
             else
                 _instancedMeshNode.UseSingleObjectColor(baseColor);
@@ -336,7 +345,7 @@ public class InstancedMeshNodeSample : CommonSample
         {
             float factor = 1.0f / _instancesData.Length;
 
-            if (isChecked)
+            if (useTransparency)
             {
                 if (_isUsingTexture)
                 {
@@ -347,7 +356,9 @@ public class InstancedMeshNodeSample : CommonSample
                     // When rendering texture, then use White color with changed alpha color
                     for (int i = 0; i < _instancesData.Length; i++)
                     {
-                        _instancesData[i].DiffuseColor = new Color4(1, 1, 1, alpha: 0.5f + i * factor);
+                        var alpha = 0.5f + i * factor;
+                        //_instancesData[i].DiffuseColor = new Color4(1, 1, 1, alpha: 0.5f + i * factor); // non alpha premultiplied
+                        _instancesData[i].DiffuseColor = new Color4(alpha, alpha, alpha, alpha); // alpha premultiplied
                     }
                 }
                 else
@@ -355,10 +366,18 @@ public class InstancedMeshNodeSample : CommonSample
                     // Alpha color value is changed based on the index
                     for (int i = 0; i < _instancesData.Length; i++)
                     {
-                        _instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red,
-                                                                    _instancesData[i].DiffuseColor.Green,
-                                                                    _instancesData[i].DiffuseColor.Blue,
-                                                                    alpha: i * factor);
+                        var alpha = i * factor;
+                        // non alpha premultiplied:
+                        //_instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red,
+                        //                                            _instancesData[i].DiffuseColor.Green,
+                        //                                            _instancesData[i].DiffuseColor.Blue,
+                        //                                            alpha: alpha);
+                        
+                        // alpha premultiplied:
+                        _instancesData[i].DiffuseColor = new Color4(alpha * _instancesData[i].DiffuseColor.Red,
+                                                                    alpha * _instancesData[i].DiffuseColor.Green,
+                                                                    alpha * _instancesData[i].DiffuseColor.Blue,
+                                                                    alpha: alpha);
                     }
                 }
             }
@@ -396,7 +415,7 @@ public class InstancedMeshNodeSample : CommonSample
         {
             "Pyramid (16 positions)", 
             "Sphere (961 positions)", 
-            "Teapot (2,976 positions)",
+            "Teapot (12,288 positions)",
             "Plane with texture (4 positions)",
         }, (selectedIndex, selectedText) => ChangeMesh(selectedIndex), selectedItemIndex: 1);
 

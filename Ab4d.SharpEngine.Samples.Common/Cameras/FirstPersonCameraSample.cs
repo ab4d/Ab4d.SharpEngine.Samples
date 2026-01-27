@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 
@@ -22,11 +21,16 @@ public class FirstPersonCameraSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
-    {
-        var testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, finalSize: new Vector3(200, 200, 200));
+    //protected override void OnCreateScene(Scene scene)
+    //{
+    //    var testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, finalSize: new Vector3(200, 200, 200));
 
-        scene.RootNode.Add(testScene);
+    //    scene.RootNode.Add(testScene);
+    //}
+
+    protected override async Task OnCreateSceneAsync(Scene scene)
+    {
+        await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees);
     }
 
     protected override Camera OnCreateCamera()
@@ -45,7 +49,7 @@ public class FirstPersonCameraSample : CommonSample
         if (_firstPersonCamera == null)
             return;
 
-        _firstPersonCamera.CameraPosition = new Vector3(22, -2, 125);
+        _firstPersonCamera.CameraPosition = new Vector3(44, 20, 250);
         _firstPersonCamera.Heading = -16;
         _firstPersonCamera.Attitude = 0;
     }

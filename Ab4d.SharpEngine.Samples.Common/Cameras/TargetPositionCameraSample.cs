@@ -33,8 +33,7 @@ public class TargetPositionCameraSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var testScene = await TestScenes.GetTestSceneAsync(scene, TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
-        scene.RootNode.Add(testScene);
+        await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees);
 
         _targetPositionCrossNode = new WireCrossNode(new Vector3(0, 0, 0), Colors.Red, lineLength: 50, lineThickness: 2);
         scene.RootNode.Add(_targetPositionCrossNode);
