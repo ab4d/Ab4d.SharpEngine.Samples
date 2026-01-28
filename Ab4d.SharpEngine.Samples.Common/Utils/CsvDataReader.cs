@@ -32,12 +32,22 @@ public class CsvDataReader
     public void ReadFile(string fileName)
     {
         var fileLines = System.IO.File.ReadAllLines(fileName);
+        ProcessAllLines(fileLines);
+    }
 
+    public void ProcessFileContent(string csvFileContent)
+    {
+        var fileLines = csvFileContent.Split('\n');
+        ProcessAllLines(fileLines);
+    }
+
+    public void ProcessAllLines(string[] fileLines)
+    {
         var columnSeparators = new char[] { ',', ';' };
 
         var columnNames = fileLines[0].Split(columnSeparators, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < columnNames.Length; i++)
-            columnNames[i] = columnNames[i].Trim(' ', '"', '\''); // Trim leading spaces or quotes
+            columnNames[i] = columnNames[i].Trim(' ', '"', '\'', '\r'); // Trim leading spaces or quotes
 
         var data = new float[fileLines.Length - 1, columnNames.Length];
 

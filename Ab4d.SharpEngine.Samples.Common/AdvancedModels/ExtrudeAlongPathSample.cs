@@ -16,7 +16,7 @@ public class ExtrudeAlongPathSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         // First prepare two 2D shapes:
         var letterTShapePositions = new Vector2[]
@@ -116,7 +116,7 @@ public class ExtrudeAlongPathSample : CommonSample
         scene.RootNode.Add(meshModelNode3);
 
 
-        var textBlockFactory = context.GetTextBlockFactory();
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
         textBlockFactory.FontSize = 12;
         textBlockFactory.BackgroundColor = Colors.LightYellow;
         textBlockFactory.BorderThickness = 1;
@@ -153,6 +153,6 @@ public class ExtrudeAlongPathSample : CommonSample
             targetPositionCamera.Distance = 550;
         }
 
-        scene.SetAmbientLight(10);
+        scene.SetAmbientLight(0.2f);
     }
 }

@@ -38,18 +38,20 @@ public abstract class CommonSample
     {
         "teapot-hires.obj",
         "Teapot.obj",
-        "dragon_vrip_res3.obj"
+        "dragon_vrip_res3.obj",
     };
 
     
     public enum CommonScenes
     {
         HouseWithTrees = 0,
+        RobotArm
     }
 
     private static string[] _commonScenesFileNames = new string[]
     {
         "house with trees.obj",
+        "robotarm.obj"
     };
 
     private Dictionary<CommonScenes, GroupNode> _commonScenesCache;
@@ -60,11 +62,15 @@ public abstract class CommonSample
     public enum CommonTextures
     {
         Tree = 0,
+        TenByTenNumbers,
+        UVChecker
     }
 
     private static string[] _commonTexturesFileNames = new string[]
     {
         "TreeTexture.png",
+        "10x10-texture.png",
+        "uvchecker2.png"
     };
 
 

@@ -19,7 +19,7 @@ public class TubesSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         // Low-segment tubes (to show that segments are correctly handled)
         CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 300, material: _specularRedMaterial);
@@ -29,8 +29,9 @@ public class TubesSample : CommonSample
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 0,  endAngle: 360, zOffset: -150, material: _specularGreenMaterial);
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 45, endAngle: 225, zOffset: -300, material: _specularGreenMaterial);
 
-        var textureFileName = base.GetCommonTexturePath("uvchecker2.png");
-        var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
+
+        var gpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.UVChecker);
+        var textureMaterial = new StandardMaterial(gpuImage);
 
         // Low-segment tubes (to show that segments are correctly handled)
         CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 600, material: textureMaterial);

@@ -4,7 +4,6 @@ using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using System;
@@ -22,7 +21,7 @@ public class BooleanOperationsSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         var boxMesh = MeshFactory.CreateBoxMesh(centerPosition: new Vector3(0, 0, 0), size: new Vector3(100, 100, 100));
         var sphereMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 65, segments: 16);
@@ -54,26 +53,6 @@ public class BooleanOperationsSample : CommonSample
         ShowMesh(scene, combinedMesh, 250);
         
 
-
-        var textBlockFactory = context.GetTextBlockFactory();
-
-        textBlockFactory.BackgroundColor = Colors.LightYellow;
-        textBlockFactory.BorderThickness = 1;
-        textBlockFactory.BorderColor = Colors.DimGray;
-
-        var textNode = textBlockFactory.CreateTextBlock("Subtract", new Vector3(-250, -45, 100), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-        textNode = textBlockFactory.CreateTextBlock("Intersect", new Vector3(-100, -45, 100), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-        textNode = textBlockFactory.CreateTextBlock("Union", new Vector3(50, -45, 100), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-        
-        textNode = textBlockFactory.CreateTextBlock("Combine (*)", new Vector3(250, -45, 100), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-
         var wireGridNode = new WireGridNode()
         {
             CenterPosition = new Vector3(0, -51, 0),
@@ -94,6 +73,26 @@ public class BooleanOperationsSample : CommonSample
             targetPositionCamera.Distance = 800;
             targetPositionCamera.TargetPosition = new Vector3(-30, -50, 0);
         }
+
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+        textBlockFactory.FontSize = 14;
+
+        var textNode = textBlockFactory.CreateTextBlock("Subtract", new Vector3(-250, -45, 100), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+
+        textNode = textBlockFactory.CreateTextBlock("Intersect", new Vector3(-100, -45, 100), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+
+        textNode = textBlockFactory.CreateTextBlock("Union", new Vector3(50, -45, 100), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+        
+        textNode = textBlockFactory.CreateTextBlock("Combine (*)", new Vector3(250, -45, 100), textAttitude: 30);
+        scene.RootNode.Add(textNode);
     }
 
     private void ShowMesh(Scene scene, StandardMesh? mesh, float xOffset)

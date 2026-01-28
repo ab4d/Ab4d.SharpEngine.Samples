@@ -6,7 +6,6 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using System.Numerics;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.glTF.Schema;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -50,22 +49,13 @@ public class TriangulatedExtrudedShapeSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         _generatedObjectsGroup = new GroupNode("GeneratedObjects");
 
         scene.RootNode.Add(_generatedObjectsGroup);
 
-
         UpdateCurrentShape();
-
-
-        var textBlockFactory = context.GetTextBlockFactory();
-
-        scene.RootNode.Add(textBlockFactory.CreateTextBlock("2D shape",           new Vector3(-70, 110, 0),  textAttitude: 90, positionType: PositionTypes.Right));
-        scene.RootNode.Add(textBlockFactory.CreateTextBlock("Triangulated shape", new Vector3(-70, 0, 0),    textAttitude: 90, positionType: PositionTypes.Right));
-        scene.RootNode.Add(textBlockFactory.CreateTextBlock("Extruded shape",     new Vector3(-70, -110, 0), textAttitude: 90, positionType: PositionTypes.Right));
-
 
         if (targetPositionCamera != null)
         {
@@ -76,6 +66,13 @@ public class TriangulatedExtrudedShapeSample : CommonSample
         }
 
         ShowCameraAxisPanel = true;
+
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        scene.RootNode.Add(textBlockFactory.CreateTextBlock("2D shape",           new Vector3(-70, 110, 0),  textAttitude: 90, positionType: PositionTypes.Right));
+        scene.RootNode.Add(textBlockFactory.CreateTextBlock("Triangulated shape", new Vector3(-70, 0, 0),    textAttitude: 90, positionType: PositionTypes.Right));
+        scene.RootNode.Add(textBlockFactory.CreateTextBlock("Extruded shape",     new Vector3(-70, -110, 0), textAttitude: 90, positionType: PositionTypes.Right));
     }
 
     private void UpdateCurrentShape()
@@ -122,7 +119,9 @@ public class TriangulatedExtrudedShapeSample : CommonSample
 
         var polyLineNode = new PolyLineNode(shape3DPositions, lineColor: Colors.Orange, lineThickness: 3)
         {
+#if VULKAN
             EndLineCap = LineCap.ArrowAnchor, // Add arrow to show the orientation of the shape
+#endif
             Transform = new TranslateTransform(y: 110)
         };
 
@@ -231,7 +230,9 @@ public class TriangulatedExtrudedShapeSample : CommonSample
 
             var polyLineNode = new PolyLineNode(onePolygonPositions3D, lineColor: Colors.Orange, lineThickness: 3)
             {
+#if VULKAN
                 EndLineCap = LineCap.ArrowAnchor, // Add arrow to show the orientation of the shape
+#endif
                 Transform = new TranslateTransform(y: 110)
             };
 

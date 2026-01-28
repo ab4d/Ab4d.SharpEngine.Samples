@@ -1,13 +1,11 @@
-﻿using Ab4d.SharpEngine.Samples.Common.Utils;
-using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -17,6 +15,8 @@ public class StreamlinesSample : CommonSample
     public override string Subtitle => "Streamlines with density encoded into color: blue: low density, red: high density\nStreamlines data are read from a csv file";
 
     private StandardMaterial? _gradientMaterial;
+
+    private CsvDataReader? _csvDataReader;
 
     public StreamlinesSample(ICommonSamplesContext context)
         : base(context)
@@ -44,10 +44,26 @@ public class StreamlinesSample : CommonSample
 
 
         // Sample data was created by using ParaView application and exporting the streamlines into csv file.
-        string sampleDataFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/streamlines.csv");
-        sampleDataFileName = FileUtils.FixDirectorySeparator(sampleDataFileName);
+        string sampleDataFileName = "Resources/streamlines.csv";
 
-        ReadStreamlinesData(scene, sampleDataFileName);
+        // Create csv file reader that can read data from a csv file
+        _csvDataReader = new CsvDataReader();
+
+#if WEB_GL
+        scene.GpuDevice.CanvasInterop.LoadTextFile(sampleDataFileName, 
+            onLoadedCallback: fileContent =>
+            {
+                _csvDataReader.ProcessFileContent(fileContent);
+                ShowStreamlines();
+            },
+            onLoadErrorCallback: errorMessage => ShowErrorMessage($"Cannot load {sampleDataFileName}: {errorMessage}"));
+#else
+        string fullFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sampleDataFileName);
+        fullFileName = FileUtils.FixDirectorySeparator(fullFileName);
+        _csvDataReader.ReadFile(fullFileName);
+
+        ShowStreamlines();
+#endif
     }
 
     protected override void OnDisposed()
@@ -61,17 +77,17 @@ public class StreamlinesSample : CommonSample
         base.OnDisposed();
     }
 
-    private void ReadStreamlinesData(Scene scene, string sampleDataFileName)
+    private void ShowStreamlines()
     {
+        var csvDataReader = _csvDataReader;
+
+        if (csvDataReader == null)
+            return;
+
+
         // We will set the tube path position color based on the Density
-        string colorColumnName  = "Density"; // "AngularVelocity"
-        bool   invertColorValue = false;     // This needs to be set to true when using AngularVelocity
-
-
-        // Create csv file reader that can read data from a csv file
-        var csvDataReader = new CsvDataReader();
-        csvDataReader.ReadFile(sampleDataFileName);
-
+        string colorColumnName = "Density"; // "AngularVelocity"
+        bool invertColorValue = false; // This needs to be set to true when using AngularVelocity
 
         csvDataReader.GetValuesRange(colorColumnName, out var minValue, out var maxValue);
 
@@ -129,7 +145,7 @@ public class StreamlinesSample : CommonSample
 
             var meshModelNode = new MeshModelNode(tubePathMesh, _gradientMaterial);
 
-            scene.RootNode.Add(meshModelNode);
+            Scene?.RootNode.Add(meshModelNode);
         }
 
         if (targetPositionCamera != null)

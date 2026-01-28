@@ -60,7 +60,7 @@
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options"/>
-  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows" IsUpdated="True" UpdateInfo="Added PlanarShadowNode that provides a faster option to render planar shadows."/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites" IsUpdated="True" UpdateInfo="Added NotifyTextureChange method to SpriteBatch that can be used\nto render a new frame without recreating the command buffers."/>
   <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering" IsNew="True"/>

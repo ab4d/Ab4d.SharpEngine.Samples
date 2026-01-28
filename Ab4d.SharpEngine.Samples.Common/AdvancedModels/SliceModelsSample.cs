@@ -1,12 +1,10 @@
 ﻿using System.Numerics;
-using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -55,7 +53,7 @@ public class SliceModelsSample : CommonSample
         ShowCameraAxisPanel = true;
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         // We add additional front and back GroupNodes that will provide separation from the front and back models.
         // Here we only create TranslateTransform objects. The actual transformation is set in UpdateSlicedModel method.
@@ -86,10 +84,12 @@ public class SliceModelsSample : CommonSample
 
 
         // Read model from obj file
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
+        //string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
 
-        var objImporter = new ObjImporter();
-        _importedModel = objImporter.Import(fileName);
+        //var objImporter = new ObjImporter();
+        //_importedModel = objImporter.Import(fileName);
+
+        _importedModel = await base.GetCommonSceneAsync(scene, CommonScenes.RobotArm, cacheSceneNode: false);
 
 
         // Uncomment to read model from some other file format:
