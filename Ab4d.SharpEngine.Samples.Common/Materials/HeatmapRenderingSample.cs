@@ -5,7 +5,6 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
@@ -74,7 +73,7 @@ public class HeatmapRenderingSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         _testObjectsGroup = new GroupNode();
         scene.RootNode.Add(_testObjectsGroup);
@@ -83,18 +82,31 @@ public class HeatmapRenderingSample : CommonSample
         _hitWireCrossNode.Visibility = SceneNodeVisibility.Hidden;
         scene.RootNode.Add(_hitWireCrossNode);
 
-        ShowTeapot();
-
-        if (scene.GpuDevice != null)
-            SetGradientTexture(gradientIndex: 0);
-
+        
         if (targetPositionCamera != null)
         {
             targetPositionCamera.TargetPosition = new Vector3(0, 20, 0);
             targetPositionCamera.Distance = 150;
         }
+
+        CommonScenes teapotScene;
+
+#if WEB_GL
+        teapotScene = CommonScenes.Teapot;
+#else
+        teapotScene = CommonScenes.TeapotHiRes;
+#endif
+
+        var teapotGroupNode = await base.GetCommonSceneAsync(scene, teapotScene);
+
+        // Get the MeshModelNode so we will be able to update the texture coordinates (this is the first and only child)
+        _teapotMeshModelNode = teapotGroupNode.GetChild<MeshModelNode>();
         
-        
+        if (scene.GpuDevice != null)
+            SetGradientTexture(gradientIndex: 0);
+
+        scene.RootNode.Add(teapotGroupNode);
+
         // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
         //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
         //
@@ -113,35 +125,6 @@ public class HeatmapRenderingSample : CommonSample
         }
 
         base.OnDisposed();
-    }
-
-    private void ShowTeapot()
-    {
-        if (_testObjectsGroup == null)
-            return;
-
-        _testObjectsGroup.Clear();
-
-
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
-
-        var objImporter = new ObjImporter();
-        var teapotModelNode = objImporter.Import(fileName);
-
-        // teapotModelNode.GetLocalBoundingBox()
-        // {Minimum:<-45.6221, 0, -29.923> Maximum:<52.8465, 48.2153, 31.3027>}
-        //     IsUndefined: false
-        //     IsZeroSize: false
-        //     Maximum: {<52.8465, 48.2153, 31.3027>}
-        //     Minimum: {<-45.6221, 0, -29.923>}
-        //     SizeX: 98.4686
-        //     SizeY: 48.2153
-        //     SizeZ: 61.2257
-
-        // Get the MeshModelNode so we will be able to update the texture coordinates
-        _teapotMeshModelNode = objImporter.NamedObjects["Teapot001"] as MeshModelNode;
-
-        _testObjectsGroup.Add(teapotModelNode);
     }
 
     private void SetGradientTexture(int gradientIndex)

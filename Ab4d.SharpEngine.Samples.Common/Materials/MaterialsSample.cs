@@ -24,7 +24,7 @@ public class MaterialsSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         int sphereRadius = 30;
 
@@ -55,12 +55,6 @@ public class MaterialsSample : CommonSample
         vertexColors = GetBoxVertexColors(planeMesh);
         planeMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
 
-
-        var textBlockFactory = context.GetTextBlockFactory();
-        textBlockFactory.BackgroundColor = Colors.LightYellow;
-        textBlockFactory.BorderThickness = 1;
-        textBlockFactory.BorderColor = Colors.DimGray;
-        textBlockFactory.FontSize = 9;
 
         var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -40, 0), size: new Vector3(700, 10, 300))
         {
@@ -100,10 +94,6 @@ public class MaterialsSample : CommonSample
 
         _testModelsGroup.Add(modelNode1);
 
-        var textNode1 = textBlockFactory.CreateTextBlock("DiffuseMaterial", new Vector3(-250, -20, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode1);
-
-
 
         //
         // 2) Material with Diffuse color and Specular color and Specular power
@@ -134,9 +124,6 @@ public class MaterialsSample : CommonSample
         };
 
         _testModelsGroup.Add(modelNode2);
-
-        var textNode2 = textBlockFactory.CreateTextBlock("SpecularMaterial", new Vector3(-150, -20, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode2);
 
 
         //
@@ -181,7 +168,14 @@ public class MaterialsSample : CommonSample
         // The most easy way to define a texture material is to set the file name in the StandardMaterial constructor.
         // We also need to set the BitmapIO provider that will read the bitmap (this is automatically set by the sample; it can be WpfBitmapIO, SkiaSharpBitmapIO (from Ab4d.SharpEngine.Avalonia), WinUIBitmapIO or ImageMagickBitmapIO)
         // This will save the texture name and when the GpuDevice is available, then the texture file will be loaded and a GpuImage object will be created on the graphics card.
-        var material3 = new StandardMaterial(textureFileName, this.BitmapIO, name: "10x10-texture.png"); // name is optional
+
+        // Create Gray material until the texture is loaded
+        var material3 = new StandardMaterial(diffuseColor: Colors.Gray, name: "TextureMaterial"); 
+        base.GetCommonTexture(scene, CommonTextures.TenByTenNumbers, textureCreatedCallback: gpuImage =>
+        {
+            material3.DiffuseTexture = gpuImage;
+            material3.DiffuseColor = Colors.White; // When using texture, the DiffuseColor is used as a color mask, so set it to White to show the original colors from the texture
+        });
 
         //// When the GpuDevice is available, then we can also create the GpuImage manually and set it to the DiffuseTexture property:
         //var gpuImage = TextureLoader.CreateTexture(textureFileName, this.BitmapIO, GpuDevice, generateMipMaps: true, isDeviceLocal: true, cacheGpuTexture: true);
@@ -230,9 +224,6 @@ public class MaterialsSample : CommonSample
 
         _testModelsGroup.Add(modelNode3);
 
-        var textNode3 = textBlockFactory.CreateTextBlock("TextureMaterial", new Vector3(-50, -20, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode3);
-
 
         //
         // 4) Semi-transparent material
@@ -275,12 +266,34 @@ public class MaterialsSample : CommonSample
 
         _testModelsGroup.Add(modelNode4);
 
-        var textNode4 = textBlockFactory.CreateTextBlock("SemiTransparent\r\nMaterial", new Vector3(50, -15, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode4);
-
 
         //
-        // 5) VertexColor material (specify different color for each vertex)
+        // 5) Solid-color material (material where no light-shading is applied)
+        //
+
+        //// We can also use texture:
+        //var solidColorMaterial = new SolidColorMaterial(textureFileName, this.BitmapIO);
+        
+        // We could also render solid color by using StandardMaterial and then setting Effect to SolidColorEffect:
+        //var solidColorMaterial = StandardMaterials.Orange;
+        //var solidColorMaterial = new StandardMaterial(Colors.Orange, "SolidColorMaterial");
+        //
+        //// ... and then change the default effect that is used to render that material to a SolidColorEffect
+        //solidColorMaterial.Effect = scene.EffectsManager.GetDefault<SolidColorEffect>();
+
+        var solidColorMaterial = new SolidColorMaterial(Colors.Orange, "SolidColorMaterial");
+
+        var modelNode5 = new MeshModelNode(sphereMesh, solidColorMaterial, "SolidColorModel")
+        {
+            Transform = new TranslateTransform(150, 0, 0)
+        };
+
+        _testModelsGroup.Add(modelNode5);
+
+
+#if VULKAN // VertexColor is not supported in current version of SharpEngine for the browser
+        //
+        // 6) VertexColor material (specify different color for each vertex)
         //
 
         // The easiest option to render VertexColor material is to set an array of Color3 or Color4 data
@@ -323,40 +336,11 @@ public class MaterialsSample : CommonSample
 
         _vertexColorModelNode = new MeshModelNode(sphereMesh, vertexColorMaterial, "VertexColorModel")
         {
-            Transform = new TranslateTransform(150, 0, 0)
-        };
-
-        _testModelsGroup.Add(_vertexColorModelNode);
-
-        var textNode5 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode5);
-
-
-        //
-        // 6) Solid-color material (material where no light-shading is applied)
-        //
-
-        //// We can also use texture:
-        //var solidColorMaterial = new SolidColorMaterial(textureFileName, this.BitmapIO);
-        
-        // We could also render solid color by using StandardMaterial and then setting Effect to SolidColorEffect:
-        //var solidColorMaterial = StandardMaterials.Orange;
-        //var solidColorMaterial = new StandardMaterial(Colors.Orange, "SolidColorMaterial");
-        //
-        //// ... and then change the default effect that is used to render that material to a SolidColorEffect
-        //solidColorMaterial.Effect = scene.EffectsManager.GetDefault<SolidColorEffect>();
-
-        var solidColorMaterial = new SolidColorMaterial(Colors.Orange, "SolidColorMaterial");
-
-        var modelNode6 = new MeshModelNode(sphereMesh, solidColorMaterial, "SolidColorModel")
-        {
             Transform = new TranslateTransform(250, 0, 0)
         };
 
-        _testModelsGroup.Add(modelNode6);
-
-        var textNode6 = textBlockFactory.CreateTextBlock("SolidColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
-        scene.RootNode.Add(textNode6);
+        _testModelsGroup.Add(_vertexColorModelNode);
+#endif
 
 
         if (targetPositionCamera != null)
@@ -365,6 +349,34 @@ public class MaterialsSample : CommonSample
             targetPositionCamera.Attitude = -15;
             targetPositionCamera.Distance = 800;
         }
+
+
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+        textBlockFactory.FontSize = 9;
+        
+        var textNode1 = textBlockFactory.CreateTextBlock("DiffuseMaterial", new Vector3(-250, -20, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode1);
+        
+        var textNode2 = textBlockFactory.CreateTextBlock("SpecularMaterial", new Vector3(-150, -20, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode2);
+        
+        var textNode3 = textBlockFactory.CreateTextBlock("TextureMaterial", new Vector3(-50, -20, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode3);
+
+        var textNode4 = textBlockFactory.CreateTextBlock("SemiTransparent\r\nMaterial", new Vector3(50, -15, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode4);
+        
+        var textNode5 = textBlockFactory.CreateTextBlock("SolidColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode5);
+
+#if VULKAN 
+        var textNode6 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode6);
+#endif
     }
 
     protected override void OnCreateLights(Scene scene)

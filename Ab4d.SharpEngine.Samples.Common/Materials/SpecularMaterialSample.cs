@@ -17,14 +17,12 @@ public class SpecularMaterialSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var textBlockFactory = context.GetTextBlockFactory();
-        //textBlockFactory.BackgroundColor = Colors.LightYellow;
-        //textBlockFactory.BorderThickness = 1;
-        //textBlockFactory.BorderColor     = Colors.DimGray;
-        textBlockFactory.FontSize        = 20;
-
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+        textBlockFactory.BackgroundColor = Colors.Transparent;
+        textBlockFactory.BorderThickness = 0;
+        textBlockFactory.FontSize = 20;
 
         var specularPowers = new float[] { 128, 64, 32, 16, 8, 4 };
 
@@ -69,6 +67,7 @@ public class SpecularMaterialSample : CommonSample
         {
             targetPositionCamera.Heading = 20;
             targetPositionCamera.Attitude = 0;
+            targetPositionCamera.Distance = 1700;
             targetPositionCamera.ShowCameraLight = ShowCameraLightType.Never;
         }
 
