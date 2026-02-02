@@ -46,6 +46,7 @@ public abstract class CommonSample
     {
         HouseWithTrees = 0,
         RobotArm,
+        Teapot,
         TeapotHiRes
     }
 
@@ -53,7 +54,8 @@ public abstract class CommonSample
     {
         "house with trees.obj",
         "robotarm.obj",
-        "teapot-hires"
+        "Teapot.obj",
+        "teapot-hires.obj"
     };
 
     private Dictionary<CommonScenes, GroupNode> _commonScenesCache;
