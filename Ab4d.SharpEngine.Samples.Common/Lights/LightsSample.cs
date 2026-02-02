@@ -4,6 +4,8 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
+using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lights;
 
@@ -17,10 +19,16 @@ public class LightsSample : CommonSample
 
     private GroupNode? _lightsGroup;
     private List<SceneNode>? _lightsModels;
-    private StandardMaterial? _lightEmissiveMaterial;
+    private SolidColorMaterial? _lightMaterial;
 
-    private Random _rnd = new Random();
     private PlaneModelNode? _planeModelNode;
+    private StandardMaterial? _textureMaterial;
+    private StandardMaterial? _specularTextureMaterial;
+
+    private string? _lightsInfoText;
+    private ICommonSampleUIElement? _lightsInfoLabel;
+    private WorldColorInstanceData[] _instancesData;
+    private StandardMesh _sphereMesh;
 
     public LightsSample(ICommonSamplesContext context)
         : base(context)
@@ -32,7 +40,7 @@ public class LightsSample : CommonSample
         _planeModelNode = new PlaneModelNode("bottomPlane")
         {
             Position = new Vector3(0, -100, 0),
-            Size = new Vector2(800, 1000),
+            Size = new Vector2(1000, 800),
             Material = StandardMaterials.Gray,
             BackMaterial = StandardMaterials.Black
         };
@@ -43,17 +51,18 @@ public class LightsSample : CommonSample
         var standardMaterial = new StandardMaterial(Colors.Silver);
         var specularMaterial = new StandardMaterial(Colors.Silver) { SpecularPower = 64 };
 
-        var textureFileName = base.GetCommonTexturePath("uvchecker2.png");
-        var textureMaterial = new StandardMaterial(textureFileName, BitmapIO);
-        var specularTextureMaterial = (StandardMaterial)textureMaterial.Clone();
-        specularTextureMaterial.SpecularPower = 64;
+        _textureMaterial = new StandardMaterial(Colors.Gray);
+
+        _specularTextureMaterial = (StandardMaterial)_textureMaterial.Clone();
+        _specularTextureMaterial.SpecularPower = 64;
+
 
         for (int i = 0; i < 3; i++)
         {
             var sphere = new SphereModelNode($"sphere_1_{i + 1}")
             {
-                CenterPosition = new Vector3(0, 0, -250 + i * 100),
-                Radius = 40 - i * 10,
+                CenterPosition = new Vector3(50 + i * 100, 0, 0),
+                Radius = 20 + i * 10,
                 Material = standardMaterial
             };
 
@@ -62,8 +71,8 @@ public class LightsSample : CommonSample
 
             sphere = new SphereModelNode($"sphere-2_{i + 1}")
             {
-                CenterPosition = new Vector3(0, 0, 50 + i * 100),
-                Radius = 20 + i * 10,
+                CenterPosition = new Vector3(-250 + i * 100, 0, 0),
+                Radius = 40 - i * 10,
                 Material = specularMaterial
             };
 
@@ -72,9 +81,9 @@ public class LightsSample : CommonSample
 
             sphere = new SphereModelNode($"sphere_3_{i + 1}")
             {
-                CenterPosition = new Vector3(0, 100, -250 + i * 100),
-                Radius = 40 - i * 10,
-                Material = textureMaterial
+                CenterPosition = new Vector3(50 + i * 100, 100, 0),
+                Radius = 20 + i * 10,
+                Material = _textureMaterial
             };
 
             scene.RootNode.Add(sphere);
@@ -82,23 +91,72 @@ public class LightsSample : CommonSample
 
             sphere = new SphereModelNode($"sphere-4_{i + 1}")
             {
-                CenterPosition = new Vector3(0, 100, 50 + i * 100),
-                Radius = 20 + i * 10,
-                Material = specularTextureMaterial
+                CenterPosition = new Vector3(-250 + i * 100, 100, 0),
+                Radius = 40 - i * 10,
+                Material = _specularTextureMaterial
             };
 
             scene.RootNode.Add(sphere);
         }
 
+        
+
+        _sphereMesh = Meshes.MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), 30, 30);
+
+        var instancedMeshNode1 = new InstancedMeshNode("InstancedMeshNode1");
+        instancedMeshNode1.Mesh = _sphereMesh;
+
+        _instancesData = new WorldColorInstanceData[]
+        {
+            new WorldColorInstanceData(new Vector3(-200, 200, 0), Colors.Yellow),
+            new WorldColorInstanceData(new Vector3(-80, 200, 0), Colors.Orange),
+        };
+
+        instancedMeshNode1.SetInstancesData(_instancesData);
+
+        scene.RootNode.Add(instancedMeshNode1);
+        
+
+
         AddDefaultLights();
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading = -80;
+            targetPositionCamera.Heading = 20;
             targetPositionCamera.Attitude = -10;
             targetPositionCamera.Distance = 1200;
             targetPositionCamera.ShowCameraLight = ShowCameraLightType.Never;
         }
+
+        //var gpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.UVChecker);
+
+        base.GetCommonTexture(scene, CommonTextures.UVChecker, gpuImage =>
+        {
+            if (_textureMaterial != null)
+            {
+                _textureMaterial.DiffuseTexture = gpuImage;
+                _textureMaterial.DiffuseColor = Colors.White;
+            }
+
+            if (_specularTextureMaterial != null)
+            {
+                _specularTextureMaterial.DiffuseTexture = gpuImage;
+                _specularTextureMaterial.DiffuseColor = Colors.White;
+            }
+
+            
+        
+            var instancedMeshNode2 = new InstancedMeshNode("InstancedMeshNode2");
+            instancedMeshNode2.Mesh = _sphereMesh;
+            instancedMeshNode2.Transform = new TranslateTransform(300, 0, 0);
+
+            instancedMeshNode2.SetInstancesData(_instancesData);
+
+            scene.RootNode.Add(instancedMeshNode2);
+        
+            instancedMeshNode2.SetDiffuseTexture(gpuImage, CommonSamplerTypes.Mirror);
+        });
+
     }
 
 
@@ -113,29 +171,29 @@ public class LightsSample : CommonSample
         SetAmbientLight(0);
 
 
-        _directionalLight1 ??= new DirectionalLight(direction: new Vector3(-1, -0.3f, 0)); // this value will be normalized by the engine
+        _directionalLight1 ??= new DirectionalLight(direction: new Vector3(-1, -0.3f, 0)); // direction value will be normalized by the engine
 
         if (!Scene.Lights.Contains(_directionalLight1))
             Scene.Lights.Add(_directionalLight1);
 
 
         //_pointLight1 ??= new PointLight(new Vector3(100, 0, -100), range: 10000) { Attenuation = new Vector3(1, 0, 0) };
-        _pointLight1 ??= new PointLight(position: new Vector3(100, 0, -100));
+        _pointLight1 ??= new PointLight(position: new Vector3(-300, 80, 200));
 
         if (!Scene.Lights.Contains(_pointLight1))
             Scene.Lights.Add(_pointLight1);
 
 
-        _spotLight1 ??= new SpotLight(position: new Vector3(300, 0, 200), 
-                                      direction: new Vector3(-1, -0.3f, 0), // this value will be normalized by the engine
-                                      innerConeAngle: 20,  // 40 by default
-                                      outerConeAngle: 30); // 50 by default
+        _spotLight1 ??= new SpotLight(position: new Vector3(150, 100, 250),
+                                      direction: new Vector3(-0.75f, -0.5f, -1), // direction value will be normalized by the engine
+                                      innerConeAngle: 30,  // 40 by default
+                                      outerConeAngle: 40); // 50 by default
 
         if (!Scene.Lights.Contains(_spotLight1))
             Scene.Lights.Add(_spotLight1);
 
 
-        UpdateLightModels();
+        OnLightsUpdated(); // Update light models and info text
     }
 
     public void AddDirectionalLight(bool randomColor = true)
@@ -149,6 +207,8 @@ public class LightsSample : CommonSample
             newLight.Color = GetRandomColor3();
 
         Scene.Lights.Add(newLight);
+
+        OnLightsUpdated(); // Update light models and info text
     }
 
     public void AddPointLight(bool randomColor = true)
@@ -163,7 +223,7 @@ public class LightsSample : CommonSample
 
         Scene.Lights.Add(newLight);
 
-        UpdateLightModels();
+        OnLightsUpdated(); // Update light models and info text
     }
 
     public void AddSpotLight(bool randomColor = true)
@@ -179,13 +239,20 @@ public class LightsSample : CommonSample
 
         Scene.Lights.Add(newLight);
 
-        UpdateLightModels();
+        OnLightsUpdated(); // Update light models and info text
     }
 
     public void SetAmbientLight(float intensityInPercent)
     {
         if (Scene == null)
             return;
+
+        var spotLight = Scene.Lights.OfType<SpotLight>().FirstOrDefault();
+        if (spotLight != null)
+        {
+            spotLight.InnerConeAngle = 10 + 0.5f * intensityInPercent;
+            spotLight.OuterConeAngle = 20 + 0.5f * intensityInPercent;
+        }
 
         float intensity = intensityInPercent / 100.0f;
 
@@ -201,18 +268,9 @@ public class LightsSample : CommonSample
         //    Scene.Lights.Add(_ambientLight);
 
         //UpdateAmbientLightTextBlock();
+
+        OnLightsUpdated(); // Update light models and info text
     }
-
-    private float GetAmbientLightIntensity()
-    {
-        //if (_ambientLight == null)
-        //    return 0;
-
-        //return (_ambientLight.Color.Red + _ambientLight.Color.Green + _ambientLight.Color.Blue) / 3.0f;
-
-        return Scene?.GetAmbientLightIntensity() ?? 0;
-    }
-
 
     // Get random position above the _planeModelNode
     private Vector3 GetRandomPosition()
@@ -252,7 +310,7 @@ public class LightsSample : CommonSample
             _lightsModels.Clear();
         }
 
-        _lightEmissiveMaterial ??= new StandardMaterial("YellowLightEmissiveMaterial") { EmissiveColor = Colors.Yellow.ToColor3() };
+        _lightMaterial ??= new SolidColorMaterial(Colors.Yellow, name: "YellowLightMaterial");
 
 
         for (var i = 0; i < Scene.Lights.Count; i++)
@@ -265,7 +323,7 @@ public class LightsSample : CommonSample
             {
                 var spotLightDirection = Vector3.Normalize(spotLight.Direction);
 
-                lightModelNode = new ArrowModelNode(_lightEmissiveMaterial, $"SpotLightModel_{i}")
+                lightModelNode = new ArrowModelNode(_lightMaterial, $"SpotLightModel_{i}")
                 {
                     StartPosition = spotLight.Position,
                     EndPosition = spotLight.Position + spotLightDirection * 20,
@@ -274,7 +332,7 @@ public class LightsSample : CommonSample
             }
             else if (oneLight is IPointLight pointLight)
             {
-                lightModelNode = new SphereModelNode(_lightEmissiveMaterial, $"PointLightModel_{i}")
+                lightModelNode = new SphereModelNode(_lightMaterial, $"PointLightModel_{i}")
                 {
                     CenterPosition = pointLight.Position,
                     Radius = 3
@@ -302,7 +360,30 @@ public class LightsSample : CommonSample
             return;
 
         Scene.Lights.Clear();
+        OnLightsUpdated(); // Update light models and info text
+    }
+
+    private void OnLightsUpdated()
+    {
+        targetPositionCamera?.Update(); // This will immediately update the lights so the UpdateLightsInfoText will be able to see if CameraLight is present or not
+
         UpdateLightModels();
+        UpdateLightsInfoText();
+    }
+    
+    private void UpdateLightsInfoText()
+    {
+        if (Scene == null)
+            return;
+
+        int directionalLightsCount = Scene.Lights.Count(l => l is DirectionalLight);
+        int spotLightCount = Scene.Lights.Count(l => l is SpotLight);
+        int pointLightCount = Scene.Lights.Count(l => l is PointLight) - spotLightCount; // SpotLight is derived from PointLight
+        bool hasCameraLights = Scene.Lights.Any(l => l is CameraLight);
+
+        _lightsInfoText = $"AmbientLight: {Scene.GetAmbientLightIntensity() * 100:N0}%\nDirectionalLights: {directionalLightsCount}\nPointLights: {pointLightCount}\nSpotLights: {spotLightCount}\nHas CameraLight: {hasCameraLights}";
+
+        _lightsInfoLabel?.UpdateValue();
     }
 
 
@@ -310,12 +391,12 @@ public class LightsSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateSlider(0, 100, () => GetAmbientLightIntensity() * 100, value => SetAmbientLight(value), 80, false, "AmbientLight:", 0, value => $"{value:F0}%");
+        ui.CreateSlider(0, 100, () => 0, value => SetAmbientLight(value), 80, false, "AmbientLight:", 0, value => $"{value:F0}%");
         ui.AddSeparator();
 
-        ui.CreateButton("Add spot light", () => AddSpotLight(randomColor: true));
-        ui.CreateButton("Add point light", () => AddPointLight(randomColor: true));
         ui.CreateButton("Add directional light", () => AddDirectionalLight(randomColor: true));
+        ui.CreateButton("Add point light", () => AddPointLight(randomColor: true));
+        ui.CreateButton("Add spot light", () => AddSpotLight(randomColor: true));
 
         ui.AddSeparator();
         ui.CreateButton("Remove all lights", () => RemoveAllLights());
@@ -326,7 +407,13 @@ public class LightsSample : CommonSample
         ui.CreateRadioButtons(new string[] { "Never (?):Never add additional camera light", "Auto (?):Show camera light only if there is no other light defined in the Scene", "Always (?):Always add a camera light" }, (selectedIndex, selectedText) =>
             {
                 if (targetPositionCamera != null)
+                {
                     targetPositionCamera.ShowCameraLight = (ShowCameraLightType)selectedIndex;
+                    OnLightsUpdated();
+                }
             }, 0);
+
+        ui.AddSeparator();
+        _lightsInfoLabel = ui.CreateKeyValueLabel(keyText: null, () => _lightsInfoText ?? "");
     }
 }
