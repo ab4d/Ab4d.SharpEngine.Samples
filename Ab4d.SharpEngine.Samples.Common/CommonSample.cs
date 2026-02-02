@@ -45,13 +45,15 @@ public abstract class CommonSample
     public enum CommonScenes
     {
         HouseWithTrees = 0,
-        RobotArm
+        RobotArm,
+        TeapotHiRes
     }
 
     private static string[] _commonScenesFileNames = new string[]
     {
         "house with trees.obj",
-        "robotarm.obj"
+        "robotarm.obj",
+        "teapot-hires"
     };
 
     private Dictionary<CommonScenes, GroupNode> _commonScenesCache;
