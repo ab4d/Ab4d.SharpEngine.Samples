@@ -76,6 +76,29 @@ public class SpecularMaterialSample : CommonSample
         scene.Lights.Add(new PointLight(position: new Vector3(0, 0, 500)));
     }
 
+    // This method can be called from the automatic tests
+    public void SetOpacity(float opacity)
+    {
+        if (Scene == null)
+            return;
+
+        Scene.RootNode.ForEachChild<SphereModelNode>(sphere =>
+            {
+                if (sphere.Material is StandardMaterial standardMaterial)
+                    standardMaterial.Opacity = opacity;
+            });
+    }
+    
+    // This method can be called from the automatic tests
+    public void SetBackgroundColor(string colorName)
+    {
+        if (SceneView == null)
+            return;
+
+        var color = Color4.Parse(colorName);
+        SceneView.BackgroundColor = color;
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         var rootStackPanel = ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
