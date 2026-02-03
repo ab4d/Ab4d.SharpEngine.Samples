@@ -21,7 +21,7 @@ public class MaterialAnimationSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         var boxModelNode = new BoxModelNode()
         {
@@ -34,17 +34,6 @@ public class MaterialAnimationSample : CommonSample
         scene.RootNode.Add(boxModelNode);
 
 
-        var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
-
-        var objImporter = new ObjImporter();
-        var teapotNode = objImporter.Import(teapotFileName);
-
-        _teapotMaterial = StandardMaterials.Gold.SetSpecular(Colors.White, 32);
-
-        Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(teapotNode, _teapotMaterial);
-        Ab4d.SharpEngine.Utilities.ModelUtils.PositionAndScaleSceneNode(teapotNode, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center | PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));
-
-        scene.RootNode.Add(teapotNode);
 
 
         if (targetPositionCamera != null)
@@ -53,6 +42,16 @@ public class MaterialAnimationSample : CommonSample
             targetPositionCamera.Attitude = -20;
             targetPositionCamera.Distance = 300;
         }
+
+        var teapotGroupNode = await base.GetCommonSceneAsync(scene, CommonScenes.Teapot, 
+                                                             position: new Vector3(0, 0, 0), 
+                                                             positionType: PositionTypes.Center | PositionTypes.Bottom, 
+                                                             finalSize: new Vector3(100, 100, 100));
+        
+        _teapotMaterial = StandardMaterials.Gold.SetSpecular(Colors.White, 32);
+        Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(teapotGroupNode, _teapotMaterial);
+
+        scene.RootNode.Add(teapotGroupNode);
     }
 
     protected override void OnDisposed()

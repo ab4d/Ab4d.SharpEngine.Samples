@@ -19,13 +19,18 @@ public class AnimationEasingSample : CommonSample
 
     private List<IAnimation> _allAnimations = new();
 
+    private TextBlockFactory? _textBlockFactory;
+
     public AnimationEasingSample(ICommonSamplesContext context)
         : base(context)
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.IsSolidColorMaterial = true;
+
         var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -5, 20), size: new Vector3(440, 10, 250), material: StandardMaterials.Silver, name: "BaseBox");
         scene.RootNode.Add(boxModelNode);
 
@@ -164,17 +169,18 @@ public class AnimationEasingSample : CommonSample
 
     private void AddTextWithBorder(Scene scene, Vector3 position, string text, Color4 textColor, float fontSize)
     {
-        var textBlockFactory = context.GetTextBlockFactory();
+        if (_textBlockFactory == null)
+            return;
 
-        textBlockFactory.FontSize = fontSize;
-        textBlockFactory.TextColor = textColor;
-        textBlockFactory.IsSolidColorMaterial = true;
+        _textBlockFactory.FontSize = fontSize;
+        _textBlockFactory.TextColor = textColor;
+        _textBlockFactory.IsSolidColorMaterial = true;
 
-        var textNode = textBlockFactory.CreateTextBlock(position: position,
-                                                        positionType: PositionTypes.Center | PositionTypes.Left,
-                                                        text,
-                                                        textDirection: new Vector3(1, 0, 0),
-                                                        upDirection: new Vector3(0, 0, -1));
+        var textNode = _textBlockFactory.CreateTextBlock(position: position,
+                                                         positionType: PositionTypes.Center | PositionTypes.Left,
+                                                         text,
+                                                         textDirection: new Vector3(1, 0, 0),
+                                                         upDirection: new Vector3(0, 0, -1));
 
         scene.RootNode.Add(textNode);
     }

@@ -27,7 +27,7 @@ public class GlobalAnimationPropertiesSample : CommonSample
 
     private PlanarShadowMeshCreator? _planarShadowMeshCreator;
     private PlaneModelNode? _planeModelNode;
-    private MeshModelNode? _shadowModel;
+    private PlanarShadowNode? _planarShadowNode;
     private DirectionalLight? _shadowDirectionalLight;
 
     private enum SampleDelayTypes
@@ -164,31 +164,18 @@ public class GlobalAnimationPropertiesSample : CommonSample
         if (_boxesGroupNode == null || _planeModelNode == null || _shadowDirectionalLight == null || Scene == null)
             return;
 
-        // Create PlanarShadowMeshCreator
-        _planarShadowMeshCreator = new PlanarShadowMeshCreator(_boxesGroupNode);
-        _planarShadowMeshCreator.SetPlane(_planeModelNode.GetCenterPosition(), _planeModelNode.Normal, _planeModelNode.HeightDirection, _planeModelNode.Size);
-        _planarShadowMeshCreator.ClipToPlane = false; // No need to clip shadow to plane because plane is big enough (when having smaller plane, turn this on - this creates a lot of additional objects on GC)
+        _planarShadowNode = new PlanarShadowNode(_boxesGroupNode);
+        _planarShadowNode.SetPlane(_planeModelNode, offset: 0.05f);
 
-        _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
+        _planarShadowNode.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
 
-        if (_planarShadowMeshCreator.ShadowMesh != null)
-        {
-            _shadowModel = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, StandardMaterials.DimGray, "PlanarShadowModel");
-            _shadowModel.Transform = new Ab4d.SharpEngine.Transformations.TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
-
-            Scene.RootNode.Add(_shadowModel);
-        }
+        Scene.RootNode.Add(_planarShadowNode);
     }
 
     private void UpdatePlanarShadow()
     {
-        if (_animation != null && _animation.IsRunning && _planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
-        {
-            _planarShadowMeshCreator.UpdateGroupNode();
-            _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
-
-            _shadowModel.Mesh = _planarShadowMeshCreator.ShadowMesh;
-        }
+        if (_animation != null && _animation.IsRunning && _planarShadowNode != null && _shadowDirectionalLight != null)
+            _planarShadowNode.ApplyDirectionalLight(_shadowDirectionalLight.Direction, updateTransformations: true);
     }
 
     private void UpdateAnimation()

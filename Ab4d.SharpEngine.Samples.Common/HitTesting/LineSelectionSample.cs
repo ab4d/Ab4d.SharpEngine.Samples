@@ -5,7 +5,6 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 

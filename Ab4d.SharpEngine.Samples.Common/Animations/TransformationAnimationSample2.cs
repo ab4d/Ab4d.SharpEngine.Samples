@@ -27,8 +27,8 @@ public class TransformationAnimationSample2 : CommonSample
     private GroupNode? _animatedObjectsGroup;
     private PlaneModelNode? _planeModelNode;
     private DirectionalLight? _shadowDirectionalLight;
-    private PlanarShadowMeshCreator? _planarShadowMeshCreator;
-    private MeshModelNode? _shadowModel;
+    private TextBlockFactory? _textBlockFactory;
+    private PlanarShadowNode? _planarShadowNode;
 
     public TransformationAnimationSample2(ICommonSamplesContext context)
         : base(context)
@@ -97,17 +97,18 @@ TranslateZ, RotateY";
 
     private void AddTextWithBorder(Scene scene, Vector3 topCenterPosition, string text, Color4 textColor, float fontSize)
     {
-        var textBlockFactory = context.GetTextBlockFactory();
+        if (_textBlockFactory == null)
+            return;
 
-        textBlockFactory.FontSize = fontSize;
-        textBlockFactory.TextColor = textColor;
-        textBlockFactory.IsSolidColorMaterial = true;
+        _textBlockFactory.TextColor = textColor;
+        _textBlockFactory.FontSize = fontSize;
+        _textBlockFactory.TextColor = textColor;
 
-        var textNode = textBlockFactory.CreateTextBlock(position: topCenterPosition,
-                                                        positionType: PositionTypes.Top | PositionTypes.Center,
-                                                        text,
-                                                        textDirection: new Vector3(1, 0, 0),
-                                                        upDirection: new Vector3(0, 0, -1));
+        var textNode = _textBlockFactory.CreateTextBlock(position: topCenterPosition,
+                                                         positionType: PositionTypes.Top | PositionTypes.Center,
+                                                         text,
+                                                         textDirection: new Vector3(1, 0, 0),
+                                                         upDirection: new Vector3(0, 0, -1));
 
         scene.RootNode.Add(textNode);
     }
@@ -117,35 +118,26 @@ TranslateZ, RotateY";
         if (_animatedObjectsGroup == null || _planeModelNode == null || _shadowDirectionalLight == null)
             return;
 
-        // Create PlanarShadowMeshCreator
-        _planarShadowMeshCreator = new PlanarShadowMeshCreator(_animatedObjectsGroup);
-        _planarShadowMeshCreator.SetPlane(_planeModelNode.GetCenterPosition(), _planeModelNode.Normal, _planeModelNode.HeightDirection, _planeModelNode.Size);
-        _planarShadowMeshCreator.ClipToPlane = false; // No need to clip shadow to plane because plane is big enough (when having smaller plane, turn this on - this creates a lot of additional objects on GC)
+        _planarShadowNode = new PlanarShadowNode(_animatedObjectsGroup);
+        _planarShadowNode.SetPlane(_planeModelNode, offset: 0.05f);
 
-        _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
+        _planarShadowNode.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
 
-        if (_planarShadowMeshCreator.ShadowMesh != null)
-        {
-            _shadowModel = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, StandardMaterials.DimGray, "PlanarShadowModel");
-            _shadowModel.Transform = new Ab4d.SharpEngine.Transformations.TranslateTransform(0, 0.1f, 0); // Lift the shadow 3D model slightly above the ground
-
-            scene.RootNode.Add(_shadowModel);
-        }
+        scene.RootNode.Add(_planarShadowNode);
     }
 
     private void UpdatePlanarShadow()
     {
-        if (_animation != null && _animation.IsRunning && _planarShadowMeshCreator != null && _shadowModel != null && _shadowDirectionalLight != null)
-        {
-            _planarShadowMeshCreator.UpdateGroupNode();
-            _planarShadowMeshCreator.ApplyDirectionalLight(_shadowDirectionalLight.Direction);
-
-            _shadowModel.Mesh = _planarShadowMeshCreator.ShadowMesh;
-        }
+        if (_animation != null && _animation.IsRunning && _planarShadowNode != null && _shadowDirectionalLight != null)
+            _planarShadowNode.ApplyDirectionalLight(_shadowDirectionalLight.Direction, updateTransformations: true);
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.FontSize = 14;
+        _textBlockFactory.IsSolidColorMaterial = true;
+
         _planeModelNode = new PlaneModelNode("BasePlane")
         {
             Position = new Vector3(0, -5f, 0),

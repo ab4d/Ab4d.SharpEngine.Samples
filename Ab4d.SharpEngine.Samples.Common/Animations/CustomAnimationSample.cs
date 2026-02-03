@@ -1,6 +1,5 @@
 ﻿using Ab4d.SharpEngine.Animation;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
@@ -109,14 +108,8 @@ public class CustomAnimationSample : CommonSample
         UpdateHueTextNode(Scene, hueValue1: angleNoEasing, hueValue2: angleWithEasing);
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _textBlockFactory = context.GetTextBlockFactory();
-        _textBlockFactory.FontSize = 20;
-
-        UpdateHueTextNode(scene, hueValue1: 0, hueValue2: 0);
-
-
         var boxCenterPosition1 = new Vector3(100, 0, -100);
         _rotationTransform1 = new StandardTransform()
         {
@@ -151,6 +144,12 @@ public class CustomAnimationSample : CommonSample
             targetPositionCamera.Attitude = -40;
             targetPositionCamera.Distance = 600;
         }
+
+
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.FontSize = 20;
+
+        UpdateHueTextNode(scene, hueValue1: 0, hueValue2: 0);
     }
 
     private void UpdateHueTextNode(Scene? scene, float hueValue1, float hueValue2)
