@@ -11,7 +11,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
 public class CameraAnimationSample : CommonSample
 {
-    public override string Title => "CameraAnimation sample";
+    public override string Title => "Camera animation sample";
     public override string? Subtitle => null;
 
     private CameraAnimation? _currentCameraAnimation;
@@ -21,7 +21,7 @@ public class CameraAnimationSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         var boxModelNode = new BoxModelNode()
         {
@@ -36,13 +36,6 @@ public class CameraAnimationSample : CommonSample
 
         var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
 
-        var objImporter = new ObjImporter();
-        var teapotNode = objImporter.Import(teapotFileName);
-
-        Ab4d.SharpEngine.Utilities.ModelUtils.ChangeMaterial(teapotNode, StandardMaterials.Gold.SetSpecular(Colors.White, 32));
-        Ab4d.SharpEngine.Utilities.ModelUtils.PositionAndScaleSceneNode(teapotNode, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center | PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));
-
-        scene.RootNode.Add(teapotNode);
 
 
         if (targetPositionCamera != null)
@@ -51,6 +44,15 @@ public class CameraAnimationSample : CommonSample
             targetPositionCamera.Attitude = -45;
             targetPositionCamera.Distance = 300;
         }
+
+        var teapotNode = await base.GetCommonSceneAsync(scene, CommonScenes.Teapot, 
+                                                        position: new Vector3(0, 0, 0), 
+                                                        positionType: PositionTypes.Center | PositionTypes.Bottom, 
+                                                        finalSize: new Vector3(100, 100, 100));
+
+        ModelUtils.ChangeMaterial(teapotNode, StandardMaterials.Gold.SetSpecular(Colors.White, 32));
+
+        scene.RootNode.Add(teapotNode);
     }
 
     protected override void OnDisposed()

@@ -9,7 +9,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
 public class MaterialAnimationSample : CommonSample
 {
-    public override string Title => "MaterialAnimation sample";
+    public override string Title => "Material animation sample";
     public override string? Subtitle => null;
 
     private StandardMaterial? _teapotMaterial;
