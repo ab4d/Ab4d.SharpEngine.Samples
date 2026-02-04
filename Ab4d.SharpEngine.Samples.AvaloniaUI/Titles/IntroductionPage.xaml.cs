@@ -117,7 +117,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
         private void ShowInfoTextBlock()
         {
             // Avalonia does not have Visibility with Hidden, so we need to first show two empty lines of text and then set the actual text
-            InfoTextBlock.Text = "Ab4d.SharpEngine is a blazing fast and cross platform\n3D rendering engine for desktop and mobile .Net applications.";
+            InfoTextBlock.Text = "Ab4d.SharpEngine is an easy to use general purpose\n3D rendering engine for desktop, mobile and browser apps.";
         }
 
         private void HideInfoTextBlock()
