@@ -935,6 +935,14 @@ public abstract class CommonSample
         if (!this.IsDisposed && !scene.IsDisposing && !scene.IsDisposed)
             scene.RootNode.Add(commonScene);
     }
+    
+    public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, Vector3 position, PositionTypes positionType, Vector3 finalSize,bool cacheSceneNode = true)
+    {
+        var commonScene = await GetCommonSceneAsync(scene, sceneType, position, positionType, finalSize, cacheSceneNode);
+
+        if (!this.IsDisposed && !scene.IsDisposing && !scene.IsDisposed)
+            scene.RootNode.Add(commonScene);
+    }
 
     public async Task<GroupNode> GetCommonSceneAsync(Scene scene, CommonScenes sceneType, bool cacheSceneNode = true)
     {
