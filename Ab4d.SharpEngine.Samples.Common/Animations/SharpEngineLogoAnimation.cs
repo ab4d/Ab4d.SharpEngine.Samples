@@ -8,6 +8,7 @@ using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Animation;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
@@ -46,19 +47,25 @@ public class SharpEngineLogoAnimation : IDisposable
     public SharpEngineLogoAnimation(Scene scene, IBitmapIO? bitmapIO = null)
     {
         // Create PlaneModelNode that will show the logo bitmap
-        string logoFileName = AppDomain.CurrentDomain.BaseDirectory + LogoImageResourceName;
-        _logoTextureMaterial = new StandardMaterial(logoFileName, bitmapIO);
+
+        _logoTextureMaterial = new StandardMaterial(Colors.Transparent, name: "Ab4dLogoTexture");
         _logoTextureMaterial.Opacity = 0; // hidden at start
 
+        if (scene.GpuDevice != null)
+            StartLoadingLogoTexture(scene);
+        else
+            scene.SceneInitialized += (sender, args) => StartLoadingLogoTexture(scene);
+
+
         _logoPlaneModel = new PlaneModelNode()
-        {
-            Position = new Vector3(0, 0, -100),
-            Normal = new Vector3(0, 0, 1),
-            HeightDirection = new Vector3(0, 1, 0),
-            Size = new Vector2(220, 220), // ration: w : h = 0.85 : 1.00,
-            Material = _logoTextureMaterial,
-            BackMaterial = StandardMaterials.Black,
-        };
+            {
+                Position = new Vector3(0, 0, -100),
+                Normal = new Vector3(0, 0, 1),
+                HeightDirection = new Vector3(0, 1, 0),
+                Size = new Vector2(220, 220), // ration: w : h = 0.85 : 1.00,
+                Material = _logoTextureMaterial,
+                BackMaterial = StandardMaterials.Black,
+            };
 
 
         // Create hash symbol
@@ -113,6 +120,21 @@ public class SharpEngineLogoAnimation : IDisposable
         _materialAnimation.SetOpacity(0, duration: lastColorFrameNumber - startColorAnimationFrameNumber, delay: startColorAnimationFrameNumber);
 
         _materialAnimation.SetDuration(AnimationDurationIsSeconds * 1000);
+    }
+
+    private void StartLoadingLogoTexture(Scene scene)
+    {
+#if VULKAN
+        string logoFileName = AppDomain.CurrentDomain.BaseDirectory + LogoImageResourceName;
+#else
+        string logoFileName = LogoImageResourceName;
+#endif
+
+        TextureLoader.CreateTexture(logoFileName, scene, textureCreatedCallback: gpuImage =>
+        {
+            _logoTextureMaterial.DiffuseTexture = gpuImage;
+            _logoTextureMaterial.DiffuseColor = Colors.White;
+        });
     }
 
     public void StartAnimation()
