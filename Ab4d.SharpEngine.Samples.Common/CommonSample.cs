@@ -777,7 +777,7 @@ public abstract class CommonSample
 #endif
 
         string fileName = GetCommonTexturePath(textureName);
-        TextureLoader.CreateTexture(fileName, scene, textureCreatedCallback, generateMipMaps: true, useSceneCache: true, textureCreationFailedCallback: textureCreationFailedCallback);
+        TextureLoader.CreateTexture(fileName, scene, textureCreatedCallback, useSceneCache: true, generateMipMaps: true, textureCreationFailedCallback: textureCreationFailedCallback);
     }
     
     public void GetCommonTexture(string textureName, GpuDevice? gpuDevice, Action<GpuImage> textureCreatedCallback, Action<Exception>? textureCreationFailedCallback = null)
