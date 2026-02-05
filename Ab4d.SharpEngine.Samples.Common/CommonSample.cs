@@ -708,7 +708,10 @@ public abstract class CommonSample
     {
         // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
         // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
-        return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
+        if (textureName.StartsWith("Resources"))
+            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, textureName);
+        else
+            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
     }
 
     public GpuImage GetCommonTexture(string textureName, Scene? scene)
