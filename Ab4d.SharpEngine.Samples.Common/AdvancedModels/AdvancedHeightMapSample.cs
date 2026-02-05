@@ -1,12 +1,8 @@
-﻿using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Lights;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -14,13 +10,17 @@ public class AdvancedHeightMapSample : CommonSample
 {
     public override string Title => "Advanced HeightMap sample";
 
+    private readonly Vector3 _heightMapCenterPosition = new Vector3(0, 0, 0);
+    private readonly Vector3 _heightMapSize = new Vector3(100, 10, 100);
+
     private float[,]? _heightData;
 
-    private HeightMapSurfaceNode? _heightMapSurfaceNode1;
-    private HeightMapSurfaceNode? _heightMapSurfaceNode2;
+    private HeightMapSurfaceNode? _standardHeightMapNode;
+    private HeightMapSurfaceNode? _gradientHeightMapNode;
 
-    private StandardMaterial? _heigthMapMaterial1;
-    private StandardMaterial? _heigthMapMaterial2;
+    private StandardMaterial? _standardHeightMapMaterial;
+    private StandardMaterial? _gradientHeightMapMaterial;
+    private StandardMaterial _graySpecularMaterial;
 
     private HeightMapContoursNode? _heightMapContoursNode;
     private HeightMapWireframeNode? _heightMapWireframeNode;
@@ -32,7 +32,6 @@ public class AdvancedHeightMapSample : CommonSample
     private bool _useGradientTexture = true;
     
     private GradientStop[]? _gradientData;
-
 
     public enum GradientType
     {
@@ -54,73 +53,21 @@ public class AdvancedHeightMapSample : CommonSample
     public AdvancedHeightMapSample(ICommonSamplesContext context)
         : base(context)
     {
+        _graySpecularMaterial = StandardMaterials.Gray.SetSpecular(Color3.White, 16);
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        // Load height data from image
-        // _heightData array should contain values from 0 to 1
-        //var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/simpleHeightMap.png");
-
-        var heightDateFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/vulkan-heightmap-cropped.png");
-        var heightImageData = BitmapIO.LoadBitmap(heightDateFileName);
-        _heightData = HeightMapSurfaceNode.CreateHeightDataFromImageData(heightImageData);
-
-        var graySpecularMaterial = StandardMaterials.Gray.SetSpecular(Color3.White, 16);
-
-        // Create height map surface
-        _heightMapSurfaceNode1 = new HeightMapSurfaceNode(centerPosition: new Vector3(0, 0, 0),
-                                                          size: new Vector3(100, 10, 100),
-                                                          heightData: _heightData,
-                                                          useHeightValuesAsTextureCoordinates: false,
-                                                          name: "HeightMapSurface")
+        var wireBoxNode = new WireBoxNode("HeightMapWireBoxNode")
         {
-            Material = graySpecularMaterial,
-            BackMaterial = graySpecularMaterial,
-        };
-
-        _heightMapSurfaceNode2 = new HeightMapSurfaceNode(centerPosition: _heightMapSurfaceNode1.CenterPosition,
-                                                          size: _heightMapSurfaceNode1.Size,
-                                                          heightData: _heightData,
-                                                          useHeightValuesAsTextureCoordinates: true,
-                                                          name: "HeightMapSurface")
-        {
-            Material     = graySpecularMaterial,
-            BackMaterial = graySpecularMaterial,
-        };
-
-        UpdateTexture();
-
-
-        // Create height map wireframe, and tie its properties to the height map surface.
-        // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
-        _heightMapWireframeNode = new HeightMapWireframeNode(_heightMapSurfaceNode1, 
-                                                             verticalLineFrequency: 5,
-                                                             horizontalLineFrequency: 5,
-                                                             wireframeOffset: 0.05f, // lift the grid slightly on top of the HeightMap
-                                                             name: "HeightMapWireframe")
-        {
-            // Changing LineColor and Visibility will not call UpdateMesh
-            LineColor = Colors.Black,
-            Visibility = SceneNodeVisibility.Hidden
-        };
-
-        var wireBoxNode = new WireBoxNode()
-        {
-            Position = _heightMapSurfaceNode1.CenterPosition,
+            Position = _heightMapCenterPosition,
             PositionType = PositionTypes.Center,
-            Size = _heightMapSurfaceNode1.Size,
+            Size = _heightMapSize,
             LineColor = Colors.Silver,
             LineThickness = 2,
         };
 
-        scene.RootNode.Add(_heightMapSurfaceNode1);
-        scene.RootNode.Add(_heightMapSurfaceNode2);
-        scene.RootNode.Add(_heightMapWireframeNode);
         scene.RootNode.Add(wireBoxNode);
-
-        UpdateContourLines();
-
 
         if (targetPositionCamera != null)
         {
@@ -135,17 +82,125 @@ public class AdvancedHeightMapSample : CommonSample
 
 
         scene.SetAmbientLight(0.2f);
+
+
+        // Load height data from image
+        // _heightData array should contain values from 0 to 1
+        //var heightImageData = BitmapIO.LoadBitmap("Resources/HeightMaps/simpleHeightMap.png");
+
+#if VULKAN
+        var heightDateFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/vulkan-heightmap-cropped.png");
+        var heightImageData = BitmapIO.LoadBitmap(heightDateFileName);
+#else
+        string heightDateFileName = GetCommonTexturePath("Resources/HeightMaps/vulkan-heightmap-cropped.png");
+        var heightImageData = await scene.GpuDevice.CanvasInterop.LoadImageBytesAsync(heightDateFileName);
+#endif
+
+        _heightData = HeightMapSurfaceNode.CreateHeightDataFromImageData(heightImageData);
+
+
+        var heightMapSurfaceNode = EnsureHeightMapSurfaceNode();
+
+        UpdateTexture();
+
+
+        // Create height map wireframe, and tie its properties to the height map surface.
+        // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
+        _heightMapWireframeNode = new HeightMapWireframeNode(heightMapSurfaceNode, 
+                                                             verticalLineFrequency: 5,
+                                                             horizontalLineFrequency: 5,
+                                                             wireframeOffset: 0.05f, // lift the grid slightly on top of the HeightMap
+                                                             name: "HeightMapWireframe")
+        {
+            // Changing LineColor and Visibility will not call UpdateMesh
+            LineColor = Colors.Black,
+            Visibility = SceneNodeVisibility.Hidden
+        };
+
+        scene.RootNode.Add(_heightMapWireframeNode);
+
+        UpdateContourLines();
+    }
+
+    private HeightMapSurfaceNode EnsureHeightMapSurfaceNode()
+    {
+        // Create height map surface
+        // _standardHeightMapNode will have useHeightValuesAsTextureCoordinates: false 
+        // _gradientHeightMapNode will have useHeightValuesAsTextureCoordinates: true 
+        if (_useGradientTexture)
+        {
+            if (_gradientHeightMapNode == null)
+            {
+                _gradientHeightMapNode = new HeightMapSurfaceNode(_heightMapCenterPosition,
+                                                                  _heightMapSize,
+                                                                  heightData: _heightData,
+                                                                  useHeightValuesAsTextureCoordinates: true,
+                                                                  name: "HeightMapSurfaceNode-GradientTexture")
+                {
+                    Material = _graySpecularMaterial,
+                    BackMaterial = _graySpecularMaterial,
+                };
+
+                if (Scene != null)
+                    Scene.RootNode.Add(_gradientHeightMapNode);
+            }
+
+            return _gradientHeightMapNode;
+        }
+
+
+        if (_standardHeightMapNode == null)
+        {
+            _standardHeightMapNode = new HeightMapSurfaceNode(_heightMapCenterPosition,
+                                                              _heightMapSize,
+                                                              heightData: _heightData,
+                                                              useHeightValuesAsTextureCoordinates: false,
+                                                              name: "HeightMapSurfaceNode-StandardTexture")
+            {
+                Material = _graySpecularMaterial,
+                BackMaterial = _graySpecularMaterial,
+            };
+
+            if (Scene != null)
+                Scene.RootNode.Add(_standardHeightMapNode);
+        }
+
+        return _standardHeightMapNode;
+    }
+
+    private void UpdateHeightMapType()
+    {
+        if (Scene == null)
+            return;
+
+        EnsureHeightMapSurfaceNode();
+        UpdateTexture();
+
+        if (_useGradientTexture)
+        {
+            _gradientHeightMapNode!.Visibility = SceneNodeVisibility.Visible;
+
+            if (_standardHeightMapNode != null)
+                _standardHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
+        }
+        else
+        {
+            _standardHeightMapNode!.Visibility = SceneNodeVisibility.Visible;
+
+            if (_gradientHeightMapNode != null)
+                _gradientHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
+        }
     }
 
     private void UpdateTexture()
     {
-        if (GpuDevice == null || _heightData == null || _heightMapSurfaceNode1 == null || _heightMapSurfaceNode2 == null)
+        if (GpuDevice == null || _heightData == null)
             return;
 
         // Create gradient
         _gradientData = CreateSampleGradient(_gradientType, _useTransparentColor);
 
-        if (_useGradientTexture)
+        if (_useGradientTexture && _gradientHeightMapNode != null)
         {
             // When using gradient texture and height map, we get more accurate results when height values are used for texture coordinates.
             // In this case a one dimensional gradient texture is used (the color at position 0 defined the color for min value; the last position defines the color for max value).
@@ -169,38 +224,42 @@ public class AdvancedHeightMapSample : CommonSample
             // Create 1D texture; "linear" texture that requires special texture coordinates
             var texture1 = TextureFactory.CreateGradientTexture(GpuDevice, _gradientData, textureSize: 256);
 
-            if (_heigthMapMaterial2 == null)
+            if (_gradientHeightMapMaterial == null)
             {
-                _heigthMapMaterial2 = new StandardMaterial(texture1, samplerType, $"1D texture material ({_gradientType}, {_useTransparentColor})");
-                _heightMapSurfaceNode2.Material = _heigthMapMaterial2;
+                _gradientHeightMapMaterial = new StandardMaterial(texture1, samplerType, $"1D texture material ({_gradientType}, {_useTransparentColor})");
+                _gradientHeightMapNode.Material = _gradientHeightMapMaterial;
             }
             else
             {
-                _heigthMapMaterial2.DiffuseTexture = texture1;
+                _gradientHeightMapMaterial.DiffuseTexture = texture1;
             }
 
-            // Show _heightMapSurfaceNode2 that was created by setting useHeightValuesAsTextureCoordinates to true
-            _heightMapSurfaceNode1.Visibility = SceneNodeVisibility.Hidden;
-            _heightMapSurfaceNode2.Visibility = SceneNodeVisibility.Visible;
+            //// Show _gradientHeightMapNode that was created by setting useHeightValuesAsTextureCoordinates to true
+            //_gradientHeightMapNode.Visibility = SceneNodeVisibility.Visible;
+
+            //if (_standardHeightMapNode != null)
+            //    _standardHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
         }
-        else
+        else if (_standardHeightMapNode != null)
         {
             // Create 2D height data texture
             var texture2 = TextureFactory.CreateHeightTexture(GpuDevice, _heightData, _gradientData);
 
-            if (_heigthMapMaterial1 == null)
+            if (_standardHeightMapMaterial == null)
             {
-                _heigthMapMaterial1 = new StandardMaterial(texture2, CommonSamplerTypes.Clamp, $"2D height-data texture material ({_gradientType}, {_useTransparentColor})");
-                _heightMapSurfaceNode1.Material = _heigthMapMaterial1;
+                _standardHeightMapMaterial = new StandardMaterial(texture2, CommonSamplerTypes.Clamp, $"2D height-data texture material ({_gradientType}, {_useTransparentColor})");
+                _standardHeightMapNode.Material = _standardHeightMapMaterial;
             }
             else
             {
-                _heigthMapMaterial1.DiffuseTexture = texture2;
+                _standardHeightMapMaterial.DiffuseTexture = texture2;
             }
 
-            // Show _heightMapSurfaceNode1 that was created by setting useHeightValuesAsTextureCoordinates to false
-            _heightMapSurfaceNode1.Visibility = SceneNodeVisibility.Visible;
-            _heightMapSurfaceNode2.Visibility = SceneNodeVisibility.Hidden;
+            //// Show _standardHeightMapNode that was created by setting useHeightValuesAsTextureCoordinates to false
+            //_standardHeightMapNode.Visibility = SceneNodeVisibility.Visible;
+
+            //if (_gradientHeightMapNode != null)
+            //    _gradientHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
         }
     }
 
@@ -234,21 +293,26 @@ public class AdvancedHeightMapSample : CommonSample
 
     private void UpdateContourLines()
     {
-        if (Scene == null || _heightMapSurfaceNode1 == null || _gradientData == null)
+        if (Scene == null || _gradientData == null)
             return;
-        
+
+        var currentHeightMapNode = _gradientHeightMapNode ?? _standardHeightMapNode;
+
+        if (currentHeightMapNode == null)
+            return;
+
         if (_heightMapContoursNode != null)
             Scene.RootNode.Remove(_heightMapContoursNode);
 
 
         // Create height map contours, and tie its properties to the height map surface
         // Set all available parameters in the constructor, because changing those values later will call UpdateMesh on each change.
-        _heightMapContoursNode = new HeightMapContoursNode(_heightMapSurfaceNode1, 
+        _heightMapContoursNode = new HeightMapContoursNode(currentHeightMapNode, 
                                                            numContourLines: 20,
                                                            majorLinesFrequency: 5,
                                                            verticalOffset: 0.05f, // lift the grid slightly on top of the HeightMap
                                                            combineContourLines: _linesType == LinesType.CombinedContourLines,
-                                                           name: "Contours")
+                                                           name: "HeightMapContoursNode")
         {
             // Setting LineThickness and LineColor does not call UpdateMesh
             MinorLineThickness = 1f,
@@ -261,8 +325,8 @@ public class AdvancedHeightMapSample : CommonSample
 
             if (contourLineHeights != null)
             {
-                if (float.IsNaN(_heightMapSurfaceNode1.MinTextureHeight))
-                    _heightMapSurfaceNode1.Update();
+                if (float.IsNaN(currentHeightMapNode.MinTextureHeight))
+                    currentHeightMapNode.Update();
 
                 float minHeight = 0;
                 float heightRange = 1;
@@ -400,7 +464,7 @@ public class AdvancedHeightMapSample : CommonSample
             _useGradientTexture, isChecked =>
         {
             _useGradientTexture = isChecked;
-            UpdateTexture();
+            UpdateHeightMapType();
         });
 
 
