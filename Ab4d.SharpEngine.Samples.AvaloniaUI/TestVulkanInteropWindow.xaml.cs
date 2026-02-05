@@ -121,8 +121,18 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                         ShowInfoMessage("  AllDeviceExtensionNames:");
                         foreach (var extensionName in onePhysicalDeviceDetail.AllDeviceExtensionNames)
                             ShowInfoMessage($"    {extensionName}");
+
+                        ShowInfoMessage("\nMemory types:");
+
+                        var memoryTypes = onePhysicalDeviceDetail.MemoryTypes;
+                        for (var i = 0; i < memoryTypes.Length; i++)
+                        {
+                            var memoryType = memoryTypes[i];
+                            ShowInfoMessage($"    [{i}]: heap index: {memoryType.HeapIndex}; properties: {memoryType.PropertyFlags}");
+                        }
+
+                        ShowInfoMessage(""); // Add new line
                     }
-                    
                 }
                 catch (Exception ex)
                 {
@@ -136,6 +146,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     {
                         var vulkanDevice = VulkanDevice.Create(vulkanInstance, allPhysicalDeviceDetails[0], vulkanInstance.CreateOptions, SurfaceKHR.Null);
                         ShowInfoMessage("VulkanDevice created for the first physical device");
+
+                        ShowInfoMessage(vulkanDevice.GetMemoryBudgetInfo());
+                        ShowInfoMessage(""); // Add new line
                     }
                     catch (Exception ex)
                     {
