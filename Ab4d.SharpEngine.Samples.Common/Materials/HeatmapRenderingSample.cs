@@ -89,19 +89,18 @@ public class HeatmapRenderingSample : CommonSample
             targetPositionCamera.Distance = 150;
         }
 
-        CommonScenes teapotScene;
 
 #if WEB_GL
-        teapotScene = CommonScenes.Teapot;
+        var teapotScene = CommonScenes.Teapot;
 #else
-        teapotScene = CommonScenes.TeapotHiRes;
+        var teapotScene = CommonScenes.TeapotHiRes;
 #endif
 
         var teapotGroupNode = await base.GetCommonSceneAsync(scene, teapotScene);
 
         // Get the MeshModelNode so we will be able to update the texture coordinates (this is the first and only child)
         _teapotMeshModelNode = teapotGroupNode.GetChild<MeshModelNode>();
-        
+
         if (scene.GpuDevice != null)
             SetGradientTexture(gradientIndex: 0);
 
@@ -114,6 +113,14 @@ public class HeatmapRenderingSample : CommonSample
         // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
         // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
         base.SubscribeSceneUpdating(UpdateHeatPosition);
+    }
+
+    protected override void OnSceneViewInitialized(SceneView sceneView)
+    {
+        // Set initial heat position (this is required for automatic testing so the teapot is shown with the correct colors)
+        UpdateHeatPosition(elapsedSeconds: 0);
+
+        base.OnSceneViewInitialized(sceneView);
     }
 
     protected override void OnDisposed()
