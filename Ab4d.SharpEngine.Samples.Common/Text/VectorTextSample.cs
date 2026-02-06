@@ -41,7 +41,12 @@ public class VectorTextSample : CommonSample
     private float _lineHeight = 1.0f;
     private float _charSpacing = 0f;
     private float _fontStretch = 1.0f;
+
+#if WEB_GL
+    private int _bezierCurveSegmentsCount = 3; // reduce the number of font segments for bezier curvers to improve performance of triangulation in the browser
+#else
     private int _bezierCurveSegmentsCount = 8;
+#endif
 
     private float _fontSize = 50;
     
@@ -62,61 +67,17 @@ public class VectorTextSample : CommonSample
     public VectorTextSample(ICommonSamplesContext context)
         : base(context)
     {
-        _selectedFontFileName = "Roboto-Black.ttf";
+        var allFontFiles = CollectAvailableFonts();
+        _selectedFontFileName = allFontFiles[0];
+
         _textToShow = CreateAllCharsText(from: 33, to: 126, lineLength: 16); // ASCII chars from 33 - 126
 
         ShowCameraAxisPanel = true;
     }
 
-    private void LoadFont(string fontFileName, bool recreateText = false)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var fontName = Path.GetFileNameWithoutExtension(fontFileName); // remove ".ttf"
-        
-        if (_allVectorFontFactories.TryGetValue(fontName, out _currentVectorFontFactory))
-        {
-            if (recreateText)
-                RecreateText();
-
-            return;
-        }
-
-
-        if (!Path.IsPathRooted(fontFileName))
-            fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontFileName);
-
-
-        // Load the font file
-        // This method can be called multiple times when the same fontName and fontFilePath is used.
-        // You can also check if font is loaded by calling:
-        // bool isLoaded = TrueTypeFontLoader.Instance.IsFontLoaded(fontName);
-
-        try
-        {
-            TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
-
-            // You can also use the async version of LoadFontFile method that read the font file in a background thread:
-            //await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
-        }
-        catch (Exception ex)
-        {
-            ShowErrorMessage("Error loading font:\n" + ex.Message);
-            return;
-        }
-
-        ClearErrorMessage();
-
-        // After font is loaded, we can create an instance of VectorFontFactory by passing the fontName to constructor
-        _currentVectorFontFactory = new VectorFontFactory(fontName);
-
-        _allVectorFontFactories.Add(fontName, _currentVectorFontFactory);
-
-        if (recreateText)
-            RecreateText();
-    }
-
-    protected override void OnCreateScene(Scene scene)
-    {
-        LoadFont(_selectedFontFileName);
+        await LoadFont(_selectedFontFileName);
 
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
@@ -138,6 +99,63 @@ public class VectorTextSample : CommonSample
 
         ShowCameraAxisPanel = true;
     }
+    
+    private async Task LoadFont(string fontFileName, bool recreateText = false)
+    {
+        if (Scene == null || Scene.GpuDevice == null)
+            return;
+
+        var fontName = Path.GetFileNameWithoutExtension(fontFileName); // remove ".ttf"
+        
+        if (_allVectorFontFactories.TryGetValue(fontName, out _currentVectorFontFactory))
+        {
+            if (recreateText)
+                RecreateText();
+
+            return;
+        }
+
+#if VULKAN
+        if (!Path.IsPathRooted(fontFileName))
+            fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontFileName);
+#endif
+
+
+        // Load the font file
+        // This method can be called multiple times when the same fontName and fontFilePath is used.
+        // You can also check if font is loaded by calling:
+        // bool isLoaded = TrueTypeFontLoader.Instance.IsFontLoaded(fontName);
+
+        try
+        {
+#if VULKAN
+            await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
+
+            // You can also use the non-async version of LoadFontFile method that read the font file in the main thread:
+            TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
+
+#elif WEB_GL
+            await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName, Scene.GpuDevice.CanvasInterop);
+#endif
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading ttf font file: " + ex.Message);
+            return;
+        }
+
+
+        ClearErrorMessage();
+
+        // After font is loaded, we can create an instance of VectorFontFactory by passing the fontName to constructor
+        _currentVectorFontFactory = new VectorFontFactory(fontName);
+
+        _allVectorFontFactories.Add(fontName, _currentVectorFontFactory);
+
+        if (recreateText)
+            RecreateText();
+    }
+
 
     private void RecreateText()
     {
@@ -305,6 +323,10 @@ public class VectorTextSample : CommonSample
     {
         if (_allFontFiles == null)
         {
+#if WEB_GL
+            // On the browser we have a fixed set of font files
+            _allFontFiles = new string[] { "fonts/Roboto-Regular.ttf", "fonts/Roboto-Bold.ttf" };
+#else
             var localFontFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/");
             var fontsFiles = Directory.GetFiles(localFontFolder, "*.ttf", SearchOption.TopDirectoryOnly).ToList();
 
@@ -320,6 +342,7 @@ public class VectorTextSample : CommonSample
             //}
 
             _allFontFiles = fontsFiles.ToArray();
+#endif
         }
 
         return _allFontFiles;
@@ -330,8 +353,11 @@ public class VectorTextSample : CommonSample
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         // Try to register for file drag-and-drop
+#if VULKAN
         bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => LoadFont(fileName, recreateText: true));
-
+#else
+        bool isDragAndDropSupported = false;
+#endif
 
         var allFontFiles = CollectAvailableFonts();
         var fontNames = allFontFiles.Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
@@ -341,7 +367,7 @@ public class VectorTextSample : CommonSample
             (selectedIndex, selectedText) =>
             {
                 _selectedFontFileName = allFontFiles[selectedIndex];
-                LoadFont(_selectedFontFileName, recreateText: true);
+                _ = LoadFont(_selectedFontFileName, recreateText: true);
             },
             selectedItemIndex: 0);
 
@@ -514,7 +540,7 @@ public class VectorTextSample : CommonSample
 
         _infoLabel = ui.CreateKeyValueLabel("", () => _textInfoString ?? "");
 
-
+#if VULKAN
         if (isDragAndDropSupported)
         {
             _subtitle += "\nDrag and drop .ttf file here to open it.";
@@ -529,12 +555,13 @@ public class VectorTextSample : CommonSample
 
             ui.CreateButton("Load", () =>
             {
-                LoadFont(_textBoxElement.GetText() ?? "", recreateText: true);
+                _ = LoadFont(_textBoxElement.GetText() ?? "", recreateText: true);
             });
 
             // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
             if (CameraAxisPanel != null)
                 CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
         }
+#endif
     }
 }
