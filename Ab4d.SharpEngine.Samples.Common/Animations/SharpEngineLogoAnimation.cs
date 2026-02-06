@@ -173,6 +173,12 @@ public class SharpEngineLogoAnimation : IDisposable
         _transformationAnimation?.SetDuration(durationInSeconds * 1000);
         _materialAnimation?.SetDuration(durationInSeconds * 1000);
     }
+    
+    public void SetAnimationDelay(float delayInSeconds)
+    {
+        _transformationAnimation?.SetDelay(delayInSeconds * 1000);
+        _materialAnimation?.SetDelay(delayInSeconds * 1000);
+    }
 
     public void SetHashModelVisibility(bool isVisible)
     {
