@@ -70,7 +70,7 @@ public class BitmapTextSample : CommonSample
         
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         _rootTextNode = new GroupNode("RootTextNode");
         scene.RootNode.Add(_rootTextNode);
@@ -98,7 +98,7 @@ public class BitmapTextSample : CommonSample
         {
             targetPositionCamera.Heading = 50;
             targetPositionCamera.Attitude = -5;
-            targetPositionCamera.Distance = 1200;
+            targetPositionCamera.Distance = 2000;
 
             targetPositionCamera.CameraChanged += (sender, args) =>
             {
@@ -109,7 +109,7 @@ public class BitmapTextSample : CommonSample
         ShowCameraAxisPanel = true;
 
 
-        RecreateBitmapTextCreator(RecreateText);
+        await RecreateBitmapTextCreator(RecreateText);
     }
 
     protected override void OnDisposed()
@@ -156,7 +156,7 @@ public class BitmapTextSample : CommonSample
         UpdateBitmapTextTransformation();
     }
 
-    private void RecreateBitmapTextCreator(Action? recreateTextAction)
+    private async Task RecreateBitmapTextCreator(Action? recreateTextAction)
     {
         if (Scene == null || Scene.GpuDevice == null)
             return;
@@ -167,6 +167,7 @@ public class BitmapTextSample : CommonSample
         if (_bitmapTextCreator != null)
             _bitmapTextCreator.Dispose();
 
+#if VULKAN
         // If the SynchronizationContext is not provided (this is not run on an UI framework like WPF or Avalonia),
         // then the async code cannot continue on the UI thread and we need to execute all code synchronously.
         if (SynchronizationContext.Current == null) 
@@ -188,9 +189,11 @@ public class BitmapTextSample : CommonSample
         }
         else
         {
-            // Call async method from sync context:
-            _ = RecreateBitmapTextCreatorAsync(recreateTextAction);
+#endif
+            await RecreateBitmapTextCreatorAsync(recreateTextAction);
+#if VULKAN
         }
+#endif
     }
     
     private async Task RecreateBitmapTextCreatorAsync(Action? recreateTextAction)
@@ -198,20 +201,29 @@ public class BitmapTextSample : CommonSample
         if (Scene == null || _fontFiles == null)
             return;
 
+        string bitmapFontFileName = _fontFiles[_bitmapTextCreatorIndex];
+
+#if VULKAN
+        // There is no DefaultBitmapText in the web version of Ab4d.SharpEngine
         if (_bitmapTextCreatorIndex == 0)
         {
             _bitmapTextCreator = await BitmapTextCreator.GetDefaultBitmapTextCreatorAsync(Scene);
         }
         else
         {
-            string bitmapFontFileName = _fontFiles[_bitmapTextCreatorIndex];
-
             var bitmapFont = await BitmapFont.CreateAsync(bitmapFontFileName);
             _bitmapTextCreator = await BitmapTextCreator.CreateAsync(Scene, bitmapFont, BitmapIO);
-            
+
             //var bitmapFont = new BitmapFont(bitmapFontFileName);
             //_bitmapTextCreator = new BitmapTextCreator(Scene, bitmapFont, BitmapIO);
         }
+#else
+        if (Scene.GpuDevice != null)
+        {
+            var bitmapFont = await BitmapFont.CreateAsync(bitmapFontFileName, Scene.GpuDevice);
+            _bitmapTextCreator = await BitmapTextCreator.CreateAsync(Scene, bitmapFont);
+        }
+#endif
 
         if (_bitmapTextCreator != null)
             recreateTextAction?.Invoke();
@@ -334,6 +346,11 @@ public class BitmapTextSample : CommonSample
     [MemberNotNull(nameof(_fontDescriptions))]
     private void CollectAvailableBitmapFonts()
     {
+#if WEB_GL
+        // In the browser we cannot read files from the file system, so we need to hardcode the font file names and descriptions.
+        _fontFiles = new List<string>() { "fonts/roboto_64.fnt "};
+        _fontDescriptions = new List<string>() { "Roboto (size: 64)"};
+#else
         string fontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\BitmapFonts\");
         fontPath = FileUtils.FixDirectorySeparator(fontPath);
         
@@ -376,6 +393,7 @@ public class BitmapTextSample : CommonSample
             _fontFiles.Add(fontFile);
             _fontDescriptions.Add(fontDescription);
         }
+#endif
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
