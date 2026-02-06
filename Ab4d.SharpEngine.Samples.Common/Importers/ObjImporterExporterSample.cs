@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Numerics;
-using System.Reflection.Metadata;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
