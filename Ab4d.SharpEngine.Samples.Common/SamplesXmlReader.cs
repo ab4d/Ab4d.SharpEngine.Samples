@@ -6,7 +6,7 @@ public class SamplesXmlReader
 {
     public class SampleItem
     {
-        public string Location { get; }
+        public string Location { get; set; }
         public string Title { get; }
         public bool IsTitle { get; }
         public bool IsSeparator { get; set; }
