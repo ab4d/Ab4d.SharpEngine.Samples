@@ -1,9 +1,10 @@
-﻿using System;
-using System.Numerics;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
+using System;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.CameraControllers;
 
@@ -48,13 +49,7 @@ public class RotateAroundCustomPointSample : CommonSample
             }
         }
 
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 30;
-            targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 200;
-            targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
-        }
+        ResetCamera();
 
         // The following values will be used when the PointerCameraController is created.
         // Note that PointerCameraController is platform specific because it needs to handle pointer or mouse events.
@@ -75,6 +70,18 @@ public class RotateAroundCustomPointSample : CommonSample
         }
 
         base.OnDisposed();
+    }
+    
+    private void ResetCamera()
+    {
+        if (targetPositionCamera == null) 
+            return;
+
+        targetPositionCamera.Heading = 30;
+        targetPositionCamera.Attitude = -20;
+        targetPositionCamera.Distance = 200;
+        targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+        targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
     }
 
     public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
@@ -183,5 +190,8 @@ public class RotateAroundCustomPointSample : CommonSample
                 "Position under the mouse",
             },
             (selectedIndex, selectedText) => ChangeCenterPosition(selectedIndex), selectedItemIndex: 1);
+
+        ui.AddSeparator();
+        ui.CreateButton("Reset camera", ResetCamera);
     }
 }

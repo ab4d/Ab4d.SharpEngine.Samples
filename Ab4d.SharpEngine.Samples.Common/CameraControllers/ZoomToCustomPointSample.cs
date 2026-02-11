@@ -47,13 +47,7 @@ public class ZoomToCustomPointSample : CommonSample
             }
         }
 
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 30;
-            targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 200;
-            targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
-        }
+        ResetCamera();
 
         // The following values will be used when the PointerCameraController is created.
         // Note that PointerCameraController is platform specific because it needs to handle pointer or mouse events.
@@ -62,6 +56,18 @@ public class ZoomToCustomPointSample : CommonSample
         this.QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
         this.RotateAroundPointerPosition = false;
         this.ZoomMode = CameraZoomMode.CameraRotationCenterPosition;
+    }
+
+    private void ResetCamera()
+    {
+        if (targetPositionCamera == null) 
+            return;
+
+        targetPositionCamera.Heading = 30;
+        targetPositionCamera.Attitude = -20;
+        targetPositionCamera.Distance = 200;
+        targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+        targetPositionCamera.RotationCenterPosition = new Vector3(-40, 5, -30); // Center of Red box (default option in this sample)
     }
 
     public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
@@ -123,6 +129,17 @@ public class ZoomToCustomPointSample : CommonSample
         }
     }
 
+    private void SetupQuickZoom(bool isChecked)
+    {
+        if (_pointerCameraController == null)
+            return;
+
+        if (isChecked)
+            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
+        else
+            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.Disabled;
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
@@ -140,16 +157,8 @@ public class ZoomToCustomPointSample : CommonSample
 
         ui.AddSeparator();
         ui.CreateCheckBox("QuickZoom (left + right button)", isInitiallyChecked: true, isChecked => SetupQuickZoom(isChecked));
-    }
 
-    private void SetupQuickZoom(bool isChecked)
-    {
-        if (_pointerCameraController == null)
-            return;
-
-        if (isChecked)
-            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed;
-        else
-            _pointerCameraController.QuickZoomConditions = PointerAndKeyboardConditions.Disabled;
+        ui.AddSeparator();
+        ui.CreateButton("Reset camera", ResetCamera);
     }
 }
