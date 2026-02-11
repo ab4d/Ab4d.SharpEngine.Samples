@@ -53,7 +53,10 @@ public class VectorTextSample : CommonSample
     private string? _textInfoString;
 
     private ICommonSampleUIElement? _infoLabel;
+
+#if VULKAN
     private ICommonSampleUIElement? _textBoxElement;
+#endif
 
     private GroupNode? _rootTextNode;
     private RectangleNode? _textBoundingRectangleNode;
