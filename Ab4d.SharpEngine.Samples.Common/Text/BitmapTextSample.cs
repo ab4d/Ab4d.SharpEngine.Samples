@@ -109,7 +109,7 @@ public class BitmapTextSample : CommonSample
         ShowCameraAxisPanel = true;
 
 
-        await RecreateBitmapTextCreator(RecreateText);
+        RecreateBitmapTextCreator(RecreateText);
     }
 
     protected override void OnDisposed()
@@ -156,7 +156,7 @@ public class BitmapTextSample : CommonSample
         UpdateBitmapTextTransformation();
     }
 
-    private async Task RecreateBitmapTextCreator(Action? recreateTextAction)
+    private void RecreateBitmapTextCreator(Action? recreateTextAction)
     {
         if (Scene == null || Scene.GpuDevice == null)
             return;
@@ -190,7 +190,7 @@ public class BitmapTextSample : CommonSample
         else
         {
 #endif
-            await RecreateBitmapTextCreatorAsync(recreateTextAction);
+            _ = RecreateBitmapTextCreatorAsync(recreateTextAction);
 #if VULKAN
         }
 #endif

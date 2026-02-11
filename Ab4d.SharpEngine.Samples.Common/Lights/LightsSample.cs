@@ -27,8 +27,8 @@ public class LightsSample : CommonSample
 
     private string? _lightsInfoText;
     private ICommonSampleUIElement? _lightsInfoLabel;
-    private WorldColorInstanceData[] _instancesData;
-    private StandardMesh _sphereMesh;
+    private WorldColorInstanceData[]? _instancesData;
+    private StandardMesh? _sphereMesh;
 
     public LightsSample(ICommonSamplesContext context)
         : base(context)

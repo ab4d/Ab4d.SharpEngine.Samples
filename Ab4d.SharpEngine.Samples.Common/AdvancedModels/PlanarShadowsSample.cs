@@ -241,15 +241,18 @@ public class PlanarShadowsSample : CommonSample
 
         if (_shadowMeshModelNode == null)
         {
-            var shadowMaterial = _isTransparentMaterial ? _transparentShadowMaterial : _solidShadowMaterial;
+            if (_planarShadowMeshCreator.ShadowMesh != null)
+            {
+                var shadowMaterial = _isTransparentMaterial ? _transparentShadowMaterial : _solidShadowMaterial;
 
-            _shadowMeshModelNode = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, shadowMaterial, name: "ShadowMeshNode");
-            _shadowMeshModelNode.Transform = new TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
+                _shadowMeshModelNode = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, shadowMaterial, name: "ShadowMeshNode");
+                _shadowMeshModelNode.Transform = new TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
 
-            if (!_isShadowVisible)
-                _shadowMeshModelNode.Visibility = SceneNodeVisibility.Hidden;
+                if (!_isShadowVisible)
+                    _shadowMeshModelNode.Visibility = SceneNodeVisibility.Hidden;
 
-            Scene.RootNode.Add(_shadowMeshModelNode);
+                Scene.RootNode.Add(_shadowMeshModelNode);
+            }
         }
         else
         {
@@ -382,12 +385,12 @@ public class PlanarShadowsSample : CommonSample
                 if (selectedIndex == 0)
                 {
                     SetupPlanarShadowNode();
-                    _clipCheckBox.SetIsVisible(false);
+                    _clipCheckBox?.SetIsVisible(false);
                 }
                 else
                 {
                     SetupPlanarShadowMeshCreator();
-                    _clipCheckBox.SetIsVisible(true);
+                    _clipCheckBox?.SetIsVisible(true);
                 }
             }, 
             selectedItemIndex: 0);

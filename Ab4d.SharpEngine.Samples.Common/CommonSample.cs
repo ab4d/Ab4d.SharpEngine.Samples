@@ -58,8 +58,6 @@ public abstract class CommonSample
         "teapot-hires.obj"
     };
 
-    private Dictionary<CommonScenes, GroupNode> _commonScenesCache;
-
     private GroupNode? _currentlyShownCommonScene;
 
 
@@ -82,7 +80,9 @@ public abstract class CommonSample
 
     protected GpuDevice? GpuDevice => context.GpuDevice;
 
+#if VULKAN
     protected IBitmapIO BitmapIO => context.BitmapIO;
+#endif
 
     private Camera? _createdCamera;
     protected TargetPositionCamera? targetPositionCamera;
@@ -116,6 +116,7 @@ public abstract class CommonSample
     public CameraZoomMode ZoomMode { get; set; } = CameraZoomMode.CameraRotationCenterPosition;
     public bool IsPointerWheelZoomEnabled { get; set; } = true;
 
+#if VULKAN
     private bool _showCameraAxisPanel;
 
     /// <summary>
@@ -129,7 +130,6 @@ public abstract class CommonSample
         get => _showCameraAxisPanel;
         set
         {
-#if VULKAN
             if (!value && CameraAxisPanel != null)
             {
                 CameraAxisPanel.Dispose(); // Remove it from SceneView
@@ -141,11 +141,15 @@ public abstract class CommonSample
                 CameraAxisPanel = CreateCameraAxisPanel(SceneView.Camera);
 
             _showCameraAxisPanel = value; // If SceneView is not yet initialized, then we will create CameraAxisPanel in InitializeSceneView
-#else
-            Ab4d.SharpEngine.Utilities.Log.Warn?.Write("CommonSample", "CameraAxisPanel is not yet supported in Ab4d.SharpEngine for the browser.");
-#endif
         }
     }
+#else
+    public bool ShowCameraAxisPanel
+    {
+        get => false;
+        set => Ab4d.SharpEngine.Utilities.Log.Warn?.Write("CommonSample", "CameraAxisPanel is not yet supported in Ab4d.SharpEngine for the browser.");
+    }
+#endif
 
 #if VULKAN
     public CameraAxisPanel? CameraAxisPanel { get; private set; }

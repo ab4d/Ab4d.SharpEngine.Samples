@@ -92,6 +92,9 @@ public class AdvancedHeightMapSample : CommonSample
         var heightDateFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/vulkan-heightmap-cropped.png");
         var heightImageData = BitmapIO.LoadBitmap(heightDateFileName);
 #else
+        if (scene.GpuDevice == null)
+            return;
+
         string heightDateFileName = GetCommonTexturePath("Resources/HeightMaps/vulkan-heightmap-cropped.png");
         var heightImageData = await scene.GpuDevice.CanvasInterop.LoadImageBytesAsync(heightDateFileName);
 #endif

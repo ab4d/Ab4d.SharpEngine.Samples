@@ -18,8 +18,6 @@ public class TransformationAnimationSample : CommonSample
     public override string Title => "Transformation animation sample";
     public override string? Subtitle => null;
 
-    private ICommonSampleUIProvider? _uiProvider;
-
     private TargetPositionCamera? _targetPositionCamera;
 
     private List<IAnimation> _animations;
@@ -27,7 +25,6 @@ public class TransformationAnimationSample : CommonSample
     private GroupNode? _animatedObjectsGroup;
     private PlaneModelNode? _planeModelNode;
     private DirectionalLight? _shadowDirectionalLight;
-    private MeshModelNode? _shadowModel;
     private TextBlockFactory? _textBlockFactory;
     private PlanarShadowNode? _planarShadowNode;
 
@@ -253,8 +250,6 @@ public class TransformationAnimationSample : CommonSample
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
-        _uiProvider = ui;
-
         ui.CreateStackPanel(alignment: PositionTypes.BottomRight);
 
         ui.CreateButton("Start animation", () =>

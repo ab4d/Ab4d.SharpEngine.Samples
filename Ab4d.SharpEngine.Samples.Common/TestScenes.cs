@@ -165,19 +165,18 @@ public static class TestScenes
     [Obsolete("Use GetTestScene with Scene and callback or async version")]
     public static GroupNode GetTestScene(StandardTestScenes testScene)
     {
+#if VULKAN
         var testSceneFileName = _standardTestScenesFileNames[(int)testScene];
 
         string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models", testSceneFileName);
 
-#if VULKAN
         var objImporter = new ObjImporter();
         var readGroupNode = objImporter.Import(fileName);
-#else
-        var readGroupNode = new GroupNode();
-        throw new NotSupportedException();
-#endif
 
         return readGroupNode;
+#else
+        throw new NotSupportedException();
+#endif
     }
 
     [Obsolete("Use GetTestScene with Scene and callback or async version")]

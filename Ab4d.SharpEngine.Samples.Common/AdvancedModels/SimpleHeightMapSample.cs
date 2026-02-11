@@ -28,6 +28,9 @@ public class SimpleHeightMapSample : CommonSample
         var heightTextureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/HeightMaps/europe.png");
         var europeTextureMaterial = new StandardMaterial(heightTextureFileName, BitmapIO);
 #else
+        if (scene.GpuDevice == null)
+            return;
+
         string heightDateFileName = GetCommonTexturePath("Resources/HeightMaps/europe_height.png");
         var heightImageData = await scene.GpuDevice.CanvasInterop.LoadImageBytesAsync(heightDateFileName);
 

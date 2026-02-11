@@ -13,6 +13,11 @@ public class WinFormsSamplesContext : CommonSamplesContext
         PreferredEngineCreateOptions.DesiredDeviceExtensionNames.AddRange(SharpEngineSceneView.RequiredDeviceExtensionNamesForSharedTexture);
     }
 
+    public void RegisterCurrentSharpEngineSceneView(SharpEngineSceneView? sharpEngineSceneView)
+    {
+        SetCurrentSharpEngineSceneView(sharpEngineSceneView);
+    }
+
     #region GetRandom... methods
     public Color GetRandomWinFormsColor()
     {

@@ -27,7 +27,10 @@ public class CircleModelNodeSample : StandardModelsSampleBase
 
     private StandardMaterial? _gradientMaterial1;
     private StandardMaterial? _gradientMaterial2;
+
+#if VULKAN
     private StandardMaterial? _gradientMaterial3;
+#endif
 
     private ICommonSampleUIElement? _segmentsSlider;
     private ICommonSampleUIElement? _startAngleSlider;

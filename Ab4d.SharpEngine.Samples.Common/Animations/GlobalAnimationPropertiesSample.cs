@@ -25,7 +25,6 @@ public class GlobalAnimationPropertiesSample : CommonSample
 
     private int _usedColumnsCount, _usedRowsCount;
 
-    private PlanarShadowMeshCreator? _planarShadowMeshCreator;
     private PlaneModelNode? _planeModelNode;
     private PlanarShadowNode? _planarShadowNode;
     private DirectionalLight? _shadowDirectionalLight;
@@ -125,7 +124,7 @@ public class GlobalAnimationPropertiesSample : CommonSample
             CreateAnimatedObjects(_selectedColumnCount, _selectedRowsCount);
             CreateOrUpdateAnimation();
 
-            if (_planarShadowMeshCreator == null)
+            if (_planarShadowNode == null)
                 SetupPlanarShadow();
             else
                 UpdatePlanarShadow();

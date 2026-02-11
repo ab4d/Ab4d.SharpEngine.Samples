@@ -18,10 +18,6 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
 {
     public GpuDevice? GpuDevice => CurrentSharpEngineSceneView?.GpuDevice ?? null;
 
-    private BitmapTextCreator? _bitmapTextCreator;
-    private TextBlockFactory? _textBlockFactory;
-    private Task<TextBlockFactory>? _textBlockFactoryLoadingTask;
-
     public ISharpEngineSceneView? CurrentSharpEngineSceneView { get; private set; }
 
     public IBitmapIO? BitmapIO { get; }
@@ -29,6 +25,10 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
     //public DiagnosticsWindow? CurrentDiagnosticsWindow { get; set; }
 
 #if VULKAN
+    private BitmapTextCreator? _bitmapTextCreator;
+    private TextBlockFactory? _textBlockFactory;
+    private Task<TextBlockFactory>? _textBlockFactoryLoadingTask;
+
     public PresentationTypes PreferredPresentationType { get; set; } = PresentationTypes.SharedTexture;
 #endif
 
@@ -52,6 +52,8 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
             DeviceSelectionType = EngineCreateOptions.DeviceSelectionTypes.DefaultDevice, // Select default device (same as wpf)
             CustomDeviceId = 0,     // no preferred device
         };
+#else
+        PreferredEngineCreateOptions = new EngineCreateOptions();
 #endif
 
         BitmapIO = bitmapIO;
@@ -149,6 +151,7 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
 
 #endif
 
+#if VULKAN
     protected void ResetTextBlockFactory()
     {
         if (_textBlockFactory == null)
@@ -163,6 +166,7 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
         _textBlockFactory.BorderColor = Color4.Black;
         _textBlockFactory.BackMaterialColor = Color4.Black;
     }
+#endif
 
     #region GetRandom... methods
     protected Random rnd = new Random();

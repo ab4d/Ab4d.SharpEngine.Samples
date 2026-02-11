@@ -15,9 +15,11 @@ public class MaterialsSample : CommonSample
     public override string Subtitle => "See code behind to see different ways to assign each material type";
 
     private GroupNode? _testModelsGroup;
-    private MeshModelNode? _vertexColorModelNode;
     private StandardMesh[] _meshes = new StandardMesh[3];
 
+#if VULKAN
+    private MeshModelNode? _vertexColorModelNode;
+#endif
 
     public MaterialsSample(ICommonSamplesContext context)
         : base(context)
