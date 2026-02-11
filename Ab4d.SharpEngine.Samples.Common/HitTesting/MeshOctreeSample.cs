@@ -83,23 +83,24 @@ public class MeshOctreeSample : CommonSample
         _octTreeLinesGroupNode = new GroupNode("OctTeeLines");
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        scene.RootNode.Add(_octTreeLinesGroupNode);
-
-        _teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot, finalSize: new Vector3(100, 100, 100));
-
-        RecreateOctree();
-
-        var meshModelNode = new MeshModelNode(_teapotMesh, StandardMaterials.Silver);
-        scene.RootNode.Add(meshModelNode);
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading  = 30;
             targetPositionCamera.Attitude = -20;
             targetPositionCamera.Distance = 200;
         }
+
+        scene.RootNode.Add(_octTreeLinesGroupNode);
+
+
+        _teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot, finalSize: new Vector3(100, 100, 100));
+
+        RecreateOctree();
+
+        var meshModelNode = new MeshModelNode(_teapotMesh, StandardMaterials.Silver);
+        scene.RootNode.Add(meshModelNode);
     }
 
     private void RecreateOctree()

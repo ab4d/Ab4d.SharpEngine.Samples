@@ -1,17 +1,15 @@
-﻿using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
 using System.Numerics;
 using System.Text;
-using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
 public class HitTestingSample : CommonSample
 {
     public override string Title => "Simple hit-testing sample";
+    public override string Subtitle => "Move pointer over the teapot to see hit tests.\nManually rotate the camera with right mouse button.";
 
     private const int MaxShownHitTestResults = 100;
 
@@ -20,12 +18,9 @@ public class HitTestingSample : CommonSample
 
     private LineMaterial? _wireCrossLineMaterial;
 
-    private GroupNode? _testObjectsGroup;
     private GroupNode? _wireCrossesGroup;
 
     private Vector2 _lastPointerPosition;
-    
-    private GroupNode? _teapotModelNode;
 
     private bool _getAllHitObjects = false;
     
@@ -41,16 +36,12 @@ public class HitTestingSample : CommonSample
         MoveCameraConditions= PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _testObjectsGroup = new GroupNode("TestObjectsGroup");
         _wireCrossesGroup = new GroupNode("WireCrossesGroup");
 
-        scene.RootNode.Add(_testObjectsGroup);
         scene.RootNode.Add(_wireCrossesGroup);
 
-        ShowTeapot();
-        
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Distance = 500;
@@ -60,6 +51,11 @@ public class HitTestingSample : CommonSample
         }
 
         ShowCameraAxisPanel = true;
+
+        await base.ShowCommonSceneAsync(scene, CommonScenes.Teapot,  
+            position: new Vector3(0, -20, 0),
+            positionType: PositionTypes.Center,
+            finalSize: new Vector3(300, 200, 300));
     }
 
     protected override void OnDisposed()
@@ -172,27 +168,6 @@ public class HitTestingSample : CommonSample
         _wireCrossIndex++;
     }
 
-    private void ShowTeapot()
-    {
-        if (_testObjectsGroup == null)
-            return;
-
-        _testObjectsGroup.Clear();
-
-
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
-
-        var objImporter = new ObjImporter();
-        _teapotModelNode = objImporter.Import(fileName);
-
-        ModelUtils.PositionAndScaleSceneNode(_teapotModelNode,
-                                             position: new Vector3(0, -20, 0),
-                                             positionType: PositionTypes.Center,
-                                             finalSize: new Vector3(300, 200, 300));
-
-        _testObjectsGroup.Add(_teapotModelNode);
-    }
-    
     private void ProcessPointerMove(Vector2 pointerPosition)
     {
         TestHitObjects(pointerPosition);
