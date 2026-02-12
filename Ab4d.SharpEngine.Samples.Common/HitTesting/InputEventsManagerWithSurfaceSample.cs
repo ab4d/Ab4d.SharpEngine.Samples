@@ -93,11 +93,11 @@ public class InputEventsManagerWithSurfaceSample : CommonSample
         _startDragWireCrossNode = new WireCrossNode(new Vector3(0, 0, 0), lineColor: Colors.Yellow, lineLength: 40, lineThickness: 3, name: "StartDragWireCross");
         scene.RootNode.Add(_startDragWireCrossNode);
 
-        _mainDragLine = new LineNode(new Vector3(0, 0, 0), new Vector3(10, 10, 10), Colors.Blue, lineThickness: 2, name: "MainDragLine");
+        _mainDragLine = new LineNode(new Vector3(0, 0, 0), new Vector3(10, 10, 10), Colors.Black, lineThickness: 2, name: "MainDragLine");
         scene.RootNode.Add(_mainDragLine);
 
         // Drag lines are shows in the following order: z, y and x
-        var smallDragLineMaterial = new LineMaterial(Colors.DeepSkyBlue, lineThickness: 1)
+        var smallDragLineMaterial = new LineMaterial(new Color3(0.4f), lineThickness: 1)
         {
             DepthBias = 0.0005f, // defining DepthBias will show lines on top of 3D models 
         };
