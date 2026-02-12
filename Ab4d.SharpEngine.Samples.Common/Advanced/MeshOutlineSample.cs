@@ -14,6 +14,9 @@ public class MeshOutlineSample : CommonSample
 @"This method increases the mesh geometry by moving all positions in the direction of the normal.
 This works well for models with rounded edges, but is not that nice on objects with sharp edges, especially when bigger outline distance is used.";
 
+
+    private static bool ShowDragonModel = true;
+
     private bool _isDragonSelected = true;
     private bool _isSphereSelected = true;
     private bool _isBoxSelected = true;
@@ -36,14 +39,20 @@ This works well for models with rounded edges, but is not that nice on objects w
 
         _objectsGroupNode = new GroupNode("ObjectsGroup");
         _outlinesGroupNode = new GroupNode("OutlinesGroup");
+
+#if WEB_GL
+        ShowDragonModel = false;
+#endif
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var dragonMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, position: new Vector3(-50, 0, 0), positionType: PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));
-
-        _dragonModelNode = new MeshModelNode(dragonMesh, StandardMaterials.Silver, "DragonModel");
-        _objectsGroupNode.Add(_dragonModelNode);
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -20;
+            targetPositionCamera.Distance = 500;
+        }
 
 
         _sphereModelNode = new SphereModelNode(centerPosition: new Vector3(50, 35, 0), radius: 30, StandardMaterials.Silver.SetSpecular(specularPower: 32), "SphereModel");
@@ -55,15 +64,19 @@ This works well for models with rounded edges, but is not that nice on objects w
         scene.RootNode.Add(_objectsGroupNode);
 
 
-        RecreateOutlines();
-
         scene.RootNode.Add(_outlinesGroupNode);
 
-        if (targetPositionCamera != null)
+        RecreateOutlines();
+
+
+        if (ShowDragonModel)
         {
-            targetPositionCamera.Heading = 25;
-            targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 500;
+            var dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, position: new Vector3(-50, 0, 0), positionType: PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));
+
+            _dragonModelNode = new MeshModelNode(dragonMesh, StandardMaterials.Silver, "DragonModel");
+            _objectsGroupNode.Add(_dragonModelNode);
+
+            RecreateOutlines();
         }
     }
     
@@ -71,7 +84,7 @@ This works well for models with rounded edges, but is not that nice on objects w
     {
         _outlinesGroupNode.Clear();
 
-        if (_isDragonSelected)
+        if (_isDragonSelected && ShowDragonModel)
             AddOutlineMesh(_dragonModelNode);
 
         if (_isSphereSelected)
@@ -119,11 +132,15 @@ This works well for models with rounded edges, but is not that nice on objects w
 
         ui.CreateLabel("Objects with outline:");
 
-        ui.CreateCheckBox("Dragon", _isDragonSelected, isChecked =>
+
+        if (ShowDragonModel)
         {
-            _isDragonSelected = isChecked;
-            RecreateOutlines();
-        });
+            ui.CreateCheckBox("Dragon", _isDragonSelected, isChecked =>
+            {
+                _isDragonSelected = isChecked;
+                RecreateOutlines();
+            });
+        }
 
         ui.CreateCheckBox("Sphere", _isSphereSelected, isChecked =>
         {

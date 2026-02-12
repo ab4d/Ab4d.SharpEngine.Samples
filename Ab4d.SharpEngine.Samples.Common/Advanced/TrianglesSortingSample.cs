@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
@@ -30,10 +29,8 @@ public class TrianglesSortingSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        ShowModel(modelIndex: 0);
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 150;
@@ -42,6 +39,8 @@ public class TrianglesSortingSample : CommonSample
 
             targetPositionCamera.CameraChanged += TargetPositionCameraOnCameraChanged;
         }
+
+        await ShowModelAsync(modelIndex: 0, scene);
     }
 
     /// <inheritdoc />
@@ -112,21 +111,25 @@ public class TrianglesSortingSample : CommonSample
         }
     }
 
-    private void ShowModel(int modelIndex)
+    private async ValueTask ShowModelAsync(int modelIndex, Scene? scene = null)
     {
-        if (Scene == null)
+        if (scene == null)
+            scene = Scene;
+
+        if (scene == null)
             return;
 
-        var mesh1 = GetMesh(modelIndex);
+        var mesh1 = await GetMeshAsync(modelIndex, scene);
 
-        // Get the same mesh again. This gets new vertices and triangle indices.        
-        var mesh2 = GetMesh(modelIndex);
+        // Duplicate the mesh's triangle indices so we will have sorted and non-sorted triangles
+        int triangleIndicesCount = mesh1.TriangleIndices!.Length;
+        var triangleIndices2 = new int[triangleIndicesCount];
+        Array.Copy(mesh1.TriangleIndices, triangleIndices2, triangleIndicesCount);
 
-        if (mesh1 == null || mesh2 == null)
-            return;
+        var mesh2 = new StandardMesh(mesh1.Vertices!, triangleIndices2, mesh1.BoundingBox, "UnsortedMesh");
 
         
-        Scene.RootNode.Clear();
+        scene.RootNode.Clear();
 
         var material = StandardMaterials.Silver.SetOpacity(0.5f);
 
@@ -135,7 +138,7 @@ public class TrianglesSortingSample : CommonSample
         
         ModelUtils.PositionAndScaleSceneNode(meshModelNode1, position: new Vector3(0, 60, 0), positionType: PositionTypes.Center, finalSize: new Vector3(1000, 100, 1000));
 
-        Scene.RootNode.Add(meshModelNode1);
+        scene.RootNode.Add(meshModelNode1);
         
         
         var meshModelNode2 = new MeshModelNode(mesh2, material);
@@ -143,7 +146,7 @@ public class TrianglesSortingSample : CommonSample
 
         ModelUtils.PositionAndScaleSceneNode(meshModelNode2, position: new Vector3(0, -60, 0), positionType: PositionTypes.Center, finalSize: new Vector3(1000, 100, 1000));
 
-        Scene.RootNode.Add(meshModelNode2);
+        scene.RootNode.Add(meshModelNode2);
 
         
         _meshToSort = mesh1;
@@ -152,14 +155,14 @@ public class TrianglesSortingSample : CommonSample
         SortTriangles();
     }
     
-    private StandardMesh? GetMesh(int modelIndex)
+    private async Task<StandardMesh> GetMeshAsync(int modelIndex, Scene scene)
     {
         StandardMesh? mesh = modelIndex switch
         {
             0 => MeshFactory.CreateTorusKnotMesh(centerPosition: new Vector3(0, 0, 0), p: 5, q: 3, radius1: 40, radius2: 20, radius3: 7, uSegmentsCount: 300, vSegmentsCount: 30),
-            1 => TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot, new Vector3(100, 100, 100)),
-            2 => TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, new Vector3(100, 100, 100)),
-            _ => null
+            1 => await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot, finalSize: new Vector3(100, 100, 100)),
+            2 => await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, finalSize: new Vector3(100, 100, 100)),
+            _ => throw new ArgumentException(nameof(modelIndex))
         };
 
         return mesh;
@@ -170,7 +173,7 @@ public class TrianglesSortingSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
-        ui.CreateComboBox(new string[] { "Torus Knot", "Teapot", "Dragon" }, (selectedIndex, selectedText) => ShowModel(selectedIndex), selectedItemIndex: 0);
+        ui.CreateComboBox(new string[] { "Torus Knot", "Teapot", "Dragon" }, (selectedIndex, selectedText) => _ = ShowModelAsync(selectedIndex), selectedItemIndex: 0);
 
         ui.AddSeparator();
 
