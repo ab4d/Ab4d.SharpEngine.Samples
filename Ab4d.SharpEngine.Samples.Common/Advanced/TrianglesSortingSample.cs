@@ -111,7 +111,7 @@ public class TrianglesSortingSample : CommonSample
         }
     }
 
-    private async ValueTask ShowModelAsync(int modelIndex, Scene? scene = null)
+    private async Task ShowModelAsync(int modelIndex, Scene? scene = null)
     {
         if (scene == null)
             scene = Scene;
