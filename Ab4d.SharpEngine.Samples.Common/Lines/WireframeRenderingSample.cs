@@ -17,6 +17,9 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 //    - requires additional memory for line positions and MultiLineNode object
 //    - longer initialize time to collect line positions and remove duplicate lines
 //
+//
+// The following two options are available only for VULKAN (not for WebGL)
+//
 // 2) Create new MeshModelNode with the same mesh but with LineMaterial. This will render the object with ThickLineEffect and will render wireframe instead of solid objects.
 //    + no additional line positions arrays and mesh buffers are required
 //    + easy to control which objects are rendered (but cannot to control individual line positions)
@@ -30,8 +33,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 public class WireframeRenderingSample : CommonSample
 {
     public override string Title => "Wireframe rendering";
-    public override string Subtitle => "This sample shows different techniques to render 3D objects are wireframe.\nSee comments in the code to get additional info with pros and cons of each technique.";
 
+#if VULKAN
+    public override string Subtitle => "This sample shows different techniques to render 3D objects are wireframe.\nSee comments in the code to get additional info with pros and cons of each technique.";
+#endif
 
     private enum WireframeRenderingTechniques
     {
@@ -55,31 +60,26 @@ public class WireframeRenderingSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        // Nothing to do because the scene is defined in OnSceneViewInitialized (we need to have a SceneView object for WireframeRenderingStep)
-    }
-
-    protected override void OnSceneViewInitialized(SceneView sceneView)
-    {
-        _testSceneNode = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
+        _testSceneNode = await base.GetCommonSceneAsync(scene, CommonScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
 
         _testSceneNode.Update(); // This will update the WoldMatrix property
 
+        // We must set _wireframeRenderingTechnique to CreateWireframePositions because we require SceneView for WireframeRenderingStep
+        _wireframeRenderingTechnique = WireframeRenderingTechniques.CreateWireframePositions;
         RecreateWireframe();
-        
-        //if (targetPositionCamera != null)
-        //    targetPositionCamera.StartRotation(20, 0);
-
-        base.OnSceneViewInitialized(sceneView);
     }
 
+
+#if VULKAN
     protected override void OnDisposed()
     {
         RemoveWireframeRenderingStep();
 
         base.OnDisposed();
     }
+#endif
 
     private void RecreateWireframe()
     {
@@ -91,7 +91,8 @@ public class WireframeRenderingSample : CommonSample
                 else
                     CreatePerObjectColoredWireframeLinePositions();
                 break;
-            
+
+#if VULKAN
             case WireframeRenderingTechniques.UseLineMaterial:
                 CreateSceneNodesWithLineMaterial();
                 break;
@@ -99,7 +100,7 @@ public class WireframeRenderingSample : CommonSample
             case WireframeRenderingTechniques.WireframeRenderingStep:
                 CreateWireframeRenderingStep();
                 break;
-
+#endif
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -184,6 +185,7 @@ public class WireframeRenderingSample : CommonSample
         }
     }
 
+#if VULKAN
     private void CreateSceneNodesWithLineMaterial()
     {
         if (_testSceneNode == null || Scene == null)
@@ -265,6 +267,7 @@ public class WireframeRenderingSample : CommonSample
 
         SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = null;
     }
+#endif
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -274,15 +277,18 @@ public class WireframeRenderingSample : CommonSample
 
         ui.CreateRadioButtons(new string[]
             {
-                "Create wireframe positions (?):Uses LineUtils.AddWireframeLinePositions method to generated line positions\nthat represent wireframe lines for the specified mesh", 
+                "Create wireframe positions (?):Uses LineUtils.AddWireframeLinePositions method to generated line positions\nthat represent wireframe lines for the specified mesh",
+#if VULKAN
                 "Use LineMaterial (?):Render the 3D meshes by using LineMaterial instead of using StandardMaterial", 
                 "OverrideEffectTechnique (?): Render all objects by using a WireframeRenderingEffectTechnique\n(setting it to DefaultRenderObjectsRenderingStep.OverrideEffectTechnique)"
+#endif
             }, 
             (selectedIndex, selectedText) =>
             {
+#if VULKAN
                 if (_wireframeRenderingTechnique == WireframeRenderingTechniques.WireframeRenderingStep)
                     RemoveWireframeRenderingStep();
-
+#endif
                 _wireframeRenderingTechnique = (WireframeRenderingTechniques)selectedIndex;
                 RecreateWireframe();
             },
@@ -294,14 +300,15 @@ public class WireframeRenderingSample : CommonSample
                 
         ui.AddSeparator();
         ui.AddSeparator();
-        
+
+#if VULKAN        
         var lineThicknessOptions = new float[] { 0.2f, 0.5f, 1, 2, 3 };
         ui.CreateComboBox(lineThicknessOptions.Select(f => f.ToString()).ToArray(), (selectedIndex, selectedText) =>
         {
             _lineThickness = lineThicknessOptions[selectedIndex];
             RecreateWireframe();
         }, selectedItemIndex: 2, keyText: "LineThickness: ");
-        
+#endif        
         
         ui.AddSeparator();
         

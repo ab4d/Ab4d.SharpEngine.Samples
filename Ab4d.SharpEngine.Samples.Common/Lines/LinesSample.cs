@@ -11,6 +11,10 @@ public class LinesSample : CommonSample
 {
     public override string Title => "3D lines";
 
+#if WEB_GL
+    public override string Subtitle => "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support thick lines (LineThickness > 1) and LineCaps (line with arrows and other ending shapes) ";
+#endif
+
     private RectangleNode? _rectanglePositionTypeNode;
     private WireBoxNode? _wireBoxNode;
     private CornerWireBoxNode? _cornerWireBoxNode;
@@ -70,7 +74,7 @@ public class LinesSample : CommonSample
         #endregion
 
         #region Lines with arrows
-
+#if VULKAN
         sceneNode = new LineNode(name: $"Line (EndLineCap: ArrowAnchor)")
         {
             LineThickness = 2,
@@ -103,7 +107,7 @@ public class LinesSample : CommonSample
             EndLineCap = LineCap.ArrowAnchor
         };
         scene.RootNode.Add(sceneNode);
-
+#endif
         #endregion
 
         #region WireCrossNode
@@ -564,8 +568,8 @@ public class LinesSample : CommonSample
         #endregion
 
 
-        #region Different start and end color
-
+#region Different start and end color
+#if VULKAN
         var positions2 = new Vector3[]
         {
             new Vector3(-50, 0, 0),
@@ -599,11 +603,11 @@ public class LinesSample : CommonSample
         };
 
         scene.RootNode.Add(multiLineNode);
-
+#endif
         #endregion
 
         #region Line with patterns
-
+#if VULKAN
         var stipplePatterns = new ushort[]
         {
             0b0101010101010101,
@@ -628,7 +632,7 @@ public class LinesSample : CommonSample
 
             scene.RootNode.Add(line);
         }
-
+#endif
         #endregion
 
 
