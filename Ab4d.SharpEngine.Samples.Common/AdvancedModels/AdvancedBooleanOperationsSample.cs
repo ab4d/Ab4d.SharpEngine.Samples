@@ -17,6 +17,8 @@ public class AdvancedBooleanOperationsSample : CommonSample
     private bool _generateInnerTriangles = true;
 
     private TextBlockFactory? _textBlockFactory;
+    private StandardMesh? _subtractedMesh1;
+    private StandardMesh? _subtractedMesh2;
 
     public AdvancedBooleanOperationsSample(ICommonSamplesContext context)
         : base(context)
@@ -25,12 +27,6 @@ public class AdvancedBooleanOperationsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _textBlockFactory = await context.GetTextBlockFactoryAsync();
-        _textBlockFactory.FontSize = 10;
-        _textBlockFactory.BackgroundColor = Colors.LightYellow;
-        _textBlockFactory.BorderThickness = 1;
-        _textBlockFactory.BorderColor = Colors.DimGray;
-
         CreateTestScene(scene);
 
         if (targetPositionCamera != null)
@@ -39,6 +35,15 @@ public class AdvancedBooleanOperationsSample : CommonSample
             targetPositionCamera.Attitude = -35;
             targetPositionCamera.Distance = 700;
         }
+
+
+        _textBlockFactory = await context.GetTextBlockFactoryAsync();
+        _textBlockFactory.FontSize = 10;
+        _textBlockFactory.BackgroundColor = Colors.LightYellow;
+        _textBlockFactory.BorderThickness = 1;
+        _textBlockFactory.BorderColor = Colors.DimGray;
+
+        AddTextDescriptions(scene);
     }
 
     private void CreateTestScene(Scene scene)
@@ -66,25 +71,12 @@ public class AdvancedBooleanOperationsSample : CommonSample
         // But when you know that most of the triangles in the meshes would intersect, then
         // it is worth setting processOnlyIntersectingTriangles to false to skip getting intersecting triangles.
 
-        var subtractedMesh1 = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Subtract(boxMesh, combinedMesh, processOnlyIntersectingTriangles: true, _generateInnerTriangles);
-        ShowMesh(scene, subtractedMesh1, -120);
+        _subtractedMesh1 = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Subtract(boxMesh, combinedMesh, processOnlyIntersectingTriangles: true, _generateInnerTriangles);
+        ShowMesh(scene, _subtractedMesh1, -120);
 
-        var subtractedMesh2 = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Subtract(boxMesh, combinedMesh, processOnlyIntersectingTriangles: false, _generateInnerTriangles);
-        ShowMesh(scene, subtractedMesh2, 120);
+        _subtractedMesh2 = Ab4d.SharpEngine.Utilities.MeshBooleanOperations.Subtract(boxMesh, combinedMesh, processOnlyIntersectingTriangles: false, _generateInnerTriangles);
+        ShowMesh(scene, _subtractedMesh2, 120);
 
-
-        if (_textBlockFactory != null)
-        {
-            var textNode = _textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {subtractedMesh1!.TriangleIndices!.Length / 3}",
-                                                             new Vector3(-120, 0, 150),
-                                                             textAttitude: 30);
-            scene.RootNode.Add(textNode);
-
-            textNode = _textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {subtractedMesh2!.TriangleIndices!.Length / 3}",
-                                                         new Vector3(120, 0, 150),
-                                                         textAttitude: 30);
-            scene.RootNode.Add(textNode);
-        }
 
         // Deep dive:
         // When processOnlyIntersectingTriangles is set to true, then behind the scenes the 
@@ -179,6 +171,25 @@ public class AdvancedBooleanOperationsSample : CommonSample
         };
 
         scene.RootNode.Add(planeModelNode);
+
+
+        AddTextDescriptions(scene);
+    }
+
+    private void AddTextDescriptions(Scene scene)
+    {
+        if (_textBlockFactory == null || _subtractedMesh1 == null || _subtractedMesh2 == null) 
+            return;
+
+        var textNode = _textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: true\r\nFinal triangles count: {_subtractedMesh1.TriangleIndices!.Length / 3}",
+                                                         new Vector3(-120, 0, 150),
+                                                         textAttitude: 30);
+        scene.RootNode.Add(textNode);
+
+        textNode = _textBlockFactory.CreateTextBlock($"processOnlyIntersectingTriangles: false\r\nFinal triangles count: {_subtractedMesh2.TriangleIndices!.Length / 3}",
+                                                     new Vector3(120, 0, 150),
+                                                     textAttitude: 30);
+        scene.RootNode.Add(textNode);
     }
 
     private void ShowMesh(Scene scene, StandardMesh? mesh, float xOffset)
