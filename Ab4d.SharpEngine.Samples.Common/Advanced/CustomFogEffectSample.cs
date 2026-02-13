@@ -7,7 +7,12 @@ using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
+//
 // This sample shows how to create a custom effect with custom vertex and fragment shaders.
+//
+
+//
+// The following are comments for Vulkan based Ab4d.SharpEngine (for desktop and mobile devices):
 //
 // The shaders for the FogEffect are stored in Resources/Shaders folder.
 // There are also two scripts that can be used to compile the shaders.
@@ -25,7 +30,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 // The most important property for rendering in RenderingItem is the EffectTechnique.
 // The EffectTechnique defines the Render method that calls the Vulkan methods that
 // bind the Vulkan pipeline, resources and the call Draw method (CmdDrawIndexed or CmdDraw).
-
+//
 //
 // Notes and tips for users who want to use custom effects:
 //
@@ -58,18 +63,32 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 // - It is possible to purchase source code of some SharpEngine effects and shaders.
 //   This can show you how the existing effects are implemented. Contact support (https://www.ab4d.com/Feedback.aspx) for more info.
 //
-
+//
 // To get another example of a more complex custom effect, see the VertexColorPlusEffect that was created by zacfromaustinpowder:
 // https://github.com/zacfromaustinpowder/Ab4d.SharpEngine.Samples/tree/customEffect2
 //
 // NOTE: This custom effect was not fully tested by AB4D company. Also, we do not offer any support for that.
 
+//
+// The following are comments for WebGL based Ab4d.SharpEngine (for browser):
+//
+// In WebGL the shaders are compiled at runtime.
+// This means that The glsl source code is generated based on the shader requirements.
+// This is done in FogEffect.cs file.
+//
+// The FogEffectTechnique class is used to set the uniform buffers in the shaders.
+
 public class CustomFogEffectSample : CommonSample
 {
     public override string Title => "Custom fog effect ";
-    public override string Subtitle => "This sample shows how to create a custom effect with custom vertex and fragment shaders.\nFogEffect and FogMaterial source code is in the Advanced folder. Shaders source code is in the Resources/Shaders folder.";
-    
-    
+    public override string Subtitle => "This sample shows how to create a custom effect with custom vertex and fragment shaders.\nFogEffect and FogMaterial source code is in the Advanced folder."
+#if VULKAN
+    + " Shaders source code is in the Resources/Shaders folder.";
+#else
+    + " Shaders source code is defined in the FogEffect.cs file.";
+#endif
+
+
     private float _fogStart = 260;
     private float _fogDistance = 150;
     private Color3 _fogColor = Color3.White;
@@ -81,6 +100,7 @@ public class CustomFogEffectSample : CommonSample
     public CustomFogEffectSample(ICommonSamplesContext context)
         : base(context)
     {
+#if VULKAN
         // First create an instance of AssemblyShaderBytecodeProvider.
         // This will allow using ShadersManager to cache and get the shaders from the assembly's EmbeddedResources.
         // Instead of AssemblyShaderBytecodeProvider, it is also possible to use:
@@ -88,16 +108,25 @@ public class CustomFogEffectSample : CommonSample
         // - DirectoryShaderBytecodeProvider
         // - FileShaderBytecodeProvider
         // - SimpleShaderBytecodeProvider
-        
+
         var resourceAssembly = this.GetType().Assembly;
         var assemblyShaderBytecodeProvider = new AssemblyShaderBytecodeProvider(resourceAssembly, resourceRootName: resourceAssembly.GetName().Name + ".Resources.Shaders.spv.");
 
         Ab4d.SharpEngine.Utilities.ShadersManager.RegisterShaderResourceStatic(assemblyShaderBytecodeProvider);
+#endif
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        // Uncomment to test rendering a StandardMaterial:
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Distance = 350;
+            targetPositionCamera.Heading = 60;
+            targetPositionCamera.Attitude = -20;
+        }
+
+
+        //// Uncomment to test rendering a StandardMaterial:
         //var standardBoxNode = new BoxModelNode(new Vector3(0, 0, 0), new Vector3(60, 80, 40), "StandardBox")
         //{
         //    UseSharedBoxMesh = false
@@ -125,9 +154,9 @@ public class CustomFogEffectSample : CommonSample
             FogFullColorStart = _fogStart + _fogDistance,
             FogColor          = _fogColor
         };
-        
 
-        var textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
+        
+        var textureImage = await base.GetCommonTextureAsync(scene, CommonTextures.TenByTenNumbers);
 
         var textureFogMaterial = new FogMaterial()
         {
@@ -138,7 +167,7 @@ public class CustomFogEffectSample : CommonSample
             FogColor          = _fogColor,
             DiffuseTexture    = textureImage,
         };
-        
+
         _allFogMaterials.Add(bottomFogMaterial);
         _allFogMaterials.Add(sphereFogMaterial);
         _allFogMaterials.Add(textureFogMaterial);
@@ -163,14 +192,6 @@ public class CustomFogEffectSample : CommonSample
 
                 scene.RootNode.Add(fogSphere);
             }
-        }
-
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Distance = 350;
-            targetPositionCamera.Heading = 60;
-            targetPositionCamera.Attitude = -20;
         }
     }
 

@@ -1,8 +1,14 @@
 ﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.Vulkan;
 using System.Text;
+
+#if VULKAN
+using Ab4d.SharpEngine.Vulkan;
+using GpuDevice = Ab4d.SharpEngine.Vulkan.VulkanDevice;
+#elif WEB_GL
+using GpuDevice = Ab4d.SharpEngine.WebGL.WebGLDevice;
+#endif
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -282,15 +288,6 @@ public class FogMaterial : Material, IDiffuseMaterial, IDiffuseTextureMaterial, 
 
             if (dispose && !diffuseTexture.IsDisposed && !diffuseTexture.IsDisposing)
                 diffuseTexture.Dispose();
-
-            // We also need to call DisposeDescriptorSetForTexture to remove the disposed ImageView from the _textureDescriptorSets dictionary.
-            // If this is not done, then the new ImageView with the same handle can use a descriptor set that is not valid anymore.
-            // This happened in AnimatedTexturesSample when using WPF with OverlayTexture or in Avalonia in Release build.
-            if (this.DiffuseTextureSampler != null)
-            {
-                if (this.Effect is FogEffect standardEffect)
-                    standardEffect.DisposeDescriptorSetForTexture(this.MaterialBlockIndex, diffuseTexture, this.DiffuseTextureSampler);
-            }
             
             _diffuseTexture = null;
         }
@@ -350,7 +347,7 @@ public class FogMaterial : Material, IDiffuseMaterial, IDiffuseTextureMaterial, 
     }
 
     /// <inheritdoc />
-    protected override void OnInitializeSceneResources(Scene scene, VulkanDevice gpuDevice)
+    protected override void OnInitializeSceneResources(Scene scene, GpuDevice gpuDevice)
     {
         // Get the default FogEffect (one instance of FogEffect that is created on first call to EffectsManager.GetDefault<FogEffect>.)
         if (Effect == null)
