@@ -66,16 +66,16 @@ public class EdgeLinesSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _rootSceneNode = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
+        _rootSceneNode = await base.GetCommonSceneAsync(scene, CommonScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
 
         // Obj files do not support hierarchically organized objects
         // So we need to manually extract the Man01, Man02 and Man03 objects and put them under a new group that can be moved around
         var manNodes = _rootSceneNode.GetAllChildren("Man*");
 
         foreach (var manNode in manNodes)
-            _rootSceneNode.Remove(manNode);
+            manNode.Parent!.Remove(manNode);
 
         var manGroupNode = new GroupNode("ManGroup");
 
@@ -147,13 +147,15 @@ public class EdgeLinesSample : CommonSample
                 UpdateEdgeLines();
             }
         }, 100, false, "EdgeStartAngle", 100, sliderValue => sliderValue.ToString("F0"));
-        
+
+#if VULKAN
         ui.CreateSlider(0.1f, 2f, () => _lineThickness, delegate (float newValue)
         {
             _lineThickness = newValue;
             if (_lineMaterial != null)
                 _lineMaterial.LineThickness = newValue;
         }, 100, false, "LineThickness", 100, sliderValue => sliderValue.ToString("F2"));
+#endif
 
         ui.CreateButton("Change transform", () =>
         {
