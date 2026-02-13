@@ -21,6 +21,13 @@ public class TubesSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = -120;
+            targetPositionCamera.Attitude = -40;
+            targetPositionCamera.Distance = 1800;
+        }
+
         // Low-segment tubes (to show that segments are correctly handled)
         CreateTubeMeshes(scene: scene, segments: 3, startAngle: 0,  endAngle: 360, zOffset: 300, material: _specularRedMaterial);
         CreateTubeMeshes(scene: scene, segments: 3, startAngle: 45, endAngle: 225, zOffset: 150, material: _specularRedMaterial);
@@ -40,13 +47,6 @@ public class TubesSample : CommonSample
         // High-segment tubes
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 0,  endAngle: 360, zOffset: -450, material: textureMaterial);
         CreateTubeMeshes(scene: scene, segments: 30, startAngle: 45, endAngle: 225, zOffset: -600, material: textureMaterial);
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = -120;
-            targetPositionCamera.Attitude = -40;
-            targetPositionCamera.Distance = 1800;
-        }
     }
 
     private void CreateTubeMeshes(Scene scene, int segments, float startAngle, float endAngle, float zOffset, StandardMaterial material)
