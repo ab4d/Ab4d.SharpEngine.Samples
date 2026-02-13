@@ -116,22 +116,6 @@ public class ExtrudeAlongPathSample : CommonSample
         scene.RootNode.Add(meshModelNode3);
 
 
-        var textBlockFactory = await context.GetTextBlockFactoryAsync();
-        textBlockFactory.FontSize = 12;
-        textBlockFactory.BackgroundColor = Colors.LightYellow;
-        textBlockFactory.BorderThickness = 1;
-        textBlockFactory.BorderColor = Colors.DimGray;
-
-        var textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: true\nisSmooth: true", new Vector3(-170, 10, 30), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-        textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: false\nisSmooth: false", new Vector3(-20, 10, 30), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-        textNode = textBlockFactory.CreateTextBlock("T shape\nisClosed: true\nisSmooth: false", new Vector3(130, 10, 30), textAttitude: 30);
-        scene.RootNode.Add(textNode);
-
-
         var wireGridNode = new WireGridNode()
         {
             CenterPosition = new Vector3(0, -5, -50),
@@ -154,5 +138,21 @@ public class ExtrudeAlongPathSample : CommonSample
         }
 
         scene.SetAmbientLight(0.2f);
+
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+        textBlockFactory.FontSize = 12;
+        textBlockFactory.BackgroundColor = Colors.LightYellow;
+        textBlockFactory.BorderThickness = 1;
+        textBlockFactory.BorderColor = Colors.DimGray;
+
+        var textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: true\nisSmooth: true", new Vector3(-170, 10, 30), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+
+        textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: false\nisSmooth: false", new Vector3(-20, 10, 30), textAttitude: 30);
+        scene.RootNode.Add(textNode);
+
+        textNode = textBlockFactory.CreateTextBlock("T shape\nisClosed: true\nisSmooth: false", new Vector3(130, 10, 30), textAttitude: 30);
+        scene.RootNode.Add(textNode);
     }
 }
