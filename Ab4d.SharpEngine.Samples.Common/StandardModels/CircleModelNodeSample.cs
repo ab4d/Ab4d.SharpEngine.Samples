@@ -360,6 +360,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
 
+#if VULKAN
         ui.CreateButton("Show Saturn rings", () =>
         {
             isTextureCheckBox?.SetValue(true);
@@ -371,6 +372,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
             _textureImageComboBox?.SetValue(3); // 3 = 'Saturn rings'
             _textureMappingComboBox?.SetValue(2); // 2 = RadialFromInnerRadius
         });
+#endif
 
         const string labelRectangle = "Create rectangle (?):This button calls CreateRectangle method that sets the properties\nof this CircleModelNode so that it renders a rectangle.";
         const string labelCircle =  "Create circle (?):This button (re)sets the properties\nof this CircleModelNode so that it renders a circle.";
