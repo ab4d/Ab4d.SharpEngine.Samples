@@ -319,13 +319,49 @@ public abstract class CommonSample
     {
         Scene = scene;
 
-        _createdCamera = OnCreateCamera();
+        try
+        {
+            _createdCamera = OnCreateCamera();
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Exception during OnCreateCamera: " + ex.Message);
+        }
+
         targetPositionCamera = _createdCamera as TargetPositionCamera;
 
-        OnCreateScene(scene);
-        OnCreateLights(scene);
 
-        _ = OnCreateSceneAsync(scene); // call async method from sync context
+        try
+        {
+            OnCreateScene(scene);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Exception during OnCreateScene: " + ex.Message);
+        }
+
+        try
+        {
+            OnCreateLights(scene);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Exception during OnCreateLights: " + ex.Message);
+        }
+
+        _ = CallOnCreateSceneAsync(scene); // call async OnCreateSceneAsync method from sync context. The helper CallOnCreateSceneAsync provides error handling.
+    }
+
+    private async Task CallOnCreateSceneAsync(Scene scene)
+    {
+        try
+        {
+            await OnCreateSceneAsync(scene);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Exception during OnCreateSceneAsync: " + ex.Message);
+        }
     }
     
     public async Task InitializeSceneAsync(Scene scene)
