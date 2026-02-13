@@ -163,14 +163,16 @@ public class MaterialsSample : CommonSample
         //
         // If not otherwise specified, then the IBitmapIO that is defined in GpuDevice.DefaultBitmapIO is used.
         // That property is by default set to an instance of PngBitmapIO.
-        
 
-        string textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/10x10-texture.png"); // NOTE: SharpEngine will automatically adjust directory separator ('\' or '/' based on the used OS).
 
         // The most easy way to define a texture material is to set the file name in the StandardMaterial constructor.
         // We also need to set the BitmapIO provider that will read the bitmap (this is automatically set by the sample; it can be WpfBitmapIO, SkiaSharpBitmapIO (from Ab4d.SharpEngine.Avalonia), WinUIBitmapIO or ImageMagickBitmapIO)
         // This will save the texture name and when the GpuDevice is available, then the texture file will be loaded and a GpuImage object will be created on the graphics card.
 
+#if VULKAN
+        string textureFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Textures/10x10-texture.png"); // NOTE: SharpEngine will automatically adjust directory separator ('\' or '/' based on the used OS).
+        var material3 = new StandardMaterial(textureFileName, this.BitmapIO, name: "10x10-texture.png"); // name is optional
+#else
         // Create Gray material until the texture is loaded
         var material3 = new StandardMaterial(diffuseColor: Colors.Gray, name: "TextureMaterial"); 
         base.GetCommonTexture(scene, CommonTextures.TenByTenNumbers, textureCreatedCallback: gpuImage =>
@@ -178,6 +180,7 @@ public class MaterialsSample : CommonSample
             material3.DiffuseTexture = gpuImage;
             material3.DiffuseColor = Colors.White; // When using texture, the DiffuseColor is used as a color mask, so set it to White to show the original colors from the texture
         });
+#endif
 
         //// When the GpuDevice is available, then we can also create the GpuImage manually and set it to the DiffuseTexture property:
         //var gpuImage = TextureLoader.CreateTexture(textureFileName, this.BitmapIO, GpuDevice, generateMipMaps: true, isDeviceLocal: true, cacheGpuTexture: true);
