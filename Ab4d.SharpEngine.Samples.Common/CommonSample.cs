@@ -147,7 +147,7 @@ public abstract class CommonSample
     public bool ShowCameraAxisPanel
     {
         get => false;
-        set => Ab4d.SharpEngine.Utilities.Log.Warn?.Write("CommonSample", "CameraAxisPanel is not yet supported in Ab4d.SharpEngine for the browser.");
+        set => Ab4d.SharpEngine.Utilities.Log.Trace?.Write("CommonSample", "CameraAxisPanel is not yet supported in Ab4d.SharpEngine for the browser.");
     }
 #endif
 
