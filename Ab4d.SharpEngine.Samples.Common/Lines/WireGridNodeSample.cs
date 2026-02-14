@@ -154,6 +154,7 @@ public class WireGridNodeSample : CommonSample
             keyText: "LineColor:",
             keyTextWidth: 140);
 
+#if VULKAN
         ui.CreateSlider(0, 10, () => _selectedMinorLineThickness, sliderValue =>
             {
                 _selectedMinorLineThickness = sliderValue;
@@ -166,6 +167,7 @@ public class WireGridNodeSample : CommonSample
             sliderValue => sliderValue.ToString("F1"));
 
         ui.AddSeparator();
+#endif
 
         ui.CreateComboBox(new string[] { "Gray", "DimGray", "Black", "SkyBlue" },
             (selectedIndex, selectedText) =>
@@ -178,6 +180,7 @@ public class WireGridNodeSample : CommonSample
             keyText: "MajorLineColor:",
             keyTextWidth: 140);
 
+#if VULKAN
         ui.CreateSlider(0, 10, () => _selectedMajorLineThickness, sliderValue =>
             {
                 _selectedMajorLineThickness = sliderValue;
@@ -188,6 +191,7 @@ public class WireGridNodeSample : CommonSample
             keyText: "MajorLinesThickness:",
             keyTextWidth: 140,
             sliderValue => sliderValue.ToString("F1"));
+#endif
 
         ui.CreateSlider(0, 15, () => _selectedMajorLinesFrequency, sliderValue =>
             {
