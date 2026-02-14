@@ -25,7 +25,9 @@ public abstract class CommonSample
     // When true, the GC.Collect is called after each sample is disposed (in the Dispose method below).
     public static bool CollectGarbageAfterEachSample = true;
 
-    private const string ModelsBaseFolder = "Resources\\Models";
+    private const string ResourcesBaseFolder = "Resources";
+    private const string ModelsBaseFolder = "Models";
+    private const string TexturesBaseFolder = "Textures";
     
     public enum CommonMeshes
     {
@@ -706,6 +708,33 @@ public abstract class CommonSample
         foreach (var commonTexture in Enum.GetValues<CommonTextures>())
             await GetCommonTextureAsync(scene, commonTexture);
     }
+    
+    public string GetCommonResourcePath(string resourceBasePath, string fileName)
+    {
+#if WEB_GL
+        if (fileName.StartsWith(ResourcesBaseFolder))
+            return fileName;
+        else
+            return System.IO.Path.Combine(ResourcesBaseFolder, resourceBasePath, fileName);
+#else
+        // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
+        // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
+        if (fileName.StartsWith(ResourcesBaseFolder))
+            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        else
+            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ResourcesBaseFolder, resourceBasePath, fileName);
+#endif
+    }
+    
+    public string GetCommonTexturePath(string textureName)
+    {
+        return GetCommonResourcePath(TexturesBaseFolder, textureName);
+    }
+    
+    public string GetCommonModelPath(string textureName)
+    {
+        return GetCommonResourcePath(ModelsBaseFolder, textureName);
+    }
 
     #region GetCommonTexture, GetCommonTexturePath
     public string GetCommonTexturePath(CommonTextures textureType)
@@ -742,16 +771,6 @@ public abstract class CommonSample
     {
         var textureName = _commonTexturesFileNames[(int)textureType];
         GetCommonTexture(textureName, scene, textureCreatedCallback, textureCreationFailedCallback);
-    }
-
-    public string GetCommonTexturePath(string textureName)
-    {
-        // We need to add CurrentDomain.BaseDirectory because the CurrentDirectory may not be set to the output folder.
-        // For example, this can happen when the samples are started with "dotnet run ." - in this case the CurrentDirectory is the same as the CLI's current directory.
-        if (textureName.StartsWith("Resources"))
-            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, textureName);
-        else
-            return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "Textures", textureName);
     }
 
     public GpuImage GetCommonTexture(string textureName, Scene? scene)
@@ -830,7 +849,7 @@ public abstract class CommonSample
         string fileName = GetCommonTexturePath(textureName);
         TextureLoader.CreateTexture(fileName, gpuDevice, textureCreatedCallback, generateMipMaps: true, useGpuDeviceCache: true, textureCreationFailedCallback: textureCreationFailedCallback);
     }
-    #endregion
+#endregion
 
     #region GetCommonMesh
 
@@ -921,7 +940,7 @@ public abstract class CommonSample
         if (commonMesh == null)
         {
             var commonMeshFileName = _commonMeshesFileNames[(int)meshType];
-            string fullFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ModelsBaseFolder, commonMeshFileName); // ModelsBaseFolder: "Resources\\Models"
+            string fullFileName = GetCommonModelPath(commonMeshFileName);
             
             var objImporter = new ObjImporter(scene);
             var readGroupNode = await objImporter.ImportAsync(fullFileName);
@@ -1008,7 +1027,7 @@ public abstract class CommonSample
 
 
         var testSceneFileName = _commonScenesFileNames[(int)sceneType];
-        string fullFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ModelsBaseFolder, testSceneFileName); // ModelsBaseFolder: "Resources\\Models"
+        string fullFileName = GetCommonModelPath(testSceneFileName);
         
         var objImporter = new ObjImporter(scene);
         var readGroupNode = await objImporter.ImportAsync(fullFileName);
@@ -1057,7 +1076,7 @@ public abstract class CommonSample
 
     private string GetCommonSceneCacheKey(CommonScenes sceneType) => sceneType.ToString() + "_CommonScene";
 
-    #endregion
+#endregion
 
     #region GetRandom... methods
     private Random _rnd = new Random();
