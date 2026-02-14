@@ -73,7 +73,11 @@ public class VectorTextSample : CommonSample
         var allFontFiles = CollectAvailableFonts();
         _selectedFontFileName = allFontFiles[0];
 
+#if VULKAN
         _textToShow = CreateAllCharsText(from: 33, to: 126, lineLength: 16); // ASCII chars from 33 - 126
+#else
+        _textToShow = "Vector text\nfrom TrueType font.\nType in the TextBox on the\nright to change this text."; // For the browser reduce the number of characters that need to be triangulated to improve performance.
+#endif
 
         ShowCameraAxisPanel = true;
     }
