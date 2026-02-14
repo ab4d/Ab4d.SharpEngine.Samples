@@ -676,7 +676,9 @@ public class InstancedArrowsSample : CommonSample
             "1000 x 1000 (1.000.000)",
         };
 #elif WEB_GL
-        // Limit number of instances because Blazor WASM does not support multi-threading
+        // Limit number of instances because Blazor WASM does not support multi-threading.
+        // Also, the debug version is quite slow. But after publishing the app, the performance is great,
+        // see: https://www.ab4d.com/sharp-engine-browser-demo/commonSamples/AdvancedModels-InstancedArrowsSample
         var arrowNumberOptions = new string[]
         {
             "10 x 10 (100)",
