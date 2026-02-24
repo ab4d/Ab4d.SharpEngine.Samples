@@ -68,12 +68,12 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
 	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.0" />
 	</ItemGroup>
-	<ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
 	    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9509" />
 	</ItemGroup>
-	<!--<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
-	</ItemGroup>-->  
+	</ItemGroup>  
 
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
       <RuntimeIdentifier>maccatalyst-arm64</RuntimeIdentifier> 
