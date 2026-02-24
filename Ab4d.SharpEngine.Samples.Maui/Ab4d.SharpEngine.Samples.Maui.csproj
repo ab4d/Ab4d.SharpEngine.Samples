@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
 		<RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
 
-        <TargetFrameworks>net9.0-android</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+        <TargetFrameworks>net10.0-android</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -21,15 +21,22 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-
-    <!-- Unsafe block is requried to use NativeMemory.AlignedAlloc in SharpEngineSceneView.PaintSkCanvas method. An altrenative without unsafe block is to use Marshal.AllocHGlobal - see comment in PaintSkCanvas. -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Enable XAML source generation for faster build times and improved performance.
+		     This generates C# code from XAML at compile time instead of runtime inflation.
+		     To disable, remove this line.
+		     For individual files, you can override by setting Inflator metadata:
+		       <MauiXaml Update="MyPage.xaml" Inflator="Default" /> (reverts to defaults: Runtime for Debug, XamlC for Release)
+		       <MauiXaml Update="MyPage.xaml" Inflator="Runtime" /> (force runtime inflation) -->
+    <MauiXamlInflator>SourceGen</MauiXamlInflator>
+    <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 
 		<!-- Display name -->
 		<ApplicationTitle>Ab4d.SharpEngine.Samples.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.ab4d.sharpengine.samples.maui.ios</ApplicationId>
+		<ApplicationId>com.ab4d.sharpengine.samples.maui</ApplicationId>
 		<ApplicationIdGuid>538a7162-4116-41b8-9595-00f749556712</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -54,7 +61,6 @@
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
@@ -64,18 +70,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
-	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.41" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
+	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2" />
 	</ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
 	    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9509" />
 	</ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
-	</ItemGroup>  
+	</ItemGroup>
 
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
       <RuntimeIdentifier>maccatalyst-arm64</RuntimeIdentifier> 
       <MtouchLink>SdkOnly</MtouchLink>
     </PropertyGroup>
@@ -112,7 +118,7 @@
 	<!-- Minimum .Net app Privacy manifest for ios. See: https://devblogs.microsoft.com/dotnet/apple-privacy-manifest-support/ -->
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
 		<BundleResource Include="Platforms\iOS\PrivacyInfo.xcprivacy" LogicalName="PrivacyInfo.xcprivacy" />
-	</ItemGroup>	
+	</ItemGroup>
 	
 	<!-- Build Properties must be defined within these property groups to ensure successful publishing
        to the Mac App Store. See: https://aka.ms/maui-publish-app-store#define-build-properties-in-your-project-file -->
