@@ -93,6 +93,11 @@ public partial class MainPage : ContentPage
             _mauiCameraController.MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
         else
             _mauiCameraController.MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+
+        Unloaded += (sender, args) =>
+        {
+            _sharpEngineSceneView.Dispose();
+        };
     }
 
     private bool SetupPlatform(EngineCreateOptions engineCreateOptions)
