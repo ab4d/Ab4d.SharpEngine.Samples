@@ -5,12 +5,12 @@ using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 
-namespace Ab4d.SharpEngine.Samples.Common.Advanced;
+namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
 public class TrianglesSortingSample : CommonSample
 {
     public override string Title => "Triangles sorting";
-    public override string Subtitle => "Upper model: SORTED triangles\nLower model: UNSORTED triangles";
+    public override string Subtitle => "Triangles sorting can be used to render the triangles in a semi-transparent object in the correct order.\n\nUpper model: SORTED triangles\nLower model: UNSORTED triangles";
 
     private StandardMesh? _meshToSort;
     private MeshTrianglesSorter? _meshTrianglesSorter;

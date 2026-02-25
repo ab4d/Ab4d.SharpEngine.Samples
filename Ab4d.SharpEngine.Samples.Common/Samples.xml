@@ -107,7 +107,10 @@
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
-
+  <Sample IsSeparator="True" />
+  <Sample Location="Materials.TransparencySortingSample" Title="Transparency sorting" IsNew="True"/>
+  <Sample Location="Materials.TrianglesSortingSample" Title="Triangles sorting" />
+  
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
   <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
@@ -144,7 +147,6 @@
   <Sample Location="Advanced.ModelOptimizerSample" Title="ModelOptimizer" />
   <Sample Location="Advanced.MeshOutlineSample" Title="Mesh outlines" />
   <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" />
-  <Sample Location="Advanced.TrianglesSortingSample" Title="Triangles sorting" />
   <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" />
   <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
