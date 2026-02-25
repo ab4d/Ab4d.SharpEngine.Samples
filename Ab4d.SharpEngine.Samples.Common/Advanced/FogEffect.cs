@@ -307,6 +307,14 @@ public class FogEffect : Effect
             _effectTechniques[i]?.ResetPipeline();
     }
 
+    /// <summary>
+    /// ResetEffectTechniques recreates all the effect techniques. It is called when the <see cref="Scene.DefaultTransparentDepthStencilState"/> and other default settings are changed.
+    /// </summary>
+    public override void ResetEffectTechniques()
+    {
+        DisposeEffectTechniques();
+    }
+
     /// <inheritdoc />
     public override void OnBeginUpdate(RenderingContext renderingContext)
     {
@@ -583,6 +591,21 @@ public class FogEffect : Effect
             _textureDescriptorSetsCache.FreeDescriptorSets(materialDataBlock.GpuBuffers, diffuseTexture, diffuseTextureSampler);
     }
 
+    protected void DisposeEffectTechniques()
+    {
+        for (var i = 0; i < _effectTechniques.Length; i++)
+        {
+            var effectTechnique = _effectTechniques[i];
+            if (effectTechnique != null && !effectTechnique.IsDisposed) // effect technique may be already disposed by finalizer
+            {
+                effectTechnique.Dispose();
+                _effectTechniques[i] = null;
+            }
+        }
+
+        _standardTechnique = null;
+    }
+
     /// <inheritdoc />
     protected override unsafe void Dispose(bool disposing)
     {
@@ -650,13 +673,8 @@ public class FogEffect : Effect
             }
         }
 
-        if (_effectTechniques != null)
-        {
-            for (var i = 0; i < _effectTechniques.Length; i++)
-                _effectTechniques[i] = null;
-
-            _standardTechnique = null;
-        }
+        if (disposing)
+            DisposeEffectTechniques();
 
         base.Dispose(disposing);
 
