@@ -31,13 +31,15 @@ public class WinFormsPoint3DTo2DSample : Point3DTo2DSample
     }
 
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
-    protected override void CreateCustomUI(ICommonSampleUIProvider ui)
+    protected override bool CreateCustomUI(ICommonSampleUIProvider ui)
     {
         if (ui is not WinFormsUIProvider winFormsUIProvider)
-            return;
+            return false;
 
         _baseWinFormsPanel = winFormsUIProvider.BaseWinFormsPanel;
         _dpiScale = winFormsUIProvider.DpiScale;
+
+        return true; // inform the base class that we have a custom UI
     }
 
     protected override void OnDisposed()

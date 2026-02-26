@@ -1,17 +1,21 @@
 ﻿using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 
-public abstract class Point3DTo2DSample : CommonSample
+public class Point3DTo2DSample : CommonSample
 {
     public override string Title => "Point3DTo2D sample";
-    public override string Subtitle => "Convert 3D position to 2D screen position and show UI elements on top of 3D scene";
+    public override string Subtitle => _subtitle;
+
+    private string _subtitle = "Convert 3D position to 2D screen position";
 
     private SphereModelNode? _sphereModelNode;
+
+    private Vector2 _lastScreenPosition;
+    private ICommonSampleUIElement? _positionLabel;
 
     public Point3DTo2DSample(ICommonSamplesContext context)
         : base(context)
@@ -84,12 +88,37 @@ public abstract class Point3DTo2DSample : CommonSample
         OnSphereScreenPositionChanged(screenPosition);
     }
 
-    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    protected virtual void OnSphereScreenPositionChanged(Vector2 screenPosition)
     {
-        CreateCustomUI(ui);
+        _lastScreenPosition = screenPosition;
+        _positionLabel?.UpdateValue();
     }
 
-    protected abstract void OnSphereScreenPositionChanged(Vector2 screenPosition);
+    protected virtual bool CreateCustomUI(ICommonSampleUIProvider ui) => false;
 
-    protected abstract void CreateCustomUI(ICommonSampleUIProvider ui);
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        if (CreateCustomUI(ui))
+        {
+            _subtitle += " and show UI elements on top of 3D scene";
+            return;
+        }
+
+        // If the derived class did not provide a custom UI, we create a simple UI here (this is also used for the browser)
+
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateLabel("Sphere center position:", isHeader: true);
+
+        if (_sphereModelNode != null)
+        {
+            ui.CreateLabel("World 3D position:");
+            ui.CreateLabel($"{_sphereModelNode.CenterPosition.X:0}, {_sphereModelNode.CenterPosition.Y:0}, {_sphereModelNode.CenterPosition.Z:0}");
+
+            ui.AddSeparator();
+        }
+
+        ui.CreateLabel("Screen 2D position:");
+        _positionLabel = ui.CreateKeyValueLabel(null, () => $"{_lastScreenPosition.X:0}, {_lastScreenPosition.Y:0}");
+    }
 }

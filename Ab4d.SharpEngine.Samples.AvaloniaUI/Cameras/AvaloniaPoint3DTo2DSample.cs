@@ -33,10 +33,10 @@ public class AvaloniaPoint3DTo2DSample : Point3DTo2DSample
     }
 
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
-    protected override void CreateCustomUI(ICommonSampleUIProvider ui)
+    protected override bool CreateCustomUI(ICommonSampleUIProvider ui)
     {
         if (ui is not AvaloniaUIProvider avaloniaUIProvider)
-            return;
+            return false;
 
         var baseAvaloniaPanel = avaloniaUIProvider.BaseAvaloniaPanel;
 
@@ -44,6 +44,8 @@ public class AvaloniaPoint3DTo2DSample : Point3DTo2DSample
         _rootCanvas.IsHitTestVisible = false;
 
         baseAvaloniaPanel.Children.Add(_rootCanvas);
+
+        return true; // inform the base class that we have a custom UI
     }
 
     protected override void OnDisposed()
