@@ -1,7 +1,6 @@
 ﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Materials;
@@ -28,6 +27,7 @@ public class TransparencySortingSample : CommonSample
 
         scene.RootNode.Add(_transparentObjectsGroupNode);
 
+        scene.SetAmbientLight(0.2f);
 
         if (targetPositionCamera != null)
         {
@@ -49,9 +49,9 @@ public class TransparencySortingSample : CommonSample
             {
                 var greenRatio = x / 4.0f;
                 var semiTransparentMaterial = new StandardMaterial(new Color3(0.5f, greenRatio, 1 - greenRatio)) { Opacity = _opacity };
-                var position = new Vector3(-100 + 40 * x, 0, -100 + 40 * y);
+                var position = new Vector3(-100 + 50 * x, 0, -100 + 50 * y);
 
-                var boxModel = new BoxModelNode(position, size: new Vector3(25, 25, 25), semiTransparentMaterial, $"Box_{x}_{y}")
+                var boxModel = new BoxModelNode(position, size: new Vector3(30, 30, 30), semiTransparentMaterial, $"Box_{x}_{y}")
                 {
                     // Note that when rendering semi-transparent objects and when alpha clipping is not used,
                     // it is better to set BackMaterial to the same material as Material instead of setting material.IsTwoSided to true
@@ -100,7 +100,7 @@ But there are exceptions:
             if (Scene != null)
                 Scene.IsTransparencySortingEnabled = isChecked;
         });
-        
+
         ui.CreateCheckBox(
 @"Disable depth write (?):By default, when a transparent object is rendered it also write its depth to the depth buffer.
 This prevents rendering objects that are rendered after that object and are farther away from the camera to be rendered.
@@ -117,7 +117,13 @@ Then rotate the camera around and you will see that the final color will be set 
 When the transparent objects are sorted, then the final color is correct.", false, isChecked =>
         {
             if (Scene != null)
-                Scene.DefaultTransparentDepthStencilState = isChecked ? CommonStatesManager.DepthRead : CommonStatesManager.DepthReadWrite;
+            {
+#if VULKAN
+                Scene.DefaultTransparentDepthStencilState = isChecked ? Ab4d.SharpEngine.Utilities.CommonStatesManager.DepthRead : Ab4d.SharpEngine.Utilities.CommonStatesManager.DepthReadWrite;
+#elif WEB_GL
+                Scene.EnableDepthWriteForTransparentObjects = !isChecked;
+#endif
+            }
         });
 
         ui.AddSeparator();
