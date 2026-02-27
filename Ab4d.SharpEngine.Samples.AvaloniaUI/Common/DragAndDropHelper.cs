@@ -129,6 +129,14 @@ public class DragAndDropHelper : IDisposable
     
     private IStorageItem? GetFirstStorageItem(DragEventArgs e)
     {
+        // Avalonia v12+ code:
+        //var storageItems = e.DataTransfer.TryGetFiles();
+
+        //if (storageItems != null && storageItems.Length > 0)
+        //    return storageItems[0];
+
+
+        // Avalonia v11 code:
         if (e.Data.Contains(DataFormats.Files))
         {
             var dropFileNames = e.Data.GetFiles();
