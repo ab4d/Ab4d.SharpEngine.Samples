@@ -1,22 +1,16 @@
 ﻿//#define ADVANCED_TIME_MEASUREMENT
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using System.Windows;
-using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Effects;
-using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Samples.Utilities;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
@@ -32,11 +26,8 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private bool _isAnimatingScene = true;
 
-        private bool _isOtherModelsLoadCalled;
-
         //private MouseCameraController? _mouseCameraController;
 
-        private PlaneModelNode? _planeModel;
         private PyramidModelNode? _silverPyramidModel;
         private StandardMaterial? _silverPyramidMaterial;
 
@@ -62,8 +53,6 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
         private GroupNode? _lightsGroup;
         private GroupNode? _additionalObjectsGroup;
-
-        private BoxModelNode? _animatedBoxModelNode;
 
         private DisposeList _disposables;
 
@@ -929,7 +918,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             return gpuImage;
         }
 
-        private static async Task<BitmapFont?> CreateBitmapFontAsync(string fontFileName, IBitmapIO bitmapIO)
+        private static async Task<BitmapFont?> CreateBitmapFontAsync(string fontFileName, IBitmapIO? bitmapIO)
         {
             string? usedFileName = null;
             Stream? fileStream = null;
@@ -944,7 +933,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
             {
                 usedFileName = fontFileName;
             }
-            else
+            else if (bitmapIO != null)
             {
                 if (bitmapIO.FileStreamResolver != null) // if stream resolved exists, then try to get the stream from the file name (note that this is the only way to resolve files on Android)
                     fileStream = bitmapIO.FileStreamResolver(fontFileName);

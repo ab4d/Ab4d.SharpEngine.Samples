@@ -8,7 +8,9 @@ using Ab4d.SharpEngine.Common;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
 using Silk.NET.Maths;
+using Silk.NET.SDL;
 using Silk.NET.Windowing;
+using Window = Silk.NET.Windowing.Window;
 
 namespace Ab4d.StandardPresentation.SilkWindowingUI
 {
@@ -57,16 +59,16 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         private IWindow _window;
 
-        private Action _renderCallback;
-        private IInputContext _inputContext;
+        private Action? _renderCallback;
+        private IInputContext? _inputContext;
 
         private Vector2 _lastMousePosition;
         private PointerButtons _lastPressedButtons;
 
         private PointerButtons[] _allMouseButtons = new PointerButtons[] { PointerButtons.Left, PointerButtons.Middle, PointerButtons.Right, PointerButtons.XButton1, PointerButtons.XButton2 };
 
-        private string[] _keyNames;
-        private Key[] _keyValues;
+        private string[]? _keyNames;
+        private Key[]? _keyValues;
 
         private float _xPos;
         private float _yPos;
@@ -74,7 +76,7 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
         private float _width;
         private float _height;
 
-        private Silk.NET.SDL.Sdl _sdl;
+        private Sdl? _sdl;
 
 
         public float Left => _xPos;
@@ -97,14 +99,14 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         public IntPtr WindowHandle => IntPtr.Zero;
 
-        public event EventHandler Loaded;
-        public event EventHandler Closing;
-        public event EventHandler Closed;
-        public event SizeChangeEventHandler SizeChanged;
-        public event MouseButtonEventHandler MouseDown;
-        public event MouseButtonEventHandler MouseUp;
-        public event MouseMoveEventHandler MouseMove;
-        public event MouseWheelEventHandler MouseWheel;
+        public event EventHandler? Loaded;
+        public event EventHandler? Closing;
+        public event EventHandler? Closed;
+        public event SizeChangeEventHandler? SizeChanged;
+        public event MouseButtonEventHandler? MouseDown;
+        public event MouseButtonEventHandler? MouseUp;
+        public event MouseMoveEventHandler? MouseMove;
+        public event MouseWheelEventHandler? MouseWheel;
 
 
 
@@ -233,6 +235,9 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         private PointerButtons GetPressedButtons(IMouse mouse)
         {
+            if (_inputContext == null)
+                return PointerButtons.None;
+
             PointerButtons pressedButtons = PointerButtons.None;
 
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Left))
@@ -326,15 +331,15 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
         private Key GetKeyValue(string keyName)
         {
             if (_keyNames == null)
-            {
-                _keyNames  = Enum.GetNames<Silk.NET.Input.Key>();
-                _keyValues = new Key[_keyNames.Length];
+                return Key.Unknown;
 
-                var keyValues = Enum.GetValues<Silk.NET.Input.Key>();
-                
-                for (var i = 0; i < _keyNames.Length; i++)
-                    _keyValues[i] = keyValues[i];
-            }
+            _keyNames  = Enum.GetNames<Silk.NET.Input.Key>();
+            _keyValues = new Key[_keyNames.Length];
+
+            var keyValues = Enum.GetValues<Silk.NET.Input.Key>();
+            
+            for (var i = 0; i < _keyNames.Length; i++)
+                _keyValues[i] = keyValues[i];
 
             for (var i = 0; i < _keyNames.Length; i++)
             {

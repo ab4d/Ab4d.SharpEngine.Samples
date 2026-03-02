@@ -13,16 +13,16 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
     {
         private IView _view;
 
-        private Action _renderCallback;
-        private IInputContext _inputContext;
+        private Action? _renderCallback;
+        private IInputContext? _inputContext;
 
         private Vector2 _lastMousePosition;
         private PointerButtons _lastPressedButtons;
 
         private PointerButtons[] _allMouseButtons = new PointerButtons[] { PointerButtons.Left, PointerButtons.Middle, PointerButtons.Right, PointerButtons.XButton1, PointerButtons.XButton2 };
 
-        private string[] _keyNames;
-        private Key[] _keyValues;
+        private string[]? _keyNames;
+        private Key[]? _keyValues;
 
         private float _width;
         private float _height;
@@ -39,7 +39,7 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         public string Title
         {
-            get => null;
+            get => "";
             set { } // Nothing to do 
         }
 
@@ -48,14 +48,14 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         public IntPtr WindowHandle => IntPtr.Zero;
 
-        public event EventHandler Loaded;
-        public event EventHandler Closing;
-        public event EventHandler Closed;
-        public event SizeChangeEventHandler SizeChanged;
-        public event MouseButtonEventHandler MouseDown;
-        public event MouseButtonEventHandler MouseUp;
-        public event MouseMoveEventHandler MouseMove;
-        public event MouseWheelEventHandler MouseWheel;
+        public event EventHandler? Loaded;
+        public event EventHandler? Closing;
+        public event EventHandler? Closed;
+        public event SizeChangeEventHandler? SizeChanged;
+        public event MouseButtonEventHandler? MouseDown;
+        public event MouseButtonEventHandler? MouseUp;
+        public event MouseMoveEventHandler? MouseMove;
+        public event MouseWheelEventHandler? MouseWheel;
 
 
 
@@ -169,6 +169,9 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
 
         private PointerButtons GetPressedButtons(IMouse mouse)
         {
+            if (_inputContext == null)
+                return PointerButtons.None;
+
             PointerButtons pressedButtons = PointerButtons.None;
 
             if (_inputContext.Mice[0].IsButtonPressed(Silk.NET.Input.MouseButton.Left))
@@ -256,15 +259,15 @@ namespace Ab4d.StandardPresentation.SilkWindowingUI
         private Key GetKeyValue(string keyName)
         {
             if (_keyNames == null)
-            {
-                _keyNames  = Enum.GetNames<Silk.NET.Input.Key>();
-                _keyValues = new Key[_keyNames.Length];
+                return Key.Unknown;
 
-                var keyValues = Enum.GetValues<Silk.NET.Input.Key>();
-                
-                for (var i = 0; i < _keyNames.Length; i++)
-                    _keyValues[i] = keyValues[i];
-            }
+            _keyNames  = Enum.GetNames<Silk.NET.Input.Key>();
+            _keyValues = new Key[_keyNames.Length];
+
+            var keyValues = Enum.GetValues<Silk.NET.Input.Key>();
+            
+            for (var i = 0; i < _keyNames.Length; i++)
+                _keyValues[i] = keyValues[i];
 
             for (var i = 0; i < _keyNames.Length; i++)
             {
