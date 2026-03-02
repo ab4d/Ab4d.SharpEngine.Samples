@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 
 using uint32_t = System.UInt32;
 
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+
 namespace Ab4d.SharpEngine.Samples.LinuxFramebuffer;
 
 public static partial class Native
@@ -162,4 +164,6 @@ public static partial class Native
 
         public const uint XKB_KEYMAP_COMPILE_NO_FLAGS = 0;
     }
+    
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 }

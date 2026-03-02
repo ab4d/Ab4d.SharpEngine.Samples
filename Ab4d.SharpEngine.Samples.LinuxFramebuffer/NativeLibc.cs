@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 
 namespace Ab4d.SharpEngine.Samples.LinuxFramebuffer;
 
+#pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+
 public static partial class Native
 {
     public static unsafe class LibC
@@ -78,4 +80,6 @@ public static partial class Native
         /* Mode constants for KDGKBMODE/KDSKBMODE */
         public const uint K_OFF = 0x4;
     }
+
+#pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 }
