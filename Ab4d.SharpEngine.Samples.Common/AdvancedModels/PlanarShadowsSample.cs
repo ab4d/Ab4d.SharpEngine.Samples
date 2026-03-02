@@ -194,7 +194,8 @@ public class PlanarShadowsSample : CommonSample
                 Material = new StandardMaterial(GetRandomColor3()),
                 Tag = t,
 #if WEB_GL
-                // Using PlanarShadowMeshCreator is very slow in the browser so reduce the number of positions there
+                // In the browser using PlanarShadowMeshCreator is slow when using debug or release builds.
+                // But when published, then it works very fast - see https://www.ab4d.com/sharp-engine-browser-demo/commonSamples/AdvancedModels-PlanarShadowsSample.
                 Segments = 10,
 #endif
             };

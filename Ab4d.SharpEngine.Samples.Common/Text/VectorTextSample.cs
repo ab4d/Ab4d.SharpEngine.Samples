@@ -17,9 +17,7 @@ public class VectorTextSample : CommonSample
 
     private string _subtitle = "Create text meshes and outlines from font glyphs.";
     public override string? Subtitle => _subtitle;
-
-    //public override string Subtitle => "SharpEngine can render text by using BitmapTextCreator that can render bitmap fonts.";
-
+    
     private string _selectedFontFileName;
 
     private string _textToShow;
@@ -43,7 +41,10 @@ public class VectorTextSample : CommonSample
     private float _fontStretch = 1.0f;
 
 #if WEB_GL
-    private int _bezierCurveSegmentsCount = 3; // reduce the number of font segments for bezier curvers to improve performance of triangulation in the browser
+    // reduce the number of font segments for bezier curvers to improve performance of triangulation in the browser when using debug and release builds.
+    // But when published, then it works very fast - see:
+    // https://www.ab4d.com/sharp-engine-browser-demo/commonSamples/Text-VectorTextSample
+    private int _bezierCurveSegmentsCount = 3; 
 #else
     private int _bezierCurveSegmentsCount = 8;
 #endif

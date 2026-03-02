@@ -35,8 +35,6 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected string? propertiesTitleText = "Properties";
     
-    protected GpuImage? textureImage;
-
     protected string positionsCountText = "0";
     protected string trianglesCountText = "0";
     
@@ -57,8 +55,6 @@ public abstract class StandardModelsSampleBase : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _commonTexture = await base.GetCommonTextureAsync("10x10-texture.png", scene.GpuDevice);
-        
         ShowCameraAxisPanel = true;
 
         modelNode = CreateModelNode();
@@ -68,6 +64,8 @@ public abstract class StandardModelsSampleBase : CommonSample
 
         scene.RootNode.Add(modelNode);
         UpdateModelNode(); // Call that again in case we need mesh and this is generated only after the scene is known
+
+        _commonTexture = await base.GetCommonTextureAsync("10x10-texture.png", scene.GpuDevice);
     }
 
     protected abstract ModelNode CreateModelNode();

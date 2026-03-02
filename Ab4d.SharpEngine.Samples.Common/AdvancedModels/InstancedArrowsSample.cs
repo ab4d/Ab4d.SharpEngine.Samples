@@ -64,7 +64,10 @@ public class InstancedArrowsSample : CommonSample
         : base(context)
     {
 #if WEB_GL
-    _selectedArrowsCount = 50; // WASM in browser does not support multi-threading so lower the number of arrows
+        // When using debug or release WebAssembly it is quite slow.
+        // But when published, then it works very fast - see:
+        // https://www.ab4d.com/sharp-engine-browser-demo/commonSamples/AdvancedModels-InstancedArrowsSample.
+        _selectedArrowsCount = 50;
 #endif
     }
 
