@@ -132,6 +132,9 @@ public class LightsSample : CommonSample
 
         base.GetCommonTexture(scene, CommonTextures.UVChecker, gpuImage =>
         {
+            if (this.IsDisposed)
+                return; // Sample already unloaded
+
             if (_textureMaterial != null)
             {
                 _textureMaterial.DiffuseTexture = gpuImage;

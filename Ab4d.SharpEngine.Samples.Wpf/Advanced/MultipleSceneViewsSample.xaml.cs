@@ -3,7 +3,9 @@ using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,6 +13,7 @@ using Ab4d.SharpEngine.Effects;
 using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.RenderingLayers;
 using Ab4d.SharpEngine.Samples.Common;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.SharpEngine.Wpf;
 using TranslateTransform = Ab4d.SharpEngine.Transformations.TranslateTransform;
@@ -344,7 +347,16 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
 
         private void CreateTestScene(Scene scene)
         {
-            _testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.obj");
+
+            var objImporter = new ObjImporter(scene);
+            _testScene = objImporter.Import(fileName);
+
+            ModelUtils.PositionAndScaleSceneNode(_testScene,
+                                                 position: new Vector3(0, -10, 0),
+                                                 positionType: PositionTypes.Center,
+                                                 finalSize: new Vector3(400, 400, 400));
+
             scene.RootNode.Add(_testScene);
 
             // To see the hierarchy of read objects call testScene.DumpHierarchy() in Visual Studio Immediate Window

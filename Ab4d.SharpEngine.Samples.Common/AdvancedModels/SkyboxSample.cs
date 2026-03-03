@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
@@ -20,7 +21,7 @@ public class SkyboxSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         // To create a skybox effect, we create a MultiMaterialModelNode with box mesh 
         // and assign correct skybox texture to each of the box sides.
@@ -42,17 +43,15 @@ public class SkyboxSample : CommonSample
         scene.RootNode.Add(multiMaterialModelNode);
 
 
-        var teapotNode = TestScenes.GetTestScene(TestScenes.StandardTestScenes.Teapot, new Vector3(100, 100, 100));
-
-        scene.RootNode.Add(teapotNode);
-
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 35;
             targetPositionCamera.Attitude = -14;
             targetPositionCamera.Distance = 200;
         }
+
+
+        await base.ShowCommonSceneAsync(scene, CommonScenes.TeapotHiRes, finalSize: new Vector3(50, 50, 50));
     }
 
     public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)

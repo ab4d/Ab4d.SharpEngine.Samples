@@ -487,6 +487,14 @@ public abstract class CommonSample
         pointerCameraController.IsPointerWheelZoomEnabled   = this.IsPointerWheelZoomEnabled;
     }
 
+    public void ReCreateUI()
+    {
+        if (_uiProvider == null)
+            throw new NullReferenceException("Cannot call ReCreateUI because _uiProvider was not yet initialized");
+
+        CreateUI(_uiProvider);
+    }
+
     public void CreateUI(ICommonSampleUIProvider uiProvider)
     {
         _uiProvider = uiProvider;
@@ -743,17 +751,7 @@ public abstract class CommonSample
         return GetCommonTexturePath(textureName);
     }
 
-    public GpuImage GetCommonTexture(Scene? scene, CommonTextures textureType)
-    {
-        var textureName = _commonTexturesFileNames[(int)textureType];
-        return GetCommonTexture(textureName, scene);
-    }
 
-    public GpuImage GetCommonTexture(GpuDevice? gpuDevice, CommonTextures textureType)
-    {
-        var textureName = _commonTexturesFileNames[(int)textureType];
-        return GetCommonTexture(textureName, gpuDevice);
-    }
 
     public async Task<GpuImage> GetCommonTextureAsync(Scene? scene, CommonTextures textureType)
     {
@@ -773,37 +771,6 @@ public abstract class CommonSample
         GetCommonTexture(textureName, scene, textureCreatedCallback, textureCreationFailedCallback);
     }
 
-    public GpuImage GetCommonTexture(string textureName, Scene? scene)
-    {
-#if VULKAN
-        ArgumentNullException.ThrowIfNull(scene);
-
-        if (scene.GpuDevice != null)
-            return GetCommonTexture(textureName, scene.GpuDevice); // Use GpuDevice so the image is also cached on GpuDevice
-
-        // else, cache on Scene object:
-        string fileName = GetCommonTexturePath(textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, scene, BitmapIO, useSceneCache: true);
-        
-        return textureImage;
-#else
-        throw new NotSupportedException();
-#endif
-    }
-    
-    public GpuImage GetCommonTexture(string textureName, GpuDevice? gpuDevice)
-    {
-#if VULKAN
-        ArgumentNullException.ThrowIfNull(gpuDevice);
-
-        string fileName = GetCommonTexturePath(textureName);
-        var textureImage = TextureLoader.CreateTexture(fileName, gpuDevice, BitmapIO, useGpuDeviceCache: true);
-        
-        return textureImage;
-#else
-        throw new NotSupportedException();
-#endif
-    }
     
     public async Task<GpuImage> GetCommonTextureAsync(string textureName, Scene? scene)
     {
@@ -990,12 +957,17 @@ public abstract class CommonSample
     public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, bool cacheSceneNode = true)
     {
         var commonScene = await GetCommonSceneAsync(scene, sceneType,
-                                                    position: new Vector3(0, -10, 0),
+                                                    position: new Vector3(0, 10, 0),
                                                     positionType: PositionTypes.Bottom | PositionTypes.Center,
                                                     finalSize: new Vector3(400, 400, 400), cacheSceneNode: cacheSceneNode);
 
         if (!this.IsDisposed && !scene.IsDisposing && !scene.IsDisposed)
             scene.RootNode.Add(commonScene);
+    }
+    
+    public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, Vector3 finalSize,bool cacheSceneNode = true)
+    {
+        await ShowCommonSceneAsync(scene, sceneType, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center, finalSize: finalSize, cacheSceneNode: cacheSceneNode);
     }
     
     public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, Vector3 position, PositionTypes positionType, Vector3 finalSize,bool cacheSceneNode = true)
@@ -1016,6 +988,9 @@ public abstract class CommonSample
 
             if (cachedGroupNode != null && !cachedGroupNode.IsDisposed)
             {
+                if (cachedGroupNode.Parent != null)
+                    cachedGroupNode.Parent.Remove(cachedGroupNode); // This can happen because we can add this groupNode to new GroupNode before calling PositionAndScaleSceneNode - see few lines below
+
                 _currentlyShownCommonScene = cachedGroupNode;
                 return cachedGroupNode;
             }

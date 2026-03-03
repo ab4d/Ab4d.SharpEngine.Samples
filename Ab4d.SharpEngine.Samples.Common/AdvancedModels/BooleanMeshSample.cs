@@ -140,17 +140,18 @@ public class BooleanMeshSample : CommonSample
 
         Ab4d.SharpEngine.Utilities.MeshUtils.GenerateCubicTextureCoordinates(_lastShownMesh);
 
-        var textureImage = GetCommonTexture("10x10-texture.png", this.GpuDevice);
-
-        if (textureImage != null)
+        base.GetCommonTexture(Scene, CommonTextures.TenByTenNumbers, gpuImage =>
         {
+            if (this.IsDisposed)
+                return; // Sample already unloaded
+
             var meshModelNode = new MeshModelNode(_lastShownMesh)
             {
-                Material = new StandardMaterial(textureImage)
+                Material = new StandardMaterial(gpuImage)
             };
 
             Scene.RootNode.Clear();
             Scene.RootNode.Add(meshModelNode);
-        }
+        });
     }
 }

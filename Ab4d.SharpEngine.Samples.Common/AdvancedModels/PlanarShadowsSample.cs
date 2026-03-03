@@ -76,7 +76,7 @@ public class PlanarShadowsSample : CommonSample
         // Create 10 spheres, prevent creating two spheres on the same XZ coordinates
         CreateTestSpheres();
 
-        
+
         _shadowPointLight = new PointLight();
         _shadowDirectionalLight = new DirectionalLight();
 

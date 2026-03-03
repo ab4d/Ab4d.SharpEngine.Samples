@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows;
@@ -12,6 +13,7 @@ using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.CameraControllers
@@ -108,7 +110,16 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
 
         private void CreateTestScene()
         {
-            var testScene = Ab4d.SharpEngine.Samples.Common.TestScenes.GetTestScene(Ab4d.SharpEngine.Samples.Common.TestScenes.StandardTestScenes.HouseWithTrees, finalSize: new Vector3(400, 400, 400));
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.obj");
+
+            var objImporter = new ObjImporter(MainSceneView.Scene);
+            var testScene = objImporter.Import(fileName);
+
+            ModelUtils.PositionAndScaleSceneNode(testScene,
+                                                 position: new Vector3(0, 0, 0),
+                                                 positionType: PositionTypes.Center,
+                                                 finalSize: new Vector3(400, 400, 400));
+
             MainSceneView.Scene.RootNode.Add(testScene);
         }
 

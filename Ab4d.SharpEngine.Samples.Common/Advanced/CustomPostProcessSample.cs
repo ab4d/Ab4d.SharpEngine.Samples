@@ -34,17 +34,16 @@ public class CustomPostProcessSample : CommonSample
         _hsvColorPostProcess = new HsvColorPostProcess();
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
-        scene.RootNode.Add(testScene);
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = -20;
             targetPositionCamera.Attitude = -20;
             targetPositionCamera.Distance = 600;
         }
+
+        await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees, new Vector3(0, -10, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(400, 400, 400));
     }
 
     /// <inheritdoc />

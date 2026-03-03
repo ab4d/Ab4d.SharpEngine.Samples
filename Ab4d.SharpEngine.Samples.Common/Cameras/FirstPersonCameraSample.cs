@@ -30,7 +30,10 @@ public class FirstPersonCameraSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees);
+        await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees,
+                                        position: new Vector3(0, 10, 0),
+                                        positionType: PositionTypes.Bottom | PositionTypes.Center,
+                                        finalSize: new Vector3(400, 400, 400));
     }
 
     protected override Camera OnCreateCamera()

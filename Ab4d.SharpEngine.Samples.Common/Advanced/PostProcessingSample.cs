@@ -68,15 +68,14 @@ public class PostProcessingSample : CommonSample
         base.OnDisposed();
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var dragonMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, 
-                                                position: new Vector3(0, 0, 0), 
-                                                positionType: PositionTypes.Bottom, 
-                                                finalSize: new Vector3(50, 50, 50));
-
-        var dragonModelNode = new MeshModelNode(dragonMesh, StandardMaterials.Silver, "DragonModel");
-        scene.RootNode.Add(dragonModelNode);
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 120;
+            targetPositionCamera.Attitude = -20;
+            targetPositionCamera.Distance = 150;
+        }
 
 
         var wireGridNode = new WireGridNode()
@@ -95,12 +94,13 @@ public class PostProcessingSample : CommonSample
         scene.RootNode.Add(sphereModelNode2);
 
 
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 120;
-            targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 150;
-        }
+        var dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, 
+                                                       position: new Vector3(0, 0, 0), 
+                                                       positionType: PositionTypes.Bottom, 
+                                                       finalSize: new Vector3(50, 50, 50));
+
+        var dragonModelNode = new MeshModelNode(dragonMesh, StandardMaterials.Silver, "DragonModel");
+        scene.RootNode.Add(dragonModelNode);
     }
 
     /// <inheritdoc />

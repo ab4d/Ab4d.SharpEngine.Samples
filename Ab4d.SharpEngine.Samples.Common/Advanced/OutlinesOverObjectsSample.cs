@@ -9,7 +9,6 @@ using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
 using System.Numerics;
-using System.Reflection;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -30,18 +29,25 @@ public class OutlinesOverObjectsSample: CommonSample
     private GpuImage? _overlayPanelGpuImage;
     private SpriteBatch? _spriteBatch;
     private TargetPositionCamera? _outlineObjectsCamera;
+    
+    private bool _recreatedUI;
 
     public OutlinesOverObjectsSample(ICommonSamplesContext context)
         : base(context)
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var dragonMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, 
-                                                position: new Vector3(0, 0, 0), 
-                                                positionType: PositionTypes.Center, 
-                                                finalSize: new Vector3(30, 30, 30));
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 70;
+            targetPositionCamera.Attitude = -10;
+            targetPositionCamera.Distance = 230;
+        }
+
+
+        var dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, finalSize: new Vector3(30, 30, 30));
         
         for (int i = 0; i < 4; i++)
         {
@@ -67,7 +73,7 @@ public class OutlinesOverObjectsSample: CommonSample
         
         for (int i = 0; i < 4; i++)
         {
-            var sphereModel = new SphereModelNode($"Sphere_{i+1}")
+            var sphereModel = new SphereModelNode($"Sphere_{i + 1}")
             {
                 CenterPosition = new Vector3(i * 50 - 50, 0, 30),
                 Radius         = 10,
@@ -92,18 +98,22 @@ public class OutlinesOverObjectsSample: CommonSample
             }
         }
 
-        if (targetPositionCamera != null)
+
+        if (_outlineObjectsSceneView == null && SceneView != null)
+            SetupOutlinesOverObjects(SceneView);
+
+        if (_recreatedUI)
         {
-            targetPositionCamera.Heading = 70;
-            targetPositionCamera.Attitude = -10;
-            targetPositionCamera.Distance = 230;
+            ReCreateUI();
+            _recreatedUI = false;
         }
     }
 
     /// <inheritdoc />
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        SetupOutlinesOverObjects(sceneView);
+        if (_outlineObjectsSceneView == null && _selectedObjects.Count > 0)
+            SetupOutlinesOverObjects(sceneView);
         
         base.OnSceneViewInitialized(sceneView);
     }
@@ -293,18 +303,25 @@ public class OutlinesOverObjectsSample: CommonSample
     
         _spriteBatch.End();        
     }
-    
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         if (Scene == null)
             return;
+
+        if (_selectedObjects.Count == 0)
+        {
+            // Dragon model not yet loaded (async). But we need all the models to create all CheckBoxes below.
+            // We will generate the UI when the scene is created and the models - at the end of OnCreateSceneAsync.
+            _recreatedUI = true;
+            return;
+        }
         
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
         
         ui.CreateLabel("Selected objects:", isHeader: true);
-        
+
         foreach (var sceneNode in Scene.RootNode)
         {
             string objectName = sceneNode.Name;

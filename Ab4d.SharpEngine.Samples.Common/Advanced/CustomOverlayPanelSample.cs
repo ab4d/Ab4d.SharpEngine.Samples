@@ -37,16 +37,8 @@ public sealed class CustomOverlayPanelSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Teapot,
-                                                position: new Vector3(0, 0, 0),
-                                                positionType: PositionTypes.Bottom,
-                                                finalSize: new Vector3(100, 100, 100));
-
-        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Silver.SetSpecular(32)));
-
-
         var wireGridNode = new WireGridNode()
         {
             CenterPosition = new Vector3(0, -0.1f, 0),
@@ -54,6 +46,14 @@ public sealed class CustomOverlayPanelSample : CommonSample
         };
 
         scene.RootNode.Add(wireGridNode);
+
+
+        var teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot, 
+                                                       position: new Vector3(0, 0, 0),
+                                                       positionType: PositionTypes.Bottom,
+                                                       finalSize: new Vector3(100, 100, 100));
+
+        scene.RootNode.Add(new MeshModelNode(teapotMesh, StandardMaterials.Silver.SetSpecular(32)));
     }
     
     protected override void OnDisposed()

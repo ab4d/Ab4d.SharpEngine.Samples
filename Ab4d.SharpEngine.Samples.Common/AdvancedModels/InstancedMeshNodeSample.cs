@@ -56,7 +56,7 @@ public class InstancedMeshNodeSample : CommonSample
         }
     }
 
-    private static WorldColorInstanceData[] CreateInstancesData(Vector3 center, Vector3 size, float modelScaleFactor, int xCount, int yCount, int zCount, bool useTransparency)
+    public static WorldColorInstanceData[] CreateInstancesData(Vector3 center, Vector3 size, float modelScaleFactor, int xCount, int yCount, int zCount, bool useTransparency)
     {
         var instancedData = new WorldColorInstanceData[xCount * yCount * zCount];
 
@@ -158,6 +158,9 @@ public class InstancedMeshNodeSample : CommonSample
                 {
                     base.GetCommonTexture(Scene, CommonTextures.Tree, gpuImage =>
                     {
+                        if (this.IsDisposed)
+                            return; // Sample already unloaded
+
                         _instancedMeshNode.SetDiffuseTexture(gpuImage, CommonSamplerTypes.Mirror, alphaClipThreshold: 0.5f); // Mirror and 0.5f are also the default values
                         _treeGpuImage = gpuImage;
                     });

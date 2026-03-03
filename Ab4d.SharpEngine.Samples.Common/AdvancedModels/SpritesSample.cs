@@ -25,13 +25,13 @@ public class SpritesSample : CommonSample
 
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         if (scene.GpuDevice == null)
             return;
 
-        _uvCheckerTexture = base.GetCommonTexture("uvchecker.png", scene);
-        _treeTexture      = base.GetCommonTexture("TreeTexture.png", scene);
+        _uvCheckerTexture = await base.GetCommonTextureAsync(scene, CommonTextures.UVChecker);
+        _treeTexture      = await base.GetCommonTextureAsync(scene, CommonTextures.Tree);
         
         // Create SpriteBatch on the Scene object (note that there we CANNOT use absolute coordinates and can use only relative coordinates, that are in range from 0 to 1)
         // It is also possible to create SpiteBatch on SceneView (see OnSceneViewInitialized below). In this case absolute coordinates can be used.
@@ -52,15 +52,25 @@ public class SpritesSample : CommonSample
         sceneSpriteBatch.DrawBitmapText("Relative coordinates:", new Vector2(0.08f, 0.175f), fontSize: 20, Color4.Black);
         
         sceneSpriteBatch.End();
+
+
+        if (SceneView != null && _sceneViewSpriteBatch == null)
+            CreateSceneViewSpriteBatch();
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
-        if (_uvCheckerTexture == null || _treeTexture == null)
+        if (_uvCheckerTexture != null && _treeTexture != null)
+            CreateSceneViewSpriteBatch();
+    }
+
+    private void CreateSceneViewSpriteBatch()
+    {
+        if (_uvCheckerTexture == null || _treeTexture == null || SceneView == null)
             return;
 
         // Create SpriteBatch on the SceneView object (note that there we CAN use absolute coordinates - set when calling Begin method)
-        _sceneViewSpriteBatch = sceneView.CreateOverlaySpriteBatch("SceneViewOverlaySpriteBatch");
+        _sceneViewSpriteBatch = SceneView.CreateOverlaySpriteBatch("SceneViewOverlaySpriteBatch");
 
         _sceneViewSpriteBatch.Begin(useAbsoluteCoordinates: true); // use absolute coordinates for all following Draw calls
 
@@ -93,7 +103,7 @@ public class SpritesSample : CommonSample
         _sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(500, 200), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
                                             marginLeft: 10, marginRight: 10, marginTop: 10, marginBottom: 10);
 
-        if (sceneView.GpuDevice != null)
+        if (SceneView.GpuDevice != null)
         {
             // Use TextureFactory.CreateGradientTexture to create a gradient texture that can be shown as a spite.
             // Note that CreateGradientTexture creates a horizontal texture with height 1 and width set to textureWidth.
@@ -106,7 +116,7 @@ public class SpritesSample : CommonSample
                 new GradientStop(Colors.Red,        offset: 1.0f),
             };
 
-            _gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, gradientStops, textureSize: 256);
+            _gradientTexture = TextureFactory.CreateGradientTexture(SceneView.GpuDevice, gradientStops, textureSize: 256);
 
             // If we only need from two colors, we can also use startColor and endColor instead of gradientStops:
             //var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, startColor: Colors.DeepSkyBlue, endColor: Colors.Yellow, textureWidth: 256);
@@ -146,7 +156,7 @@ public class SpritesSample : CommonSample
 
 
         // Create a new SpriteBatch that will use dpi scaled coordinates and sizes (dpi scale is get for window's dpi scale setting).
-        var dpiAwareSpriteBatch = sceneView.CreateOverlaySpriteBatch("DpiAwareSpriteBatch");
+        var dpiAwareSpriteBatch = SceneView.CreateOverlaySpriteBatch("DpiAwareSpriteBatch");
         dpiAwareSpriteBatch.IsUsingDpiScale = true;
 
         dpiAwareSpriteBatch.Begin(useAbsoluteCoordinates: true);
@@ -165,7 +175,7 @@ public class SpritesSample : CommonSample
         // and animated sprites and text that change often into another SpriteBatch.
         // This way the RenderingItems for the static SpriteBatch are generated only once
         // and only the animated SpriteBatch needs to recreate its RenderingItems.
-        _animatedSpriteBatch = sceneView.CreateOverlaySpriteBatch("AnimatedSpriteBatch");
+        _animatedSpriteBatch = SceneView.CreateOverlaySpriteBatch("AnimatedSpriteBatch");
 
         
         // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:

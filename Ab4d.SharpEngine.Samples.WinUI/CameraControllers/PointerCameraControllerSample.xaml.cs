@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using System.Windows;
-using Ab4d.SharpEngine;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
-using System.IO;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Samples.WinUI.Common;
-using Ab4d.SharpEngine.Vulkan;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using Colors = Microsoft.UI.Colors;
+using System;
+using System.IO;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.WinUI.CameraControllers
 {
@@ -86,7 +75,6 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             CreateTestScene();
         }
 
-
         private void SetupPointerCameraController()
         {
             _targetPositionCamera = new TargetPositionCamera()
@@ -123,10 +111,18 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
 
         private void CreateTestScene()
         {
-            var testScene = Ab4d.SharpEngine.Samples.Common.TestScenes.GetTestScene(Ab4d.SharpEngine.Samples.Common.TestScenes.StandardTestScenes.HouseWithTrees, finalSize: new Vector3(400, 400, 400));
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\house with trees.obj");
+
+            var objImporter = new ObjImporter(MainSceneView.Scene);
+            var testScene = objImporter.Import(fileName);
+
+            ModelUtils.PositionAndScaleSceneNode(testScene,
+                position: new Vector3(0, 0, 0),
+                positionType: PositionTypes.Center,
+                finalSize: new Vector3(400, 400, 400));
+
             MainSceneView.Scene.RootNode.Add(testScene);
         }
-
 
         private void OnRotateCheckBoxChanged(object sender, RoutedEventArgs e)
         {

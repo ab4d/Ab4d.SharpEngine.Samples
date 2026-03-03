@@ -42,7 +42,7 @@ public class PixelsRenderingSample : CommonSample
         //
         // In this sample we use a special TreeTexture-square.png that is the same as TreeTexture.png but
         // has added transparent pixels on the left and right so that the final image is squared.
-        _treeGpuImage = base.GetCommonTexture("TreeTexture-square.png", scene);
+        base.GetCommonTexture(Scene, CommonTextures.TenByTenNumbers, gpuImage => _treeGpuImage = gpuImage);
 
         if (targetPositionCamera != null)
         {
@@ -195,8 +195,7 @@ public class PixelsRenderingSample : CommonSample
                     break;
 
                 case 2: // Dragon model
-                    var dragonMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.Dragon, finalSize: new Vector3(300, 300, 300));
-                    ShowMesh(dragonMesh, Colors.Orange);
+                    base.GetCommonMesh(Scene, CommonMeshes.Dragon, finalSize: new Vector3(300, 300, 300), dragonMesh => ShowMesh(dragonMesh, Colors.Orange));
                     break;
 
                 case 3: // 10,000 pixels (100 x 1 x 100)

@@ -28,6 +28,9 @@ public class ModelScalarSample : CommonSample
     private MeshModelNode? _shadowModel;
     private Vector3 _startScaleFactors;
 
+    private bool _recreatedUI;
+    private ManualInputEventsManager? _inputEventsManager;
+
     public ModelScalarSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -40,11 +43,25 @@ public class ModelScalarSample : CommonSample
         ShowCameraAxisPanel = true;
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        var wireGridNode = new WireGridNode()
+        {
+            Size = new Vector2(400, 400),
+            WidthCellsCount = 8,
+            HeightCellsCount = 8
+        };
+
+        scene.RootNode.Add(wireGridNode);
+
+
+        if (targetPositionCamera != null)
+            targetPositionCamera.Distance = 800;
+
+
         float teapotSize = 80;
 
-        var teapotMesh = TestScenes.GetTestMesh(TestScenes.StandardTestScenes.TeapotLowResolution, finalSize: new Vector3(teapotSize, teapotSize, teapotSize));
+        var teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.TeapotLowResolution, finalSize: new Vector3(teapotSize, teapotSize, teapotSize));
 
         _testModelsGroupNode = new GroupNode("TestModelsGroup");
         scene.RootNode.Add(_testModelsGroupNode);
@@ -67,24 +84,33 @@ public class ModelScalarSample : CommonSample
         }
 
 
-        var wireGridNode = new WireGridNode()
-        {
-            Size = new Vector2(400, 400),
-            WidthCellsCount = 8,
-            HeightCellsCount = 8
-        };
-
-        scene.RootNode.Add(wireGridNode);
-
-
-        if (targetPositionCamera != null)
-            targetPositionCamera.Distance = 800;
-
-
         SetupPlanarShadow(scene);
+
+        if (_modelScalar == null && _inputEventsManager != null)
+        {
+            SetupModelRotator(_inputEventsManager);
+            _inputEventsManager = null;
+        }
+
+        if (_recreatedUI)
+        {
+            ReCreateUI();
+            _recreatedUI = false;
+        }
     }
 
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
+    {
+        if (_testModelsGroupNode == null || Scene == null)
+        {
+            _inputEventsManager = inputEventsManager; // we will call SetupModelRotator when all the models are loaded
+            return;
+        }
+
+        SetupModelRotator(inputEventsManager);
+    }
+
+    private void SetupModelRotator(ManualInputEventsManager inputEventsManager)
     {
         if (_testModelsGroupNode == null || Scene == null)
             return;
@@ -256,6 +282,14 @@ public class ModelScalarSample : CommonSample
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
+        if (_modelScalar == null)
+        {
+            // _modelScalar not yet created because the teapot model not yet loaded (async). 
+            // We will generate the UI when the scene is created and the models - at the end of OnCreateSceneAsync.
+            _recreatedUI = true;
+            return;
+        }
+
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         ui.CreateCheckBox("Show X axis", _modelScalar!.IsXAxisShown, isChecked => _modelScalar!.IsXAxisShown = isChecked);
