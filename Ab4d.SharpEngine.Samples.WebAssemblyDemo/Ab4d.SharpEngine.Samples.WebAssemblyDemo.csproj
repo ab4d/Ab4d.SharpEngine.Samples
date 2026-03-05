@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-browser</TargetFramework>
+
+    <OutputType>Exe</OutputType>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <InvariantTimezone>true</InvariantTimezone>
+    <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
+
+    <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+
+    <RootNamespace>Ab4d.SharpEngine.Samples.WebAssemblyDemo</RootNamespace>
+
+    <EmccFlags>-lGL -s FULL_ES3=1 -sMAX_WEBGL_VERSION=2</EmccFlags>
+    <WasmEnableSIMD>true</WasmEnableSIMD>
+    <WasmEnableExceptionHandling>true</WasmEnableExceptionHandling>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <WasmBuildNative>true</WasmBuildNative>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
+    <WasmEmitSourceMap>false</WasmEmitSourceMap>
+    <CompressionEnabled>true</CompressionEnabled>
+    <WasmNativeStrip>true</WasmNativeStrip>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+  </PropertyGroup>
+  
+    <ItemGroup>
+    <!--The following NativeFileReference is required for Ab4d.SharpEngine.Web to use WebGL from the browser -->
+    <NativeFileReference Include="Native/libEGL.c" ScanForPInvokes="true" />
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <PackageReference Include="Ab4d.SharpEngine.Web" Version="0.9.9543-rc1" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\My\Ab4d\SharpEngine\Ab4d.SharpEngine.Web\Ab4d.SharpEngine.Web.csproj" />
+  </ItemGroup>
+
+</Project>

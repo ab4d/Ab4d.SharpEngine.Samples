@@ -1,0 +1,17 @@
+{
+  "name": "Ab4d.SharpEngine.Samples.BlazorWebAssembly",
+  "short_name": "SharpEngine Samples",
+  "id": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#03173d",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "ab4d-logo-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}

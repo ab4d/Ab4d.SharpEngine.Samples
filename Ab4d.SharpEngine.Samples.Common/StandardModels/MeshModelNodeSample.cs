@@ -142,6 +142,27 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        // Add WireGrid
+        var wireGridNode = new WireGridNode()
+        {
+            CenterPosition = new Vector3(55, -0.1f, 30),
+            Size = new Vector2(110, 60),
+            WidthCellsCount = 11,
+            HeightCellsCount = 6,
+            MinorLineColor = Colors.DimGray
+        };
+
+        scene.RootNode.Add(wireGridNode);
+
+
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 20;
+            targetPositionCamera.Attitude = -40;
+            targetPositionCamera.TargetPosition = new Vector3(65, 0, 0);
+        }
+
+
         await base.OnCreateSceneAsync(scene);
         
         
@@ -164,30 +185,11 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
             }
         }
 
-        // Add WireGrid
-        var wireGridNode = new WireGridNode()
-        {
-            CenterPosition = new Vector3(55, -0.1f, 30),
-            Size = new Vector2(110, 60),
-            WidthCellsCount = 11,
-            HeightCellsCount = 6,
-            MinorLineColor = Colors.DimGray
-        };
-
-        scene.RootNode.Add(wireGridNode);
-
 
         // Add 3 axis
         scene.RootNode.Add(new ArrowModelNode(startPosition: new Vector3(0, 0, 0), endPosition: new Vector3(30, 0, 0), radius: 0.5f) { Material = StandardMaterials.Red });
         scene.RootNode.Add(new ArrowModelNode(startPosition: new Vector3(0, 0, 0), endPosition: new Vector3(0, 30, 0), radius: 0.5f) { Material = StandardMaterials.Green });
         scene.RootNode.Add(new ArrowModelNode(startPosition: new Vector3(0, 0, 0), endPosition: new Vector3(0, 0, 30), radius: 0.5f) { Material = StandardMaterials.Blue });
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 20;
-            targetPositionCamera.Attitude = -40;
-            targetPositionCamera.TargetPosition = new Vector3(65, 0, 0);
-        }
     }
 
     protected override void OnCreateLights(Scene scene)

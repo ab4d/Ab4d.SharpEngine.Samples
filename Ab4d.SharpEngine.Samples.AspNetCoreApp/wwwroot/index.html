@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ab4d.SharpEngine browser demo without Blazor</title>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .loader {
+            position: fixed;
+            top: 20%;
+            left: 30%;
+            z-index: 9999; /* higher than canvas */
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Ab4d.SharpEngine browser demo without using Blazor</h2>
+
+    <p>This sample is showing how to show 3D graphics by using Ab4d.SharpEngine library in a simple HTML and JavaScript based web page.</p>
+
+    <div>
+        <div id="loader" class="loader"></div>
+        <canvas id="webGLCanvas" style="width: 70%; min-width: 400px; height: 500px; margin-top: 10pt"></canvas>
+    </div>
+
+    <br />
+    <span style="font-weight: bold">Info text</span><span> (set from .Net code):</span><br />
+    <span id="infoSpan"></span><br />
+
+    <br />
+    <span style="font-weight: bold">Available actions:</span><span> (call methods in SharpEngineTest .Net class):</span><br />
+    <a href="javascript:toggleCameraRotation();">Toggle camera rotation</a><br />
+    <a href="javascript:changeMaterial('blue');">Change material to Blue</a><br />
+    <a href="javascript:changeMaterial('');">Change material to a random color</a><br />
+    <a href="javascript:addObjects(100);">Add 100 objects</a><br />
+    <a href="javascript:addObjects(1000);">Add 1000 objects</a><br />
+
+    <br />
+    <span>See also Browser's console to see log messages from JavaScript and .Net (error are also usually shown there).</span>
+
+    <script type="module">
+        // Load webassembly-demo and get the functions that call the WebAssembly methods (defined in .Net)
+        import { toggleCameraRotation, changeMaterial, addObjects } from './webassembly-demo.js';
+
+        // Expose the function globally so they can be called from the <a href="javascript:..." code above
+        window.toggleCameraRotation = toggleCameraRotation;
+        window.changeMaterial = changeMaterial;
+        window.addObjects = addObjects;
+    </script>
+
+    <script>
+
+    </script>
+</body>
+</html>

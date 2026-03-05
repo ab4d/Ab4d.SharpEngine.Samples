@@ -1,0 +1,288 @@
+@page "/stlFileViewer"
+@using System.Numerics
+@using Ab4d.SharpEngine.Cameras
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.SceneNodes
+@using Ab4d.SharpEngine.Browser
+@using Ab4d.SharpEngine.Utilities
+@implements IDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Ab4d.SharpEngine.Web - STL file viewer</PageTitle>
+
+<div style="padding: 1.5rem">
+    <h1>Ab4d.SharpEngine.Web - STL file viewer</h1>
+
+    <p>This example shows how to load user stl (text and binary) files with Ab4d.SharpEngine. Stl files are commonly used for 3D printing.</p>
+    <p><strong>To load a custom file, drag and drop it to the area under the 3D scene.</strong></p>
+
+    <SharpEngineSceneView @ref="sharpEngineSceneView" style="width: 100%; min-width: 400px; max-width: 1000px; height: 500px; margin-top: 10pt; border: solid black 1px"></SharpEngineSceneView>
+
+    <br />
+    <p>@_infoText</p>
+
+    <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
+        Drop stl file here or click to open file picker</div>
+    <input type="file" id="fileInput" accept=".stl" style="display: none;" />
+</div>
+
+<script>
+    // Initialize javascript for drag and drop only once.
+    window.objFileViewerModule = window.objFileViewerModule || (function() {
+        let dotNetInterop;
+        let lastDropZone = null;
+        let lastFileInput = null;
+
+        function handleFiles(files) {
+            for (const file of files) {
+                console.log('js: File dropped:', file.name);
+
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    var arrayBuffer = e.target.result;
+                    var bytes = new Uint8Array(arrayBuffer);
+
+                    dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes);
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function initializeDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!dropZone || !fileInput) return;
+
+            // Check if elements have changed (re-rendered), if so, re-attach listeners
+            if (lastDropZone === dropZone && lastFileInput === fileInput) {
+                return; // Already initialized for these exact elements
+            }
+
+            // Store references to current elements
+            lastDropZone = dropZone;
+            lastFileInput = fileInput;
+
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.cursor = 'copy';
+                dropZone.style.backgroundColor = '#e0f3ff';
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.cursor = 'pointer';
+                dropZone.style.backgroundColor = '';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.cursor = 'pointer';
+                dropZone.style.backgroundColor = '';
+
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        return {
+            attachFileImportHandler: function(dotNetHelper) {
+                dotNetInterop = dotNetHelper;
+                initializeDropZone();
+            }
+        };
+    })();
+
+    function attachFileImportHandler(dotNetHelper) {
+        window.objFileViewerModule.attachFileImportHandler(dotNetHelper);
+    }
+</script>
+
+@code {
+    // BOUND FIELDS:
+    private string _infoText = "Loading default file ...";
+
+    private SharpEngineSceneView sharpEngineSceneView = null!;
+
+    private TargetPositionCamera? _targetPositionCamera;
+    private PointerCameraController? _pointerCameraController;
+
+    private MeshModelNode? _importedSceneNode;
+
+    private DotNetObjectReference<StlFileViewer>? _thisJSReference;
+    private StlImporter? _stlImporter;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+
+        var scene = sharpEngineSceneView.Scene;
+        var sceneView = sharpEngineSceneView.SceneView;
+
+        sceneView.BackgroundColor = Colors.LightSkyBlue;
+
+        _targetPositionCamera = new TargetPositionCamera()
+        {
+            Heading = 30,
+            Attitude = -25,
+            Distance = 400,
+            TargetPosition = new Vector3(0, 0, 0),
+            ShowCameraLight = ShowCameraLightType.Always,
+        };
+
+        sceneView.Camera = _targetPositionCamera;
+
+        _pointerCameraController = new PointerCameraController(sceneView)
+        {
+            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
+            ZoomMode = CameraZoomMode.PointerPosition,
+            RotateAroundPointerPosition = true,
+            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
+            IsPinchMoveEnabled = true  // move camera with two fingers
+        };
+
+        scene.SetAmbientLight(0.2f);
+
+
+        var wireGridNode = new WireGridNode("Wire grid")
+        {
+            CenterPosition = new Vector3(0, -0.5f, 0),
+            Size = new Vector2(160, 160),
+
+            WidthDirection = new Vector3(1, 0, 0),   // this is also the default value
+            HeightDirection = new Vector3(0, 0, -1), // this is also the default value
+
+            WidthCellsCount = 20,
+            HeightCellsCount = 20,
+
+            MajorLineColor = Colors.Black,
+            MajorLineThickness = 1,
+
+            MinorLineColor = Colors.Gray,
+            MinorLineThickness = 1,
+
+            MajorLinesFrequency = 5,
+
+            IsClosed = true,
+        };
+
+        scene.RootNode.Add(wireGridNode);
+
+
+        string stlUrl = "Resources/Models/lego-fan.stl";
+
+        try
+        {
+            _stlImporter = new StlImporter(sharpEngineSceneView.Scene)
+            {
+                // Usually the stl files are defined by using Z-up coordinate system. This property converts the mesh to Y-up coordinates.
+                // Note that it would be also possible to change the scene's coordinate system by calling:
+                // sharpEngineSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
+                ConvertToYUp = true, 
+
+                // Setting CalculateNormals to true, can fix the invalid normals direction in many stl files that lead to invalid shading of the model.
+                CalculateNormals = true,  
+            };
+
+            var importedNode = await _stlImporter.ImportAsync(stlUrl);
+
+            if (importedNode != null)
+            {
+                Utilities.ModelUtils.PositionAndScaleSceneNode(importedNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
+
+                sharpEngineSceneView.Scene.RootNode.Add(importedNode);
+                _importedSceneNode = importedNode;
+
+                ShowInfoMessage("Default lego-fan.stl file loaded");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowInfoMessage($"Error importing {stlUrl} file: " + ex.Message);
+        }
+
+        // Initialize javascript attachFileImportHandler so it can call back blazor (ObjFileImportedJS and MtlFileImportedJS)
+        _thisJSReference = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+    }
+
+    [JSInvokable]
+    //public void FileImportedJS(string fileName, string fileContent) // When reading text files
+    public void FileImportedJS(string fileName, byte[] fileContent)
+    {
+        if (fileName.EndsWith(".stl", StringComparison.OrdinalIgnoreCase))
+        {
+            ImportDroppedStlFile(fileName, fileContent);
+
+            ShowInfoMessage($"3D model from {fileName} file imported.");
+        }
+        else
+        {
+            ShowInfoMessage($"File '{fileName}' not supported. Only stl files can be dropped here.");
+        }
+    }
+
+    private void ImportDroppedStlFile(string fileName, byte[] fileContent)
+    {
+        if (_stlImporter == null)
+            return;
+
+        // Create a memory stream from the byte array
+        using MemoryStream stlStream = new MemoryStream(fileContent);
+
+        try
+        {
+            // STL always defines only one mesh.
+            // The Import method returns a single MeshModelNode
+            var importedMeshModelNode = _stlImporter.Import(stlStream);
+
+            ShowImportedModel(importedMeshModelNode);
+        }
+        catch (Exception ex)
+        {
+            ShowInfoMessage("Error reading file: " + ex.Message);
+        }
+    }
+
+    private void ShowImportedModel(MeshModelNode? importedSceneNode)
+    {
+        var scene = sharpEngineSceneView.Scene;
+
+        if (_importedSceneNode != null)
+        {
+            scene.RootNode.Remove(_importedSceneNode);
+            _importedSceneNode.Dispose();
+            _importedSceneNode = null;
+        }
+
+        if (importedSceneNode == null)
+            return;
+        
+        Utilities.ModelUtils.PositionAndScaleSceneNode(importedSceneNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
+            
+        scene.RootNode.Add(importedSceneNode);
+    }
+
+    private void ShowInfoMessage(string message)
+    {
+        _infoText = message;
+        StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
+    }
+
+    public void Dispose()
+    {
+        _thisJSReference?.Dispose();
+        sharpEngineSceneView.Dispose();
+    }
+}
+

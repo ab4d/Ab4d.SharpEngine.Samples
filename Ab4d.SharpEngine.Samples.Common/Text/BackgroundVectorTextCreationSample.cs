@@ -132,7 +132,7 @@ public class BackgroundVectorTextCreationSample : CommonSample
         });
 
 
-        if (textMesh.Vertices == null || textMesh.TriangleIndices == null)
+        if (textMesh.Vertices == null || textMesh.TriangleIndices == null || this.IsDisposed)
             return;
 
 

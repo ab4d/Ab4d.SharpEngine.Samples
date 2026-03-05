@@ -66,6 +66,9 @@ public abstract class StandardModelsSampleBase : CommonSample
         UpdateModelNode(); // Call that again in case we need mesh and this is generated only after the scene is known
 
         _commonTexture = await base.GetCommonTextureAsync("10x10-texture.png", scene.GpuDevice);
+
+        if (isTextureMaterialChecked)
+            UpdateMaterial();
     }
 
     protected abstract ModelNode CreateModelNode();

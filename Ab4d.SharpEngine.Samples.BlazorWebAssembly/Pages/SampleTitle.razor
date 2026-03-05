@@ -1,0 +1,123 @@
+﻿@page "/sampleTitle"
+@page "/sampleTitle/{TitleId}"
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Ab4d.SharpEngine.Web - Common samples</PageTitle>
+
+<div class="ui-container">
+    <div style="background: white; padding: 20px;">
+        @((MarkupString)_markdownHtmlContent)
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? TitleId { get; set; }
+
+    private IJSObjectReference? _markedJSModule;
+    private string _markdownHtmlContent = "";
+
+    protected override void OnParametersSet()
+    {
+        // This is called BOTH:
+        // - when navigating to the page
+        // - AND when the parameter changes while staying on the same page
+        //Console.WriteLine($"Sample changed to: {SampleId}");
+
+        LoadSample(TitleId);
+    }
+
+    private void LoadSample(string? titleId)
+    {
+        // Reset markdown content
+        _markdownHtmlContent = "";
+
+        titleId = AdjustTitleId(titleId);
+
+        if (titleId == null)
+            return;
+
+        _ = ShowMarkdown(titleId); // Do not wait for ShowMarkdown to finish
+    }
+
+    private string? AdjustTitleId(string? titleId)
+    {
+        if (titleId == null)
+            return null;
+
+        titleId = titleId.Replace('-', '/');  // Replace - back to / to get the correct path to the markdown file
+
+        if (!titleId.EndsWith(".md", StringComparison.Ordinal))
+            titleId += ".md";
+
+        return titleId;
+    }
+
+    private async Task ShowMarkdown(string titleId)
+    {
+        // Handle markdown files
+        IJSObjectReference? markedModule;
+        try
+        {
+            // Ensure marked.js is loaded
+            markedModule = await EnsureMarkedJsLoaded();
+        }
+        catch (Exception ex)
+        {
+            markedModule = null;
+            _markdownHtmlContent = $"<p>Error loading marked.js: {ex.Message}</p>";
+        }
+
+        if (markedModule == null)
+            return;
+
+
+        string? markdownContent;
+        try
+        {
+            markdownContent = await Http.GetStringAsync(titleId);
+        }
+        catch (Exception ex)
+        {
+            _markdownHtmlContent = $"<p>Error loading markdown file for '{titleId}': {ex.Message}</p>";
+            markdownContent = null;
+        }
+
+        if (markdownContent != null)
+        {
+
+            string markdownHtmlContent;
+
+            try
+            {
+                //_markdownHtmlContent = ParseMarked(markdownContent);
+                markdownHtmlContent = await markedModule.InvokeAsync<string>("parse", markdownContent);
+                //_markdownHtmlContent = await JSRuntime.InvokeAsync<string>("marked.parse", markdownContent);
+            }
+            catch (Exception ex)
+            {
+                markdownHtmlContent = $"<p>Error parsing markdown file '{titleId}': {ex.Message}</p>";
+            }
+
+            // If the current sample was not yet changed, then show the markdown content
+            if (titleId == AdjustTitleId(this.TitleId))
+            {
+                _markdownHtmlContent = markdownHtmlContent;
+                StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
+            }
+        }
+    }
+
+    private async Task<IJSObjectReference> EnsureMarkedJsLoaded()
+    {
+        if (_markedJSModule != null)
+            return _markedJSModule; 
+
+        // ImportAsync does not return IJSObjectReference in .Net 10
+        //var markedModule = await System.Runtime.InteropServices.JavaScript.JSHost.ImportAsync(moduleName: "marked.js", moduleUrl: "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js");
+        _markedJSModule = await JSRuntime.InvokeAsync<IJSObjectReference>( "import", "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js");
+        return _markedJSModule;
+    }
+}

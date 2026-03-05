@@ -1,0 +1,510 @@
+@page "/gltfFileViewer"
+@using System.Numerics
+@using Ab4d.SharpEngine.Cameras
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.SceneNodes
+@using Ab4d.SharpEngine.Browser
+@using Ab4d.SharpEngine.Core
+@using Ab4d.SharpEngine.Materials
+@using Ab4d.SharpEngine.glTF
+@implements IDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Ab4d.SharpEngine.Web - glTF file viewer</PageTitle>
+
+<div style="padding: 1.5rem">
+    <h1>Ab4d.SharpEngine.Web - glTF file viewer</h1>
+
+    <p>This example shows how to load user glTF or glb (text and binary) files with Ab4d.SharpEngine.</p>
+    <p><strong>To load a custom file, drag and drop gltf, glb, dat and texture files to the area under the 3D scene.</strong></p>
+
+    <SharpEngineSceneView @ref="sharpEngineSceneView" style="width: 100%; min-width: 400px; max-width: 1000px; height: 500px; margin-top: 10pt; border: solid black 1px"></SharpEngineSceneView>
+
+    <br />
+    <p>@_infoText</p>
+
+    <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
+        Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
+    <input type="file" id="fileInput" style="display: none;" />
+</div>
+
+<script>
+    // Initialize javascript for drag and drop only once.
+    // This javascript will call FilesDroppedJS, TextureImportedJS and FileImportedJS .Net methods.
+    // The script need to be initialized by calling attachFileImportHandler function (this is done in the OnAfterRenderAsync method below).
+    window.objFileViewerModule = window.objFileViewerModule || (function() {
+        let dotNetInterop;
+        let lastDropZone = null;
+        let lastFileInput = null;
+
+        function handleFiles(files) {
+            const allFileNames = Array.from(files).map(file => file.name).join(',');
+            dotNetInterop.invokeMethodAsync('FilesDroppedJS', allFileNames);
+
+            console.log('js: Files dropped:', allFileNames);
+
+            for (const file of files) {
+                const reader = new FileReader();
+
+                reader.onload = async function(e) {
+                    var arrayBuffer = e.target.result;
+
+                    console.log(`js: File uploaded: '${file.name}' ${arrayBuffer.byteLength} bytes`);
+                    
+                    if (file.name.toLowerCase().endsWith(".png") || file.name.toLowerCase().endsWith(".jpg")) {
+                        // Decode image
+                        // NOTE: This uses OffscreenCanvas that is not supported on all browsers. To add support for that, add fallback code - see loadImageBytesOldWay in sharp-engine.js
+                        var mimeType = file.name.toLowerCase().endsWith(".png") ? "image/png" : "image/jpg";
+
+                        const blob = new Blob([arrayBuffer], { type: mimeType });
+                        const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' });
+                        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(bitmap, 0, 0);
+                        const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+
+                        const data = Array.from(imageData.data);
+                        const imageBytes = new Uint8Array(data);
+
+                        console.log(`js: Image '${file.name}' decoded to ${bitmap.width} x ${bitmap.height}`);
+                        
+                        dotNetInterop.invokeMethodAsync('TextureImportedJS', file.name, bitmap.width, bitmap.height, imageBytes);
+                    } else {
+                        const bytes = new Uint8Array(arrayBuffer);
+                        dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes);
+                    }
+                };
+
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function initializeDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+
+            if (!dropZone || !fileInput) return;
+
+            // Check if elements have changed (re-rendered), if so, re-attach listeners
+            if (lastDropZone === dropZone && lastFileInput === fileInput) {
+                return; // Already initialized for these exact elements
+            }
+
+            // Store references to current elements
+            lastDropZone = dropZone;
+            lastFileInput = fileInput;
+
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.cursor = 'copy';
+                dropZone.style.backgroundColor = '#e0f3ff';
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.style.cursor = 'pointer';
+                dropZone.style.backgroundColor = '';
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.cursor = 'pointer';
+                dropZone.style.backgroundColor = '';
+
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        return {
+            attachFileImportHandler: function(dotNetHelper) {
+                dotNetInterop = dotNetHelper;
+                initializeDropZone();
+            }
+        };
+    })();
+
+    function attachFileImportHandler(dotNetHelper) {
+        window.objFileViewerModule.attachFileImportHandler(dotNetHelper);
+    }
+</script>
+
+@code {
+    // BOUND FIELDS:
+    private string _infoText = "";
+
+    private SharpEngineSceneView sharpEngineSceneView = null!;
+
+    private TargetPositionCamera? _targetPositionCamera;
+    private PointerCameraController? _pointerCameraController;
+
+    private GroupNode? _importedSceneNode;
+
+    private DotNetObjectReference<GltfFileViewer>? _thisJSReference;
+
+    private glTFImporter? _gltfImporter;
+
+    private string[]? _droppedFileNames;
+    private int _droppedImagesCount;
+    private int _droppedDataFilesCount;
+    private int _uploadedGltfFileIndex;
+    private byte[]?[]? _uploadedFileContents;
+    private int _uploadedFilesCount;
+    private int _uploadedImagesCount;
+    private List<(string fileName, RawImageData rawImageData)>? _uploadedImages;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var scene = sharpEngineSceneView.Scene;
+        var sceneView = sharpEngineSceneView.SceneView;
+
+        sceneView.BackgroundColor = Colors.LightSkyBlue;
+
+        _targetPositionCamera = new TargetPositionCamera()
+        {
+            Heading = -60,
+            Attitude = -25,
+            Distance = 500,
+            TargetPosition = new Vector3(0, 0, 0),
+            ShowCameraLight = ShowCameraLightType.Always,
+        };
+
+        sceneView.Camera = _targetPositionCamera;
+
+        _pointerCameraController = new PointerCameraController(sceneView)
+        {
+            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
+            ZoomMode = CameraZoomMode.PointerPosition,
+            RotateAroundPointerPosition = true,
+            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
+            IsPinchMoveEnabled = true  // move camera with two fingers
+        };
+
+        scene.SetAmbientLight(0.2f);
+
+
+        var wireGridNode = new WireGridNode("Wire grid")
+        {
+            CenterPosition = new Vector3(0, -0.5f, 0),
+            Size = new Vector2(160, 160),
+
+            WidthDirection = new Vector3(1, 0, 0),   // this is also the default value
+            HeightDirection = new Vector3(0, 0, -1), // this is also the default value
+
+            WidthCellsCount = 20,
+            HeightCellsCount = 20,
+
+            MajorLineColor = Colors.Black,
+            MajorLineThickness = 1,
+
+            MinorLineColor = Colors.Gray,
+            MinorLineThickness = 1,
+
+            MajorLinesFrequency = 5,
+
+            IsClosed = true,
+        };
+
+        scene.RootNode.Add(wireGridNode);
+
+        //scene.RootNode.Add(new AxisLineNode(length: 100));
+
+
+        //string gltfUrl = "Resources/Models/voyager.gltf";
+        string gltfUrl = "Resources/Models/duck.glb"; // binary glTF file with embedded texture
+
+        ShowInfoMessage("Start importing initial file " + gltfUrl);
+
+        try
+        {
+            _gltfImporter = new glTFImporter(scene);
+
+            // when using ImportAsync with gltf file, the importer will use GpuDevice.CanvasInterop
+            // to load additional dat or texture files if they are required
+            var importedNode = await _gltfImporter.ImportAsync(gltfUrl);
+
+            ShowImportedModel(importedNode);
+        }
+        catch (Exception ex)
+        {
+            ShowInfoMessage($"Error importing {gltfUrl} file: " + ex.Message);
+        }
+
+
+        // Initialize javascript attachFileImportHandler so it can call back blazor (ObjFileImportedJS and MtlFileImportedJS)
+        _thisJSReference = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+    }
+
+
+    // The following method is called from javascript after the files defined in allFileNames are dropped
+    [JSInvokable]
+    public void FilesDroppedJS(string allFileNames)
+    {
+        _droppedFileNames = allFileNames.Split(',');
+
+        _droppedImagesCount = _droppedFileNames.Count(f => f.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase));
+        _droppedDataFilesCount = _droppedFileNames.Length - _droppedImagesCount;
+
+        _uploadedFileContents = new byte[_droppedFileNames.Length][];
+        _uploadedImages = null;
+
+        _uploadedFilesCount = 0;
+        _uploadedImagesCount = 0;
+        _uploadedGltfFileIndex = -1;
+
+        ShowInfoMessage($"Start uploading {allFileNames.Length - _droppedImagesCount} data files and {_droppedImagesCount} images");
+    }
+
+    // The following method is called from javascript after the image file is read and decoded
+    [JSInvokable]
+    public void TextureImportedJS(string fileName, int width, int height, byte[] imageContent)
+    {
+        int index = GetDroppedFileIndex(fileName);
+
+        if (index == -1)
+            return; // probably this texture was loaded for the previously loaded file
+
+
+        var rawImageData = new RawImageData(width, height, width * 4, StandardBitmapFormats.Rgba, imageContent, checkTransparency: true);
+
+        bool isResolved = ResolveTexture(fileName, rawImageData);
+
+        if (!isResolved)
+        {
+            // texture uploaded and decoded before the gltf file was importer
+            // Save the texture so we can resolve it after the model is imported
+            _uploadedImages ??= new List<(string, RawImageData)>();
+            _uploadedImages.Add((fileName, rawImageData));
+        }
+
+        _uploadedImagesCount++;
+
+        if (_uploadedImagesCount == _droppedImagesCount)
+        {
+            // Make it possible for GC release resources
+            _uploadedImages = null; 
+            _uploadedFileContents = null;
+
+            if (_gltfImporter != null && _gltfImporter.UnresolvedTextureMaterials != null && _gltfImporter.UnresolvedTextureMaterials.Count > 0)
+                ShowInfoMessage("All images uploaded but the following textures are not defined because the images were not uploaded: " + string.Join(", ", _gltfImporter.UnresolvedTextureMaterials.Select(f => f.fileName)));
+        }
+        else
+        {
+            UpdateUploadedFilesInfo();
+        }
+    }
+
+    private bool ResolveTexture(string fileName, RawImageData rawImageData)
+    {
+        bool isResolved = false;
+
+        var gpuDevice = sharpEngineSceneView.Scene.GpuDevice;
+
+        if (_gltfImporter != null && _gltfImporter.UnresolvedTextureMaterials != null && gpuDevice != null)
+        {
+            GpuImage? gpuImage = null;
+
+            for (var i = _gltfImporter.UnresolvedTextureMaterials.Count - 1; i >= 0; i--)
+            {
+                if (_gltfImporter.UnresolvedTextureMaterials[i].fileName == fileName)
+                {
+                    if (_gltfImporter.UnresolvedTextureMaterials[i].material is StandardMaterialBase standardMaterial)
+                    {
+                        if (gpuImage == null)
+                        {
+                            gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, fileName);
+                            gpuDevice.CacheObject(fileName, gpuImage);
+                        }
+
+                        standardMaterial.DiffuseTexture = gpuImage;
+                    }
+
+                    _gltfImporter.UnresolvedTextureMaterials.RemoveAt(i); // Mark as resolved
+                    isResolved = true;
+                }
+            }
+        }
+
+        return isResolved;
+    }
+
+    // The following method is called from javascript after the fileName content is read
+    [JSInvokable]
+    public void FileImportedJS(string fileName, byte[] fileContent)
+    {
+        int index = GetDroppedFileIndex(fileName);
+
+        if (index == -1)
+            return; // probably this file was uploaded for the previously loaded file
+
+
+        if (_uploadedFileContents != null)
+        {
+            _uploadedFileContents[index] = fileContent;
+            _uploadedFilesCount++;
+        }
+
+        if (fileName.EndsWith(".gltf", StringComparison.OrdinalIgnoreCase) ||
+            fileName.EndsWith(".glb", StringComparison.OrdinalIgnoreCase))
+        {
+            _uploadedGltfFileIndex = index; // Save the main glTf file name
+        }
+
+        // Wait until all non-image files are uploaded (for example .gltf and .dat)
+        // and then call Import method.
+
+        if (_uploadedFilesCount < _droppedDataFilesCount)
+        {
+            UpdateUploadedFilesInfo();
+        }
+        else
+        {
+            if (_droppedFileNames != null && _uploadedFileContents != null)
+            {
+                if (_uploadedGltfFileIndex != -1)
+                {
+                    fileName = _droppedFileNames[_uploadedGltfFileIndex];
+                    fileContent = _uploadedFileContents[_uploadedGltfFileIndex]!;
+                }
+                else
+                {
+                    // No glTF or glb file found
+                    ShowInfoMessage($"Cannot import the dropped file(s) because they are not supported.");
+                    return;
+                }
+            }
+
+            // Start importing
+            ImportDroppedGltfFile(fileName, fileContent);
+        }
+    }
+
+    private void UpdateUploadedFilesInfo()
+    {
+        ShowInfoMessage($"Uploaded {_uploadedFilesCount} / {_droppedDataFilesCount} data files and {_uploadedImagesCount} / {_droppedImagesCount} images");
+    }
+
+    private int GetDroppedFileIndex(string fileName)
+    {
+        int index;
+
+        if (_droppedFileNames == null)
+        {
+            Console.WriteLine("FileImportedJS called without calling FilesDroppedJS");
+
+            _uploadedGltfFileIndex = -1; // Just import this file
+            index = -1;
+        }
+        else
+        {
+            index = _droppedFileNames.IndexOf(fileName);
+        }
+
+        return index;
+    }
+
+    private void ImportDroppedGltfFile(string fileName, byte[] fileContent)
+    {
+        ShowInfoMessage($"Start importing '{fileName}'");
+
+        _gltfImporter ??= new glTFImporter(gpuDevice: sharpEngineSceneView.Scene.GpuDevice);
+
+        // Create a memory stream from the byte array
+        using MemoryStream fileStream = new MemoryStream(fileContent);
+
+        try
+        {
+            var importedMeshModelNode = _gltfImporter.Import(fileStream, ResolveDroppedFileNames);
+
+            if (importedMeshModelNode == null && _gltfImporter.IsDracoMeshCompressionUsed)
+                throw new Exception("Cannot read draco compressed gltf files");
+
+            if (_uploadedImages != null)
+            {
+                // Resolve images that were uploaded before the gltf file was imported
+                foreach (var uploadedImage in _uploadedImages)
+                    ResolveTexture(uploadedImage.fileName, uploadedImage.rawImageData);
+
+                _uploadedImages = null;
+            }
+
+            ShowImportedModel(importedMeshModelNode);
+        }
+        catch (Exception ex)
+        {
+            ShowInfoMessage("Error reading file: " + ex.Message);
+
+            // reset all arrays to null. This will stop reading the textures
+            _droppedFileNames = null;
+        }
+
+        // Allow GC to release temp arrays
+        _uploadedGltfFileIndex = -1;
+        _uploadedFileContents = null;
+    }
+
+    private Tuple<Stream?, string?> ResolveDroppedFileNames(string fileName)
+    {
+        int index = _droppedFileNames?.IndexOf(fileName) ?? -1;
+
+        if (index == -1 || _uploadedFileContents == null)
+        {
+            ShowInfoMessage($"Cannot read the required '{fileName}' file. Please drag and drop all required files");
+            return new Tuple<Stream?, string?>(null, fileName);
+        }
+
+        var fileBytes = _uploadedFileContents[index];
+
+        if (fileBytes == null)
+            return new Tuple<Stream?, string?>(null, fileName);
+
+        return new Tuple<Stream?, string?>(new MemoryStream(fileBytes), fileName);
+    }
+
+    private void ShowImportedModel(GroupNode? importedSceneNode)
+    {
+        var scene = sharpEngineSceneView.Scene;
+
+        if (_importedSceneNode != null)
+        {
+            scene.RootNode.Remove(_importedSceneNode);
+            _importedSceneNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+            _importedSceneNode = null;
+        }
+
+        if (importedSceneNode == null)
+            return;
+
+        Utilities.ModelUtils.PositionAndScaleSceneNode(importedSceneNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
+
+        scene.RootNode.Add(importedSceneNode);
+
+        _importedSceneNode = importedSceneNode;
+
+        ShowInfoMessage("Imported model shown");
+    }
+
+    private void ShowInfoMessage(string message)
+    {
+        _infoText = message;
+        StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
+    }
+
+    public void Dispose()
+    {
+        _thisJSReference?.Dispose();
+        sharpEngineSceneView.Dispose();
+    }
+}
+

@@ -1,0 +1,1 @@
+Downloaded version v1.1.0 from brotli-x64-windows-static.zip from https://github.com/google/brotli/releases

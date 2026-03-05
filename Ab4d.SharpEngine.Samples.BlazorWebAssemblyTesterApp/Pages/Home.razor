@@ -1,0 +1,97 @@
+﻿@page "/"
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.WebGL
+@using Ab4d.SharpEngine.Samples.WebAssemblyDemo
+@implements IDisposable
+
+<PageTitle>WebAssemblyDemo Blazor tester</PageTitle>
+
+<h2>Blazor tester for Ab4d.SharpEngine.Samples.WebAssemblyDemo project</h2>
+
+<p>The purpose of this project is to be able to debug the code in the Ab4d.SharpEngine.Samples.WebAssemblyDemo project. 
+    This is only possible when the code from WebAssemblyDemo project runs in a Blazor WebAssembly project 
+    (it is not possible to debug it when started in Asp.Net Core and any other web server).</p>
+<p>To test this, put a breakpoint in the linked SharpEngineTest.cs file in Ab4d.SharpEngine.Samples.BlazorWebAssemblyTesterApp (this) project.</p>
+
+The following methods from SharpEngineTest are exported and can be called from JavaScript:<br/>
+<button class="btn-primary" style="margin-top: 3pt" @onclick="OnToggleCameraRotation">Toggle camera rotation</button>
+<button class="btn-primary" style="margin-top: 3pt" @onclick="OnChangeMaterialToBlue">Change material to Blue</button>
+<button class="btn-primary" style="margin-top: 3pt" @onclick="OnChangeMaterialToRandom">Change material to a random color</button>
+<button class="btn-primary" style="margin-top: 3pt" @onclick="Add100Objects">Add 100 objects</button>
+<button class="btn-primary" style="margin-top: 3pt" @onclick="Add1000Objects">Add 1000 objects</button>
+<br />
+<br />
+
+<canvas id="webGLCanvas" style="width: 70%; min-width: 400px; max-width: 1000px; height: 500px; margin-top: 10pt; border: solid black 1px"></canvas>
+
+
+@code
+{
+    private CanvasInterop? _canvasInterop;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize the browser interop (load sharp-engine.js file and from javascript get access to exported methods in the CanvasInterop class)
+        // Because Blazor uses Single Page Applications style, this needs to be executed only once
+        await CanvasInterop.InitializeInterop();
+    }
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!CanvasInterop.IsInteropInitialized || _canvasInterop != null)
+            return;
+
+
+        // In OnAfterRender method all the DOM elements (including our canvas) have been initialized, so we can connect to them.
+        // So we can create an instance of CanvasInterop class that will connect the SharpEngine with the canvas in the DOM.
+        // NOTE: canvasId is the id of the canvas that shows WebGL graphics (see the html part of the code above)
+        _canvasInterop = new CanvasInterop(canvasId: "webGLCanvas"); // if we do not need pointer events, we can also add: subscribePointerEvents: false
+
+        // Try to connect to the canvas and get the WebGL context.
+        // We can also skip this call. In this case InitWebGL will be called from the Scene or SceneView Initialized method.
+        // But by calling this by ourselves, we can immediately check if the WebGL context is available (checking IsWebGLInitialized).
+        _canvasInterop.InitWebGL();
+
+        if (!_canvasInterop.IsWebGLInitialized)
+            return; // Skip creating Scene and SceneView objects; error message was already written to console in the InitWebGL method
+
+
+        SharpEngineTest.Instance.InitSharpEngine(_canvasInterop);
+    }
+     
+
+    private void OnToggleCameraRotation()
+    {
+        SharpEngineTest.Instance.ToggleCameraRotation();
+    }
+
+    private void OnChangeMaterialToBlue()
+    {
+        SharpEngineTest.Instance.ChangeMaterial(colorText: "blue"); // colorText could be also "#0000FF"
+    }
+    
+    private void OnChangeMaterialToRandom()
+    {
+        SharpEngineTest.Instance.ChangeMaterial(""); // empty text or null will generate a random color
+    }
+
+    public void Add100Objects()
+    {
+        SharpEngineTest.Instance.AddObjects(100);
+    }
+    
+    public void Add1000Objects()
+    {
+        SharpEngineTest.Instance.AddObjects(1000);
+    }
+    
+    public void Dispose()
+    {
+        if (_canvasInterop != null)
+        {
+            _canvasInterop.Dispose(); // This will also dispose SceneView, Scene and WebGLDevice
+            _canvasInterop = null;
+        }
+    }
+}

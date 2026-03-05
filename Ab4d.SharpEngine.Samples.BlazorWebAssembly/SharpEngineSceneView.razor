@@ -1,0 +1,467 @@
+﻿@using Ab4d.SharpEngine
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.Utilities
+@using Ab4d.SharpEngine.WebGL
+@implements IDisposable
+@implements Ab4d.SharpEngine.Common.ISharpEngineSceneView
+@inject IJSRuntime JS
+
+<!-- Define the initial width and height in style. If this is not done, then under some cases, the onResize in sharp-engine.js can start increasing the size in an infinite loop -->
+<canvas id="@_canvasId" style="width: 300px; height: 150px" @attributes="AdditionalAttributes"></canvas>
+
+@code {
+    // BOUND FIELDS:
+    private string _canvasId = "sharpEngineCanvas"; // Just start with some value. This will be overwritten in OnInitializedAsync
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+
+    private static readonly string LogArea = typeof(SharpEngineSceneView).FullName!;
+
+    /// <summary>
+    /// Gets a unique id of this resource
+    /// </summary>
+    public long Id { get; private set; }
+
+    public string Name { get; set; } = "SharpEngineSceneView";
+
+    /// <inheritdoc />
+    public EngineCreateOptions CreateOptions { get; private set; } = new EngineCreateOptions();
+
+
+    /// <summary>
+    /// Gets the multi-sampling count (MSAA) used by this SharpEngineSceneView.
+    /// See remarks for more info.
+    /// </summary>
+    public int MultisampleCount
+    {
+        get => SceneView.MultisampleCount;
+        set => throw new NotSupportedException("It is not possible to change the MultisampleCount after the WebGL device is created.");
+    }
+
+
+    /// <summary>
+    /// SupersamplingCount always returns 1 and setting it throws NotSupportedException.
+    /// </summary>
+    public float SupersamplingCount
+    {
+        get => 1;
+        set => throw new NotSupportedException("Setting Supersampling is not supported in the current version of Ab4d.SharpEngine.Web");
+    }
+
+    /// <summary>
+    /// Gets a Boolean that specifies if this resource has been disposed.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Gets a Boolean that specifies if this resource is currently being disposed (the current code is executing inside Dispose method).
+    /// </summary>
+    public bool IsDisposing { get; private set; }
+
+
+    public CanvasInterop CanvasInterop { get; } = new CanvasInterop(); // Automatically define the CanvasId
+
+    public Scene Scene { get; } = new Scene();
+
+    // When everything is defined in razor file, we do not have a constructor,
+    // so we cannot initialize SceneView (pass Scene instance to its SceneView constructor).
+    // This could be done by using a code-behind where we have a constructor, 
+    // but then the user would need to copy an additional file.
+    private SceneView? _sceneView;
+    public SceneView SceneView
+    {
+        get
+        {
+            _sceneView ??= new SceneView(Scene);
+            return _sceneView;
+        }
+    }
+
+    public WebGLDevice? GpuDevice { get; private set; }
+
+    public bool IsInitialized => GpuDevice != null;
+
+
+    #region Events
+
+    /// <summary>
+    /// Called after the <see cref="GpuDevice"/> object was created.
+    /// If device creation has failed, then <see cref="GpuDeviceCreationFailed"/> event is triggered.
+    /// </summary>
+    public event GpuDeviceCreatedEventHandler? GpuDeviceCreated;
+
+    /// <summary>
+    /// Called when the device creation has failed. User can set the IsHandled property to true to prevent showing error text that is shown by SharpEngineSceneView.
+    /// </summary>
+    public event DeviceCreateFailedEventHandler? GpuDeviceCreationFailed;
+
+    /// <summary>
+    /// Called after the <see cref="SceneView"/> object have been initialized (have a valid view size and the back buffers were created).
+    /// </summary>
+    public event EventHandler? SceneViewInitialized;
+
+    /// <summary>
+    /// Called when the scene is being updated and before it is rendered. The event is called at the beginning of the <see cref="RenderScene"/> method. This event can be used to update the animations.
+    /// </summary>
+    public event EventHandler? SceneUpdating
+    {
+        add => SceneView.SceneUpdating += value;
+        remove => SceneView.SceneUpdating -= value;
+    }
+
+    /// <summary>
+    /// Called after the scene has been rendered.
+    /// </summary>
+    public event EventHandler? SceneRendered
+    {
+        add => SceneView.SceneRendered += value;
+        remove => SceneView.SceneRendered -= value;
+    }
+
+    /// <summary>
+    /// Called when the size of the rendering area is changed. The event is also called after the back buffers are initialized for the first time.
+    /// </summary>
+    public event ViewSizeChangedEventHandler? ViewSizeChanged
+    {
+        add => SceneView.ViewResized += value;
+        remove => SceneView.ViewResized -= value;
+    }
+
+    /// <summary>
+    /// Called when the selected PresentationType is not supported and was changed to a fallback PresentationType.
+    /// The event parameter may provide some additional information about the reason for change.
+    /// </summary>
+    public event EventHandler<string?>? PresentationTypeChanged;
+
+
+    /// <summary>
+    /// Occurs when this instance is starting to be disposed.
+    /// The value of the parameter is the same the disposing parameter in the Dispose(bool) method.
+    /// </summary>
+    public event EventHandler<bool>? Disposing;
+
+    /// <summary>
+    /// Occurs when this instance is fully disposed.
+    /// The value of the parameter is the same the disposing parameter in the Dispose(bool) method.
+    /// </summary>
+    public event EventHandler<bool>? Disposed;
+
+
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Id = ResourceTracker.GetNextId(this);
+        _canvasId = CanvasInterop.CanvasId;
+
+        // Initialize the browser interop (load sharp-engine.js file and from javascript get access to exported methods in the CanvasInterop class)
+        // Because Blazor uses Single Page Applications style, this needs to be executed only once
+        await CanvasInterop.InitializeInterop(JS);
+    }
+
+    /// <summary>
+    /// Destructor
+    /// </summary>
+    ~SharpEngineSceneView()
+    {
+        Dispose(false);
+    }
+
+    /// <inheritdoc />
+    public WebGLDevice Initialize()
+    {
+        CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
+
+        InitializeInt(throwException: true);
+
+        return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
+    }
+
+    /// <inheritdoc />
+    public WebGLDevice Initialize(EngineCreateOptions createOptions)
+    {
+        CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
+
+        CreateOptions = createOptions;
+
+        InitializeInt(throwException: true);
+
+        return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
+    }
+
+    /// <inheritdoc />
+    public WebGLDevice Initialize(Action<EngineCreateOptions>? configureAction)
+    {
+        CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
+
+        configureAction?.Invoke(CreateOptions);
+        InitializeInt(throwException: true);
+
+        return GpuDevice!; // _gpuDevice is not null here because in case when it cannot be created an exception is thrown
+    }
+
+    /// <inheritdoc />
+    public void Initialize(WebGLDevice gpuDevice)
+    {
+        if (gpuDevice == null)
+            throw new ArgumentNullException(nameof(gpuDevice));
+
+        CheckIsGpuDeviceCreated(); // Throw exception if _gpuDevice was already created
+
+        GpuDevice = gpuDevice;
+        CreateOptions = GpuDevice.CreateOptions;
+
+        InitializeInt(throwException: false);
+    }
+
+    private void CheckIsGpuDeviceCreated()
+    {
+        if (GpuDevice != null)
+            throw new InvalidOperationException("Cannot initialize SharpEngineSceneView again. Initialize method was probably automatically called after the SharpEngineSceneView was loaded or resized. To manually initialize SharpEngineSceneView call Initialize method before the SharpEngineSceneView is added to the parent control.");
+    }
+
+    private void InitializeInt(bool throwException)
+    {
+        if (!CanvasInterop.IsInteropInitialized)
+        {
+            if (throwException)
+                throw new InvalidOperationException("Cannot initialize SharpEngineSceneView because CanvasInterop is not initialized.");
+
+            return;
+        }
+
+        try
+        {
+            // In OnAfterRender method all the DOM elements (including our canvas) have been initialized, so we can connect to them.
+            // So we can create an instance of CanvasInterop class that will connect the SharpEngine with the canvas in the DOM.
+            //
+            // Try to connect to the canvas and get the WebGL context.
+            // We can also skip this call. In this case InitWebGL will be called from the Scene or SceneView Initialized method.
+            // But by calling this by ourselves, we can immediately check if the WebGL context is available (checking IsWebGLInitialized).
+            // By setting preventShowingContextMenu to true (by default), we disable showing browser's context menu when right-clicking on the canvas.
+            CanvasInterop.InitWebGL(useMultisampleAntiAliasing: CreateOptions.UseMultisampleAntiAliasing,
+                preserveDrawingBuffer: CreateOptions.PreserveDrawingBuffer,
+                preventShowingContextMenu: CreateOptions.PreventBrowserContextMenu);
+
+            if (!CanvasInterop.IsWebGLInitialized)
+            {
+                if (throwException)
+                    throw new InvalidOperationException("Cannot initialize SharpEngineSceneView because WebGL in CanvasInterop is not initialized.");
+
+                return; // Skip creating Scene and SceneView objects; error message was already written to console in the InitWebGL method
+            }
+
+
+            GpuDevice = WebGLDevice.Create(CanvasInterop); // We can also pass an EngineCreateOptions object to the Create method
+
+
+        }
+        catch (Exception ex)
+        {
+            OnGpuDeviceCreationFailed(ex);
+            return;
+        }
+
+        if (!GpuDevice.IsInitialized)
+        {
+            OnGpuDeviceCreationFailed(new Exception("Cannot create GpuDevice because Blazor cannot use the WebGL context"));
+            return; // Blazor cannot use the WebGL context
+        }
+
+        OnGpuDeviceCreated(GpuDevice);
+        
+        
+        SceneView.Initialize(GpuDevice);
+
+        OnSceneViewInitialized();
+    }
+
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (GpuDevice == null)
+            InitializeInt(throwException: false);
+    }
+
+    /// <summary>
+    /// RenderScene rendered the scene.
+    /// If forceRender is false then the scene is rendered only if there are any changes in the scene nodes.
+    /// If forceUpdate is true then the RenderingQueues are always regenerated (otherwise RenderingQueues are regenerated only when this is required because of the changes).
+    /// </summary>
+    /// <param name="forceRender">if true then scene is rendered even if there are no scene changes. Default value is true.</param>
+    /// <param name="forceUpdate">if true then the RenderingQueues are always regenerated (otherwise RenderingQueues are regenerated only when this is required because of the changes). Default value is false.</param>
+    public void RenderScene(bool forceRender = true, bool forceUpdate = false)
+    {
+        if (GpuDevice == null)
+        {
+            if (forceRender || forceUpdate)
+                Log.Warn?.Write(LogArea, "Cannot render the scene because GpuDevice is null");
+
+            return;
+        }
+
+        try
+        {
+            SceneView.Render(forceRender, forceUpdate);
+        }
+#if DEBUG
+            catch //(Exception ex)
+            {
+                throw;
+            }
+#else
+        catch (Exception ex)
+        {
+            Log.Error?.Write(LogArea, Id, "Unhandled exception in SharpEngineSceneView.RenderScene: " + ex.Message, ex);
+        }
+#endif
+    }
+
+
+
+    /// <summary>
+    /// OnSceneViewInitialized
+    /// </summary>
+    protected void OnSceneViewInitialized()
+    {
+        if (SceneViewInitialized == null)
+            return;
+
+        try
+        {
+            SceneViewInitialized(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            Log.Error?.Write(LogArea, Id, "Unhandled exception in SceneViewInitialized event handler: " + ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// OnPresentationTypeChanged
+    /// </summary>
+    /// <param name="reason">optional reason why presentation type was changed</param>
+    protected void OnPresentationTypeChanged(string? reason)
+    {
+        if (PresentationTypeChanged == null)
+            return;
+
+        try
+        {
+            PresentationTypeChanged(this, reason);
+        }
+        catch (Exception ex)
+        {
+            Log.Error?.Write(LogArea, Id, "Unhandled exception in PresentationTypeChanged event handler: " + ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// OnGpuDeviceCreated
+    /// </summary>
+    /// <param name="gpuDevice">WebGLDevice</param>
+    protected void OnGpuDeviceCreated(WebGLDevice gpuDevice)
+    {
+        if (GpuDeviceCreated == null)
+            return;
+
+        var gpuDeviceCreatedEventArgs = new GpuDeviceCreatedEventArgs(gpuDevice);
+
+        try
+        {
+            GpuDeviceCreated(this, gpuDeviceCreatedEventArgs);
+        }
+        catch (Exception ex)
+        {
+            Log.Error?.Write(LogArea, Id, "Unhandled exception in GpuDeviceCreated event handler: " + ex.Message, ex);
+        }
+    }
+
+    /// <summary>
+    /// OnGpuDeviceCreationFailed
+    /// </summary>
+    /// <param name="exception">Exception</param>
+    protected bool OnGpuDeviceCreationFailed(Exception exception)
+    {
+        if (GpuDeviceCreationFailed == null)
+            return false;
+
+        var deviceCreateFailedEventArgs = new DeviceCreateFailedEventArgs(exception);
+
+        try
+        {
+            GpuDeviceCreationFailed(this, deviceCreateFailedEventArgs);
+        }
+        catch (Exception ex)
+        {
+            Log.Error?.Write(LogArea, Id, "Unhandled exception in GpuDeviceCreationFailed event handler: " + ex.Message, ex);
+        }
+
+        return deviceCreateFailedEventArgs.IsHandled;
+    }
+
+    /// <summary>
+    /// OnDisposing
+    /// </summary>
+    /// <param name="disposing">disposing</param>
+    protected void OnDisposing(bool disposing)
+    {
+        if (Disposing != null)
+            Disposing(this, disposing);
+    }
+
+    /// <summary>
+    /// OnDisposed
+    /// </summary>
+    /// <param name="disposing">disposing</param>
+    protected void OnDisposed(bool disposing)
+    {
+        if (Disposed != null)
+            Disposed(this, disposing);
+    }
+
+    protected void Dispose(bool disposing)
+    {
+        if (IsDisposing || IsDisposed)
+            return;
+
+        Log.Info?.Write(LogArea, Id, $"Disposing SharpEngineSceneView disposing: {disposing}");
+
+        IsDisposing = true;
+
+        OnDisposing(disposing);
+
+        if (disposing) // if disposing is false then D3DImage and other resources will be disposed by calling their destructors
+        {
+            if (!SceneView.IsDisposed)
+                SceneView.Dispose();
+        
+            if (!Scene.IsDisposed)
+                Scene.Dispose();
+
+            if (GpuDevice != null)
+            {
+                GpuDevice.Dispose();
+                GpuDevice = null;
+            }
+
+            if (CanvasInterop.IsWebGLInitialized)
+                CanvasInterop.Dispose();
+        }
+
+        IsDisposed = true;
+        IsDisposing = false;
+
+        OnDisposed(disposing);
+    }
+
+
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+}

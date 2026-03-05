@@ -1,0 +1,733 @@
+﻿@page "/quickStart"
+@using System.Diagnostics
+@using System.Numerics
+@using Ab4d.SharpEngine.Cameras
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.Materials
+@using Ab4d.SharpEngine.SceneNodes
+@using Ab4d.SharpEngine.Browser
+@using Ab4d.SharpEngine.Lights
+@using Ab4d.SharpEngine.Meshes
+@using Ab4d.SharpEngine.Utilities
+@implements IDisposable
+
+<PageTitle>Ab4d.SharpEngine.Web - Quick start</PageTitle>
+
+<div style="padding: 1.5rem">
+    <h1>Quick start for Ab4d.SharpEngine.Web</h1>
+
+    <p>This is a example of how to use the Ab4d.SharpEngine.Web 3D rendering engine in a browser.<br/>
+        This sample demonstrates only a few features of the engine.</p>
+    <p>
+        To see the full demonstration of the engine, please check the <a href="https://github.com/ab4d/Ab4d.SharpEngine.Samples" target="_blank">samples for the desktop and mobile devices</a> and
+        <a href="https://www.ab4d.com/help/SharpEngine/html/R_Project_Ab4d_SharpEngine.htm">online help</a>.<br />
+        To see which features are already available in this beta version, check the <a href="https://github.com/ab4d/Ab4d.SharpEngine.Samples.Web#implementation-details-and-roadmap" target="_blank">Roadmap and Implementation details</a>.
+    </p>
+
+    <span style="font-weight: bold">Options:</span><br/>
+
+    <label><input type="checkbox" checked="checked" @onchange="OnCameraRotateSettingsChanged" /> Rotate the camera with left mouse button or touch</label><br />
+    <label><input type="checkbox" checked="checked" @onchange="OnCameraMoveSettingsChanged" /> Move the camera with control + left mouse button or two fingers</label><br />
+    <label><input type="checkbox" checked="checked" @onchange="OnCameraZoomSettingsChanged" /> Zoom with mouse wheel or touch pinch</label><br />
+    <label><input type="checkbox" checked="checked" @onchange="OnUseCameraLightCheckBoxChanged" /> Use camera light (shines from the position of the camera; when unchecked then a fixed directional light is used)</label><br />
+    <label><input type="checkbox" @bind="_showRenderTimes" /> Show render times in DevTools (F12) Console</label><br />
+    <br />
+
+    <button class="btn-primary" @onclick="OnStartStopCameraRotationButtonClicked">@_cameraRotationButtonText</button>
+    <button class="btn-primary" style="margin-top: 3pt" @onclick="ChangeMaterial">Change material</button>
+    <button class="btn-primary" style="margin-top: 3pt" @onclick="AddManyObjects">Add many objects</button>
+    <button class="btn-primary" style="margin-top: 3pt" @onclick="RemoveAddedObjects">Remove added objects</button>
+    <button class="btn-primary" style="margin-top: 3pt" @onclick="OnRenderToBitmapClicked">RenderToBitmap</button>
+    @* <button class="btn-primary" style="margin-top: 3pt" @onclick="CaptureNextFrame">Capture frame in Spector</button> *@
+
+    <br />
+
+    <SharpEngineSceneView @ref="sharpEngineSceneView" style="width: 70%; min-width: 400px; max-width: 1000px; height: 400px; margin-top: 10pt; border: solid black 1px"></SharpEngineSceneView>
+
+    <br />
+    <p>@_infoText</p>
+    <br/>
+    <canvas id="renderedBitmapCanvas" style="display: none"></canvas>
+</div>
+
+@code {
+    // BOUND FIELDS:
+    private string _infoText = "Initializing...";
+    private string _cameraRotationButtonText = "Start camera rotation";
+    private bool _useCameraLight = true;
+    private bool _showRenderTimes = true;
+
+    private SharpEngineSceneView sharpEngineSceneView = null!;
+
+    private TargetPositionCamera? _targetPositionCamera;
+    private PointerCameraController? _pointerCameraController;
+    private DirectionalLight? _directionalLight;
+
+    private StandardMaterialBase? _hashMaterial;
+    private ModelNode? _lastSelectedModelNode;
+    private Material? _lastSelectedModelNodeMaterial;
+
+    private Random? _rnd;
+
+    private List<GroupNode> _addedObjects = new List<GroupNode>();
+    private int _addedObjectsCount;
+
+    private BitmapTextCreator? _bitmapTextCreator;
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Utilities.Log.LogLevel = LogLevels.Trace;
+        if (firstRender)
+        {
+            InitializeScene();
+            CreateDemoScene();
+        }
+    }
+
+    // //If we would like to use CreateTextureAsync, then we need to override the OnAfterRenderAsync
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+
+    //     Utilities.Log.LogLevel = LogLevels.Trace;
+    //     Utilities.Log.IsLoggingToDebugOutput = true;
+
+    //     if (!firstRender)
+    //         return;
+
+    //     await AddBitmapText();
+    //     await AddVectorFont();
+
+    //     // var gpuDevice = sharpEngineSceneView.Scene.GpuDevice;
+
+    //     // if (gpuDevice == null)
+    //     //     sharpEngineSceneView.Scene.SceneInitialized += async (sender, args) => await ShowBitmapText();
+    //     // else
+    //     //     await ShowBitmapText();
+
+    //     // var gpuImage = await Ab4d.SharpEngine.Utilities.TextureLoader.CreateTextureAsync("ab4d-logo-256.png", gpuDevice);
+
+    //     // if (gpuImage == null)
+    //     //     return;
+
+    //     // var textureMaterial = new StandardMaterial(gpuImage)
+    //     // {
+    //     //     HasTransparency = true,
+    //     // };
+
+    //     // var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(0, 30, -150),
+    //     //     size: new Vector2(60, 60),
+    //     //     normal: new Vector3(0, 0, 1),
+    //     //     heightDirection: new Vector3(0, 1, 0),
+    //     //     name: "TexturePlane")
+    //     // {
+    //     //     IsHitTestVisible = false,
+    //     //     Material = textureMaterial,
+    //     //     BackMaterial = textureMaterial,
+    //     // };
+
+    //     // sharpEngineSceneView.Scene.RootNode.Add(planeModelNode);
+    // }
+
+
+    private void InitializeScene()
+    {
+        var scene         = sharpEngineSceneView.Scene;
+        var sceneView     = sharpEngineSceneView.SceneView;
+        var canvasInterop = sharpEngineSceneView.CanvasInterop;
+        
+
+        // Use CanvasInterop to subscribe to canvas pointer moved event
+        canvasInterop.PointerMoved += (sender, args) =>
+        {
+            var hitObject = sceneView.GetClosestHitObject(args.MouseX, args.MouseY);
+            if (hitObject != null && hitObject.HitSceneNode != null)
+            {
+                ShowInfoMessage($"Hit object: {hitObject.HitSceneNode.Name}");
+                SelectSceneNode(hitObject.HitSceneNode);
+            }
+            else
+            {
+                ShowInfoMessage("Hit object: none");
+                SelectSceneNode(null);
+            }
+        };
+
+
+        sceneView.BackgroundColor = Colors.LightSkyBlue;
+
+        _targetPositionCamera = new TargetPositionCamera()
+        {
+            Heading = 30,
+            Attitude = -25,
+            Distance = 500,
+            TargetPosition = new Vector3(0, 0, 0),
+            ShowCameraLight = ShowCameraLightType.Auto,
+        };
+
+        sceneView.Camera = _targetPositionCamera;
+
+        _pointerCameraController = new PointerCameraController(sceneView)
+        {
+            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
+            ZoomMode = CameraZoomMode.PointerPosition,
+            RotateAroundPointerPosition = true,
+            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
+            IsPinchMoveEnabled = true  // move camera with two fingers
+        };
+
+
+        sceneView.SceneRendered += (sender, args) => UpdateRenderTime();
+
+
+        scene.SetAmbientLight(0.2f);
+
+        canvasInterop.ContextLost += (sender, args) =>
+        {
+            // Usually here we would save the current state of the 3D scene so that can be recreated when the page is reloaded by the used
+            ShowInfoMessage("ERROR: WebGL context lost! Please reload the web page...");
+        };
+    }
+
+    private void CreateDemoScene()
+    {
+        var scene = sharpEngineSceneView.Scene;
+
+        float hashModelSize = 100;
+        float hashModelBarThickness = 16;
+        float hashModelBarOffset = 20;
+
+        var hashSymbolMesh = MeshFactory.CreateHashSymbolMesh(centerPosition: new Vector3(0, hashModelBarThickness * 0.5f, 0),
+        shapeYVector: new Vector3(0, 0, 1),
+        extrudeVector: new Vector3(0, hashModelBarThickness, 0),
+        size: hashModelSize,
+        barThickness: hashModelBarThickness,
+        barOffset: hashModelBarOffset,
+        name: "HashSymbolMesh");
+
+        _hashMaterial = new StandardMaterial(diffuseColor: Color3.FromByteRgb(255, 197, 0));
+        //_hashMaterial = new StandardMaterial(diffuseColor: Colors.Silver);
+
+        var hashSymbolNode = new MeshModelNode(hashSymbolMesh, _hashMaterial, "HashSymbolNode");
+        scene.RootNode.Add(hashSymbolNode);
+
+        var wireGridNode = new WireGridNode("Wire grid")
+        {
+            CenterPosition = new Vector3(0, -0.5f, -33),
+            Size = new Vector2(200, 200),
+
+            WidthDirection = new Vector3(1, 0, 0),  // this is also the default value
+            HeightDirection = new Vector3(0, 0, -1), // this is also the default value
+
+            WidthCellsCount = 30,
+            HeightCellsCount = 30,
+
+            MajorLineColor = Colors.Black,
+            MajorLineThickness = 1,
+
+            MinorLineColor = Colors.Gray,
+            MinorLineThickness = 1,
+
+            MajorLinesFrequency = 5,
+
+            IsClosed = true,
+        };
+        scene.RootNode.Add(wireGridNode);
+
+
+        // The first sphere is rendered by a SolidColorMaterial that renders the whole object with a single solid color (without any light shading)
+        var solidColorMaterial = new SolidColorMaterial(diffuseColor: Colors.Silver);
+
+        // Other spheres are rendered by a specular silver material (renders a white reflection)
+        var sphereMaterial = StandardMaterials.Silver.SetSpecular(64);
+
+        for (int i = 0; i < 6; i++)
+        {
+            Material usedMaterial = i == 0 ? solidColorMaterial : sphereMaterial;
+            var sphereModelNode1 = new SphereModelNode(new Vector3(-67 - 17 + i * 33, 16, -80), radius: 14, usedMaterial, name: $"Sphere_{i + 1}");
+            scene.RootNode.Add(sphereModelNode1);
+        }
+
+
+        // Load an obj model with its material
+
+        // When loading obj and mtl files, check that the webserver supports serving those two file types
+        // For asp.net you may need to add the following to the web.config file:
+        // <system.webServer>
+        //   <staticContent>
+        //     <mimeMap fileExtension=".obj" mimeType="text/plain" />
+        //     <mimeMap fileExtension=".mtl" mimeType="text/plain" />
+        //   </staticContent>
+        // </system.webServer> 
+
+        string objUrl = "Resources/Models/Teapot-with-material.obj";
+
+        var objImporter = new ObjImporter(sharpEngineSceneView.Scene);
+
+        // To uses await call the ImportAsync method (see also ObjFileViewer.razor)
+        // var importedNode = await objImporter.ImportAsync(objUrl);
+        // sharpEngineSceneView.Scene.RootNode.Add(importedNode);
+
+        objImporter.Import(objUrl, importCompleteCallback: importedNode =>
+        {
+            if (importedNode != null)
+            {
+                Utilities.ModelUtils.PositionAndScaleSceneNode(importedNode, new Vector3(100, 0, 0), PositionTypes.Bottom, new Vector3(80, 80, 80));
+                sharpEngineSceneView.Scene.RootNode.Add(importedNode);
+            }
+        },
+        importFailedCallback: error => Console.WriteLine($"Obj load error: {error}"));
+
+        // //canvasInterop.LoadTextFile("/models/house-with-trees.obj",
+        // canvasInterop.LoadTextFile(objUrl,
+        //     onLoadedCallback: objText =>
+        //     {
+        //         Console.WriteLine($"Obj file loaded - len: {objText.Length}");
+
+        //         var objImporter = new ObjImporter(sharpEngineSceneView.GpuDevice);
+        //         var teapotNode = objImporter.Import(objText, mtlFileContent: null, defaultMaterial: null);
+
+        //         Utilities.ModelUtils.PositionAndScaleSceneNode(teapotNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
+
+        //         sharpEngineSceneView.Scene.RootNode.Add(teapotNode);
+        //     },
+        //     onLoadErrorCallback: error => Console.WriteLine($"Obj load error: {error}") );
+
+
+
+        if (sharpEngineSceneView.IsInitialized)
+        {
+            AddTexturePlanes();
+            _ = AddBitmapText(); // call async method from sync context
+            _ = AddVectorFont(); // call async method from sync context
+        }
+        else
+        {
+            sharpEngineSceneView.SceneViewInitialized += async (sender, args) =>
+            {
+                AddTexturePlanes();
+                await AddBitmapText();
+                await AddVectorFont();
+            };
+        }
+
+        ShowInfoMessage("Initial 3D scene shown");
+    }
+
+    private void AddTexturePlanes()
+    {
+        // The easiest way to show texture is to create a new StandardMaterial
+        // and specify the textureFileName and initialDiffuseColor (shown until the texture is loaded).
+        // This also does not require that the GpuDevice is initialized.
+
+        var textureMaterial = new StandardMaterial(textureFileName: "ab4d-logo-256.png", 
+                                                   initialDiffuseColor: Colors.Gray,
+                                                   alphaClipThreshold: 0.5f); // alphaClipThreshold is optional and defines which pixels are discarded
+
+        var planeModelNode1 = new PlaneModelNode(centerPosition: new Vector3(-80, 30, -150), 
+            size: new Vector2(60, 60), 
+            normal: new Vector3(0, 0, 1), 
+            heightDirection: new Vector3(0, 1, 0), 
+            name: "Texture1Plane")
+        {
+            IsHitTestVisible = false,
+            Material = textureMaterial,
+            BackMaterial = textureMaterial,
+        };
+
+        sharpEngineSceneView.Scene.RootNode.Add(planeModelNode1);
+
+
+
+        // We can also use the TextureLoader to load the texture.
+        // TextureLoader requires that the GpuDevice is defined.
+
+        if (!sharpEngineSceneView.IsInitialized)
+            return;
+
+        var gpuDevice = sharpEngineSceneView.Scene.GpuDevice;
+        if (gpuDevice == null)
+            return;
+
+        // The CreateTexture can take textureCreatedCallback and textureCreationFailedCallback callback actions:
+        TextureLoader.CreateTexture(
+            "ab4d-logo-256.png", gpuDevice, 
+            textureCreatedCallback: gpuImage =>
+            {
+                // This time we use SolidColorMaterial instead of StandardMaterial
+                // Therefore, this texture will not be affected by lighting and will always show its full colors.
+                var textureMaterial2 = new SolidColorMaterial(gpuImage)
+                {
+                    AlphaClipThreshold = 0.5f, // Set AlphaClipThreshold to a value between 0 and 1 to discard pixels with alpha below 0.5 (by default AlphaClipThreshold is zero that disabled alpha clipping)
+                };
+
+                var planeModelNode2 = new PlaneModelNode(centerPosition: new Vector3(0, 30, -150), 
+                                                         size: new Vector2(60, 60), 
+                                                         normal: new Vector3(0, 0, 1), 
+                                                         heightDirection: new Vector3(0, 1, 0), 
+                                                         name: "Texture2Plane")
+                {
+                    IsHitTestVisible = false,
+                    Material = textureMaterial2,
+                    BackMaterial = textureMaterial2,
+                };
+
+                sharpEngineSceneView.Scene.RootNode.Add(planeModelNode2);
+            },
+            textureCreationFailedCallback: exception =>
+            {
+                ShowInfoMessage("ERROR: " + exception.Message);
+            });
+
+
+        // Instead of calling CreateTexture that takes a callback, we can also use an awaitable CreateTextureAsync.
+        // To use await, then override the OnAfterRenderAsync method instead of OnAfterRender.
+
+        // var gpuImage = await TextureLoader.CreateTextureAsync("ab4d-logo-256.png", gpuDevice);
+
+        // if (gpuImage == null)
+        //     return;
+
+        // var textureMaterial2 = new StandardMaterial(gpuImage)
+        // {
+        //     AlphaClipThreshold = 0.5f, // Set AlphaClipThreshold to a value between 0 and 1 to discard pixels with alpha below 0.5 (by default AlphaClipThreshold is zero that disabled alpha clipping)
+        // };
+
+        // var planeModelNode2 = new PlaneModelNode(centerPosition: new Vector3(0, 30, -150), 
+        //     size: new Vector2(60, 60), 
+        //     normal: new Vector3(0, 0, 1), 
+        //     heightDirection: new Vector3(0, 1, 0), 
+        //     name: "Texture2Plane")
+        // {
+        //     IsHitTestVisible = false,
+        //     Material = textureMaterial2,
+        //     BackMaterial = textureMaterial2,
+        // };
+
+        // sharpEngineSceneView.Scene.RootNode.Add(planeModelNode2);
+
+
+        //
+        // TESTING TextureFactory:
+        //
+
+        // We can also create a simple single color 1x1 texture:
+        //var gradientTexture = Ab4d.SharpEngine.Utilities.TextureFactory.Create1x1Texture(gpuDevice, Colors.Yellow);
+
+        // or a simple gradient with two colors:
+        //var gradientTexture = Ab4d.SharpEngine.Utilities.TextureFactory.CreateGradientTexture(gpuDevice, Colors.Yellow, Colors.Blue, isHorizontal: false);
+
+        var gradientStops = new GradientStop[]
+        {
+            new GradientStop(Colors.Yellow, 0),
+            new GradientStop(Colors.Blue, 0.3f),
+            new GradientStop(Colors.Red, 0.8f),
+            new GradientStop(Colors.Red, 1),
+        };
+        var gradientTexture = Ab4d.SharpEngine.Utilities.TextureFactory.CreateGradientTexture(gpuDevice, gradientStops, isHorizontal: true);
+
+        var gradientMaterial = new StandardMaterial(gradientTexture);
+
+        var planeModelNode = new PlaneModelNode(centerPosition: new Vector3(80, 30, -150), 
+            size: new Vector2(60, 60), 
+            normal: new Vector3(0, 0, 1), 
+            heightDirection: new Vector3(0, 1, 0), 
+            name: "GradientPlane")
+        {
+            IsHitTestVisible = false,
+            Material = gradientMaterial,
+            BackMaterial = gradientMaterial,
+        };
+
+        sharpEngineSceneView.Scene.RootNode.Add(planeModelNode);
+    }
+
+    private async Task AddBitmapText()
+    {
+        var gpuDevice = sharpEngineSceneView.Scene.GpuDevice;
+
+        if (gpuDevice == null) // bitmap text can be created only after the GpuDevice was initialized
+            return;
+
+        // See Text/BitmapTextSample.cs file in the Ab4d.SharpEngine.Samples.Common project
+        // (project is part of Ab4d.SharpEngine samples - https://github.com/ab4d/Ab4d.SharpEngine.Samples)
+        // to see how to create a custom bitmap font.
+        // There are also Arial, Arial Black, Roboto Black and Arial Black with outline bitmap fonts in the Resources\BitmapFonts folder.
+
+        // When loading bitmap fonts, check that the webserver supports serving fnt files.
+        // For asp.net you may need to add the following to the web.config file:
+        // <system.webServer>
+        //   <staticContent>
+        //     <mimeMap fileExtension=".fnt" mimeType="text/plain" />
+        //   </staticContent>
+        // </system.webServer> 
+
+        try
+        {
+            var bitmapFont = await BitmapFont.CreateAsync("fonts/roboto_64.fnt", gpuDevice);
+            _bitmapTextCreator = await BitmapTextCreator.CreateAsync(sharpEngineSceneView.Scene, bitmapFont);
+
+            var bitmapTextNode = _bitmapTextCreator.CreateTextNode("Bitmap font", 
+                                                                   position: new Vector3(0, 0, 85), 
+                                                                   positionType: PositionTypes.Center, 
+                                                                   textDirection: new Vector3(1, 0, 0), 
+                                                                   upDirection: new Vector3(0, 0, -1), 
+                                                                   fontSize: 20, 
+                                                                   textColor: Colors.Black, 
+                                                                   isSolidColorMaterial: true);
+
+            sharpEngineSceneView.Scene.RootNode.Add(bitmapTextNode);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading BitmapFont: " + ex);
+        }
+    }
+
+    private async Task AddVectorFont()
+    {
+        // Load the font file
+        // This method can be called multiple times when the same fontName and fontFilePath is used.
+        // You can also check if font is loaded by calling:
+        // bool isLoaded = TrueTypeFontLoader.Instance.IsFontLoaded(fontName);
+
+        var fontFile = "fonts/Roboto-Regular.ttf";
+        var fontName = "RobotoRegular";
+
+        try
+        {
+            await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFile, fontName, sharpEngineSceneView.CanvasInterop);
+
+            // You can also use the async version of LoadFontFile method that read the font file in a background thread:
+            //await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading ttf font file: " + ex.Message);
+            return;
+        }
+
+        // After font is loaded, we can create an instance of VectorFontFactory by passing the fontName to constructor
+        var vectorFontFactory = new VectorFontFactory(fontName);
+
+        var textMesh = vectorFontFactory.CreateTextMesh("Vector FONT",
+                                                        new Vector3(0, 0, 110),
+                                                        TextPositionTypes.Center,
+                                                        textDirection: new Vector3(1, 0, 0),
+                                                        upDirection: new Vector3(0, 0, -1),
+                                                        fontSize: 20);
+
+        var meshModelNode = new MeshModelNode(textMesh!, StandardMaterials.Gold, "VectorTextNode") { BackMaterial = StandardMaterials.Black };
+        sharpEngineSceneView.Scene.RootNode.Add(meshModelNode);
+    }
+
+    private void UpdateRenderTime()
+    {
+        var statistics = sharpEngineSceneView.SceneView.Statistics;
+        if (_showRenderTimes && statistics != null)
+            Console.WriteLine($"Frame {sharpEngineSceneView.SceneView.FrameNumber} rendered in {statistics.TotalRenderTimeMs:F2} ms");
+    }
+
+    private void SelectSceneNode(SceneNode? sceneNode)
+    {
+        if (sceneNode == _lastSelectedModelNode)
+            return;
+
+        if (_lastSelectedModelNode != null)
+        {
+            _lastSelectedModelNode.Material = _lastSelectedModelNodeMaterial;
+            _lastSelectedModelNode = null;
+            _lastSelectedModelNodeMaterial = null;
+        }
+
+        if (sceneNode is ModelNode modelNode)
+        {
+            _lastSelectedModelNodeMaterial = modelNode.Material;
+            _lastSelectedModelNode = modelNode;
+
+            modelNode.Material = StandardMaterials.Red;
+        }
+    }
+
+
+    private void AddManyObjects()
+    {
+        int objectsCount = 1000;
+
+        var startTime = Stopwatch.GetTimestamp();
+
+        var scene = sharpEngineSceneView.Scene;
+
+        var groupNode = new GroupNode($"AddedObjectsGroup_{_addedObjectsCount}");
+        scene.RootNode.Add(groupNode);
+
+        var material = StandardMaterials.LightGreen;
+
+        for (int i = 0; i < objectsCount; i++)
+        {
+            var boxModelNode = new BoxModelNode(centerPosition: new Vector3(_addedObjectsCount * 30, -30, -50 + i * 15),
+                                                size: new Vector3(10, 10, 10),
+                                                material,
+                                                name: $"Box_{_addedObjectsCount + 1}_{i + 1}");
+
+            groupNode.Add(boxModelNode);
+        }
+
+        _addedObjectsCount++;
+
+        Console.WriteLine($"Adding {objectsCount} BoxModelNodes in {Stopwatch.GetElapsedTime(startTime).TotalMilliseconds:F2} ms");
+
+        _addedObjects.Add(groupNode);
+
+        ShowRenderedObjectsCount();
+    }
+
+    private void RemoveAddedObjects()
+    {
+        var scene = sharpEngineSceneView.Scene;
+
+        foreach (var groupNode in _addedObjects)
+        {
+            scene.RootNode.Remove(groupNode);
+
+            // Also dispose all meshes, materials and textures here.
+            groupNode.DisposeWithAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+
+            _addedObjectsCount--;
+        }
+
+        _addedObjects.Clear();
+
+        ShowRenderedObjectsCount();
+    }
+
+    private void OnRenderToBitmapClicked()
+    {
+        var rawImageData = sharpEngineSceneView.SceneView.RenderToRawImageData();
+        sharpEngineSceneView.CanvasInterop.ShowRawBitmap("renderedBitmapCanvas", rawImageData.Width, rawImageData.Height, rawImageData.Data, displayStyle: "block");
+    }
+
+    private void ChangeMaterial()
+    {
+        if (_hashMaterial == null)
+            return;
+
+        _rnd ??= new Random(1234); // use fixed seed so the same results are always the same for automatic tests have
+
+        _hashMaterial.DiffuseColor = Color3.FromHsl(_rnd.NextDouble() * 360);
+    }
+
+    private void OnStartStopCameraRotationButtonClicked()
+    {
+        if (_targetPositionCamera == null)
+            return;
+
+        if (_targetPositionCamera.IsRotating)
+        {
+            _targetPositionCamera.StopRotation();
+            _cameraRotationButtonText = "Start camera rotation";
+        }
+        else
+        {
+            _targetPositionCamera.StartRotation(headingChangeInSecond: 40);
+            _cameraRotationButtonText = "Stop camera rotation";
+        }
+    }
+
+    private void ShowRenderedObjectsCount()
+    {
+        int totalObjectsCount = 0;
+        sharpEngineSceneView.Scene.RootNode.ForEachChild((_ => totalObjectsCount++));
+
+        ShowInfoMessage($"Rendering {totalObjectsCount} objects");
+    }
+
+    private void ShowInfoMessage(string message)
+    {
+        _infoText = message;
+        StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
+    }
+
+    private void OnCameraRotateSettingsChanged(ChangeEventArgs e)
+    {
+        if (_pointerCameraController == null)
+            return;
+
+        bool isChecked = e.Value != null && (bool)e.Value;
+
+        _pointerCameraController.RotateCameraConditions = isChecked ? PointerAndKeyboardConditions.LeftPointerButtonPressed
+                                                                    : PointerAndKeyboardConditions.Disabled;
+    }
+
+    private void OnCameraMoveSettingsChanged(ChangeEventArgs e)
+    {
+        if (_pointerCameraController == null)
+            return;
+
+        bool isChecked = e.Value != null && (bool)e.Value;
+
+        _pointerCameraController.MoveCameraConditions = isChecked ? PointerAndKeyboardConditions.ControlKey | PointerAndKeyboardConditions.LeftPointerButtonPressed
+                                                                  : PointerAndKeyboardConditions.Disabled;
+
+        _pointerCameraController.IsPinchMoveEnabled = isChecked;
+    }
+
+    private void OnCameraZoomSettingsChanged(ChangeEventArgs e)
+    {
+        if (_pointerCameraController == null)
+            return;
+
+        bool isChecked = e.Value != null && (bool)e.Value;
+
+        _pointerCameraController.IsPointerWheelZoomEnabled = isChecked;
+        _pointerCameraController.IsPinchZoomEnabled = isChecked;
+    }
+
+    private void OnUseCameraLightCheckBoxChanged(ChangeEventArgs e)
+    {
+        if (_targetPositionCamera == null)
+            return;
+
+        var scene = sharpEngineSceneView.Scene;
+
+        _useCameraLight = e.Value != null && (bool)e.Value;
+        if (_useCameraLight)
+        {
+            if (_directionalLight != null)
+            {
+                scene.Lights.Remove(_directionalLight);
+                _directionalLight = null;
+            }
+            
+            _targetPositionCamera.ShowCameraLight = ShowCameraLightType.Always;
+        }
+        else
+        {
+            _targetPositionCamera.ShowCameraLight = ShowCameraLightType.Never;
+
+            _directionalLight ??= new DirectionalLight(new Vector3(-1, -0.5f, 0));
+            scene.Lights.Add(_directionalLight);
+        }
+    }
+
+    // private async Task CaptureNextFrame()
+    // {
+    //     bool success = await sharpEngineSceneView.CanvasInterop.StartSpectorCapture();
+
+    //     if (!success)
+    //     {
+    //         ShowInfoMessage("Cannot start Spector capture.");
+    //         return;
+    //     }
+
+    //     sharpEngineSceneView.SceneView.Render(forceRender: true);
+
+    //     sharpEngineSceneView.CanvasInterop.StopSpectorCapture();
+    // }
+
+    public void Dispose()
+    {
+        sharpEngineSceneView.Dispose();
+    }
+}

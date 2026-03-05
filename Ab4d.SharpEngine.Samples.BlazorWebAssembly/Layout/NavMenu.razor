@@ -1,0 +1,132 @@
+﻿@using Ab4d.SharpEngine.Samples.Common
+@inject HttpClient Http
+
+
+<div class="top-row navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Ab4d.SharpEngine by</a><br/>
+        <img src="ab4d-logo.png"/>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable">
+    <nav class="nav flex-column">
+        @foreach (var group in _groups)
+        {
+            <div class="nav-item">
+
+                <!-- Top-level collapsible item -->
+                <a class="nav-title nav-link nav-item @(IsSelected(group.Location) ? "nav-item-selected" : "")" href="@("commonSamples/" + group.Location)" 
+                   @onclick="() => SelectGroup(group.Location)">
+                    @group.Title
+                </a>
+                
+                @if (IsGroupOpened(group.Location))
+                {
+                    <div class="submenu ms-2">
+                        @foreach (var item in group.Items)
+                        {
+                            <a class="nav-link nav-item nav-submenu-link @(IsSelected(item.Location) ? "nav-item-selected" : "") @(item.IsSeparator ? "nav-submenu-separator" : "")"
+                               href="@("commonSamples/" + item.Location)" @onclick="() => SelectItem(item.Location)">
+                                @item.Title
+                                @if (item.IsNew)
+                                {
+                                    <img src="images/new_icon.png" class="badge-icon" style="height: 0.8em; margin-left: 0.5em;"/>
+                                }
+                                @if (item.IsUpdated)
+                                {
+                                    <img src="images/updated_icon.png" class="badge-icon" style="height: 0.8em; margin-left: 0.5em;" title="@item.UpdateInfo"/>
+                                }
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        }        
+
+    </nav>
+</div>
+
+@code {
+    private string? NavMenuCssClass => _isNavMenuOpened ? null : "collapse";
+    private List<SamplesXmlReader.SampleGroup> _groups = new ();
+
+    private bool _isNavMenuOpened;
+
+    private List<string>? _openedGroups;
+
+    private string? _selectedLocation;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string xmlContent = await Http.GetStringAsync("Samples.xml");
+
+        var items = SamplesXmlReader.ParseXml(xmlContent);
+
+        // Update location values to work with Blazor - see comments in UpdateSampleLocationForBlazor
+        UpdateSampleLocationForBlazor(items);
+
+        _groups = SamplesXmlReader.BuildGroups(items);
+        _openedGroups = new();
+    }
+
+    private bool IsSelected(string itemLocation) => _selectedLocation == itemLocation;
+
+    private bool IsGroupOpened(string groupLocation) => !_isNavMenuOpened ||  // When we have wide screen the NavMenu is not shown and show all the menu items on the left
+                                                        _openedGroups == null || _openedGroups.Contains(groupLocation);
+
+    private void ToggleNavMenu()
+    {
+        _isNavMenuOpened = !_isNavMenuOpened;
+    }
+
+    private void SelectItem(string itemLocation)
+    {
+        _selectedLocation = itemLocation;
+
+        if (_isNavMenuOpened)
+            ToggleNavMenu();
+    }
+
+    private void SelectGroup(string groupLocation)
+    {
+        if (_openedGroups == null)
+            return;
+
+        _selectedLocation = groupLocation;
+
+        if (_openedGroups.Contains(groupLocation))
+            _openedGroups.Remove(groupLocation);
+        else
+            _openedGroups.Add(groupLocation);
+    }
+
+    // IMPORTANT:
+    // Because web server that serves Blazor WebAssembly interprets each url that has dot as a static file
+    // (for example: https://localhost:7032/commonSamples/StandardModels.BoxModelNodeSample or https://localhost:7032/sampleTitle/Titles.CamerasTitle.md)
+    // we would get a 404 error when trying to paste that into url.
+    // Only urls without dot are passed to the Blazor.
+    // 
+    // To preserve the dot in the Location attribute in Samples.xml, 
+    // we need to update that for Blazor:
+    // - replace dot '/' => '-'
+    // - remove ".razor" ending
+    // - remove ".md" ending
+    private void UpdateSampleLocationForBlazor(List<SamplesXmlReader.SampleItem> samplesList)
+    {
+        foreach (var sampleItem in samplesList)
+        {
+            var oneLocation = sampleItem.Location;
+
+            if (oneLocation.EndsWith(".razor"))
+                oneLocation = oneLocation[..^6]; // stip off ".razor"
+            else if (oneLocation.EndsWith(".md"))
+                oneLocation = oneLocation[..^3]; // stip off ".md"
+                
+            sampleItem.Location = oneLocation.Replace('.', '-');
+        }
+    }
+}

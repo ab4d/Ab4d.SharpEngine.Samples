@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Ab4d.SharpEngine.Samples.Common.Web</AssemblyName>
+    <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>    
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DefineConstants>WEB_GL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+    <PackageReference Include="Ab4d.SharpEngine.Web" Version="0.9.9543-rc1" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Web\Ab4d.SharpEngine.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Cameras\CameraAxisPanelSample.cs" />
+    <Compile Remove="Cameras\TwoDimensionalCamera.cs" />
+    <Compile Remove="Cameras\TwoDimensionalCameraSample.cs" />
+
+    <Compile Remove="AdvancedModels\BooleanMeshSample.cs" />
+    <Compile Remove="AdvancedModels\MultiMaterialModelNodeSample.cs" />
+    <Compile Remove="AdvancedModels\PixelOptionsSample.cs" />
+    <Compile Remove="AdvancedModels\PixelsRenderingSample.cs" />
+    <Compile Remove="AdvancedModels\SkyboxSample.cs" />
+    <Compile Remove="AdvancedModels\SpritesSample.cs" />
+    <Compile Remove="AdvancedModels\VolumeRenderingSample.cs" />
+    
+    <Compile Remove="HitTesting\HitTestingWithIdBitmapSample.cs" />
+    <Compile Remove="HitTesting\ModelMoverSample.cs" />
+    <Compile Remove="HitTesting\ModelRotatorSample.cs" />
+    <Compile Remove="HitTesting\ModelScalarSample.cs" />
+    <Compile Remove="HitTesting\PointCloudHitTestingSample.cs" />
+    <Compile Remove="HitTesting\RectangularSelectionSample.cs" />
+    <Compile Remove="HitTesting\TriangleHitTestingSample.cs" />
+
+    <Compile Remove="Text\BackgroundVectorTextCreationSample.cs" />
+    <Compile Remove="Text\InstancedTextNodePerformanceSample.cs" />
+    <Compile Remove="Text\InstancedTextNodeSample.cs" />
+
+    <Compile Remove="Lines\DepthBiasSample.cs" />
+    <Compile Remove="Lines\LineCapsSample.cs" />
+    <Compile Remove="Lines\LinesPerformanceSample.cs" />
+    <Compile Remove="Lines\MiterLimitSample.cs" />
+    <Compile Remove="Lines\SpecialLineRenderingSample.cs" />
+
+    <Compile Remove="Advanced\*" />
+    <Compile Include="Advanced\MeshOutlineSample.cs" />
+    <Compile Include="Advanced\FrustumCullingSample.cs" />
+    <Compile Include="Advanced\FogMaterial.cs" />
+    <Compile Include="Advanced\CustomFogEffectSample.cs" />
+    <Compile Include="Advanced\*.webgl.cs" />
+
+    <Compile Remove="Utils\*" />
+    <Compile Include="Utils\CsvDataReader.cs" />
+
+    <None Remove="Samples.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Diagnostics\**" />
+    <Compile Remove="Graphs\**" />
+    <Compile Remove="Importers\**" />
+    <None Remove="Importers\**" />
+    <None Remove="Resources\**" />
+    <EmbeddedResource Remove="Resources\**" />
+    <Compile Remove="Resources\**" />
+    <None Remove="Titles\**" />
+  </ItemGroup>
+
+</Project>

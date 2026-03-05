@@ -1,0 +1,56 @@
+.ui-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Button styling */
+::deep button.btn {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+::deep button.btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+::deep button.btn:active {
+    background-color: #004085;
+    border-color: #004085;
+}
+
+/* Input styling */
+::deep input[type="text"],
+::deep input[type="checkbox"],
+::deep input[type="radio"],
+::deep textarea,
+::deep select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+::deep input[type="text"]:focus,
+::deep textarea:focus,
+::deep select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+::deep input[type="checkbox"],
+::deep input[type="radio"] {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+::deep label {
+    cursor: pointer;
+    user-select: none;
+}

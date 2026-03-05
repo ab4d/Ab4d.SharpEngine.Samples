@@ -1,0 +1,124 @@
+﻿@page "/introduction"
+@using Ab4d.SharpEngine.Cameras
+@using Ab4d.SharpEngine.Samples.Common.Animations
+@implements IDisposable
+
+<PageTitle>Ab4d.SharpEngine.Web - Quick start</PageTitle>
+
+<div style="display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
+    <SharpEngineSceneView @ref="sharpEngineSceneView" style="width: 100%; flex-grow: 1; height: auto; min-height: 0;"></SharpEngineSceneView>
+    
+    <div style="text-align: center; font-size: 1.3rem; height: 5rem; flex-grow: 1;">
+        <p>@((MarkupString)_infoText)</p>
+    </div>
+    
+    @if (_showPlayButton)
+    {
+        <button class="btn-primary" style="position: absolute; margin-right: 10px; margin-bottom: 10px; right: 0; bottom: 0" @onclick="OnPlayAgainButtonClicked">@_playButtonContent</button>
+    }
+</div>
+
+@code {
+    // BOUND FIELDS:
+    private bool _showPlayButton;
+    private string _infoText = "";
+    private string _playButtonContent = "Play again";
+
+    private static readonly bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
+
+    private SharpEngineSceneView sharpEngineSceneView = null!;
+
+    private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // Utilities.Log.LogLevel = LogLevels.Trace;
+        if (firstRender)
+            InitializeScene();
+    }
+
+    private void InitializeScene()
+    {
+        var scene         = sharpEngineSceneView.Scene;
+        var sceneView     = sharpEngineSceneView.SceneView;
+        var canvasInterop = sharpEngineSceneView.CanvasInterop;
+
+        _sharpEngineLogoAnimation = new SharpEngineLogoAnimation(scene, bitmapIO: null);
+
+        scene.RootNode.Add(_sharpEngineLogoAnimation.LogoPlaneModel);
+        scene.RootNode.Add(_sharpEngineLogoAnimation.HashModel);
+
+
+        var targetPositionCamera = new TargetPositionCamera();
+        _sharpEngineLogoAnimation.ResetCamera(targetPositionCamera);
+        _sharpEngineLogoAnimation.SetupLights(scene);
+
+        sceneView.Camera = targetPositionCamera;
+
+        sceneView.SceneUpdating += MainSceneViewOnSceneUpdating;
+
+        _sharpEngineLogoAnimation.AnimationCompleted += delegate (object? sender2, EventArgs args2)
+        {
+            _showPlayButton = true;
+            ShowInfoTextBlock();
+        };
+
+
+        if (PlayAnimationOnStartup)
+        {
+            // Start with going to first frame
+            _sharpEngineLogoAnimation.GotoFirstFrame();
+
+            _sharpEngineLogoAnimation.SetAnimationDelay(0.3f);
+            _sharpEngineLogoAnimation.StartAnimation();
+        }
+        else
+        {
+            _sharpEngineLogoAnimation.GotoLastFrame();
+
+            _playButtonContent = "Play animation"; // replace "Play again" because animation was not yet played
+            _showPlayButton = true;
+            StateHasChanged(); // Forces UI refresh
+        }
+
+        canvasInterop.ContextLost += (sender, args) =>
+        {
+            // Usually here we would save the current state of the 3D scene so that can be recreated when the page is reloaded by the used
+            _infoText = "ERROR: WebGL context lost! Please reload the web page...";
+            StateHasChanged(); // Forces UI refresh
+        };
+    }
+
+    private void ShowInfoTextBlock()
+    {
+        // Avalonia does not have Visibility with Hidden, so we need to first show two empty lines of text and then set the actual text
+        _infoText = "Ab4d.SharpEngine is an easy to use general purpose<br/>3D rendering engine for desktop, mobile and browser apps.";
+        StateHasChanged(); // Forces UI refresh
+    }
+
+    private void HideInfoTextBlock()
+    {
+        // Avalonia does not have Visibility with Hidden, so to hide the text we only set it to two empty lines
+        _infoText = "";
+        StateHasChanged(); // Forces UI refresh
+    }
+
+    private void MainSceneViewOnSceneUpdating(object? sender, EventArgs e)
+    {
+        _sharpEngineLogoAnimation?.UpdateAnimation();
+    }
+
+    private void OnPlayAgainButtonClicked()
+    {
+        HideInfoTextBlock();
+        _showPlayButton = false;
+
+        _sharpEngineLogoAnimation?.StartAnimation();
+    }
+
+    public void Dispose()
+    {
+        sharpEngineSceneView.Dispose();
+    }
+}

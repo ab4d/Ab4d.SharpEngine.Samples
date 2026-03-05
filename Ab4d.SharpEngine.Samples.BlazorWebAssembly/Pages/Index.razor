@@ -1,0 +1,11 @@
+@page "/"
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        // Navigate to the Common samples page on app start
+        //Navigation.NavigateTo("sampleTitle/Titles-CamerasTitle", replace: true); // Start without creating any SharpEngine object
+        Navigation.NavigateTo("introduction", replace: true);
+    }
+}

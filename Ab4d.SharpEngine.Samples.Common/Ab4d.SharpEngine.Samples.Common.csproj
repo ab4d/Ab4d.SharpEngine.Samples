@@ -58,5 +58,10 @@
     <Content Include="Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Resources\ScannedImages\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Advanced\*.webgl.cs" />
+    <Compile Remove="HitTesting\BlazorManualInputEventsSample.cs" />
+  </ItemGroup>  
 
 </Project>

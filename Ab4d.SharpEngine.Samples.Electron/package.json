@@ -1,0 +1,31 @@
+{
+  "name": "ab4d.sharpengine.samples.electron",
+  "version": "1.0.0",
+  "description": "Electron sample for Ab4d.SharpEngine - 3D rendering engine",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ab4d/Ab4d.SharpEngine.Samples.git"
+  },
+  "keywords": [
+    "electron",
+    "3d",
+    "wasm",
+    "WebAssembly",
+    "Blazor"
+  ],
+  "author": "AB4D",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ab4d/Ab4d.SharpEngine.Samples/issues"
+  },
+  "homepage": "https://github.com/ab4d/Ab4d.SharpEngine.Samples#readme",
+  "devDependencies": {
+    "electron": "^40.6.1",
+    "electron-devtools-installer": "^4.0.0"
+  }
+}

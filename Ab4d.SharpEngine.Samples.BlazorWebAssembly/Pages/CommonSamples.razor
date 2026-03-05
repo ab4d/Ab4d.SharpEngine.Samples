@@ -1,0 +1,230 @@
+﻿@page "/commonSamples"
+@page "/commonSamples/{SampleId}"
+@using Ab4d.SharpEngine.Browser
+@using Ab4d.SharpEngine.Common
+@using Ab4d.SharpEngine.Samples.Common
+@using Ab4d.SharpEngine.Samples.Blazor.UIProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Ab4d.SharpEngine.Web - Common samples</PageTitle>
+
+<div class="ui-container">
+    <SharpEngineSceneView @ref="sharpEngineSceneView" style="display: block; width: 100%; height: 100%; overflow: hidden;"></SharpEngineSceneView>
+    
+    <div style="position: absolute; margin: 1.5rem; left: 0; top: 0; pointer-events: none;">
+        <h1>@sample_title</h1>
+        <span style="white-space: pre-wrap;">@sample_subtitle</span>
+    </div>
+
+    @if (_uiProvider != null)
+    {
+        foreach (var rootElement in _uiProvider.GetRootUIElements())
+        {
+            @rootElement.BlazorElement
+        }
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string? SampleId { get; set; }
+
+    //private const string? StartupSample = "Lights.LightsSample"; // StartupSample is not used anymore. Set NavigateTo in the Pages/Index.razor instead.
+
+    private static readonly bool ShowCaptureInSpector = false;
+
+    private SharpEngineSceneView sharpEngineSceneView = null!;
+    private string sample_title = "";
+    private string sample_subtitle = "";
+
+    public SharpEngineSceneView? MainSceneView => sharpEngineSceneView;
+
+    private CommonSample? _currentCommonSample;
+    private CommonSample? _lastInitializedSample;
+    private PointerCameraController? _pointerCameraController;
+    private BlazorUIProvider? _uiProvider;
+    private InputEventsManager? _inputEventsManager;
+
+    public CommonSample? CurrentCommonSample
+    {
+        get => _currentCommonSample;
+        set
+        {
+            _currentCommonSample = value;
+            InitializeCommonSample();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        // Create the UI provider with a callback to trigger re-rendering
+        _uiProvider = new BlazorUIProvider(() => StateHasChanged());
+    }
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        //Utilities.Log.LogLevel = LogLevels.Trace;
+
+        if (firstRender)
+        {
+            BlazorSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+
+            sharpEngineSceneView.SceneView.BackgroundColor = Colors.LightSkyBlue;
+
+            if (sharpEngineSceneView.IsInitialized)
+                LoadCurrentSample();
+            else
+                sharpEngineSceneView.SceneViewInitialized += (sender, args) => LoadCurrentSample(); // Wait until the sharpEngineSceneView is created
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        // This is called BOTH:
+        // - when navigating to the page
+        // - AND when the parameter changes while staying on the same page
+        //Console.WriteLine($"Sample changed to: {SampleId}");
+
+        LoadSample(SampleId);
+    }
+
+    private void LoadSample(string? sampleId)
+    {
+        if (sampleId == null)
+            return;
+
+        if (CurrentCommonSample != null)
+        {
+            CurrentCommonSample.Dispose();
+            CurrentCommonSample = null;
+        }
+
+        // NOTE:
+        // The UpdateSampleLocationForBlazor method in NavMenu.razor updates the location from Samples.xml
+        // to work with Blazor - it replaces '/' => '-' and removes ".razor" ending.
+        // If we want to accept SampleId with '/' we need to use set page in the second line of this file to "/commonSamples/{*SampleId}"
+        // The * prefix makes it a catch-all route parameter that will capture everything after /
+
+        if (sampleId.StartsWith("Titles", StringComparison.Ordinal))
+        {
+            Navigation.NavigateTo("sampleTitle/" + sampleId);
+            return;
+        }
+
+        if (!sampleId.Contains('-')) // When no slash is in the sampleId, then we have a direct razor page
+        {
+            Navigation.NavigateTo("./" + sampleId);
+            return;
+        }
+
+        var typeName = sampleId.Replace('-', '.'); 
+
+        var createdSample = (CommonSample?)CommonSample.CreateSampleObject(uiFramework: "Blazor", typeName, BlazorSamplesContext.Current, errorMessage => Console.WriteLine(errorMessage));
+        CurrentCommonSample = createdSample;
+    }
+
+    private void LoadCurrentSample()
+    {
+        if (_uiProvider != null && sharpEngineSceneView.Scene.GpuDevice != null)
+            _uiProvider.CanvasInterop = sharpEngineSceneView.Scene.GpuDevice.CanvasInterop;
+
+        if (_currentCommonSample != null)
+        {
+            // Sample was already created - we just need to show it after the sharpEngineSceneView is created
+            InitializeCommonSample(); 
+        }
+    }
+
+    private void ResetSample()
+    {
+        sample_title = "";
+        sample_subtitle = "";
+
+        if (MainSceneView != null)
+        {
+            // Remove all lights (new sample will set setup their own lights)
+            MainSceneView.Scene.Lights.Clear();
+
+            // // Remove any registered event sources or drag surfaces
+            // _inputEventsManager.ResetEventSources();
+            // _inputEventsManager.RemoveAllDragSurfaces();
+
+            // Call DisposeAllChildren on RootNode.
+            // Here we will also dispose all meshes and materials with textures (textures that are cached by the Scene or GpuDevice are not disposed).
+            // We also set runSceneCleanup to true so the Scene.Cleanup method is also called to release free empty memory blocks.
+            // Note that we must not dispose the RootNode without disposing the Scene.
+            MainSceneView.Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true, runSceneCleanup: true);
+        }
+
+        _lastInitializedSample = null;
+    }
+
+    private void InitializeCommonSample()
+    {
+        if (_lastInitializedSample == _currentCommonSample)
+            return; // already initialized
+
+        ResetSample();
+
+        if (_currentCommonSample == null || MainSceneView == null)
+            return;
+
+        _inputEventsManager ??= new InputEventsManager(MainSceneView);
+        
+        _currentCommonSample.InitializeSharpEngineView(MainSceneView);
+        _currentCommonSample.InitializeInputEventsManager(_inputEventsManager);
+
+        if (_uiProvider != null)
+        {
+            _currentCommonSample.CreateUI(_uiProvider);
+
+            if (ShowCaptureInSpector)
+            {
+                if (_uiProvider.CurrentPanel == null)
+                    _uiProvider.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+                _uiProvider.AddSeparator();
+                _uiProvider.CreateButton("Capture frame in Spector", () => _ = CaptureNextFrame());
+            }
+        }
+
+        // Set Title and Subtitle after initializing UI, because they can be changed there
+        sample_title = _currentCommonSample.Title;
+        sample_subtitle = _currentCommonSample.Subtitle ?? "";
+
+        //MainSceneView.Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded);
+
+        if (_currentCommonSample != null)
+        {
+            if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
+            {
+                // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
+                // we need to set a custom eventsSourceElement when creating the PointerCameraController
+                _pointerCameraController ??= new PointerCameraController(MainSceneView.SceneView);
+            }
+
+            _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
+        }
+
+        _lastInitializedSample = _currentCommonSample;
+    }
+
+    private async Task CaptureNextFrame()
+    {
+        bool success = await sharpEngineSceneView.CanvasInterop.StartSpectorCapture();
+
+        if (!success)
+        {
+            Console.WriteLine("Cannot start Spector capture.");
+            return;
+        }
+
+        sharpEngineSceneView.SceneView.Render(forceRender: true);
+
+        sharpEngineSceneView.CanvasInterop.StopSpectorCapture();
+    }
+}

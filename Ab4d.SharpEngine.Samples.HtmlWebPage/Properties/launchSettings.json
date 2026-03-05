@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Ab4d.SharpEngine.Samples.HtmlWebPage": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:58348;http://localhost:58349"
+    }
+  }
+}
