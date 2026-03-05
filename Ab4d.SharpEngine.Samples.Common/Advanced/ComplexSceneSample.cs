@@ -238,7 +238,7 @@ public class ComplexSceneSample : CommonSample
             };
 
             // Use async method to load texture in background thread and when loaded set that to Material:
-            TextureLoader.CreateTextureAsync(
+            TextureLoader.CreateTexture(
                 @"Resources\Textures\10x10-texture.png", gpuDevice, 
                 textureCreatedCallback: createdGpuImage =>
                 {
@@ -284,7 +284,7 @@ public class ComplexSceneSample : CommonSample
 
         if (gpuDevice != null)
         {
-            TextureLoader.CreateTextureAsync(
+            TextureLoader.CreateTexture(
                 @"Resources\Textures\uvchecker2.png", gpuDevice,
                 textureCreatedCallback: createdGpuImage =>
                 {

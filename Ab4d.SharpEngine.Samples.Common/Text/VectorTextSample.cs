@@ -362,7 +362,7 @@ public class VectorTextSample : CommonSample
 
         // Try to register for file drag-and-drop
 #if VULKAN
-        bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => LoadFont(fileName, recreateText: true));
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".ttf", (fileName) => _ = LoadFont(fileName, recreateText: true));
 #else
         bool isDragAndDropSupported = false;
 #endif

@@ -83,7 +83,7 @@ public abstract class CommonSample
     protected GpuDevice? GpuDevice => context.GpuDevice;
 
 #if VULKAN
-    protected IBitmapIO BitmapIO => context.BitmapIO;
+    protected IBitmapIO BitmapIO => context.BitmapIO ?? new PngBitmapIO();
 #endif
 
     private Camera? _createdCamera;
