@@ -87,7 +87,8 @@ public class GlobalAnimationPropertiesSample : CommonSample
 
         UpdateSceneObjectsIfNeeded();
 
-        _animation?.Start();
+        if (!IsTestEnvironment)
+            _animation?.Start();
     }
 
     protected override Camera OnCreateCamera()

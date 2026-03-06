@@ -110,7 +110,9 @@ public abstract class CommonSample
     public virtual string? Subtitle { get; }
 
     public bool IsDisposed { get; private set; }
-    
+
+    public bool IsTestEnvironment { get; set; } // This can be set to true from automated tests to prevent starting animations and camera rotations in the samples.
+
     public PointerAndKeyboardConditions RotateCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed;
     public PointerAndKeyboardConditions MoveCameraConditions { get; set; } = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
     public PointerAndKeyboardConditions QuickZoomConditions { get; set; } = PointerAndKeyboardConditions.Disabled;
@@ -393,6 +395,9 @@ public abstract class CommonSample
         // If SubscribeSceneUpdating was called before the SceneView was initialized, then we need to subscribe to SceneUpdating event
         if (_subscribedSceneUpdatingAction != null && _subscribedSceneView == null)
             SubscribeSceneUpdatingEvent();
+
+        if (IsTestEnvironment)
+            sceneView.IsAnimationEnabled = false; // Disable all animations
 
         OnSceneViewInitialized(sceneView);
     }
@@ -957,7 +962,7 @@ public abstract class CommonSample
     public async Task ShowCommonSceneAsync(Scene scene, CommonScenes sceneType, bool cacheSceneNode = true)
     {
         var commonScene = await GetCommonSceneAsync(scene, sceneType,
-                                                    position: new Vector3(0, 10, 0),
+                                                    position: new Vector3(0, 0, 0),
                                                     positionType: PositionTypes.Bottom | PositionTypes.Center,
                                                     finalSize: new Vector3(400, 400, 400), cacheSceneNode: cacheSceneNode);
 

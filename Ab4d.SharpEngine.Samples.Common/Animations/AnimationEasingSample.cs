@@ -72,11 +72,13 @@ public class AnimationEasingSample : CommonSample
         AddAnimationProgressTicks(scene, animation3, sphere3);
         AddAnimationProgressTicks(scene, animation4, sphere4);
 
-        animation1.Start();
-        animation2.Start();
-        animation3.Start();
-        animation4.Start();
-
+        if (!IsTestEnvironment)
+        {
+            animation1.Start();
+            animation2.Start();
+            animation3.Start();
+            animation4.Start();
+        }
 
         if (targetPositionCamera != null)
         {

@@ -46,6 +46,8 @@
     private BlazorUIProvider? _uiProvider;
     private InputEventsManager? _inputEventsManager;
 
+    private bool _isTestEnvironment;
+
     public CommonSample? CurrentCommonSample
     {
         get => _currentCommonSample;
@@ -59,6 +61,8 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        _isTestEnvironment = Navigation.Uri.Contains("e2e=playwright", StringComparison.Ordinal);
 
         // Create the UI provider with a callback to trigger re-rendering
         _uiProvider = new BlazorUIProvider(() => StateHasChanged());
@@ -124,6 +128,15 @@
         var typeName = sampleId.Replace('-', '.'); 
 
         var createdSample = (CommonSample?)CommonSample.CreateSampleObject(uiFramework: "Blazor", typeName, BlazorSamplesContext.Current, errorMessage => Console.WriteLine(errorMessage));
+
+        if (_isTestEnvironment && createdSample != null)
+        {
+            // Disable all 
+            createdSample.IsTestEnvironment = true;
+            createdSample.UseCommonRandomSeed = true;
+            createdSample.PreventSceneUpdating();
+        }
+        
         CurrentCommonSample = createdSample;
     }
 
