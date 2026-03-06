@@ -90,6 +90,15 @@ public class HeatmapRenderingSample : CommonSample
         }
 
 
+        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
+        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
+        //
+        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
+        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
+        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
+        base.SubscribeSceneUpdating(UpdateHeatPosition);
+
+
 #if WEB_GL
         var teapotScene = CommonScenes.Teapot;
 #else
@@ -106,13 +115,8 @@ public class HeatmapRenderingSample : CommonSample
 
         scene.RootNode.Add(teapotGroupNode);
 
-        // Usually the custom animation is done in the SceneUpdating event handler, that is subscribed by the following code:
-        //sceneView.SceneUpdating += OnSceneViewOnSceneUpdating;
-        //
-        // But in this samples project we use call to CommonSample.SubscribeSceneUpdating method to subscribe to the SceneUpdating event.
-        // This allows automatic unsubscribing when the sample is unloaded and automatic UI testing
-        // (prevented starting animation and using CallSceneUpdating with providing custom elapsedSeconds value).
-        base.SubscribeSceneUpdating(UpdateHeatPosition);
+        if (SceneView != null)
+            UpdateHeatPosition(elapsedSeconds: 0);
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
@@ -190,7 +194,7 @@ public class HeatmapRenderingSample : CommonSample
     
     private void UpdateHeatPosition(float elapsedSeconds)
     {
-        if (SceneView == null)
+        if (SceneView == null || _teapotMeshModelNode == null)
             return;
 
         // Position around center of the OverlayCanvas and with radius = 100 and in clockwise direction (negate the elapsedSeconds)
