@@ -5,7 +5,7 @@ VisualStudioVersion = 18.3.11505.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.BlazorWebAssembly", "Ab4d.SharpEngine.Samples.BlazorWebAssembly\Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj", "{00C1B388-D819-4E10-A9F0-CFBEA9E6B93D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.Common.Web", "Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.Web.csproj", "{589BB256-4508-E526-AAA7-C91CC7D9A95E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.Common.WebGL", "Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.WebGL.csproj", "{589BB256-4508-E526-AAA7-C91CC7D9A95E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

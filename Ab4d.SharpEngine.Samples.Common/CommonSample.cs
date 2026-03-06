@@ -241,7 +241,7 @@ public abstract class CommonSample
 
         if (uiFramework == "Blazor")
         {
-            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common.Web", throwOnError: false);
+            sampleType = Type.GetType($"Ab4d.SharpEngine.Samples.Common.{sampleLocation}, Ab4d.SharpEngine.Samples.Common.WebGL", throwOnError: false);
         }
         else
         {

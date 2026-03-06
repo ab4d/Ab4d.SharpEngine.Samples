@@ -42,18 +42,13 @@
     <WasmNativeStrip>true</WasmNativeStrip>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine.Web" Version="0.9.9543-rc1" />
-    <PackageReference Include="Ab4d.SharpEngine.glTF.Web" Version="0.9.9543-rc1" />
-  </ItemGroup>
-  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
-    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Web\Ab4d.SharpEngine.Web.csproj" />
-    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF.Web\Ab4d.SharpEngine.glTF.Web.csproj" />
-  </ItemGroup>
-
   <ItemGroup>
     <!--The following NativeFileReference is required for Ab4d.SharpEngine.Web to use WebGL from the browser -->
     <NativeFileReference Include="Native/libEGL.c" ScanForPInvokes="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot/service-worker.js" PublishedContent="wwwroot/service-worker.published.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,12 +56,17 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.3" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.Web.csproj" />
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+    <PackageReference Include="Ab4d.SharpEngine.WebGL" Version="0.9.9543-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine.glTF.WebGL" Version="0.9.9543-rc1" />
+  </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.WebGL\Ab4d.SharpEngine.WebGL.csproj" />
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF.WebGL\Ab4d.SharpEngine.glTF.WebGL.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+    <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.WebGL.csproj" />
   </ItemGroup>
 
 </Project>

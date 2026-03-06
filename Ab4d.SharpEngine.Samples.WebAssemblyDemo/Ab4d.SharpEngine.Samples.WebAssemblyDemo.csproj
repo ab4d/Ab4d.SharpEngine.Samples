@@ -38,13 +38,12 @@
     <!--The following NativeFileReference is required for Ab4d.SharpEngine.Web to use WebGL from the browser -->
     <NativeFileReference Include="Native/libEGL.c" ScanForPInvokes="true" />
   </ItemGroup>
-
-  <!--<ItemGroup>
-    <PackageReference Include="Ab4d.SharpEngine.Web" Version="0.9.9543-rc1" />
-  </ItemGroup>-->
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\My\Ab4d\SharpEngine\Ab4d.SharpEngine.Web\Ab4d.SharpEngine.Web.csproj" />
+  
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
+    <PackageReference Include="Ab4d.SharpEngine.WebGL" Version="0.9.9543-rc1" />
   </ItemGroup>
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.WebGL\Ab4d.SharpEngine.WebGL.csproj" />
+  </ItemGroup>  
 
 </Project>
