@@ -123,7 +123,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 CloseDiagnosticsWindow();
             };
 
-#if DEBUG
+#if DEBUG && !AVALONIA_12
             this.AttachDevTools();
 #endif
         }

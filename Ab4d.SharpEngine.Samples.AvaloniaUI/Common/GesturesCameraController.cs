@@ -35,15 +35,21 @@ public class GesturesCameraController : PointerCameraController
             eventsSourceElement = sharpEngineSceneView;
         
         eventsSourceElement.GestureRecognizers.Add(new PinchGestureRecognizer());
-
-        sharpEngineSceneView.AddHandler(Gestures.PinchEvent, PinchEventHandler);
-        sharpEngineSceneView.AddHandler(Gestures.PinchEndedEvent, PinchEndedEventHandler);
-
-
         eventsSourceElement.GestureRecognizers.Add(new ScrollGestureRecognizer() { CanHorizontallyScroll = true, CanVerticallyScroll = true });
 
+#if AVALONIA_12        
+        // Avalonia v12 preview2 code:
+        sharpEngineSceneView.Pinch              += PinchEventHandler;
+        sharpEngineSceneView.PinchEnded         += PinchEndedEventHandler;
+        sharpEngineSceneView.ScrollGesture      += ScrollGestureHandler;
+        sharpEngineSceneView.ScrollGestureEnded += ScrollGestureEndedHandler;
+#else
+        // Avalonia v11 code:
+        sharpEngineSceneView.AddHandler(Gestures.PinchEvent, PinchEventHandler);
+        sharpEngineSceneView.AddHandler(Gestures.PinchEndedEvent, PinchEndedEventHandler);
         eventsSourceElement.AddHandler(Gestures.ScrollGestureEvent, ScrollGestureHandler);
         eventsSourceElement.AddHandler(Gestures.ScrollGestureEndedEvent, ScrollGestureEndedHandler);
+#endif        
     }
 
 

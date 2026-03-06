@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
@@ -8,15 +8,21 @@
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
+    <!--<DefineConstants>AVALONIA_12;VULKAN_BACKEND</DefineConstants>-->
     <DefineConstants>VULKAN_BACKEND</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(DefineConstants.Contains('AVALONIA_12'))">
+    <PackageReference Include="Avalonia" Version="12.0.0-preview2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.0-preview2" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.0-preview2" />
+  </ItemGroup>
+  <ItemGroup Condition="!$(DefineConstants.Contains('AVALONIA_12'))">
     <PackageReference Include="Avalonia" Version="11.3.5" />
     <PackageReference Include="Avalonia.Desktop" Version="11.3.5" />
     <PackageReference Include="Avalonia.Diagnostics" Version="11.3.5" />
-    <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
   </ItemGroup>
+
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
     <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
     <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.2.9501" />
@@ -26,8 +32,12 @@
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.AvaloniaUI\Ab4d.SharpEngine.AvaloniaUI.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Assimp\Ab4d.SharpEngine.Assimp.csproj" />
-  </ItemGroup>    
-
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Ab4d.SharpEngine.Samples.Common\Ab4d.SharpEngine.Samples.Common.csproj" />
   </ItemGroup>
