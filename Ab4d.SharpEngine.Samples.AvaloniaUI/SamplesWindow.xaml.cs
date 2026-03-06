@@ -241,7 +241,13 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                ToolTip.SetTip(updatedImage, sampleItem.UpdateInfo ?? "Updated sample");
+                string updateInfo;
+                if (!string.IsNullOrEmpty(sampleItem.UpdateInfo))
+                    updateInfo = sampleItem.UpdateInfo.Replace("\\n", "\n").Replace("&#x0a;", "\n");
+                else
+                    updateInfo = "Updated sample";
+
+                ToolTip.SetTip(updatedImage, updateInfo);
 
                 stackPanel.Children.Add(updatedImage);
             }
