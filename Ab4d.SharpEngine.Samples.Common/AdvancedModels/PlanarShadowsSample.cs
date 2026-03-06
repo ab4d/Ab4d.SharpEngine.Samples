@@ -54,7 +54,7 @@ public class PlanarShadowsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var gpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.TenByTenNumbers);
+        var planeMaterial = StandardMaterials.Gray;
 
         _planeModelNode = new PlaneModelNode()
         {
@@ -62,7 +62,7 @@ public class PlanarShadowsSample : CommonSample
             Position = new Vector3(0, -0.1f, 0),
             Size = new Vector2(400, 400),
             HeightDirection = new Vector3(0, 0, -1),
-            Material = new StandardMaterial(gpuImage),
+            Material = planeMaterial,
             BackMaterial = StandardMaterials.DimGray
         };
 
@@ -105,6 +105,11 @@ public class PlanarShadowsSample : CommonSample
             targetPositionCamera.Distance = 800;
             targetPositionCamera.ShowCameraLight = ShowCameraLightType.Never; // prevent adding camera's light
         }
+
+
+        var gpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.TenByTenNumbers);
+        planeMaterial.DiffuseColor = Color3.White;
+        planeMaterial.DiffuseTexture = gpuImage;
     }
 
     private void SetupPlanarShadowNode()
