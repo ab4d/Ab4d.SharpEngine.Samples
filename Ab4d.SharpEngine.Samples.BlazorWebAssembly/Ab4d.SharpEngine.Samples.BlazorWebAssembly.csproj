@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.WebGL\Ab4d.SharpEngine.WebGL.csproj" />
-    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF.WebGL\Ab4d.SharpEngine.glTF.WebGL.csproj" />
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF\Ab4d.SharpEngine.glTF.WebGL.csproj" />
   </ItemGroup>
 
   <ItemGroup>
