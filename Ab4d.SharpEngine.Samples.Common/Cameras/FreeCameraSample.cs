@@ -27,7 +27,7 @@ public class FreeCameraSample : CommonSample
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
         await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees,
-                                        position: new Vector3(0, 10, 0),
+                                        position: new Vector3(0, -10, 0),
                                         positionType: PositionTypes.Bottom | PositionTypes.Center,
                                         finalSize: new Vector3(400, 400, 400));
 
@@ -83,9 +83,9 @@ public class FreeCameraSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateKeyValueLabel("TargetPosition:", () => $"({_freeCamera.TargetPosition.X:F0}, {_freeCamera.TargetPosition.Y:F0}, {_freeCamera.TargetPosition.Z:F0})");
-        ui.CreateKeyValueLabel("CameraPosition:", () => $"({_freeCamera.CameraPosition.X:F0}, {_freeCamera.CameraPosition.Y:F0}, {_freeCamera.CameraPosition.Z:F0})");
-        ui.CreateKeyValueLabel("UpDirection:", () => $"({_freeCamera.UpDirection.X:F2}, {_freeCamera.UpDirection.Y:F2}, {_freeCamera.UpDirection.Z:F2})");
+        ui.CreateKeyValueLabel("TargetPosition:", () => $"{_freeCamera.TargetPosition.X:F0}, {_freeCamera.TargetPosition.Y:F0}, {_freeCamera.TargetPosition.Z:F0} (red cross)", keyTextWidth: 110).SetColor(Colors.Red);
+        ui.CreateKeyValueLabel("CameraPosition:", () => $"{_freeCamera.CameraPosition.X:F0}, {_freeCamera.CameraPosition.Y:F0}, {_freeCamera.CameraPosition.Z:F0}", keyTextWidth: 110);
+        ui.CreateKeyValueLabel("UpDirection:", () => $"{_freeCamera.UpDirection.X:F2}, {_freeCamera.UpDirection.Y:F2}, {_freeCamera.UpDirection.Z:F2}", keyTextWidth: 110);
 
         ui.AddSeparator();
         ui.CreateComboBox(new[] { "None", "Y axis", "Z axis" },
@@ -93,7 +93,7 @@ public class FreeCameraSample : CommonSample
             selectedItemIndex: 0,
             width: 120,
             keyText: "RotationUpAxis:",
-            keyTextWidth: 100);
+            keyTextWidth: 110);
 
         ui.AddSeparator();
         ui.CreateComboBox(new[] { "Perspective", "Orthographic" },
@@ -101,7 +101,7 @@ public class FreeCameraSample : CommonSample
                           selectedItemIndex: 0,
                           width: 120,
                           keyText: "ProjectionType:",
-                          keyTextWidth: 100);
+                          keyTextWidth: 110);
 
         ui.AddSeparator();
         _viewWidthSlider = ui.CreateSlider(10, 1000,
@@ -109,7 +109,7 @@ public class FreeCameraSample : CommonSample
                                            newValue => _freeCamera.ViewWidth = newValue,
                                            width: 120,
                                            keyText: "ViewWidth:",
-                                           keyTextWidth: 100,
+                                           keyTextWidth: 110,
                                            formatShownValueFunc: sliderValue => sliderValue.ToString("F0"))
                                         .SetIsVisible(false);
         

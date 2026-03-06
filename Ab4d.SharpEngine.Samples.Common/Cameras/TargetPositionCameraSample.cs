@@ -34,7 +34,7 @@ public class TargetPositionCameraSample : CommonSample
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
         await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees,
-                                        position: new Vector3(0, 10, 0),
+                                        position: new Vector3(0, -10, 0),
                                         positionType: PositionTypes.Bottom | PositionTypes.Center,
                                         finalSize: new Vector3(400, 400, 400));
 
@@ -166,7 +166,7 @@ public class TargetPositionCameraSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateKeyValueLabel("TargetPosition:", () => $"({_targetPositionCamera.TargetPosition.X:F0}, {_targetPositionCamera.TargetPosition.Y:F0}, {_targetPositionCamera.TargetPosition.Z:F0})");
+        ui.CreateKeyValueLabel("TargetPosition:", () => $"{_targetPositionCamera.TargetPosition.X:F0}, {_targetPositionCamera.TargetPosition.Y:F0}, {_targetPositionCamera.TargetPosition.Z:F0} (red cross)").SetColor(Colors.Red);
 
         ui.AddSeparator();
 

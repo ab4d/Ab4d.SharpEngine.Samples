@@ -31,7 +31,7 @@ public class FirstPersonCameraSample : CommonSample
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
         await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees,
-                                        position: new Vector3(0, 10, 0),
+                                        position: new Vector3(0, -10, 0),
                                         positionType: PositionTypes.Bottom | PositionTypes.Center,
                                         finalSize: new Vector3(400, 400, 400));
     }
@@ -75,7 +75,7 @@ public class FirstPersonCameraSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateKeyValueLabel("CameraPosition:", () => $"({_firstPersonCamera.CameraPosition.X:F0}, {_firstPersonCamera.CameraPosition.Y:F0}, {_firstPersonCamera.CameraPosition.Z:F0})");
+        ui.CreateKeyValueLabel("CameraPosition:", () => $"{_firstPersonCamera.CameraPosition.X:F0}, {_firstPersonCamera.CameraPosition.Y:F0}, {_firstPersonCamera.CameraPosition.Z:F0}");
 
         ui.AddSeparator();
 
