@@ -53,9 +53,9 @@ public class HitTestingSample : CommonSample
         ShowCameraAxisPanel = true;
 
         await base.ShowCommonSceneAsync(scene, CommonScenes.Teapot,  
-            position: new Vector3(0, -20, 0),
-            positionType: PositionTypes.Center,
-            finalSize: new Vector3(300, 200, 300));
+                                        position: new Vector3(0, -20, 0),
+                                        positionType: PositionTypes.Center,
+                                        finalSize: new Vector3(300, 200, 300));
     }
 
     protected override void OnDisposed()
