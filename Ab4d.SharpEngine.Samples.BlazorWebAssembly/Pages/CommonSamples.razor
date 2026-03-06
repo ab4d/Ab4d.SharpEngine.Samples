@@ -62,7 +62,7 @@
     {
         base.OnInitialized();
 
-        _isTestEnvironment = Navigation.Uri.Contains("e2e=playwright", StringComparison.Ordinal);
+        _isTestEnvironment = Navigation.Uri.Contains("e2e=playwright", StringComparison.Ordinal); // When this sample is started from a Playwright test, then e2e=playwright is added to the url
 
         // Create the UI provider with a callback to trigger re-rendering
         _uiProvider = new BlazorUIProvider(() => StateHasChanged());
@@ -131,10 +131,9 @@
 
         if (_isTestEnvironment && createdSample != null)
         {
-            // Disable all 
+            // Disable all animations and use the same random seed for all samples when running in test environment, to make the tests reproducible
             createdSample.IsTestEnvironment = true;
             createdSample.UseCommonRandomSeed = true;
-            createdSample.PreventSceneUpdating();
         }
         
         CurrentCommonSample = createdSample;
@@ -221,8 +220,11 @@
             }
 
             _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
-        }
 
+            if (_isTestEnvironment)
+                _currentCommonSample.PreventSceneUpdating();
+        }
+        
         _lastInitializedSample = _currentCommonSample;
     }
 
