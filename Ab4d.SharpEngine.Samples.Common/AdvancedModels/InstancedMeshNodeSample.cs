@@ -21,6 +21,7 @@ public class InstancedMeshNodeSample : CommonSample
     private StandardMesh? _planeMesh;
     private StandardMesh? _teapotMesh;
     private GpuImage? _treeGpuImage;
+    private ICommonSampleUIElement? _totalTrianglesLabel;
     private ICommonSampleUIElement? _totalPositionsLabel;
     private bool _useTransparency;
     private bool _isUsingTexture;
@@ -32,7 +33,7 @@ public class InstancedMeshNodeSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         _sphereMesh = Meshes.MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), 5, 30);
 
@@ -54,6 +55,9 @@ public class InstancedMeshNodeSample : CommonSample
             targetPositionCamera.Heading = 90;
             targetPositionCamera.ShowCameraLight = ShowCameraLightType.Always;
         }
+
+
+        _teapotMesh = await GetCommonMeshAsync(scene, CommonMeshes.Teapot, finalSize: new Vector3(20, 20, 20));
     }
 
     public static WorldColorInstanceData[] CreateInstancesData(Vector3 center, Vector3 size, float modelScaleFactor, int xCount, int yCount, int zCount, bool useTransparency)
@@ -119,22 +123,8 @@ public class InstancedMeshNodeSample : CommonSample
         }
         else if (selectedIndex == 2)
         {
-            if (_teapotMesh != null)
-            {
-                _instancedMeshNode.Mesh = _teapotMesh;
-            }
-            else
-            {
-                _instancedMeshNode.Mesh = null;
-
-                base.GetCommonMesh(Scene, CommonMeshes.Teapot, finalSize: new Vector3(20, 20, 20), meshCreatedCallback: (teapotMesh) =>
-                {
-                    _teapotMesh = teapotMesh;
-                    _instancedMeshNode.Mesh = _teapotMesh;
-
-                    _totalPositionsLabel?.UpdateValue();
-                });
-            }
+            if (_teapotMesh != null) // we assume that until the user managed to click on the "Teapot", it was already loaded in the background (from the OnCreateSceneAsync)
+                _instancedMeshNode.Mesh = _teapotMesh; 
         }
         else if (selectedIndex == 3)
         {
@@ -188,7 +178,7 @@ public class InstancedMeshNodeSample : CommonSample
         
         _singleColorCheckBox?.SetValue(_isUsingTexture); // Check "Use single color" when showing texture; uncheck for others to see nice color gradient
 
-        _totalPositionsLabel?.UpdateValue();
+        UpdateStatistics();
     }
 
     private void RecreateInstancesData(int selectedIndex)
@@ -206,7 +196,7 @@ public class InstancedMeshNodeSample : CommonSample
         //var instancesData = CreateSimpleInstancedData();
 
         _instancedMeshNode.SetInstancesData(_instancesData);
-        _totalPositionsLabel?.UpdateValue();
+        UpdateStatistics();
     }
 
     private void ChangeInstancesCount(bool isChecked)
@@ -219,7 +209,7 @@ public class InstancedMeshNodeSample : CommonSample
         else
             _instancedMeshNode.InstancesCount = _instancesData.Length;
 
-        _totalPositionsLabel?.UpdateValue();
+        UpdateStatistics();
     }
 
     private void ChangeStartInstanceIndex(bool isChecked)
@@ -232,7 +222,7 @@ public class InstancedMeshNodeSample : CommonSample
         else
             _instancedMeshNode.StartInstanceIndex = 0;
 
-        _totalPositionsLabel?.UpdateValue();
+        UpdateStatistics();
     }
     
     private void ChangeScale(bool isChecked)
@@ -413,7 +403,21 @@ public class InstancedMeshNodeSample : CommonSample
 
         return $"{_instancedMeshNode.Mesh.VertexCount:#,##0} * {_instancesData.Length:#,##0} = {_instancedMeshNode.Mesh.VertexCount * _instancesData.Length:#,##0}";
     }
+    
+    private string GetTotalTrianglesText()
+    {
+        if (_instancedMeshNode == null || _instancedMeshNode.Mesh == null || _instancesData == null)
+            return "";
 
+        int trianglesCount = (int)(_instancedMeshNode.Mesh.IndexCount / 3);
+        return $"{trianglesCount:#,##0} * {_instancesData.Length:#,##0} = {trianglesCount * _instancesData.Length:#,##0}";
+    }
+
+    private void UpdateStatistics()
+    {
+        _totalTrianglesLabel?.UpdateValue();
+        _totalPositionsLabel?.UpdateValue();
+    }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -422,10 +426,10 @@ public class InstancedMeshNodeSample : CommonSample
         ui.CreateLabel("Mesh:");
         ui.CreateRadioButtons(new string[]
         {
-            "Pyramid (16 positions)", 
-            "Sphere (961 positions)", 
-            "Teapot (12,288 positions)",
-            "Plane with texture (4 positions)",
+            "Pyramid (6 triangles)", 
+            "Sphere (1,740 triangles)", 
+            "Teapot (4,096 triangles)",
+            "Plane with texture (2 triangles)",
         }, (selectedIndex, selectedText) => ChangeMesh(selectedIndex), selectedItemIndex: 1);
 
         ui.AddSeparator();
@@ -435,6 +439,12 @@ public class InstancedMeshNodeSample : CommonSample
             (selectedIndex, selectedText) => RecreateInstancesData(selectedIndex),
             selectedItemIndex: 2);
 
+        ui.AddSeparator();
+        ui.AddSeparator();
+
+        ui.CreateLabel("Total triangles:");
+        _totalTrianglesLabel = ui.CreateKeyValueLabel("", () => GetTotalTrianglesText());
+        
         ui.AddSeparator();
 
         ui.CreateLabel("Total positions:");
