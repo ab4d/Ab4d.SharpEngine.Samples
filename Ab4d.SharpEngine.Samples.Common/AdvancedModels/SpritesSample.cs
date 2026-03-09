@@ -43,13 +43,13 @@ public class SpritesSample : CommonSample
 
         // Draw 2 sprites using relative coordinates (form 0 to 1).
         // Note that the spriteSize has the same width and height, but it is rendered with bigger width than height because view's Width is bigger then Height 
-        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.08f, 0.2f), spriteSize: new Vector2(0.15f, 0.15f)); 
+        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.08f, 0.5f), spriteSize: new Vector2(0.15f, 0.15f)); 
 
         // When using scaleX and scaleY instead of spriteSize, the aspect ratio of the sprite is preserved
-        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.25f, 0.2f), scaleX: 0.1f, scaleY: 0.1f);
+        sceneSpriteBatch.DrawSprite(topLeftPosition: new Vector2(0.25f, 0.5f), scaleX: 0.1f, scaleY: 0.1f);
 
         // It is also possible to render 2D text
-        sceneSpriteBatch.DrawBitmapText("Relative coordinates:", new Vector2(0.08f, 0.175f), fontSize: 20, Color4.Black);
+        sceneSpriteBatch.DrawBitmapText("Relative coordinates:", new Vector2(0.08f, 0.475f), fontSize: 20, Color4.Black);
         
         sceneSpriteBatch.End();
 
@@ -73,34 +73,35 @@ public class SpritesSample : CommonSample
         _sceneViewSpriteBatch = SceneView.CreateOverlaySpriteBatch("SceneViewOverlaySpriteBatch");
 
         _sceneViewSpriteBatch.Begin(useAbsoluteCoordinates: true); // use absolute coordinates for all following Draw calls
+        _sceneViewSpriteBatch.IsUsingDpiScale = true;
 
         // To switch to using relative coordinates, set IsUsingAbsoluteCoordinates to false
         // All following draw calls will use relative coordinates.
         //sceneViewSpriteBatch.IsUsingAbsoluteCoordinates = false;
 
 
-        _sceneViewSpriteBatch.DrawBitmapText("Absolute coordinates\nwith color mask:", new Vector2(100, 350), fontSize: 20, Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("Dpi scaled\nabsolute coordinates\nwith color mask:", new Vector2(50, 100), fontSize: 14, Color4.Black);
 
         _sceneViewSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
         // Use color mask
-        _sceneViewSpriteBatch.DrawSprite(new Vector2(100, 400), new Vector2(50, 50), colorMask: Colors.Red);
-        _sceneViewSpriteBatch.DrawSprite(new Vector2(160, 400), new Vector2(50, 50), colorMask: Colors.Green);
-        _sceneViewSpriteBatch.DrawSprite(new Vector2(220, 400), new Vector2(50, 50), colorMask: Colors.Blue);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(50, 150), new Vector2(50, 50), colorMask: Colors.Red);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(110, 150), new Vector2(50, 50), colorMask: Colors.Green);
+        _sceneViewSpriteBatch.DrawSprite(new Vector2(170, 150), new Vector2(50, 50), colorMask: Colors.Blue);
 
 
         // Draw rectangles
-        _sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(100, 490), fontSize: 20, Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("DrawRectangle:", new Vector2(50, 240), fontSize: 14, Color4.Black);
 
-        _sceneViewSpriteBatch.DrawRectangle(new Vector2(100, 520), new Vector2(40, 40), Colors.Red);
-        _sceneViewSpriteBatch.DrawRectangle(new Vector2(160, 520), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
-        _sceneViewSpriteBatch.DrawRectangle(new Vector2(220, 520), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(50, 270), new Vector2(40, 40), Colors.Red);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(110, 270), new Vector2(40, 40), Colors.Green, rotationAngleDegrees: 33);
+        _sceneViewSpriteBatch.DrawRectangle(new Vector2(170, 270), new Vector2(40, 40), Colors.Blue, rotationAngleDegrees: 66);
 
 
         // Advanced draw text with background and margin
-        _sceneViewSpriteBatch.DrawBitmapText("Rotated text", new Vector2(700, 200), fontSize: 20, textColor: Color4.Black, rotationAngleDegrees: 90);
-        _sceneViewSpriteBatch.DrawBitmapText("Text with background", new Vector2(500, 150), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen);
-        _sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(500, 200), fontSize: 20, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
+        _sceneViewSpriteBatch.DrawBitmapText("Rotated text", new Vector2(600, 200), fontSize: 14, textColor: Color4.Black, rotationAngleDegrees: 90);
+        _sceneViewSpriteBatch.DrawBitmapText("Text with background", new Vector2(450, 150), fontSize: 14, textColor: Color4.Black, backgroundColor: Colors.LightGreen);
+        _sceneViewSpriteBatch.DrawBitmapText("Text with\nbackground\nand margin", new Vector2(450, 200), fontSize: 14, textColor: Color4.Black, backgroundColor: Colors.LightGreen,
                                             marginLeft: 10, marginRight: 10, marginTop: 10, marginBottom: 10);
 
         if (SceneView.GpuDevice != null)
@@ -122,9 +123,9 @@ public class SpritesSample : CommonSample
             //var gradientTexture = TextureFactory.CreateGradientTexture(sceneView.GpuDevice, startColor: Colors.DeepSkyBlue, endColor: Colors.Yellow, textureWidth: 256);
 
             _sceneViewSpriteBatch.SetSpriteTexture(_gradientTexture);
-            _sceneViewSpriteBatch.DrawSprite(new Vector2(870, 90), new Vector2(100, 200), rotationAngleDegrees: 90);
+            _sceneViewSpriteBatch.DrawSprite(new Vector2(770, 90), new Vector2(100, 200), rotationAngleDegrees: 90);
 
-            _sceneViewSpriteBatch.DrawBitmapText("Sprite with\ngradient", new Vector2(850, 170), fontSize: 20, textColor: Color4.Black);
+            _sceneViewSpriteBatch.DrawBitmapText("Sprite with\ngradient", new Vector2(750, 170), fontSize: 14, textColor: Color4.Black);
         }
 
 
@@ -138,15 +139,15 @@ public class SpritesSample : CommonSample
         // When Center or Bottom is used, then vertical axis is pointing Up (distance from the bottom or center).
         _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomRight);
         _sceneViewSpriteBatch.DrawSprite(new Vector2(60, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
-        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomRight", new Vector2(125, 180), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomRight", new Vector2(90, 155), fontSize: 14, textColor: Color4.Black);
 
         _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopRight);
         _sceneViewSpriteBatch.DrawSprite(new Vector2(60, 10), new Vector2(50, 90), rotationAngleDegrees: 0);
-        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nTopRight", new Vector2(125, 110), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nTopRight", new Vector2(90, 110), fontSize: 14, textColor: Color4.Black);
 
         _sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.BottomLeft);
         _sceneViewSpriteBatch.DrawSprite(new Vector2(10, 100), new Vector2(50, 90), rotationAngleDegrees: 0);
-        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomLeft", new Vector2(10, 180), fontSize: 20, textColor: Color4.Black);
+        _sceneViewSpriteBatch.DrawBitmapText("Coordinate\ncenter set to\nBottomLeft", new Vector2(10, 155), fontSize: 14, textColor: Color4.Black);
 
         // Hide top-left sprite so that the title of the sample is visible
         // sceneViewSpriteBatch.SetCoordinateCenter(PositionTypes.TopLeft);
@@ -156,16 +157,21 @@ public class SpritesSample : CommonSample
 
 
         // Create a new SpriteBatch that will use dpi scaled coordinates and sizes (dpi scale is get for window's dpi scale setting).
-        var dpiAwareSpriteBatch = SceneView.CreateOverlaySpriteBatch("DpiAwareSpriteBatch");
-        dpiAwareSpriteBatch.IsUsingDpiScale = true;
+        var dpiAwareSpriteBatch = SceneView.CreateOverlaySpriteBatch("NotDpiAwareSpriteBatch");
+        dpiAwareSpriteBatch.IsUsingDpiScale = false;
 
         dpiAwareSpriteBatch.Begin(useAbsoluteCoordinates: true);
 
         dpiAwareSpriteBatch.SetSpriteTexture(_uvCheckerTexture);
 
+        // To prevent the not dpi scaled sprite to be rendered over other dpi scaled sprites, 
+        // we calculate its non-scaled position based on the position of dpi-scaled sprites and then multiply that by dpi scale.
+        var dpiScaledPosition = new Vector2(230, 150);
+        var nonDpiScaledPosition = new Vector2(dpiScaledPosition.X * SceneView.DpiScaleX, dpiScaledPosition.Y * SceneView.DpiScaleY);
+
         // Note that when there is some dpi scale, then this box will be bigger and not in line with other 3 sprites
-        dpiAwareSpriteBatch.DrawSprite(new Vector2(280, 400), new Vector2(50, 50));
-        dpiAwareSpriteBatch.DrawBitmapText("Dpi scaled:", new Vector2(250, 380), fontSize: 20, textColor: Color4.Black);
+        dpiAwareSpriteBatch.DrawSprite(nonDpiScaledPosition, new Vector2(50, 50));
+        dpiAwareSpriteBatch.DrawBitmapText("Not dpi scaled:", nonDpiScaledPosition - new Vector2(0, 20), fontSize: 16, textColor: Color4.Black);
 
         dpiAwareSpriteBatch.End();
 
