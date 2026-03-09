@@ -821,10 +821,11 @@ public abstract class CommonSample
         string fileName = GetCommonTexturePath(textureName);
         TextureLoader.CreateTexture(fileName, gpuDevice, textureCreatedCallback, generateMipMaps: true, useGpuDeviceCache: true, textureCreationFailedCallback: textureCreationFailedCallback);
     }
-#endregion
+    #endregion
 
-    #region GetCommonMesh
+#region GetCommonMesh
 
+#if VULKAN
     public void GetCommonMesh(Scene scene, CommonMeshes meshType, Action<StandardMesh> meshCreatedCallback, bool cacheCommonMesh = true)
     {
         GetCommonMesh(scene, meshType, Vector3.Zero, PositionTypes.Center, finalSize: new Vector3(100, 100, 100), meshCreatedCallback, cacheCommonMesh: cacheCommonMesh, preserveAspectRatio: true);
@@ -871,7 +872,7 @@ public abstract class CommonSample
                 meshCreatedCallback(readMesh);
             }, TaskScheduler.FromCurrentSynchronizationContext()); // Continue on UI thread
     }
-
+#endif
 
     public async Task<StandardMesh> GetCommonMeshAsync(Scene scene, CommonMeshes meshType, bool cacheCommonMesh = true)
     {
@@ -955,7 +956,7 @@ public abstract class CommonSample
 
     private string GetCommonMeshCacheKey(CommonMeshes meshType) => meshType.ToString() + "_CommonMesh";
 
-    #endregion
+#endregion
     
     #region GetCommonScene, ShowCommonScene
 
