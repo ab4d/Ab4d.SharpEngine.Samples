@@ -7,7 +7,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Graphs;
 public class MultipleAxesDemo : CommonSample
 {
     public override string Title => "Multiple axes demo";
-    public override string Subtitle => "This sample shows multiple AxisWithLabelsNode objects";
+    public override string Subtitle => "This sample shows multiple AxisWithLabelsNode objects.\nNote that by default the text is updated when the camera is changed so that it always looks upright.";
     
     private bool _isUpdatingOnCameraChange = true;
     private ICommonSampleUIElement? _updatingButton;
@@ -23,10 +23,6 @@ public class MultipleAxesDemo : CommonSample
                                                  axisEndPosition: new Vector3(120, 100, 0),
                                                  targetPositionCamera,
                                                  axisTitle: "Default axis");
-
-        //var defaultAxis = new AxisWithLabelsNode(axisStartPosition: new Vector3(120, 0, 0), 
-        //                                         axisEndPosition: new Vector3(120, 100, 0), 
-        //                                         axisTitle: "Default axis");
 
         scene.RootNode.Add(defaultAxis);
 
@@ -137,11 +133,10 @@ public class MultipleAxesDemo : CommonSample
 
         if (targetPositionCamera != null)
         {
+            targetPositionCamera.TargetPosition = new Vector3(0, 20, 0);
             targetPositionCamera.Heading = 25;
             targetPositionCamera.Attitude = -30;
             targetPositionCamera.Distance = 500;
-
-            //defaultAxis.Camera = targetPositionCamera;
         }
     }
 
