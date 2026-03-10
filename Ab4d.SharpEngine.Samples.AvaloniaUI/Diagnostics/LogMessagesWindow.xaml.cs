@@ -17,7 +17,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Diagnostics
     /// </summary>
     public partial class LogMessagesWindow : Window
     {
-        private const int MaxLogMessages = 200;
+        private const int MaxLogMessages = 50;
 
         private int _deletedLogMessagesCount;
 
