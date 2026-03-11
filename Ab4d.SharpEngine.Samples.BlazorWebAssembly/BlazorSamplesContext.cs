@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Samples.BlazorWebAssembly;
+﻿using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.BlazorWebAssembly;
 using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common;
@@ -26,7 +27,10 @@ public class BlazorSamplesContext : CommonSamplesContext
     {
         // If already loaded, return synchronously
         if (_textBlockFactory != null)
+        {
+            ResetTextBlockFactory();
             return _textBlockFactory;
+        }
         
         // If loading already started, return the same task
         if (_textBlockFactoryLoadingTask != null)
@@ -65,5 +69,20 @@ public class BlazorSamplesContext : CommonSamplesContext
         }
 
         return _textBlockFactory;
+    }
+
+    protected void ResetTextBlockFactory()
+    {
+        if (_textBlockFactory == null)
+            return;
+
+        _textBlockFactory.TextColor = Color4.Black;
+        _textBlockFactory.FontSize = 14;
+        _textBlockFactory.BackgroundHorizontalPadding = 8;
+        _textBlockFactory.BackgroundVerticalPadding = 4;
+        _textBlockFactory.BackgroundColor = Color4.Transparent;
+        _textBlockFactory.BorderThickness = 0;
+        _textBlockFactory.BorderColor = Color4.Black;
+        _textBlockFactory.BackMaterialColor = Color4.Black;
     }
 }

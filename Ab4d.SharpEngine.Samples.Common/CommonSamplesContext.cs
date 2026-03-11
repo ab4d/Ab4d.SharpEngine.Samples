@@ -103,8 +103,11 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
     {
         // If already loaded, return synchronously
         if (_textBlockFactory != null)
+        {
+            ResetTextBlockFactory();
             return Task.FromResult(_textBlockFactory);
-        
+        }
+
         // If loading already started, return the same task
         if (_textBlockFactoryLoadingTask != null)
             return _textBlockFactoryLoadingTask;
