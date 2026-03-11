@@ -35,6 +35,8 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
     private Action<Vector2>? _pointerMovedAction;
     private Action<string>? _fileDroppedAction;
     private DragAndDropHelper? _dragAndDropHelper;
+    private Func<string, bool>? _keyDownFunc;
+    private IDisposable? _keyDownClassHandler;
 
     private double _lastSeparator;
     
@@ -293,45 +295,42 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         return (text, toolTip);
     }
 
+
     public bool RegisterKeyDown(Func<string, bool>? keyDownFunc)
     {
-        return false; // not supported for now
+        UnRegisterKeyDown();
 
-        //UnRegisterKeyDown();
+        _keyDownFunc = keyDownFunc;
 
-        //_keyDownFunc = keyDownFunc;
+        if (keyDownFunc == null)
+            return false;
 
-        //if (_keyDownFunc == null)
-        //    return;
+        // The following will get all mouse events (also handled)
+        _keyDownClassHandler = InputElement.KeyDownEvent.AddClassHandler<TopLevel>(OnKeyDown, handledEventsToo: true);
 
-        //var parentWindow = Window.GetWindow(_baseAvaloniaPanel);
-
-        //if (parentWindow != null)
-        //    parentWindow.PreviewKeyDown += BaseWpfPanelOnPreviewKeyDown;
+        return true;
     }
 
-    private void BaseWpfPanelOnPreviewKeyDown(object sender, KeyEventArgs e)
+    private void OnKeyDown(object? sender, KeyEventArgs e)
     {
-        //if (_keyDownFunc == null)
-        //{
-        //    e.Handled = false;
-        //    return;
-        //}
+        if (_keyDownFunc == null)
+        {
+            e.Handled = false;
+            return;
+        }
 
-        //e.Handled = _keyDownFunc.Invoke(e.Key.ToString());
+        e.Handled = _keyDownFunc.Invoke(e.Key.ToString());
     }
 
     private void UnRegisterKeyDown()
     {
-        //if (_keyDownFunc != null)
-        //{
-        //    var parentWindow = Window.GetWindow(_baseAvaloniaPanel);
+        if (_keyDownClassHandler != null)
+        {
+            _keyDownClassHandler.Dispose();
+            _keyDownClassHandler = null;
+        }
 
-        //    if (parentWindow != null)
-        //        parentWindow.PreviewKeyDown -= BaseWpfPanelOnPreviewKeyDown;
-
-        //    _keyDownFunc = null;
-        //}
+        _keyDownFunc = null;
     }
 
     public bool RegisterPointerMoved(Action<Vector2> pointerMovedAction)
