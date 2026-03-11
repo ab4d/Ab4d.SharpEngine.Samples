@@ -47,8 +47,6 @@ public class AxesBoxNodeSample : CommonSample
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.XAxis, minimumValue: 0, maximumValue: 100, majorTicksStep: 10, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.YAxis, minimumValue: 0, maximumValue: 100, majorTicksStep: 10, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.ZAxis, minimumValue: -20, maximumValue: 200, majorTicksStep: 20, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
-        
-        ShowCameraAxisPanel = true;
     }
 
     protected override void OnCreateScene(Scene scene)

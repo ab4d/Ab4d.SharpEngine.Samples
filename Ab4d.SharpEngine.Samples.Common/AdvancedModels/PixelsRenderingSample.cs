@@ -32,9 +32,15 @@ public class PixelsRenderingSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         ChangeShownPositions(selectedIndex: 2); // Show Dragon model
+
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 30;
+            targetPositionCamera.Distance = 600;
+        }
 
         // IMPORTANT:
         // With PixelNode and PixelMaterial, the texture is always rendered to a square area (width == height)
@@ -42,13 +48,7 @@ public class PixelsRenderingSample : CommonSample
         //
         // In this sample we use a special TreeTexture-square.png that is the same as TreeTexture.png but
         // has added transparent pixels on the left and right so that the final image is squared.
-        base.GetCommonTexture(Scene, CommonTextures.TenByTenNumbers, gpuImage => _treeGpuImage = gpuImage);
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 30;
-            targetPositionCamera.Distance = 600;
-        }
+        _treeGpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.TreeSquareBitmap);
     }
 
     private void ShowMesh(StandardMesh mesh, Color4 pixelColor)

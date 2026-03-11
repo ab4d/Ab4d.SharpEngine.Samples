@@ -52,7 +52,7 @@ public class HitTestingSample : CommonSample
 
         ShowCameraAxisPanel = true;
 
-        await base.ShowCommonSceneAsync(scene, CommonScenes.Teapot,  
+        await base.ShowCommonSceneAsync(scene, CommonScenes.TeapotHiRes,  
                                         position: new Vector3(0, -20, 0),
                                         positionType: PositionTypes.Center,
                                         finalSize: new Vector3(300, 200, 300));

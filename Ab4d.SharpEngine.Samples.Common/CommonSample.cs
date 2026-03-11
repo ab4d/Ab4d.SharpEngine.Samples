@@ -67,14 +67,16 @@ public abstract class CommonSample
     {
         Tree = 0,
         TenByTenNumbers,
-        UVChecker
+        UVChecker,
+        TreeSquareBitmap,
     }
 
     private static string[] _commonTexturesFileNames = new string[]
     {
         "TreeTexture.png",
         "10x10-texture.png",
-        "uvchecker2.png"
+        "uvchecker2.png",
+        "TreeTexture-square.png"
     };
 
 
