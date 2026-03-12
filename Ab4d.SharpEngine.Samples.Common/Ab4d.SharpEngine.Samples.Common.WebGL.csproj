@@ -62,7 +62,7 @@
 
   <ItemGroup>
     <Compile Remove="Diagnostics\**" />
-    <Compile Remove="Graphs\**" />
+    <!--<Compile Remove="Graphs\**" />-->
     <Compile Remove="Importers\**" />
     <None Remove="Importers\**" />
     <None Remove="Resources\**" />
