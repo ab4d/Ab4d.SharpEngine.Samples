@@ -51,7 +51,7 @@ public class SkyboxSample : CommonSample
         }
 
 
-        await base.ShowCommonSceneAsync(scene, CommonScenes.TeapotHiRes, finalSize: new Vector3(100, 100, 100));
+        await base.ShowCommonSceneAsync(scene, CommonScenes.Teapot, finalSize: new Vector3(100, 100, 100));
     }
 
     public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)

@@ -43,7 +43,7 @@ public class MaterialAnimationSample : CommonSample
             targetPositionCamera.Distance = 300;
         }
 
-        var teapotGroupNode = await base.GetCommonSceneAsync(scene, CommonScenes.Teapot, 
+        var teapotGroupNode = await base.GetCommonSceneAsync(scene, CommonScenes.TeapotLowResolution, 
                                                              position: new Vector3(0, 0, 0), 
                                                              positionType: PositionTypes.Center | PositionTypes.Bottom, 
                                                              finalSize: new Vector3(100, 100, 100));

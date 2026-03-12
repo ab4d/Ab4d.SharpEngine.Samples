@@ -21,13 +21,6 @@ public class FirstPersonCameraSample : CommonSample
     {
     }
 
-    //protected override void OnCreateScene(Scene scene)
-    //{
-    //    var testScene = TestScenes.GetTestScene(TestScenes.StandardTestScenes.HouseWithTrees, finalSize: new Vector3(200, 200, 200));
-
-    //    scene.RootNode.Add(testScene);
-    //}
-
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
         await base.ShowCommonSceneAsync(scene, CommonScenes.HouseWithTrees,
