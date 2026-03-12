@@ -38,7 +38,6 @@ public class HeatmapRenderingSample : CommonSample
     public override string Title => "Heatmap";
     public override string Subtitle => "Showing a heatmap with a gradient texture and adjusting TextureCoordinates";
 
-    private GroupNode? _testObjectsGroup;
     private MeshModelNode? _teapotMeshModelNode;
     private GpuImage? _gradientTexture;
 
@@ -75,9 +74,6 @@ public class HeatmapRenderingSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _testObjectsGroup = new GroupNode();
-        scene.RootNode.Add(_testObjectsGroup);
-
         _hitWireCrossNode = new WireCrossNode(new Vector3(0, 0, 0), lineColor: Colors.Red, lineThickness: 2, lineLength: 20);
         _hitWireCrossNode.Visibility = SceneNodeVisibility.Hidden;
         scene.RootNode.Add(_hitWireCrossNode);
@@ -100,20 +96,23 @@ public class HeatmapRenderingSample : CommonSample
 
 
 #if WEB_GL
-        var teapotScene = CommonScenes.Teapot;
+        // Improve performance of running the sample in Debug and Release mode for Blazor WebAssembly (note that when deployed the code is running much faster).
+        var teapotScene = CommonMeshes.TeapotLowResolution;
 #else
-        var teapotScene = CommonScenes.TeapotHiRes;
+        var teapotScene = CommonMeshes.Teapot;
 #endif
 
-        var teapotGroupNode = await base.GetCommonSceneAsync(scene, teapotScene);
+        var teapotMesh = await base.GetCommonMeshAsync(scene, teapotScene);
 
         // Get the MeshModelNode so we will be able to update the texture coordinates (this is the first and only child)
-        _teapotMeshModelNode = teapotGroupNode.GetChild<MeshModelNode>();
+        _teapotMeshModelNode = new MeshModelNode(teapotMesh, StandardMaterials.Gray, name: "TeapotModelNode");
+        Utilities.ModelUtils.PositionAndScaleSceneNode(_teapotMeshModelNode, new Vector3(00, 0, 0), positionType: PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(100, 100, 100));
+
 
         if (scene.GpuDevice != null)
             SetGradientTexture(gradientIndex: 0);
 
-        scene.RootNode.Add(teapotGroupNode);
+        scene.RootNode.Add(_teapotMeshModelNode);
 
         if (SceneView != null)
             UpdateHeatPosition(elapsedSeconds: 0);
@@ -157,11 +156,24 @@ public class HeatmapRenderingSample : CommonSample
         if (_teapotMeshModelNode == null)
             return;
 
-        var geometryMesh = _teapotMeshModelNode.Mesh as GeometryMesh;
+        if (!_teapotMeshModelNode.IsWorldMatrixIdentity)
+        {
+            // When the teapot models is transformed, then we need to transform the targetPosition
+            // to the local space of the teapot model, so we can correctly calculate the distance from each position to the targetPosition.
+            var matrix = _teapotMeshModelNode.WorldMatrix;
+            if (Matrix4x4.Invert(matrix, out var invertedMatrix))
+                targetPosition = Vector3.Transform(targetPosition, invertedMatrix);
+        }
 
-        if (geometryMesh == null)
-            return;
+        if (_teapotMeshModelNode.Mesh is GeometryMesh geometryMesh)
+            UpdateGeometryMesh(geometryMesh, targetPosition, maxDistance);
 
+        if (_teapotMeshModelNode.Mesh is StandardMesh standardMesh)
+            UpdateStandardMesh(standardMesh, targetPosition, maxDistance);
+    }
+
+    private void UpdateGeometryMesh(GeometryMesh geometryMesh, Vector3 targetPosition, float maxDistance)
+    {
         var positions = geometryMesh.Positions;
         var textureCoordinates = geometryMesh.TextureCoordinates;
 
@@ -190,6 +202,38 @@ public class HeatmapRenderingSample : CommonSample
 
         // After changing the TextureCoordinates we need to update the underlying buffer (we can preserve the BoundingBox because no position was changed)
         geometryMesh.UpdateMesh(geometryMesh.BoundingBox);
+    }
+    
+    private void UpdateStandardMesh(StandardMesh standardMesh, Vector3 targetPosition, float maxDistance)
+    {
+        var vertices = standardMesh.Vertices;
+
+        if (vertices == null)
+            return;
+
+
+        var vertexCount = vertices.Length;
+
+        for (int i = 0; i < vertexCount; i++)
+        {
+            var onePosition = vertices[i].Position;
+
+            // Get distance of this position from the targetPosition
+            float length = (onePosition - targetPosition).Length();
+            if (length > maxDistance)
+                length = maxDistance;
+
+            // set the relative color index that is a number from 0 to 1 where 0 is the first color in the gradient and 1 is the last color in the gradient
+            float relativeColorIndex = length / maxDistance;
+
+            // Set X texture coordinate to the color in the _gradientColorsArray. 
+            // We also invert the color so the colors starts from the bottom up.
+            var newTextureCoordinates = new Vector2(1.0f - relativeColorIndex, 0.5f);
+            vertices[i] = new PositionNormalTextureVertex(onePosition, vertices[i].Normal, newTextureCoordinates);
+        }
+
+        // After changing the TextureCoordinates we need to update the underlying buffer (we can preserve the BoundingBox because no position was changed)
+        standardMesh.UpdateMesh(standardMesh.BoundingBox);
     }
     
     private void UpdateHeatPosition(float elapsedSeconds)
