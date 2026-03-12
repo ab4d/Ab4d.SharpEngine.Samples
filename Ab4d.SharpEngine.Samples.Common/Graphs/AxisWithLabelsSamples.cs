@@ -1,6 +1,5 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
