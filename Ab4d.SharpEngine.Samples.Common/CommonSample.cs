@@ -48,8 +48,8 @@ public abstract class CommonSample
     {
         HouseWithTrees = 0,
         RobotArm,
-        Teapot,
-        TeapotHiRes
+        TeapotLowResolution,
+        Teapot
     }
 
     private static string[] _commonScenesFileNames = new string[]
