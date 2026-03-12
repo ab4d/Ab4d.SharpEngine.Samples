@@ -106,7 +106,7 @@ public class ComplexSceneSample : CommonSample
     }
 #endif
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
 #if ADVANCED_TIME_MEASUREMENT
         _startTime = DateTime.Now;
@@ -331,37 +331,6 @@ public class ComplexSceneSample : CommonSample
             };
 
             texturedMaterialGroup.Add(planeModelNode);
-        }
-
-
-        var treePlaneMaterial = new StandardMaterial(@"Resources\Textures\TreeTexture.png", BitmapIO, initialDiffuseColor: Colors.Transparent, loadInBackground: true);
-
-        for (int i = 0; i < 5; i++)
-        {
-            StandardMaterial usedMaterial;
-
-            if (i < 2)
-            {
-                usedMaterial = treePlaneMaterial;
-            }
-            else
-            {
-                usedMaterial = (StandardMaterial)treePlaneMaterial.Clone($"TreeTexture_{i}");
-                usedMaterial.AlphaClipThreshold = 0.2f * (i - 1);
-            }
-
-            var treePlane = new PlaneModelNode($"TreePlane_{i}")
-            {
-                Position = new Vector3(-400 + i * 50, 20, 350),
-                Size = new Vector2(100, 150),
-                Normal = new Vector3(1, 0, 0),
-                HeightDirection = new Vector3(0, 1, 0),
-                Material = usedMaterial
-            };
-
-            treePlane.BackMaterial = treePlane.Material;
-
-            scene.RootNode.Add(treePlane);
         }
 
 
@@ -701,14 +670,6 @@ public class ComplexSceneSample : CommonSample
         }
 
 
-        //
-        // Show text
-        //
-
-        // Start running async task from sync context and continue execution in this method
-        _ = CreateBitmapTextNodesAsync(scene);
-
-
         // Add InstancedMeshNode that can show many instances of the same mesh (sphere in this sample).
         // The color, position, size and orientation of each instance is defined by instancesData.
         var sphereMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 2, segments: 30);
@@ -735,9 +696,59 @@ public class ComplexSceneSample : CommonSample
         _additionalObjectsGroup = new GroupNode("AdditionalObjectsGroup");
         scene.RootNode.Add(_additionalObjectsGroup);
 
+
+        
+        //
+        // Show text
+        //
+
+        await CreateBitmapTextNodesAsync(scene);
+
+
+        //
+        // Show tree textures
+        // 
+
+        await CreatePlanesWithTreeTexture(scene);
+
+
 #if ADVANCED_TIME_MEASUREMENT
         System.Diagnostics.Debug.WriteLine($"OnCreateScene METHOD TIME: {(DateTime.Now - _startTime).TotalMilliseconds} ms");
 #endif
+    }
+
+    private async Task CreatePlanesWithTreeTexture(Scene scene)
+    {
+        var treeTexture = await base.GetCommonTextureAsync(scene, CommonTextures.Tree);
+        var treePlaneMaterial = new StandardMaterial(treeTexture, name: "TreeTexture");
+
+        for (int i = 0; i < 5; i++)
+        {
+            StandardMaterial usedMaterial;
+
+            if (i < 2)
+            {
+                usedMaterial = treePlaneMaterial;
+            }
+            else
+            {
+                usedMaterial = new StandardMaterial(treeTexture, name: $"TreeTexture_{i}") { AlphaClipThreshold = 0.2f * (i - 1) };
+                usedMaterial.AlphaClipThreshold = 0.2f * (i - 1);
+            }
+
+            var treePlane = new PlaneModelNode($"TreePlane_{i}")
+            {
+                Position = new Vector3(-400 + i * 50, 20, 350),
+                Size = new Vector2(100, 150),
+                Normal = new Vector3(1, 0, 0),
+                HeightDirection = new Vector3(0, 1, 0),
+                Material = usedMaterial
+            };
+
+            treePlane.BackMaterial = treePlane.Material;
+
+            scene.RootNode.Add(treePlane);
+        }
     }
 
     private async Task CreateBitmapTextNodesAsync(Scene scene)
