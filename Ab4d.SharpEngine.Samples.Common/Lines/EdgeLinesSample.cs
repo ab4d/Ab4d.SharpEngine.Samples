@@ -68,7 +68,10 @@ public class EdgeLinesSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        _rootSceneNode = await base.GetCommonSceneAsync(scene, CommonScenes.HouseWithTrees, new Vector3(0, 0, 0), PositionTypes.Bottom | PositionTypes.Center, finalSize: new Vector3(800, 800, 800));
+        _rootSceneNode = await base.GetCommonSceneAsync(scene, CommonScenes.HouseWithTrees, 
+                                                        position: new Vector3(0, 0, 0), positionType: PositionTypes.Bottom | PositionTypes.Center, 
+                                                        finalSize: new Vector3(800, 800, 800), 
+                                                        cacheSceneNode: false); // Do not use the cached scene node because we will need to modify the scene node hierarchy
 
         // Obj files do not support hierarchically organized objects
         // So we need to manually extract the Man01, Man02 and Man03 objects and put them under a new group that can be moved around

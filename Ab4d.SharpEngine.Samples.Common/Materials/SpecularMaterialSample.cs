@@ -19,19 +19,11 @@ public class SpecularMaterialSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var textBlockFactory = await context.GetTextBlockFactoryAsync();
-        textBlockFactory.BackgroundColor = Colors.Transparent;
-        textBlockFactory.BorderThickness = 0;
-        textBlockFactory.FontSize = 20;
-
         var specularPowers = new float[] { 128, 64, 32, 16, 8, 4 };
 
         for (int i = 0; i < specularPowers.Length; i++)
         {
             float specularPower = specularPowers[i];
-
-            var specularPowerTextNode = textBlockFactory.CreateTextBlock($"{specularPower:F0}", new Vector3(-350, i * 100 - 270, 0), positionType: PositionTypes.Right, textAttitude: 90);
-            scene.RootNode.Add(specularPowerTextNode);
 
             for (float specularColorFactor = 0; specularColorFactor <= 1; specularColorFactor += 0.2f)
             {
@@ -49,19 +41,6 @@ public class SpecularMaterialSample : CommonSample
             }
         }
 
-
-        var specularColorTextNode1 = textBlockFactory.CreateTextBlock("black (#000000) ...", new Vector3(-330, -350, 0), positionType: PositionTypes.Left, textAttitude: 90);
-        scene.RootNode.Add(specularColorTextNode1);
-        
-        var specularColorTextNode2 = textBlockFactory.CreateTextBlock("... white (#FFFFFF)", new Vector3(330, -350, 0), positionType: PositionTypes.Right, textAttitude: 90);
-        scene.RootNode.Add(specularColorTextNode2);
-
-        var label1 = textBlockFactory.CreateTextBlock("SpecularPower:", new Vector3(-350, 280, 0), positionType: PositionTypes.Right, textAttitude: 90);
-        scene.RootNode.Add(label1);
-
-        var label2 = textBlockFactory.CreateTextBlock("SpecularColor:", new Vector3(-350, -350, 0), positionType: PositionTypes.Right, textAttitude: 90);
-        scene.RootNode.Add(label2);
-
         
         if (targetPositionCamera != null)
         {
@@ -74,6 +53,38 @@ public class SpecularMaterialSample : CommonSample
         scene.Lights.Clear();
         scene.Lights.Add(new AmbientLight(0.4f));
         scene.Lights.Add(new PointLight(position: new Vector3(0, 0, 500)));
+
+
+        //
+        // Add texts (after the TextBlockFactory is initialized)
+        // 
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+        textBlockFactory.BackgroundColor = Colors.Transparent;
+        textBlockFactory.BorderThickness = 0;
+        textBlockFactory.FontSize = 20;
+
+
+        for (int i = 0; i < specularPowers.Length; i++)
+        {
+            float specularPower = specularPowers[i];
+
+            var specularPowerTextNode = textBlockFactory.CreateTextBlock($"{specularPower:F0}", new Vector3(-350, i * 100 - 270, 0), positionType: PositionTypes.Right, textAttitude: 90);
+            scene.RootNode.Add(specularPowerTextNode);
+        }
+
+
+        var specularColorTextNode1 = textBlockFactory.CreateTextBlock("black (#000000) ...", new Vector3(-330, -350, 0), positionType: PositionTypes.Left, textAttitude: 90);
+        scene.RootNode.Add(specularColorTextNode1);
+        
+        var specularColorTextNode2 = textBlockFactory.CreateTextBlock("... white (#FFFFFF)", new Vector3(330, -350, 0), positionType: PositionTypes.Right, textAttitude: 90);
+        scene.RootNode.Add(specularColorTextNode2);
+
+        var label1 = textBlockFactory.CreateTextBlock("SpecularPower:", new Vector3(-350, 280, 0), positionType: PositionTypes.Right, textAttitude: 90);
+        scene.RootNode.Add(label1);
+
+        var label2 = textBlockFactory.CreateTextBlock("SpecularColor:", new Vector3(-350, -350, 0), positionType: PositionTypes.Right, textAttitude: 90);
+        scene.RootNode.Add(label2);
     }
 
     // This method can be called from the automatic tests

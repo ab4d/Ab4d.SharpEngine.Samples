@@ -98,7 +98,7 @@ public class BitmapTextSample : CommonSample
         {
             targetPositionCamera.Heading = 50;
             targetPositionCamera.Attitude = -5;
-            targetPositionCamera.Distance = 2000;
+            targetPositionCamera.Distance = 1200;
 
             targetPositionCamera.CameraChanged += (sender, args) =>
             {
