@@ -87,5 +87,7 @@ public class TextBoxUIElement : BlazorUIElement
 
         _text = newText;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 }

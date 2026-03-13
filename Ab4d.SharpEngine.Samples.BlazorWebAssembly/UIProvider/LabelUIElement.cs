@@ -93,9 +93,14 @@ public class LabelUIElement : BlazorUIElement
     {
         var (textToShow, toolTip) = blazorUIProvider.ParseTextAndToolTip(text);
         _text = textToShow ?? string.Empty;
+        
         if (toolTip != null)
             SetToolTip(toolTip);
+
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 
@@ -103,6 +108,8 @@ public class LabelUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override string? GetStyle() => _styleString;
@@ -111,6 +118,9 @@ public class LabelUIElement : BlazorUIElement
     {
         _styleString = style;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 }

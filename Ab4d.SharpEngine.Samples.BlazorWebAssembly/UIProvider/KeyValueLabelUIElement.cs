@@ -139,6 +139,9 @@ public class KeyValueLabelUIElement : BlazorUIElement
     {
         _keyText = text;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 
@@ -146,6 +149,8 @@ public class KeyValueLabelUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override string? GetStyle() => _styleString;
@@ -154,6 +159,9 @@ public class KeyValueLabelUIElement : BlazorUIElement
     {
         _styleString = style;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 }

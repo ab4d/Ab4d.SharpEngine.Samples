@@ -174,6 +174,8 @@ public class SliderUIElement : BlazorUIElement
         float newValue = _getValueFunc();
         _currentValue = newValue;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override string? GetText() => _keyText;
@@ -182,6 +184,9 @@ public class SliderUIElement : BlazorUIElement
     {
         _keyText = text;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 
@@ -189,6 +194,8 @@ public class SliderUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
 
@@ -204,6 +211,8 @@ public class SliderUIElement : BlazorUIElement
             throw new ArgumentException($"SetValue for Slider expects int, float or double value, but got {newValue?.GetType().Name}");
 
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override void SetProperty(string propertyName, string propertyValue)
@@ -218,6 +227,8 @@ public class SliderUIElement : BlazorUIElement
             _minValue = float.Parse(propertyValue, NumberStyles.Float, CultureInfo.InvariantCulture);
             BuildRenderFragment();
         }
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override string? GetPropertyValue(string propertyName)

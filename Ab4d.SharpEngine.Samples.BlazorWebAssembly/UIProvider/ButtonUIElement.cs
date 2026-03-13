@@ -69,6 +69,8 @@ public class ButtonUIElement : BlazorUIElement
             SetToolTip(toolTip);
 
         BuildRenderFragment();
+        
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
 
         return this;
     }

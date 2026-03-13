@@ -68,6 +68,9 @@ public class CheckBoxUIElement : BlazorUIElement
     {
         _text = text ?? string.Empty;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 
@@ -75,6 +78,8 @@ public class CheckBoxUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override void SetValue(object newValue)

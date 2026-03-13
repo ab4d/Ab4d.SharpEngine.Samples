@@ -141,6 +141,8 @@ public class ComboBoxUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override void SetValue(object newValue)
@@ -162,7 +164,6 @@ public class ComboBoxUIElement : BlazorUIElement
 
         _itemChangedAction?.Invoke(_selectedIndex, _items[_selectedIndex]);
 
-        // Trigger a re-render of the parent component
-        blazorUIProvider.NotifyStateChanged();
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 }

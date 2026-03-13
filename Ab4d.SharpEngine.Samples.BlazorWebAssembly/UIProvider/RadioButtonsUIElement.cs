@@ -145,6 +145,9 @@ public class RadioButtonsUIElement : BlazorUIElement
     {
         _keyText = text;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
+
         return this;
     }
 
@@ -152,6 +155,8 @@ public class RadioButtonsUIElement : BlazorUIElement
     {
         _color = htmlColor;
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 
     public override void SetValue(object newValue)
@@ -178,5 +183,7 @@ public class RadioButtonsUIElement : BlazorUIElement
         }
 
         BuildRenderFragment();
+
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
 }
