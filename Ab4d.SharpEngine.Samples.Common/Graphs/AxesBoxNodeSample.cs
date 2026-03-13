@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
@@ -11,7 +10,7 @@ public class AxesBoxNodeSample : CommonSample
     public override string Title => "AxesBoxNode";
     public override string Subtitle => "AxesBoxNode can show all 6 axes with tick lines and value labels.\nIt automatically switches and orients the shown axes.\nTick lines and value labels can be shown as 3D text or as 2D text.";
     
-    private AxesBoxNode _axesBoxNode;
+    private AxesBoxNode _axesBoxNode = null!;
     
     private Color4[]? _gradientColors;
     
@@ -22,7 +21,26 @@ public class AxesBoxNodeSample : CommonSample
     public AxesBoxNodeSample(ICommonSamplesContext context)
         : base(context)
     {
-        _axesBoxNode = new AxesBoxNode()
+
+    }
+
+    protected override async Task OnCreateSceneAsync(Scene scene)
+    {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = -20;
+            targetPositionCamera.Attitude = -30;
+            targetPositionCamera.Distance = 430;
+
+            // Adjust the camera so the 3D scene is moved to the left (see Cameras/OffCenterCameraSample for more info)
+            targetPositionCamera.TargetPosition = new Vector3(30, 0, 0);
+            targetPositionCamera.RotationCenterPosition = new Vector3(0, 0, 0);
+        }
+
+
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        _axesBoxNode = new AxesBoxNode(textBlockFactory.BitmapTextCreator)
         {
             CenterPosition = new Vector3(0, 0, 0),
             Size = new Vector3(100, 100, 100),
@@ -49,20 +67,6 @@ public class AxesBoxNodeSample : CommonSample
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.ZAxis, minimumValue: -20, maximumValue: 200, majorTicksStep: 20, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
     }
 
-    protected override void OnCreateScene(Scene scene)
-    {
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = -20;
-            targetPositionCamera.Attitude = -30;
-            targetPositionCamera.Distance = 430;
-
-            // Adjust the camera so the 3D scene is moved to the left (see Cameras/OffCenterCameraSample for more info)
-            targetPositionCamera.TargetPosition = new Vector3(30, 0, 0);
-            targetPositionCamera.RotationCenterPosition = new Vector3(0, 0, 0);
-        }
-    }
-
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         ShowDemoAxes(sceneView);
@@ -73,49 +77,7 @@ public class AxesBoxNodeSample : CommonSample
     {
         _axesBoxNode.Camera = sceneView.Camera;
         sceneView.Scene.RootNode.Add(_axesBoxNode);
-
-        //                 <visuals:AxesBoxVisual3D x:Name="AxesBox"
-        //                          CenterPosition="0 0 0"
-        //                          Size="100 100 100"
-        //                          
-        //                          Camera="{Binding ElementName=Camera1}"
-        //                          OverlayCanvas="{Binding ElementName=AxisOverlayCanvas}"
-        //                          
-        //                          Is3DTextShown="True"
-        //                          IsWireBoxFullyClosed="{Binding ElementName=IsWireBoxFullyClosedCheckBox, Path=IsChecked}"
-        //                          AdjustFirstAndLastLabelPositions="{Binding ElementName=AdjustFirstAndLastLabelPositionsCheckBox, Path=IsChecked}"
-        //                          AxisShowingStrategy="{Binding ElementName=AxisShowingStrategyComboBox, Path=SelectedItem}"
-        //                          
-        //                          ShowBottomConnectionLines="{Binding ElementName=ShowBottomConnectionLinesCheckBox, Path=IsChecked}"
-        //                          ShowBackConnectionLines="{Binding ElementName=ShowBackConnectionLinesCheckBox, Path=IsChecked}"
-        //                          ShowXAxisConnectionLines="{Binding ElementName=ShowXAxisConnectionLinesCheckBox, Path=IsChecked}"
-        //                          ShowYAxisConnectionLines="{Binding ElementName=ShowYAxisConnectionLinesCheckBox, Path=IsChecked}"
-        //                          ShowZAxisConnectionLines="{Binding ElementName=ShowZAxisConnectionLinesCheckBox, Path=IsChecked}"
-        //                          
-        //                          AxisTitleBrush="Black"
-        //                          AxisTitleFontSize="6"
-        //                          AxisTitleFontWeight="Bold"
-
-        //                          ValueLabelsBrush="Black"
-        //                          ValueLabelsFontSize="6"
-        //                          ValueLabelsFontWeight="Normal"
-        //                          ValueLabelsPadding="3"
-        //                          ValueDisplayFormatString="#,##0"
-        //                          
-        //                          AxisLineColor="Black"
-        //                          AxisLineThickness="2"
-        //                          
-        //                          TicksLineColor="Black"
-        //                          TicksLineThickness="1"
-        //                          
-        //                          ConnectionLinesColor="Gray"
-        //                          ConnectionLinesThickness="0.5"
-        //                          
-        //                          MajorTicksLength="5"
-        //                          MinorTicksLength="2.5" />
-        //                          <!-- Axes line data ranges and axes titles are set in code behind -->
     }
-
 
     
     private void UpdateZAxisCustomization()
@@ -210,7 +172,7 @@ FrontFacingPlanes: AxesBoxNode will automatically show and hide axes so that the
 LeftmostAxis: AxesBoxNode will automatically show and hide vertical axes (ZAxis) so that only axis that is furthest to the left on the screen is shown.
 RightmostAxis: AxesBoxNode will automatically show and hide vertical axes so that only axis that is furthest to the right on the screen is shown.");
         
-        var strategies = new string[] { "None.", "FrontFacingPlanes", "LeftmostAxis", "RightmostAxis" };
+        var strategies = new string[] { "None", "FrontFacingPlanes", "LeftmostAxis", "RightmostAxis" };
         ui.CreateComboBox(strategies, (selectedIndex, selectedText) =>
         {
             _axesBoxNode.AxisShowingStrategy = (AxesBoxNode.AxisShowingStrategies)selectedIndex;
@@ -259,6 +221,6 @@ RightmostAxis: AxesBoxNode will automatically show and hide vertical axes so tha
             UpdateZAxisCustomization();
         });
 
-        ui.CreateButton("Randomize", () => RandomizeAxesBox());
+        ui.CreateButton("Randomize", RandomizeAxesBox);
     }
 }

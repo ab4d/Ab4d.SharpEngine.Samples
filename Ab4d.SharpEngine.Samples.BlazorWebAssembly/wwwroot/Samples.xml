@@ -69,6 +69,11 @@
   <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
 
+  <Sample Location="Titles.GraphsTitle.md" IsTitle="True" Title="Graphs"/>
+  <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo" IsNew="True"/>
+  <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels" IsNew="True"/>
+  <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode" IsNew="True"/>
+
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
 

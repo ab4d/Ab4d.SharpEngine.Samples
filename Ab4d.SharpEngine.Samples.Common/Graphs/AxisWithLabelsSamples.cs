@@ -11,50 +11,40 @@ public class AxisWithLabelsSamples : CommonSample
     public override string Title => "AxisWithLabelsNode";
     public override string Subtitle => "AxisWithLabelsNode can render highly customizable axis with title, value labels and line ticks";
     
-    private AxisWithLabelsNode _axisNode;
+    private AxisWithLabelsNode? _axisNode;
 
+    private bool _recreateUI;
+
+#if VULKAN
     private bool _isCustomBitmapTextCreator;
-    private Vector2? _savedAxisPanelPosition;
     private ICommonSampleUIElement? _customTextCreatorButton;
+#endif
     private ICommonSampleUIElement? _axisTitleColorComboBox;
 
     public AxisWithLabelsSamples(ICommonSamplesContext context)
         : base(context)
     {
-        // Define _axisNode here so we do not need to define it as nullable 
-        // // and then do null checks in the UI event handler
-        _axisNode = new AxisWithLabelsNode(axisStartPosition: new Vector3(0, -50, 0), 
+    }
+
+    protected override async Task OnCreateSceneAsync(Scene scene)
+    {
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        _axisNode = new AxisWithLabelsNode(bitmapTextCreator: textBlockFactory.BitmapTextCreator, 
+                                           axisStartPosition: new Vector3(0, -50, 0), 
                                            axisEndPosition: new Vector3(0, 50, 0), 
                                            axisTitle: "AxisWithLabelsNode");
-
-
-        ShowCameraAxisPanel = true;
-    }
-
-    /// <inheritdoc />
-    protected override void OnDisposed()
-    {
-        if (_savedAxisPanelPosition != null && CameraAxisPanel != null)
-            CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
-
-        base.OnDisposed();
-    }
-
-    protected override void OnCreateScene(Scene scene)
-    {
-        // _axisNode is created in constructor, so we do not need to define it as nullable 
-        // and then do null checks in the UI event handler
-
+        
         scene.RootNode.Add(_axisNode);
-
-        // Assign a Camera so the AxisWithLabelsNode is subscribed (because _axisNode.UpdateOnCameraChanges is true)
-        // to camera changes and this automatically updates text directions for different camera angles.
-        _axisNode.Camera = targetPositionCamera;
 
         // NOTE:
         // Many additional customizations are possible by deriving your class from AxisWithLabelsNode
         // and by overriding the virtual methods. The derived class can also access many protected properties.
 
+
+        // Assign a Camera so the AxisWithLabelsNode is subscribed (because _axisNode.UpdateOnCameraChanges is true)
+        // to camera changes and this automatically updates text directions for different camera angles.
+        _axisNode.Camera = targetPositionCamera;
 
         if (targetPositionCamera != null)
         {
@@ -62,8 +52,17 @@ public class AxisWithLabelsSamples : CommonSample
             targetPositionCamera.Attitude = -30;
             targetPositionCamera.Distance = 430;
         }
+
+        // If _axisNode was not yet available when the OnCreateUI was first called (because GetTextBlockFactoryAsync was not yet finished),
+        // then we need to create the OnCreateUI again.
+        if (_recreateUI)
+        {
+            ReCreateUI();
+            _recreateUI = false;
+        }
     }
 
+#if VULKAN
     private void ChangeBitmapTextCreator()
     {
         if (Scene == null)
@@ -110,13 +109,23 @@ public class AxisWithLabelsSamples : CommonSample
             _isCustomBitmapTextCreator = true;
         }
     }
+#endif
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
+        if (_axisNode == null)
+        {
+            // _axisNode is required to get initial values for the controls.
+            // If it is not yet available (because GetTextBlockFactoryAsync was not yet finished)
+            // them mark that so we will call OnCreateUI again after the _axisNode is available.
+            _recreateUI = true;
+            return;
+        }
+
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Left);
 
         var comboBoxWidth = 80;
-        var keyTextWidth = 165;
+        var keyTextWidth = 155;
 
         
         var possibleLineThicknesses = new float[] { 0.5f, 1, 2, 3 };
@@ -159,6 +168,26 @@ public class AxisWithLabelsSamples : CommonSample
             selectedItemIndex: Array.IndexOf(possiblePaddings, _axisNode.AxisTitlePadding),
             comboBoxWidth, keyText: "AxisTitlePadding:", keyTextWidth);
 
+        ui.AddSeparator();
+        
+
+        ui.CreateComboBox(possibleFontSizeTexts,
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsFontSize = possibleFontSizes[selectedIndex], 
+            selectedItemIndex: Array.IndexOf(possibleFontSizes, _axisNode.ValueLabelsFontSize),
+            comboBoxWidth, keyText: "ValueLabelsFontSize:", keyTextWidth);
+
+        ui.CreateComboBox(possibleColorsTexts, 
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsColor = possibleColors[selectedIndex],
+            selectedItemIndex: 0,
+            comboBoxWidth, keyText: "ValueLabelsColor:", keyTextWidth);
+        
+        ui.CreateComboBox(possiblePaddingTexts, 
+            (selectedIndex, selectedText) => _axisNode.ValueLabelsPadding = possiblePaddings[selectedIndex],
+            selectedItemIndex: Array.IndexOf(possiblePaddings, _axisNode.ValueLabelsPadding),
+            comboBoxWidth, keyText: "ValueLabelsPadding:", keyTextWidth);
+        
+        ui.AddSeparator();
+
 
         ui.CreateComboBox(possibleOrientationTexts,
             (selectedIndex, selectedText) =>
@@ -184,7 +213,35 @@ public class AxisWithLabelsSamples : CommonSample
             selectedItemIndex: 0,
             comboBoxWidth, keyText: "AxisLineColor:", keyTextWidth);
 
-   
+        ui.AddSeparator();
+
+
+        ui.CreateCheckBox("IsRenderingOnRightSideOfAxis",
+            _axisNode.IsRenderingOnRightSideOfAxis,
+            (isChecked) => _axisNode.IsRenderingOnRightSideOfAxis = isChecked);
+        
+        ui.CreateCheckBox("IsRightToLeftText",
+            _axisNode.IsRightToLeftText,
+            (isChecked) => _axisNode.IsRightToLeftText = isChecked);
+
+        ui.AddSeparator();
+
+
+        ui.CreateLabel("Additional customizations are possible by calling SetCustomValueLabels and SetCustomValueColors.", width: 250).SetStyle("italic");
+
+
+
+#if VULKAN
+        ui.AddSeparator();
+
+        _customTextCreatorButton = ui.CreateButton("Use custom BitmapTextCreator", ChangeBitmapTextCreator);
+#endif
+
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        keyTextWidth = 165;
+
+
         ui.CreateComboBox(possibleValueTexts, 
             (selectedIndex, selectedText) => _axisNode.MinimumValue = possibleValues[selectedIndex],
             selectedItemIndex: Array.IndexOf(possibleValues, _axisNode.MinimumValue),
@@ -195,7 +252,6 @@ public class AxisWithLabelsSamples : CommonSample
             selectedItemIndex: Array.IndexOf(possibleValues, _axisNode.MaximumValue),
             comboBoxWidth, keyText: "MaximumValue:", keyTextWidth);
 
-
         var possibleFormatStrings = new string[] { "#,##0", "N2", "$ 0.00" };
 
         ui.CreateComboBox(possibleFormatStrings,
@@ -203,47 +259,8 @@ public class AxisWithLabelsSamples : CommonSample
             selectedItemIndex: 0,
             comboBoxWidth, keyText: "ValueDisplayFormatString:", keyTextWidth);
 
-
         ui.AddSeparator();
 
-        ui.CreateCheckBox("IsRenderingOnRightSideOfAxis",
-            _axisNode.IsRenderingOnRightSideOfAxis,
-            (isChecked) => _axisNode.IsRenderingOnRightSideOfAxis = isChecked);
-        
-        ui.CreateCheckBox("IsRightToLeftText",
-            _axisNode.IsRightToLeftText,
-            (isChecked) => _axisNode.IsRightToLeftText = isChecked);
-
-
-        ui.AddSeparator();
-
-        _customTextCreatorButton = ui.CreateButton("Use custom BitmapTextCreator", ChangeBitmapTextCreator);
-
-
-        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
-
-        keyTextWidth = 130;
-
-
-        ui.CreateComboBox(possibleFontSizeTexts,
-            (selectedIndex, selectedText) => _axisNode.ValueLabelsFontSize = possibleFontSizes[selectedIndex], 
-            selectedItemIndex: Array.IndexOf(possibleFontSizes, _axisNode.ValueLabelsFontSize),
-            comboBoxWidth, keyText: "ValueLabelsFontSize:", keyTextWidth);
-
-        ui.CreateComboBox(possibleColorsTexts, 
-            (selectedIndex, selectedText) => _axisNode.ValueLabelsColor = possibleColors[selectedIndex],
-            selectedItemIndex: 0,
-            comboBoxWidth, keyText: "ValueLabelsColor:", keyTextWidth);
-
-
-
-        ui.CreateComboBox(possiblePaddingTexts, 
-            (selectedIndex, selectedText) => _axisNode.ValueLabelsPadding = possiblePaddings[selectedIndex],
-            selectedItemIndex: Array.IndexOf(possiblePaddings, _axisNode.ValueLabelsPadding),
-            comboBoxWidth, keyText: "ValueLabelsPadding:", keyTextWidth);
-
-
-        ui.AddSeparator();
 
         ui.CreateComboBox(possibleTickStepsTexts, 
             (selectedIndex, selectedText) => _axisNode.MajorTicksStep = possibleTickSteps[selectedIndex],
@@ -254,7 +271,6 @@ public class AxisWithLabelsSamples : CommonSample
             (selectedIndex, selectedText) => _axisNode.MinorTicksStep = possibleTickSteps[selectedIndex],
             selectedItemIndex: Array.IndexOf(possibleTickSteps, _axisNode.MinorTicksStep),
             comboBoxWidth, keyText: "MinorTicksStep:", keyTextWidth);
-
 
         ui.AddSeparator();
 
@@ -281,6 +297,7 @@ public class AxisWithLabelsSamples : CommonSample
 
         ui.AddSeparator();
 
+
         ui.CreateCheckBox("AdjustFirstLabelPosition (?):When checked, then the first label is moved up.\nThis can prevent overlapping the first label with adjacent axis.\nThe amount of movement is calculated by multiplying font size and the LabelAdjustmentFactor (0.45 by default).", 
             _axisNode.AdjustFirstLabelPosition, 
             isChecked => _axisNode.AdjustFirstLabelPosition = isChecked);
@@ -289,18 +306,20 @@ public class AxisWithLabelsSamples : CommonSample
             _axisNode.AdjustLastLabelPosition, 
             isChecked => _axisNode.AdjustLastLabelPosition = isChecked);
 
-
         ui.AddSeparator();
+
 
         ui.CreateCheckBox("Updating on camera changes (?):When checked, then the text directions are updated on camera changes so that text is correctly shown.", 
             true,
             isChecked => _axisNode.UpdateOnCameraChanges = isChecked);
 
+        ui.AddSeparator();
 
-        if (CameraAxisPanel != null)
-        {
-            _savedAxisPanelPosition = CameraAxisPanel.Position;
-            CameraAxisPanel.Position = new Vector2(400, 10); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
-        }
+
+        ui.CreateLabel("Additional customizations are possible by calling SetCustomMajorTickValues and SetCustomValueLabels.", width: 250).SetStyle("italic");
+
+        // NOTE:
+        // Many additional customizations are possible by deriving your class from AxisWithLabelsNode
+        // and by overriding the virtual methods. The derived class can also access many protected properties.
     }
 }

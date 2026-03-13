@@ -7,7 +7,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Graphs;
 public class MultipleAxesDemo : CommonSample
 {
     public override string Title => "Multiple axes demo";
-    public override string Subtitle => "This sample shows multiple AxisWithLabelsNode objects.\nNote that by default the text is updated when the camera is changed so that it always looks upright.";
+    public override string Subtitle => "This sample shows multiple AxisWithLabelsNode objects.\nNote that when the camera is rotated, the axis title and labels are updated so that the text always looks upright.";
     
     private bool _isUpdatingOnCameraChange = true;
     private ICommonSampleUIElement? _updatingButton;
@@ -17,9 +17,12 @@ public class MultipleAxesDemo : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var defaultAxis = new AxisWithLabelsNode(axisStartPosition: new Vector3(120, 0, 0),
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        var defaultAxis = new AxisWithLabelsNode(bitmapTextCreator:textBlockFactory.BitmapTextCreator,
+                                                 axisStartPosition: new Vector3(120, 0, 0),
                                                  axisEndPosition: new Vector3(120, 100, 0),
                                                  targetPositionCamera,
                                                  axisTitle: "Default axis");
@@ -27,7 +30,7 @@ public class MultipleAxesDemo : CommonSample
         scene.RootNode.Add(defaultAxis);
 
        
-        var changedValuesRangeAxis = new AxisWithLabelsNode(axisTitle: "Changed range and ticks step")
+        var changedValuesRangeAxis = new AxisWithLabelsNode(textBlockFactory.BitmapTextCreator, axisTitle: "Changed range and ticks step")
         {
             AxisStartPosition = new Vector3(60, 0, 0),
             AxisEndPosition = new Vector3(60, 100, 0),
@@ -43,7 +46,7 @@ public class MultipleAxesDemo : CommonSample
         scene.RootNode.Add(changedValuesRangeAxis);
 
 
-        var changedTicksAxis = new AxisWithLabelsNode(axisTitle: "Changed display format")
+        var changedTicksAxis = new AxisWithLabelsNode(textBlockFactory.BitmapTextCreator, axisTitle: "Changed display format")
         {
             AxisStartPosition = new Vector3(0, 0, 0),
             AxisEndPosition = new Vector3(0, 100, 0),
@@ -61,7 +64,7 @@ public class MultipleAxesDemo : CommonSample
         scene.RootNode.Add(changedTicksAxis);
 
 
-        var customValuesLabelsAxis = new AxisWithLabelsNode(axisTitle: "Custom value labels")
+        var customValuesLabelsAxis = new AxisWithLabelsNode(textBlockFactory.BitmapTextCreator, axisTitle: "Custom value labels")
         {
             AxisStartPosition = new Vector3(-60, 0, 0),
             AxisEndPosition = new Vector3(-60, 100, 0),
@@ -83,7 +86,7 @@ public class MultipleAxesDemo : CommonSample
         scene.RootNode.Add(customValuesLabelsAxis);
 
 
-        var customValuesAxis = new AxisWithLabelsNode(axisTitle: "Logarithmic scale")
+        var customValuesAxis = new AxisWithLabelsNode(textBlockFactory.BitmapTextCreator, axisTitle: "Logarithmic scale")
         {
             AxisStartPosition = new Vector3(-120, 0, 0),
             AxisEndPosition = new Vector3(-120, 100, 0),
@@ -108,7 +111,7 @@ public class MultipleAxesDemo : CommonSample
         scene.RootNode.Add(customValuesAxis);
 
 
-        var horizontalAxis1 = new AxisWithLabelsNode(axisTitle: "Horizontal axis")
+        var horizontalAxis1 = new AxisWithLabelsNode(textBlockFactory.BitmapTextCreator, axisTitle: "Horizontal axis")
         {
             AxisStartPosition = new Vector3(0, 0, 80),
             AxisEndPosition   = new Vector3(-100, 0, 80),
