@@ -42,8 +42,8 @@ public class AxesBoxNodeSample : CommonSample
 
         _axesBoxNode = new AxesBoxNode(textBlockFactory.BitmapTextCreator)
         {
-            CenterPosition = new Vector3(0, 0, 0),
-            Size = new Vector3(100, 100, 100),
+            CenterPosition = new Vector3(0, 50, 0),
+            Size = new Vector3(200, 100, 300),
             
             ValueLabelsColor = new Color4(0.3f, 0.3f, 0.3f, 1), // Slightly dim the value labels
 

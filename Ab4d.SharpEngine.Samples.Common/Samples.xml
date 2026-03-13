@@ -101,6 +101,7 @@
   <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo" IsNew="True"/>
   <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels" IsNew="True"/>
   <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode" IsNew="True"/>
+  <Sample Location="Graphs.Plot3DSample" Title="3D Plot" IsNew="True"/>
   
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsSolidColor, DiffuseColor, Opacity and IsTwoSided property to VertexColorMaterial"/>
