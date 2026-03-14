@@ -30,6 +30,7 @@ public abstract class BlazorUIElement : ICommonSampleUIElement
     public virtual ICommonSampleUIElement SetIsVisible(bool isVisible)
     {
         _isVisible = isVisible;
+        blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
         return this;
     }
 
