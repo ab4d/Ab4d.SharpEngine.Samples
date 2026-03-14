@@ -600,5 +600,12 @@ public class AdvancedHeightMapSample : CommonSample
         ui.CreateSlider(0, 1, () => 0.2f, ambientValue => Scene?.SetAmbientLight(ambientValue), width: 150, 
             keyText: "Ambient light:", 
             formatShownValueFunc: ambientValue => $"{ambientValue * 100:F0}%");
+
+#if WEB_GL
+        ui.AddSeparator();
+        ui.AddSeparator();
+
+        ui.CreateLabel("Performance note:\nThis sample can be very slow when running in Debug or Release build. Start the sample in Deployed build to run at full speed.", width: 280).SetStyle("italic");
+#endif
     }
 }
