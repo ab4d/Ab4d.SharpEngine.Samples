@@ -34,7 +34,7 @@ public class AdvancedHeightMapSample : CommonSample
     private float _customContourLineHeight = 0.5f;
 
     private GradientStop[]? _gradientData;
-    private ICommonSampleUIElement _customContourHeightSlider;
+    private ICommonSampleUIElement? _customContourHeightSlider;
 
     public enum GradientType
     {
@@ -50,8 +50,9 @@ public class AdvancedHeightMapSample : CommonSample
         WireGrid,
         CombinedContourLines,
         IndividualContourLines,
-        CustomContourLineHeight,
         ColoredContourLines,
+        FlattenColoredContourLines,
+        CustomContourLineHeight,
     }
 
     public AdvancedHeightMapSample(ICommonSamplesContext context)
@@ -278,6 +279,11 @@ public class AdvancedHeightMapSample : CommonSample
         if (_singleContourLineNode != null)
             _singleContourLineNode.Visibility = SceneNodeVisibility.Hidden;
 
+        var currentHeightMapNode = _gradientHeightMapNode ?? _standardHeightMapNode;
+        if (currentHeightMapNode != null)
+            currentHeightMapNode.Visibility = SceneNodeVisibility.Visible; // always visible except for ColoredContourLines
+
+
         switch (_linesType)
         {
             case LinesType.None:
@@ -292,11 +298,22 @@ public class AdvancedHeightMapSample : CommonSample
             
             case LinesType.IndividualContourLines:
             case LinesType.CombinedContourLines:
-            case LinesType.ColoredContourLines:
                 UpdateContourLines();
 
                 _heightMapWireframeNode.Visibility = SceneNodeVisibility.Hidden;
                 _heightMapContoursNode.Visibility = SceneNodeVisibility.Visible;
+                break;
+            
+            case LinesType.ColoredContourLines:
+            case LinesType.FlattenColoredContourLines:
+                UpdateContourLines();
+
+                _heightMapWireframeNode.Visibility = SceneNodeVisibility.Hidden;
+                _heightMapContoursNode.Visibility = SceneNodeVisibility.Visible;
+
+                if (currentHeightMapNode != null)
+                    currentHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
+
                 break;
 
             case LinesType.CustomContourLineHeight:
@@ -335,31 +352,53 @@ public class AdvancedHeightMapSample : CommonSample
             MajorLineThickness = 2f,
         };
 
-        if (_linesType == LinesType.ColoredContourLines)
+        if (_linesType == LinesType.ColoredContourLines || 
+            _linesType == LinesType.FlattenColoredContourLines)
         {
-            var contourLineHeights = _heightMapContoursNode.GetAvailableLineHeights();
+            // The simples option to customize the contour lines is to use GetCustomLineThicknessCallback and GetCustomLineColorCallback
+            // to set the thickness and color of each contour line based on its height.
+            //
+            // Here we set the thickness of the contour line to 2 if the contour height is close to a multiple of 0.5 and set the thickness to 1 for other contour lines.
+            // The color is set based on the height of the contour line using the same gradient that is used for the height map surface.
+            _heightMapContoursNode.GetCustomLineThicknessCallback = contourHeight => MathF.Abs(contourHeight % 0.5f) < 0.05f ? 2 : 1;
+            _heightMapContoursNode.GetCustomLineColorCallback = contourHeight => TextureFactory.GetGradientColor(contourHeight, _gradientData);
 
-            if (contourLineHeights != null)
-            {
-                if (float.IsNaN(currentHeightMapNode.MinTextureHeight))
-                    currentHeightMapNode.Update();
 
-                float minHeight = 0;
-                float heightRange = 1;
 
-                for (var i = 0; i < contourLineHeights.Count; i++)
-                {
-                    var contourLineHeightValue = contourLineHeights[i];
-                    var heightPercent = (contourLineHeightValue - minHeight) / heightRange;
+            // Another option to customize the contour lines is to get the individual MultiLineNode objects that are used to render the contour lines:
 
-                    var gradientColor = TextureFactory.GetGradientColor(heightPercent, _gradientData);
+            //var contourLineHeights = _heightMapContoursNode.GetAvailableLineHeights();
 
-                    var multiLineNode = _heightMapContoursNode.GetLineNode(contourLineHeightValue);
-                    
-                    if (multiLineNode != null)
-                        multiLineNode.LineColor = gradientColor;
-                }
-            }
+            //if (contourLineHeights == null)
+            //{
+            //    _heightMapContoursNode.Update();
+            //    contourLineHeights = _heightMapContoursNode.GetAvailableLineHeights();
+            //}
+
+            //if (contourLineHeights != null)
+            //{
+            //    if (float.IsNaN(currentHeightMapNode.MinTextureHeight))
+            //        currentHeightMapNode.Update();
+
+            //    float minHeight = 0;
+            //    float heightRange = 1;
+
+            //    for (var i = 0; i < contourLineHeights.Count; i++)
+            //    {
+            //        var contourLineHeightValue = contourLineHeights[i];
+            //        var heightPercent = (contourLineHeightValue - minHeight) / heightRange;
+
+            //        var gradientColor = TextureFactory.GetGradientColor(heightPercent, _gradientData);
+
+            //        var multiLineNode = _heightMapContoursNode.GetLineNode(contourLineHeightValue);
+
+            //        if (multiLineNode != null)
+            //            multiLineNode.LineColor = gradientColor;
+            //    }
+            //}
+
+            if (_linesType == LinesType.FlattenColoredContourLines)
+                _heightMapContoursNode.FlattenContours(0);
         }
 
 
@@ -536,14 +575,15 @@ public class AdvancedHeightMapSample : CommonSample
             "WireGrid",
             "Combined contours lines (?):Combined contour lines show all contour lines with two MultiLineNodes: one for major lines and one for minor lines. This is the best for performance, but contour lines cannot be colored by height.",
             "Individual contours lines (?):Individual contour lines create one MultiLineNode for each contour line.",
+            "Colored contours lines (?): Colored contour lines show how to color each individual contour line.",
+            "Flatten colored contours lines (?): Colored contour lines flatten on the bottom plane.",
             "Single contour line (?):Single line that can be moved up and down by the slider.",
-            //"Colored contours lines (?): Colored contour lines show how to color each individual contour line." // TODO
         }, (itemIndex, itemText) =>
         {
             _linesType = (LinesType)itemIndex;
             UpdateLines();
 
-            _customContourHeightSlider.SetIsVisible(itemIndex == 4);
+            _customContourHeightSlider?.SetIsVisible(_linesType == LinesType.CustomContourLineHeight);
         }, 2);
 
         _customContourHeightSlider = ui.CreateSlider(0, 1, () => _customContourLineHeight, (newValue) =>
