@@ -24,14 +24,17 @@ public class AdvancedHeightMapSample : CommonSample
 
     private HeightMapContoursNode? _heightMapContoursNode;
     private HeightMapWireframeNode? _heightMapWireframeNode;
+    private MultiLineNode? _singleContourLineNode;
 
     private GradientType _gradientType = GradientType.GeographicalSmooth;
     private LinesType _linesType = LinesType.CombinedContourLines;
 
     private bool _useTransparentColor;
     private bool _useGradientTexture = true;
-    
+    private float _customContourLineHeight = 0.5f;
+
     private GradientStop[]? _gradientData;
+    private ICommonSampleUIElement _customContourHeightSlider;
 
     public enum GradientType
     {
@@ -47,6 +50,7 @@ public class AdvancedHeightMapSample : CommonSample
         WireGrid,
         CombinedContourLines,
         IndividualContourLines,
+        CustomContourLineHeight,
         ColoredContourLines,
     }
 
@@ -271,6 +275,9 @@ public class AdvancedHeightMapSample : CommonSample
         if (_heightMapWireframeNode == null || _heightMapContoursNode == null)
             return;
 
+        if (_singleContourLineNode != null)
+            _singleContourLineNode.Visibility = SceneNodeVisibility.Hidden;
+
         switch (_linesType)
         {
             case LinesType.None:
@@ -290,6 +297,12 @@ public class AdvancedHeightMapSample : CommonSample
 
                 _heightMapWireframeNode.Visibility = SceneNodeVisibility.Hidden;
                 _heightMapContoursNode.Visibility = SceneNodeVisibility.Visible;
+                break;
+
+            case LinesType.CustomContourLineHeight:
+                _heightMapWireframeNode.Visibility = SceneNodeVisibility.Hidden;
+                _heightMapContoursNode.Visibility = SceneNodeVisibility.Hidden;
+                UpdateSingleContourLine();
                 break;
         }
     }
@@ -441,6 +454,50 @@ public class AdvancedHeightMapSample : CommonSample
 
         return stops;
     }
+    
+    private void UpdateSingleContourLine()
+    {
+        var heightMapSurfaceNode = _standardHeightMapNode ?? _gradientHeightMapNode;
+
+        if (heightMapSurfaceNode == null || _heightMapContoursNode == null)
+            return;
+
+
+        
+        // _heightMapContoursNode.Update()
+        var lineHeights = _heightMapContoursNode.GetAvailableLineHeights();
+
+        var selectedHeightValue = heightMapSurfaceNode.HeightDataMinValue + _customContourLineHeight * heightMapSurfaceNode.HeightDataMaxValue;
+
+        var contourLinePositions = _heightMapContoursNode.CreateContourLine(selectedHeightValue, 
+                                                                            contourOffset: 0.05f,           // lift the grid slightly on top of the HeightMap
+                                                                            isLineHeightInDataUnits: true); // the selectedHeightValue is in HeightData units and not in mesh units (scaled by _heightMapContoursNode.Size)
+
+        if (contourLinePositions == null) // This happens when there are no contour lines at the selected height value
+        {
+            if (_singleContourLineNode != null)
+                _singleContourLineNode.Visibility = SceneNodeVisibility.Hidden;
+
+            return;
+        }
+
+        if (_singleContourLineNode != null)
+        {
+            _singleContourLineNode.Positions = contourLinePositions.ToArray();
+            _singleContourLineNode.Visibility = SceneNodeVisibility.Visible;
+        }
+        else
+        {
+            _singleContourLineNode = new MultiLineNode(contourLinePositions.ToArray(), isLineStrip: false, "SingleContourLineNode")
+            {
+                LineThickness = 2,
+                LineColor = Colors.Black
+            };
+
+            if (Scene != null)
+                Scene.RootNode.Add(_singleContourLineNode);
+        }
+    }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -479,12 +536,24 @@ public class AdvancedHeightMapSample : CommonSample
             "WireGrid",
             "Combined contours lines (?):Combined contour lines show all contour lines with two MultiLineNodes: one for major lines and one for minor lines. This is the best for performance, but contour lines cannot be colored by height.",
             "Individual contours lines (?):Individual contour lines create one MultiLineNode for each contour line.",
+            "Single contour line (?):Single line that can be moved up and down by the slider.",
             //"Colored contours lines (?): Colored contour lines show how to color each individual contour line." // TODO
         }, (itemIndex, itemText) =>
         {
             _linesType = (LinesType)itemIndex;
             UpdateLines();
+
+            _customContourHeightSlider.SetIsVisible(itemIndex == 4);
         }, 2);
+
+        _customContourHeightSlider = ui.CreateSlider(0, 1, () => _customContourLineHeight, (newValue) =>
+            {
+                _customContourLineHeight = newValue;
+                UpdateSingleContourLine();
+            },
+            width: 100,
+            keyText: "Contour line height:",
+            formatShownValueFunc: (sliderValue) => $"{(sliderValue*100):N0}%").SetIsVisible(false);
 
         ui.CreateLabel("View:", isHeader: true);
 
