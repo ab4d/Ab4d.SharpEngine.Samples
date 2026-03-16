@@ -25,6 +25,7 @@ public class AdvancedHeightMapSample : CommonSample
     private HeightMapContoursNode? _heightMapContoursNode;
     private HeightMapWireframeNode? _heightMapWireframeNode;
     private MultiLineNode? _singleContourLineNode;
+    private WireBoxNode? _wireBoxNode;
 
     private GradientType _gradientType = GradientType.GeographicalSmooth;
     private LinesType _linesType = LinesType.CombinedContourLines;
@@ -63,7 +64,7 @@ public class AdvancedHeightMapSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var wireBoxNode = new WireBoxNode("HeightMapWireBoxNode")
+        _wireBoxNode = new WireBoxNode("HeightMapWireBoxNode")
         {
             Position = _heightMapCenterPosition,
             PositionType = PositionTypes.Center,
@@ -72,7 +73,7 @@ public class AdvancedHeightMapSample : CommonSample
             LineThickness = 2,
         };
 
-        scene.RootNode.Add(wireBoxNode);
+        scene.RootNode.Add(_wireBoxNode);
 
         if (targetPositionCamera != null)
         {
@@ -283,6 +284,9 @@ public class AdvancedHeightMapSample : CommonSample
         if (currentHeightMapNode != null)
             currentHeightMapNode.Visibility = SceneNodeVisibility.Visible; // always visible except for ColoredContourLines
 
+        if (_wireBoxNode != null)
+            _wireBoxNode.Visibility = SceneNodeVisibility.Visible; // always visible except for ColoredContourLines
+
 
         switch (_linesType)
         {
@@ -313,6 +317,9 @@ public class AdvancedHeightMapSample : CommonSample
 
                 if (currentHeightMapNode != null)
                     currentHeightMapNode.Visibility = SceneNodeVisibility.Hidden;
+
+                if (_linesType == LinesType.FlattenColoredContourLines && _wireBoxNode != null)
+                    _wireBoxNode.Visibility = SceneNodeVisibility.Hidden;
 
                 break;
 
