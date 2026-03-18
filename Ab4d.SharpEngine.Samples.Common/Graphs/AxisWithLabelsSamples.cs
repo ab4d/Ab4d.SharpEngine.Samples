@@ -65,7 +65,7 @@ public class AxisWithLabelsSamples : CommonSample
 #if VULKAN
     private void ChangeBitmapTextCreator()
     {
-        if (Scene == null)
+        if (Scene == null || _axisNode == null)
             return;
 
         if (_isCustomBitmapTextCreator)
