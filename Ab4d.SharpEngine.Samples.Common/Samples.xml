@@ -17,7 +17,7 @@
   <Sample Location="Cameras.{uiFramework}Point3DTo2DSample" Title="Point3DTo2D"/>
   <Sample Location="Cameras.CameraAxisPanelSample" Title="CameraAxisPanel"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
-  <Sample Location="Cameras.OffCenterCameraSample" Title="Off-center scene rendering" IsNew="True"/>
+  <Sample Location="Cameras.OffCenterCameraSample" Title="Off-center scene rendering"/>
   <Sample Location="Cameras.TwoDimensionalCameraSample" Title="TwoDimensionalCamera"/>
 
   <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
@@ -45,8 +45,8 @@
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
-  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap" IsUpdated="True" UpdateInfo="Using new HeightMapWireframeNode constructor that improved initialization time."/>
-  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap" IsUpdated="True" UpdateInfo="Added CreateContourLine that can be used to create contour lines at any height.&#x0a;Added FlattenContours method to flatten all contour lines.&#x0a;Using new HeightMapContoursNode and HeightMapWireframeNode constructors that improved initialization time."/>
+  <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap" IsUpdated="True" UpdateInfo="Added CreateContourLine that can be used to create contour lines at any height.&#x0a;Added FlattenContours method to flatten all contour lines."/>
   <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
@@ -63,7 +63,7 @@
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows" IsUpdated="True" UpdateInfo="Added PlanarShadowNode that provides a faster option to render planar shadows."/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox" IsUpdated="True" UpdateInfo="Updating the position of the sky box so it is always rendered from the camera's position."/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites" IsUpdated="True" UpdateInfo="Added NotifyTextureChange method to SpriteBatch that can be used&#x0a;to render a new frame without recreating the command buffers."/>
-  <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering" IsNew="True"/>
+  <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering"/>
 
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
   <Sample Location="Text.VectorTextSample" Title="Vector text from TrueType font"/>
@@ -122,12 +122,12 @@
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample IsSeparator="True" />
-  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method" />
-  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" IsUpdated="True" UpdateInfo="Fixed GetObjectIdFromColor method"/>
-  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap" IsNew="True"/>
+  <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" />
+  <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" />
+  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap"/>
   <Sample Location="HitTesting.PointCloudHitTestingSample" Title="Point-cloud hit testing" IsNew="True"/>
   <Sample IsSeparator="True" />
-  <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample" IsNew="True"/>
+  <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
   <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
