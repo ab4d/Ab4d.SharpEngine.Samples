@@ -61,7 +61,7 @@
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows" IsUpdated="True" UpdateInfo="Added PlanarShadowNode that provides a faster option to render planar shadows."/>
-  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
+  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox" IsUpdated="True" UpdateInfo="Updating the position of the sky box so it is always rendered from the camera's position."/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites" IsUpdated="True" UpdateInfo="Added NotifyTextureChange method to SpriteBatch that can be used&#x0a;to render a new frame without recreating the command buffers."/>
   <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering" IsNew="True"/>
 
@@ -106,6 +106,8 @@
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsSolidColor, DiffuseColor, Opacity and IsTwoSided property to VertexColorMaterial"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
+  <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering" IsNew="True"/>
+  <Sample IsSeparator="True" />
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
   <Sample IsSeparator="True" />

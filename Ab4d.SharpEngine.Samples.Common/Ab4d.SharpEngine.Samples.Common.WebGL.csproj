@@ -46,6 +46,8 @@
     <Compile Remove="Lines\LinesPerformanceSample.cs" />
     <Compile Remove="Lines\MiterLimitSample.cs" />
     <Compile Remove="Lines\SpecialLineRenderingSample.cs" />
+    
+    <Compile Remove="Materials\PhysicallyBasedMaterialSample.cs" />
 
     <Compile Remove="Advanced\*" />
     <Compile Include="Advanced\MeshOutlineSample.cs" />

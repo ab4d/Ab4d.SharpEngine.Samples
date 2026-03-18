@@ -57,8 +57,9 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Models\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Models\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\PointClouds\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\PointClouds\" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\ScannedImages\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\ScannedImages\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\CloudyLightRays\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\CloudyLightRays\" />
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\metal_plate_1k\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\metal_plate_1k\" />
   </ItemGroup>
 
   <ItemGroup>
