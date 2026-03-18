@@ -22,6 +22,8 @@ public class GltfImporterExporterSample : CommonSample
 
     private readonly string _initialFileName = "Resources\\Models\\voyager.gltf";
 
+    private bool _usePbrMaterials = true;
+
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
     private GroupNode? _importedModelNodes;
@@ -140,6 +142,9 @@ public class GltfImporterExporterSample : CommonSample
         // So in case any error appears when reading textures, this is thrown here (and can be caught in the catch below).
         // If GpuDevice is not provide in the constructor then the textures will be created when the objects are added to the Scene.
         var glTfImporter = new glTFImporter(this.BitmapIO, Scene.GpuDevice);
+
+        // Physically Based Rendering (PBR) materials provides a much more physically accurate rendering than standard rendering
+        glTfImporter.UsePbrMaterial = _usePbrMaterials;
 
         // We could also create the glTFImporter by using a custom imageReader and by providing a VulkanDevice (this immediately creates the textures):
         //var glTfImporter = new glTFImporter(imageReader: customBitmapIO, gpuDevice: Scene.GpuDevice);
@@ -359,6 +364,15 @@ public class GltfImporterExporterSample : CommonSample
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
+
+        ui.CreateLabel("Import options", isHeader: true);
+
+        ui.CreateCheckBox("Use PBR materials (?):Physically Based Rendering (PBR) materials provides a much more physically accurate rendering than standard rendering.\nThe glTF 2.0 by default defines all objects by PBR properties.\nThis provide values and textures for base color, metalness, roughness, normal and environment maps.", _usePbrMaterials, isChecked =>
+        {
+            _usePbrMaterials = isChecked;
+            ImportFile(_importedFileName);
+        });
+        ui.AddSeparator();
 
         ui.CreateLabel("View", isHeader: true);
         ui.CreateRadioButtons(new string[] { "Solid objects only", "Solid + EdgeLines", "Solid + Wireframe" }, (selectedIndex, selectedText) =>
