@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
@@ -16,10 +17,6 @@ public class MaterialsSample : CommonSample
 
     private GroupNode? _testModelsGroup;
     private StandardMesh[] _meshes = new StandardMesh[3];
-
-#if VULKAN
-    private MeshModelNode? _vertexColorModelNode;
-#endif
 
     public MaterialsSample(ICommonSamplesContext context)
         : base(context)
@@ -58,7 +55,7 @@ public class MaterialsSample : CommonSample
         planeMesh.SetDataChannel(MeshDataChannelTypes.VertexColors, vertexColors);
 
 
-        var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -40, 0), size: new Vector3(700, 10, 300))
+        var boxModelNode = new BoxModelNode(centerPosition: new Vector3(50, -40, 0), size: new Vector3(800, 10, 300))
         {
             Material = StandardMaterials.Silver
         };
@@ -296,7 +293,8 @@ public class MaterialsSample : CommonSample
         _testModelsGroup.Add(modelNode5);
 
 
-#if VULKAN // VertexColor is not supported in current version of SharpEngine for the browser
+#if VULKAN // VertexColor and PBR are not supported in current version of SharpEngine for the browser
+        
         //
         // 6) VertexColor material (specify different color for each vertex)
         //
@@ -339,12 +337,54 @@ public class MaterialsSample : CommonSample
             //DiffuseColor = Colors.Blue, // DiffuseColor is multiplied by the per-vertex colors (by default, set to White to preserve the per-vertex colors)
         };
 
-        _vertexColorModelNode = new MeshModelNode(sphereMesh, vertexColorMaterial, "VertexColorModel")
+        var vertexColorModelNode = new MeshModelNode(sphereMesh, vertexColorMaterial, "VertexColorModel")
         {
             Transform = new TranslateTransform(250, 0, 0)
         };
 
-        _testModelsGroup.Add(_vertexColorModelNode);
+        _testModelsGroup.Add(vertexColorModelNode);
+
+
+
+        //
+        // 7) Physically Based Rendering (PBR) material
+        //
+
+        string metalPlateFolderName = GetCommonTexturePath("metal_plate_1k/");
+        
+        // Base color texture is the same as diffuse texture. It provides the color of the pixels.
+        var baseColorGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_diff_1k.png", scene);
+
+        // Normal map is used to adjust the normals of the pixels to create more detailed lighting effects.
+        // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
+        var normalMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_nor_gl_1k.png", scene);
+
+        // Metalness and roughness maps are used to define how the light is reflected from the surface.
+        var metalnessRawImage = scene.GpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_metal_1k.png");
+        var roughnessRawImage = scene.GpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_rough_1k.png");
+
+        // The current version of the PBR shader requires that metalness and roughness values are stored in the same texture (metalness in blue channel and roughness in green channel).
+        // This is also standard for glTF models that use a combined metalness-roughness map.
+        //
+        // But if we have separate metalness and roughness textures, then we need to combine them into one texture:
+        var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
+        var metalnessRoughnessMapGpuImage = new GpuImage(scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
+
+
+        var physicallyBasedMaterial = new PhysicallyBasedMaterial(baseColor: Colors.Silver, name: "PhysicallyBasedMaterial");
+
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.NormalMap, normalMapGpuImage);
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.MetalnessRoughness, metalnessRoughnessMapGpuImage);
+
+        // PhysicallyBasedMaterial also supports environment map, but this is not used here - see PhysicallyBasedMaterialSample for a demo.
+
+        var pbrModelNode = new MeshModelNode(sphereMesh, physicallyBasedMaterial, "PBRModel")
+        {
+            Transform = new TranslateTransform(350, 0, 0)
+        };
+
+        _testModelsGroup.Add(pbrModelNode);
 #endif
 
 
@@ -381,6 +421,9 @@ public class MaterialsSample : CommonSample
 #if VULKAN 
         var textNode6 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode6);
+        
+        var textNode7 = textBlockFactory.CreateTextBlock("PBR\r\nMaterial", new Vector3(350, -15, 50), textAttitude: 30);
+        scene.RootNode.Add(textNode7);
 #endif
     }
 

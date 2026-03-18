@@ -104,7 +104,7 @@
   <Sample Location="Graphs.Plot3DSample" Title="3D Plot" IsNew="True"/>
   
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added IsSolidColor, DiffuseColor, Opacity and IsTwoSided property to VertexColorMaterial"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added support for PhysicallyBasedMaterial (PBR material).\nAdded IsSolidColor, DiffuseColor, Opacity and IsTwoSided property to VertexColorMaterial"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering" IsNew="True"/>
   <Sample IsSeparator="True" />
