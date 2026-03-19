@@ -368,6 +368,10 @@ To get **better error diagnostics when running dotnet build**, add the following
 
 ## Troubleshooting
 
+- [Performance tips[(doc/performance.md)
+
+- [How to install DiagnosticsWindow in your app](https://github.com/ab4d/Ab4d.SharpEngine.Samples?tab=readme-ov-file#how-to-install-diagnosticswindow-to-your-app)
+
 - To solve some unusual build errors, sometimes it helps to close the Visual Studio (or some other IDE), delete the obj folder, open Visual Studio again and then try to recompile the solution (this works better than selecting "Clean" option in Visual Studio).
 
 - Use the latest version of the **'main' branch**. This version works with the latest published NuGet package. The latest source from the **'development' branch** may require the latest development version of the engine that is not publicly available. If you need a feature from that branch, you can contact support to get the pre-release version.
@@ -399,7 +403,14 @@ To get **better error diagnostics when running dotnet build**, add the following
   Ab4d.SharpEngine.Utilities.Log.WriteSimplifiedLogMessage = true;
   ```
 
-- **DiagnosticsWindow** provides advanced rendering diagnostics for Ab4d.SharpEngine. It is available for Avalonia, WPF and WinUI apps. The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing valuable insight into the engine's performance. It also provides menu items to quickly get details about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data. It is recommended that for the DEBUG build, you add the DiagnosticsWindow to your application.
+- To enable **Vulkan validation**, install the Vulkan SDK from: https://vulkan.lunarg.com/
+  When Vulkan validation is installed and enabled by the Ab4d.SharpEngine (`EngineCreateOptions.EnableStandardValidation` is set to true when creating the engine),
+  then each Vulkan call is checked by the validation layer and this can give much better error reports (all Vulkan validation reports are logged at Warn log level).
+
+
+## How to install DiagnosticsWindow to your app
+
+**DiagnosticsWindow** provides advanced rendering diagnostics for Ab4d.SharpEngine. It is available for Avalonia, WPF and WinUI apps. The DiagnosticsWindow displays exact times for each part of the rendering pipeline, providing valuable insight into the engine's performance. It also provides menu items to quickly get details about the scene hierarchy, rendering items, rendering steps, memory usage and other behind-the-scenes data. It is recommended that for the DEBUG build, you add the DiagnosticsWindow to your application.
 
   The following are the steps to add the DiagnosticsWindow to your project:
   - Create a new Diagnostics folder in your project.
@@ -414,11 +425,7 @@ To get **better error diagnostics when running dotnet build**, add the following
     ```
   - In your application use "#if DEBUG" to add a button or some other way for the user of your application to open the Diagnostics window. In the button event handler, create an instance of the `DiagnosticsWindow` and set the `SharpEngineSceneView` property to your instance of the SharpEngineSceneView object. Then show the DiagnosticsWindow. See the `OpenDiagnosticsWindow` method for an example code.
 
-- Some **Intel graphics cards** may not work with shared texture in WPF's SharpEngineSceneView control (`WritableBitmap` is used instead, but this is slower).
 
-- To enable **Vulkan validation**, install the Vulkan SDK from: https://vulkan.lunarg.com/
-  When Vulkan validation is installed and enabled by the Ab4d.SharpEngine (`EngineCreateOptions.EnableStandardValidation` is set to true when creating the engine),
-  then each Vulkan call is checked by the validation layer and this can give much better error reports (all Vulkan validation reports are logged at Warn log level).
 
 
 ## Change log
