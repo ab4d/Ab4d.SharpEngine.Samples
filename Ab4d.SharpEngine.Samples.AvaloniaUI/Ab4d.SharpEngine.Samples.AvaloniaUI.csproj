@@ -118,9 +118,6 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\ScannedImages\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\ScannedImages\" /> 
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\CloudyLightRays\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\CloudyLightRays\" />
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\Textures\metal_plate_1k\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\Textures\metal_plate_1k\" />
-    
-    <!--<Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\BricksMaps\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\BricksMaps\" />
-    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\SkyboxTextures\*" CopyToOutputDirectory="PreserveNewest" LinkBase="Resources\SkyboxTextures\" />-->
   </ItemGroup>
 
 </Project>
