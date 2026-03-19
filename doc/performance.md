@@ -6,14 +6,11 @@ Performance is an important aspect of any 3D engine, and Ab4d.SharpEngine is des
 
 - Try to **lower the number of draw calls** (individual SceneNode objects). Rendering a few complex objects is usually faster than rendering many simple objects because the GPU can be fully utilized without waiting for the API and driver to process many draw calls.
 - Use **instancing** (InstancedMeshNode) when rendering many similar objects. This allows the GPU to render multiple instances of the same geometry with a single draw call, which can significantly improve performance.
-- Use MultiLineNode instead of many LineNode objects when rendering many lines. This reduces the number of draw calls.
-- Check where the time is spent by inspecting the values in `RenderingStatistics`. The easiest way to do that is to use the Diagnostics Window (see "Troubleshooting" / "DiagnosticsWindow" on how to include it in your app). 
+- Use **MultiLineNode** instead of many LineNode objects when rendering many lines. This reduces the number of draw calls.
+- Use **Diagnostics Window** to check the rendering statistics. See [Install DiagnosticsWindow in your app](../README.md#how-to-install-diagnosticswindow-to-your-app) on how to include it in your app. 
 You can also get the `RenderingStatistics` from the `SceneView.Statistics` property.
 Before the `Statistics` is collected, you need to enable it by setting `SceneView.IsCollectingStatistics` to `true`.
 See also [RenderingStatistics online help](https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Core_RenderingStatistics.htm).
-
-You can also get the `CompleteRenderTime` and `FrameCopyTime` from the `SceneView.Statistics` property.
-Before the `Statistics` is collected, you need to enable it by setting `SceneView.IsCollectingStatistics` to `true`.
 
 
 ### Use a dedicated GPU on a laptop with multiple graphics cards (for Windows)

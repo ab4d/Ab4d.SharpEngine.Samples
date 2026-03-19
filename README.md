@@ -370,7 +370,7 @@ To get **better error diagnostics when running dotnet build**, add the following
 
 - [Performance tips](./doc/performance.md)
 
-- [How to install DiagnosticsWindow in your app](#how-to-install-diagnosticswindow-to-your-app)
+- [Install DiagnosticsWindow in your app](#how-to-install-diagnosticswindow-to-your-app)
 - To solve some unusual build errors, sometimes it helps to close the Visual Studio (or some other IDE), delete the obj folder, open Visual Studio again and then try to recompile the solution (this works better than selecting "Clean" option in Visual Studio).
 
 - Use the latest version of the **'main' branch**. This version works with the latest published NuGet package. The latest source from the **'development' branch** may require the latest development version of the engine that is not publicly available. If you need a feature from that branch, you can contact support to get the pre-release version.
