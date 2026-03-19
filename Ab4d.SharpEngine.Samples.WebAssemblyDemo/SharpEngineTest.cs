@@ -197,6 +197,8 @@ public class SharpEngineTest
         Console.WriteLine("SharpEngineTest: " + message);
 
         // Call JavaScript showInfoText function to change the Info text on the web page
+        // Call JavaScript showInfoText function that is defined in wwwroot/webassembly-demo.js to change the
+        // Info text on the web page (span defined with id="infoSpan" in wwwroot/index.html)
         _ = JavaScriptInterop.ShowInfoText(message); // Call async method from sync context
     }
 }
