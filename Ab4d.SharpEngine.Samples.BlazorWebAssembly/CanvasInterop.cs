@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Ab4d.SharpEngine.Browser;
+﻿using Ab4d.SharpEngine.Browser;
 using Ab4d.SharpEngine.Common;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -574,7 +575,7 @@ public partial class CanvasInterop : ICanvasInterop
     /// <param name="identifier">An identifier for the function to invoke.</param>
     /// <param name="args">JSON-serializable arguments.</param>
     /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
-    public async Task<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]TValue>(string identifier, object?[]? args)
     {
 #if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
         if (JS == null)
@@ -597,7 +598,7 @@ public partial class CanvasInterop : ICanvasInterop
     /// </param>
     /// <param name="args">JSON-serializable arguments.</param>
     /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
-    public async Task<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+    public async ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
 #if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
         if (JS == null)
