@@ -375,7 +375,7 @@ public class MaterialsSample : CommonSample
             var metalnessRoughnessMapGpuImage = new GpuImage(gpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
 
 
-            var physicallyBasedMaterial = new PhysicallyBasedMaterial(baseColor: Colors.Silver, name: "PhysicallyBasedMaterial");
+            var physicallyBasedMaterial = new PhysicallyBasedMaterial(name: "PhysicallyBasedMaterial");
 
             physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
             physicallyBasedMaterial.SetTextureMap(TextureMapTypes.NormalMap, normalMapGpuImage);
