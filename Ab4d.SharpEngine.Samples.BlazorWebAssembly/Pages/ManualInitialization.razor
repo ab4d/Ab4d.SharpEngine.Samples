@@ -36,7 +36,11 @@
     {
         // Initialize the browser interop (load sharp-engine.js file and from javascript get access to exported methods in the CanvasInterop class)
         // Because Blazor uses Single Page Applications style, this needs to be executed only once
-        await CanvasInterop.InitializeInterop(JS);
+        await CanvasInterop.InitializeInterop();
+        
+        // Set the JSRuntime in CanvasInterop so it can be used to call JavaScript methods from CanvasInterop class
+        // Note that JS is available only from a Blazor assembly and not from a pure .Net assembly.
+        CanvasInterop.JS = JS;
     }
 
     /// <inheritdoc />

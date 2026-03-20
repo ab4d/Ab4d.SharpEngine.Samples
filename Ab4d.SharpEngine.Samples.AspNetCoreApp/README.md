@@ -1,10 +1,10 @@
 # Simple ASP.NET Core website with Ab4d.SharpEngine
 
-This project demonstrates how to create a simple web page that uses only HTML and JavaScript 
-to start the WebAssembly that is compiled from the `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project.
+This project demonstrates how use **ASP.NET Core web server** to start a simple web page that uses 
+WebAssembly files that are compiled from the `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project.
+This project does not require Blazor WebAssembly because it only uses HTML and JavaScript to load and start the WebAssembly.
 
-To serve the web page, this project uses an **Asp.Net Core web server**.
-To see how to use a Node.js web server or a simple Python, see the [Ab4d.SharpEngine.Samples.HtmlWebPage project](../Ab4d.SharpEngine.Samples.HtmlWebPage/README.md).
+To see how to use a Node.js web server or a simple Python web server, see the [Ab4d.SharpEngine.Samples.HtmlWebPage project](../Ab4d.SharpEngine.Samples.HtmlWebPage/README.md).
 
 ### Prepare required files
 
@@ -14,12 +14,13 @@ The wwwroot folder must contain the **HTML and JavaScript files** that load and 
 
 Then, the wwwroot folder must also contain the `_framework` folder with **WebAssembly files** that are compiled from the Ab4d.SharpEngine.Samples.WebAssemblyDemo project.
 
-By default, this project is dependent on the Ab4d.SharpEngine.Samples.WebAssemblyDemo project so 
-when it is compiled, the WebAssemblyDemo project is also compiled and the WebAssembly files are
+By default, this project is dependent on the Ab4d.SharpEngine.Samples.WebAssemblyDemo project 
+(this is defined in .sln file and not in csproj becasue we cannot reference a project with `RuntimeIdentifier` set to `browser-wasm` from a project that does not have it).
+This means that when this project is compiled, the WebAssemblyDemo project is also compiled and the WebAssembly files are
 available in its Debug or Release folder.
 
 You can also manually compile the Ab4d.SharpEngine.Samples.WebAssemblyDemo project by starting 
-the `compile_publish_version.bat` script. This compiles the WebAssemblyDemo project in release mode
+the `run_published_version.bat` script. This compiles the WebAssemblyDemo project in release mode
 and also compresses the .js and .wasm files into Brotli compressed files (requires ThirdParty brotli tool).
 
 
@@ -59,7 +60,7 @@ There, the code first initializes the .NET WebAssembly runtime by loading the `.
 
 ## Debugging
 
-When the web server is started by using Asp.Net Core, a python script or in some other way, it is not possible (at least to my knowledge) to debug the c# code that was used to generate the WebAssembly files.
+When the web server is started by using ASP.NET Core, a python script or in some other way, it is not possible (at least to my knowledge) to debug the c# code that was used to generate the WebAssembly files.
 
 Therefore, it is recommended to create a **Blazor WebAssembly web page** that uses linked .cs files from the main project (Ab4d.SharpEngine.Samples.WebAssemblyDemo) and can be started as a Blazor WebAssembly web page, allowing for full code debugging.
 

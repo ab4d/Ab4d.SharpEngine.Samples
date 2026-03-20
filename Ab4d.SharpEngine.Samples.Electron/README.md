@@ -1,6 +1,7 @@
 # Electron app with Ab4d.SharpEngine
 
-The Electron framework can be used to create desktop applications using web technologies that are rendered using a version of the Chromium browser engine and a back end using the Node.js runtime environment. Electron apps can run on Windows, macOS and Linux.
+The Electron framework can be used to create desktop applications using web technologies that are rendered using a version of the Chromium browser engine and a back end using the Node.js runtime environment. 
+Electron apps can run on Windows, macOS and Linux.
 
 Electron is a very popular framework and is used by many applications, including Visual Studio Code, Slack, Discord, GitHub Desktop, and many others.
 

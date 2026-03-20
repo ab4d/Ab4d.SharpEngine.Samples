@@ -168,8 +168,9 @@ export function loadBinaryFile(canvasId, url) {
 }
 
 export async function loadImageBytes(canvasId, url) {
-    log("loadImageBytes: start loading " + url);
-     
+    var loggedUrl = url.startsWith("data:") ? "base64 encoded data" : url; // prevent logging the whole base64 string in case of data url
+    log("loadImageBytes: start loading " + loggedUrl);
+    
     if (!createImageBitmap || typeof OffscreenCanvas === "undefined") {
         // Before Safari 16.4 (2024-03-27)
         await loadImageBytesOldWay(canvasId, url);
@@ -179,19 +180,19 @@ export async function loadImageBytes(canvasId, url) {
     const response = await fetch(url, { mode: 'cors' });
     if (!response.ok) {
         if (interop)
-            interop.OnImageBytesLoaded(canvasId, url, 0, 0, null, 'Image could not be fetched, url: ' + url);
+            interop.OnImageBytesLoaded(canvasId, url, 0, 0, null, 'Image could not be fetched, url: ' + loggedUrl);
 
         return;
     }
 
-    log("loadImageBytes: Image loaded: " + url);
+    log("loadImageBytes: Image loaded: " + loggedUrl);
 
     try {
         const blob = await response.blob();
         await loadImageBytesFromBlob(blob, canvasId, url);
     }
     catch (ex) {
-        let message = `loadImageBytes: error decoding image '${url}': ${ex.message}`;
+        let message = `loadImageBytes: error decoding image '${loggedUrl}': ${ex.message}`;
         log(message);
 
         if (interop)
@@ -585,7 +586,7 @@ const pointerMove = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseMove
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -597,7 +598,7 @@ const pointerDown = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseDown
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -609,7 +610,7 @@ const pointerUp = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -621,7 +622,7 @@ const pointerEnter = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -633,7 +634,7 @@ const pointerLeave = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using System.Runtime.InteropServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,23 +10,28 @@ string rootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 
 //
 // Ensure that WebAssembly files are available.
-// If not, copy them from Ab4d.SharpEngine.Samples.HtmlWebPage or Ab4d.SharpEngine.Samples.WebAssemblyDemo projects.
+// If not, copy them from Ab4d.SharpEngine.Samples.WebAssemblyDemo or Ab4d.SharpEngine.Samples.HtmlWebPage projects.
 //
 
 if (!System.IO.File.Exists(rootPath + "/_framework/dotnet.native.wasm"))
 {
-    // First try to copy the wwwroot from Ab4d.SharpEngine.Samples.HtmlWebPage to this project's wwwroot
-    // There the files are created by starting compile_debug_version.bat or compile_publish_version.bat scripts.
-    var sourceFolder = Path.Combine(builder.Environment.ContentRootPath, $"../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/");
-    if (!System.IO.Directory.Exists(sourceFolder))
-    {
 #if DEBUG
-        string build = "Debug";
+    string build = "Debug";
 #else
-        string build = "Release";
+    string build = "Release";
 #endif
 
-        sourceFolder = Path.Combine(builder.Environment.ContentRootPath, $"..\\Ab4d.SharpEngine.Samples.WebAssemblyDemo\\bin\\{build}\\net9.0-browser\\browser-wasm\\AppBundle\\");
+    // Get the last compiled folder in Ab4d.SharpEngine.Samples.WebAssemblyDemo
+    var sourceFolder = Path.Combine(builder.Environment.ContentRootPath, $"..\\Ab4d.SharpEngine.Samples.WebAssemblyDemo\\bin\\{build}");
+    var allFolders = Directory.GetDirectories(sourceFolder, "*", SearchOption.TopDirectoryOnly);
+    var lastFolder = allFolders.OrderByDescending(f => new DirectoryInfo(f).LastWriteTime).First();
+
+    sourceFolder = Path.Combine(lastFolder, "browser-wasm\\AppBundle\\_framework\\");
+    
+    if (!System.IO.Directory.Exists(sourceFolder))
+    {
+        // If files in Ab4d.SharpEngine.Samples.WebAssemblyDemo does not exist, try to get files from Ab4d.SharpEngine.Samples.HtmlWebPage
+        sourceFolder = Path.Combine(builder.Environment.ContentRootPath, $"../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/");    
         if (!Directory.Exists(sourceFolder))
         {
             sourceFolder = null;

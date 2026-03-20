@@ -586,7 +586,7 @@ const pointerMove = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseMove
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -598,7 +598,7 @@ const pointerDown = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseDown
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -610,7 +610,7 @@ const pointerUp = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -622,7 +622,7 @@ const pointerEnter = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;
@@ -634,7 +634,7 @@ const pointerLeave = (e) => {
     if (!interop)
         return;
 
-    e.preventDefault(); // Prevent sending mouseUp
+    e.preventDefault();
 
     if (isPinchZooming)
         return;

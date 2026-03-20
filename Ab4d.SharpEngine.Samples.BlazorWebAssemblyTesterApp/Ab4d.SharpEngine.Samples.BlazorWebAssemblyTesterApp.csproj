@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Ab4d.SharpEngine.Samples.WebAssemblyDemo\CanvasInterop.cs" Link="CanvasInterop.cs" />
+    <Compile Include="..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\CanvasInterop.cs" Link="CanvasInterop.cs" />
     <Compile Include="..\Ab4d.SharpEngine.Samples.WebAssemblyDemo\SharpEngineTest.cs" Link="SharpEngineTest.cs" />
   </ItemGroup>
 

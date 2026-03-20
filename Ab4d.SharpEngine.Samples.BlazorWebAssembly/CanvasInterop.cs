@@ -1,14 +1,14 @@
-﻿using Ab4d.SharpEngine.Browser;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Utilities;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using Ab4d.SharpEngine.Browser;
+using Ab4d.SharpEngine.Common;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
+using System.Threading;
+using System.Threading.Tasks;
 
 // IMPORTANT:
 // If you change this namespace, then you also need to change the code in sharp-engine.js: interop = exports.Ab4d.SharpEngine.WebGL.CanvasInterop;
@@ -39,15 +39,24 @@ public partial class CanvasInterop : ICanvasInterop
     /// </summary>
     public static bool IsInteropInitialized { get; private set; }
 
+#if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
     /// <summary>
     /// Gets the IJSRuntime that is used for javascript interop. This is set when the <see cref="InitializeInterop"/> method is called.
     /// </summary>
-    public static Microsoft.JSInterop.IJSRuntime? JS { get; private set; }
+    public static Microsoft.JSInterop.IJSRuntime? JS { get; set; }
 
     /// <summary>
     /// True when <see cref="InvokeAsync{TValue}(string,object?[])"/> and <see cref="InvokeVoidAsync"/> are supported.
     /// </summary>
     public bool IsInvokeSupported => JS != null;
+#else
+    /// <summary>
+    /// Javascript invoke is not supported without Blazor (in pure .Net assembly).
+    /// </summary>
+    public bool IsInvokeSupported => false;
+#endif
+
+
     
     /// <summary>
     /// Gets the id of the canvas element that is defined in the browser DOM (html or razor file).
@@ -143,14 +152,12 @@ public partial class CanvasInterop : ICanvasInterop
     }
     
     #region static Initialize method and GetCanvasInterop
-    public static async Task InitializeInterop(Microsoft.JSInterop.IJSRuntime jsRuntime, string? sharpEngineJsFileUrl = null)
+    public static async Task InitializeInterop(string? sharpEngineJsFileUrl = null)
     {
         if (_isInitializeCalled)
             return;
 
         _isInitializeCalled = true;
-
-        JS = jsRuntime;
 
         if (!OperatingSystem.IsBrowser())
             throw new SharpEngineException("Ab4d.SharpEngine.Web can be used only in Blazor WebAssembly.");
@@ -549,7 +556,11 @@ public partial class CanvasInterop : ICanvasInterop
     /// <returns>A <see cref="Task"/> that represents the asynchronous invocation operation.</returns>
     public async Task InvokeVoidAsync(string identifier, params object?[]? args)
     {
+#if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
         await InvokeAsync<Microsoft.JSInterop.Infrastructure.IJSVoidResult>(identifier, args);
+#else
+        throw new NotSupportedException("InvokeAsync is available only when CanvasInterop is defined in a Blazor WebAssembly assembly and not in pure .Net assembly.");
+#endif
     }
 
     /// <summary>
@@ -565,10 +576,14 @@ public partial class CanvasInterop : ICanvasInterop
     /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
     public async Task<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
     {
+#if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
         if (JS == null)
-            throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that InitializeInterop method was called.");
+            throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that the static CanvasInterop.JS property is set after calling the InitializeInterop method.");
 
         return await JS.InvokeAsync<TValue>(identifier, args);
+#else
+        throw new NotSupportedException("InvokeAsync is available only when CanvasInterop is defined in a Blazor WebAssembly assembly and not in pure .Net assembly.");
+#endif
     }
 
     /// <summary>
@@ -584,10 +599,14 @@ public partial class CanvasInterop : ICanvasInterop
     /// <returns>An instance of <typeparamref name="TValue"/> obtained by JSON-deserializing the return value.</returns>
     public async Task<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
+#if !NO_JSInterop // NO_JSInterop constant is defined in csproj when we do not add reference to Microsoft.AspNetCore.Components.WebAssembly
         if (JS == null)
-            throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that InitializeInterop method was called.");
+            throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that the static CanvasInterop.JS property is set after calling the InitializeInterop method.");
 
         return await JS.InvokeAsync<TValue>(identifier, cancellationToken, args);
+#else
+        throw new NotSupportedException("InvokeAsync is available only when CanvasInterop is defined in a Blazor WebAssembly assembly and not in pure .Net assembly.");
+#endif
     }
 
     /// <summary>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11505.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.Electron", "Ab4d.SharpEngine.Samples.Electron\Ab4d.SharpEngine.Samples.Electron.csproj", "{7E072375-8026-439F-808E-AA055D61FAC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E072375-8026-439F-808E-AA055D61FAC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E072375-8026-439F-808E-AA055D61FAC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E072375-8026-439F-808E-AA055D61FAC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E072375-8026-439F-808E-AA055D61FAC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C268911E-86FC-4996-B7CB-AA230C086402}
+	EndGlobalSection
+EndGlobal
