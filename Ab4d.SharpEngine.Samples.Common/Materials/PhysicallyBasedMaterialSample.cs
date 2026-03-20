@@ -91,6 +91,10 @@ public class PhysicallyBasedMaterialSample : CommonSample
         _textBlockFactory = await context.GetTextBlockFactoryAsync();
 
 
+        if (this.IsDisposed) // If async loading takes some time and the sample is disposed before the loading is finished, then just return without setting up the scene.
+            return;
+
+
         // After the required resources are loaded, we can create the main scene objects.
         if (_isSimpleScene)
             SetupSimpleScene();
