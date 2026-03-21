@@ -72,11 +72,13 @@ SceneView.SupersamplingFactor is 2). This requires running the pixel shader 4 ti
 2xSSAA renders the scene to a texture with 2 times more pixels. 
 In this case width and height are multiplied by 1.41 = sqrt(2) - SceneView.SupersamplingFactor is 1.41.");
 
-            SetupDeviceInfo();
-            SetupLogOptions();
-            
+
             this.Loaded += (sender, args) =>
             {
+                // Wait until loaded if user sets the SharpEngineSceneView
+                SetupDeviceInfo();
+                SetupLogOptions();
+            
                 bool isAnySettingChanged;
                 
                 if (AdvancedSettings != null)
@@ -145,9 +147,9 @@ In this case width and height are multiplied by 1.41 = sqrt(2) - SceneView.Super
                 AdapterStackPanel.Children.Add(radioButton);
 
 
-                if (i == 0)
+                if (radioButton.IsChecked ?? false)
                 {
-                    // We are using the primary graphic card so fill ComboBoxes based on its capabilities
+                    // Fill ComboBoxes based on selected device capabilities
                     SetupAntialisingComboBoxes(deviceDetails);
                     
                     if (deviceDetails.DeviceProperties.VendorID == VendorIds.Intel)

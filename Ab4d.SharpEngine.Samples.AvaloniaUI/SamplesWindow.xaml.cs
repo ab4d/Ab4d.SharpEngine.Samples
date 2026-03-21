@@ -710,10 +710,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         
         private async Task OpenSettingsWindow()
         {
-            var settingsWindow = new SettingsWindow();
-            
-            settingsWindow.ShowTestRunner = _testRunnerButton != null;
-            settingsWindow.IsStandardValidationEnabled = EnableStandardValidation;
+            var settingsWindow = new SettingsWindow
+            {
+                SharpEngineSceneView        = _currentSharpEngineSceneView,
+                ShowTestRunner              = _testRunnerButton != null,
+                IsStandardValidationEnabled = EnableStandardValidation
+            };
 
             SettingsWindow.AdvancedSharpEngineSettings oldSettings;
             if (_currentSharpEngineSceneView is SharpEngineSceneView sharpEngineSceneView)
