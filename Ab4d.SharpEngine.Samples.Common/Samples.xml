@@ -85,7 +85,7 @@
   <Sample Location="Lines.LineCapsSample" Title="Lines with caps"/>
   <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
-  <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
+  <Sample Location="Lines.CurveLineSample" Title="Curve lines" IsUpdated="True" UpdateInfo="Improved BezierCurve and BSpline classes by adding methods that use an adaptive algorithm\nthat generates the curve position based on angle change so more positions are generated\nat sharper curve bends and fewer positions at straighter curve segments."/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
   <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
