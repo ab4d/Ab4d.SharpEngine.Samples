@@ -10,6 +10,7 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
@@ -164,6 +165,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
                 RotateAroundPointerPosition = false,
                 ZoomMode = CameraZoomMode.ViewCenter,
+                
+                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
             };
         }
 

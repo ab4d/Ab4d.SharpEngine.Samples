@@ -13,6 +13,7 @@ using Ab4d.SharpEngine.Transformations;
 using System.IO;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -126,7 +127,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                 MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
                 QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
                 ZoomMode = CameraZoomMode.PointerPosition,
-                RotateAroundPointerPosition = true
+                RotateAroundPointerPosition = true,
+                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
             };
         }
 

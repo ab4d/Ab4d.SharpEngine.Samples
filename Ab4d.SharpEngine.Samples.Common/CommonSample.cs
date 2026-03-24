@@ -121,6 +121,7 @@ public abstract class CommonSample
     public bool RotateAroundPointerPosition { get; set; }
     public CameraZoomMode ZoomMode { get; set; } = CameraZoomMode.CameraRotationCenterPosition;
     public bool IsPointerWheelZoomEnabled { get; set; } = true;
+    public CameraController.CameraSmoothingPresets CameraSmoothing { get; set; } = CameraController.CameraSmoothingPresets.Normal;
 
 #if VULKAN
     private bool _showCameraAxisPanel;
@@ -492,6 +493,7 @@ public abstract class CommonSample
         pointerCameraController.RotateAroundPointerPosition = this.RotateAroundPointerPosition;
         pointerCameraController.ZoomMode                    = this.ZoomMode;
         pointerCameraController.IsPointerWheelZoomEnabled   = this.IsPointerWheelZoomEnabled;
+        pointerCameraController.CameraSmoothing             = this.CameraSmoothing;
     }
 
     public void ReCreateUI()

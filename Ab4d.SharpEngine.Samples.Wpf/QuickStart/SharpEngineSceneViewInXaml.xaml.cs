@@ -15,6 +15,7 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Wpf;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.Transformations;
+using Ab4d.SharpEngine.Utilities;
 using System.Windows.Media.Imaging;
 using System.IO;
 
@@ -119,7 +120,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
                 MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
                 QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
                 ZoomMode = CameraZoomMode.PointerPosition,
-                RotateAroundPointerPosition = true
+                RotateAroundPointerPosition = true,
+                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
             };
         }
 

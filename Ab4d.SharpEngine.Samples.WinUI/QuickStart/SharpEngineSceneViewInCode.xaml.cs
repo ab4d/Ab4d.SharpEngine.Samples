@@ -12,6 +12,7 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.WinUI.Common;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.WinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -167,6 +168,8 @@ namespace Ab4d.SharpEngine.Samples.WinUI.QuickStart
 
                 RotateAroundPointerPosition = false,
                 ZoomMode = CameraZoomMode.ViewCenter,
+                
+                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
             };
         }
 

@@ -16,6 +16,7 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Samples.Wpf.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Vulkan;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Wpf;
 
 namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
@@ -174,6 +175,8 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
                 RotateAroundPointerPosition = false,
                 ZoomMode = CameraZoomMode.ViewCenter,
+                
+                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
             };
         }
 
