@@ -18,6 +18,7 @@
   <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
+  <Sample Location="CameraControllers.CameraSmoothingSample" Title="Camera smoothing"/>
   
   <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
   <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
