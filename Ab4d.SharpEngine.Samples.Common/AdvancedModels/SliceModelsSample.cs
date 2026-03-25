@@ -12,35 +12,83 @@ public class SliceModelsSample : CommonSample
 {
     public override string Title => "Slice 3D model with a plane";
 
-    private GroupNode? _importedModel;
-    private StandardMaterial _redBackMaterial;
+        
+    private readonly Slicer _slicer;
     
-    private GroupNode? _frontGroupNode;
-    private GroupNode? _backGroupNode;
+    private enum SceneTypes
+    {
+        Box,
+        Sphere,
+        Teapot,
+        MultipleModels,
+        Robotarm,
+    }
+
+    private SceneTypes _currentSceneType = SceneTypes.MultipleModels;
+    
+    private int _selectedPlaneIndex = 2;
+
+    private float _transformSliderValue = 50;
+
+    private bool _isTranslateTransform = true;
+    
+    private float _transformationAmount = 0.5f;
+    
+    private GroupNode _frontGroupNode;
+    private GroupNode _backGroupNode;
+    private GroupNode _slicesOnPlaneGroup;
+    private MultiLineNode _wireframeLineNode;
     
     private TranslateTransform? _frontGroupTranslateTransform;
     private TranslateTransform? _backGroupTranslateTransform;
 
     private Plane[] _allPlanes;
-
-    private int _selectedPlaneIndex = 0;
-
-    private float _slicePositionPercent = 70;
-    private float _planeRotationAngle = 0;
-
-    private EdgeLinesFactory? _edgeLinesFactory;
-    private MultiLineNode? _frontEdgeLinesNode;
-    private MultiLineNode? _backEdgeLinesNode;
-
+    
+    private BoundingBox _modelBounds;
+    
+    private bool _showEdgeLines = true;
+    private bool _showWireframe = false;
     private bool _showFront = true;
     private bool _showBack = true;
-    private bool _showEdgeLines = true;
+    private bool _showSliceMesh = true;
+    private bool _closeMesh = false;
+    
+    private StandardMesh? _originalMesh;
+    private GroupNode? _originalGroupNode;
+    private StandardMesh? _teapotMesh;
+    private GroupNode? _robotArmModel;
+
+    private EdgeLinesFactory? _edgeLinesFactory;
+    
+    private float _rootModelSize;
+    
+    private ICommonSampleUIElement? _transformAmountLabel;
+    private ICommonSampleUIElement? _showWireframeCheckBox;
+    private ICommonSampleUIElement? _showEdgeLinesCheckBox;
 
 
     public SliceModelsSample(ICommonSamplesContext context)
         : base(context)
     {
-        _redBackMaterial = StandardMaterials.Red; // Use a single instance for back material
+        // Create the Slicer helper class that can slice 3D models
+        _slicer = new Slicer()
+        {
+            // When we use Slicer only to slice 3D models and we do not need the 2D slice shape or to close the mesh, 
+            // then we can set the CollectIntersectionPoints to false.
+            //CollectIntersectionPoints = false
+            
+            // When creating closed meshes or shape polylines, then Slicer needs to combine duplicate positions
+            // (positions that lie at the same position in 3D space). But because of limited float precision (32 bits)
+            // this leads to floating point imprecision. To solve that the actual positions are converted into 
+            // normalized positions with a fixed precision (deleting the least significant bits).
+            // The number of used bits is defined by the DuplicatePositionsPrecisionBitsCount.
+            // 
+            // By default, it is set to 18 bits. If you still find that some closed meshes are not generated,
+            // you can decrease this number. But be aware that too low precision can lead to wrong results,
+            // especially for meshes with positions that are very close to each other.
+            DuplicatePositionsPrecisionBitsCount = 18
+        };
+
 
         // Plane is created by defining plane's normal vector (first 3 numbers) and an offset d (forth number):
         _allPlanes = new Plane[]
@@ -50,6 +98,21 @@ public class SliceModelsSample : CommonSample
             new Plane(0, 0, 1, 0),
         };
 
+        _frontGroupNode = new GroupNode("FrontGroup");
+        _frontGroupTranslateTransform = new TranslateTransform();
+        _frontGroupNode.Transform = _frontGroupTranslateTransform;
+
+        _backGroupNode = new GroupNode("BackGroup");
+        _backGroupTranslateTransform = new TranslateTransform();
+        _backGroupNode.Transform = _backGroupTranslateTransform;
+
+        _slicesOnPlaneGroup = new GroupNode("SlicesOnPlaneGroup");
+
+        _wireframeLineNode = new MultiLineNode(lineColor: Colors.Black, lineThickness: 1, "WireframeLinesNode")
+        {
+            DepthBias = 0.005f
+        };
+
         ShowCameraAxisPanel = true;
     }
 
@@ -57,231 +120,356 @@ public class SliceModelsSample : CommonSample
     {
         // We add additional front and back GroupNodes that will provide separation from the front and back models.
         // Here we only create TranslateTransform objects. The actual transformation is set in UpdateSlicedModel method.
-        _frontGroupNode = new GroupNode("FrontGroup");
-        _frontGroupTranslateTransform = new TranslateTransform();
-        _frontGroupNode.Transform = _frontGroupTranslateTransform;
+
         scene.RootNode.Add(_frontGroupNode);
-
-        _backGroupNode = new GroupNode("BackGroup");
-        _backGroupTranslateTransform = new TranslateTransform();
-        _backGroupNode.Transform = _backGroupTranslateTransform;
         scene.RootNode.Add(_backGroupNode);
-
-
-        // Create MultiLineNodes that will show edge lines
-        var edgeLineMaterial = new LineMaterial(Colors.Black)
-        {
-            LineThickness = 1,
-            DepthBias = 0.005f // rise the lines above the 3D object
-        };
-
-        _frontEdgeLinesNode = new MultiLineNode(isLineStrip: false, edgeLineMaterial);
-        scene.RootNode.Add(_frontEdgeLinesNode);
-
-        _backEdgeLinesNode = new MultiLineNode(isLineStrip: false, edgeLineMaterial);
-        scene.RootNode.Add(_backEdgeLinesNode);
-
-
-
-        // Read model from obj file
-        //string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\robotarm.obj");
-
-        //var objImporter = new ObjImporter();
-        //_importedModel = objImporter.Import(fileName);
-
-        _importedModel = await base.GetCommonSceneAsync(scene, CommonScenes.RobotArm, cacheSceneNode: false);
-
-
-        // Uncomment to read model from some other file format:
-        //var assimpImporter = Importers.AssimpImporterSample.InitAssimpLibrary(scene.GpuDevice, this.BitmapIO, "assimp-lib", showErrorMessageAction: null);
-
-        //if (assimpImporter == null)
-        //    return;
-
-        //string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources\\Models\\planetary-gear.FBX");
-        //fileName = Ab4d.SharpEngine.Utilities.FileUtils.FixDirectorySeparator(fileName);
-
-        //_importedModel = assimpImporter.Import(fileName);
-
-
-        // Test on fixed box models:
-
-        //var box1 = new BoxModelNode("Box1")
-        //{
-        //    Position = new Vector3(-100, 0, 0),
-        //    Size = new Vector3(100, 60, 80),
-        //    Material = StandardMaterials.Green,
-        //    UseSharedBoxMesh = false
-        //};
-
-        //var box2 = new BoxModelNode("Box2")
-        //{
-        //    Position = new Vector3(0, 0, 0),
-        //    Size = new Vector3(100, 60, 80),
-        //    Material = StandardMaterials.Blue,
-        //    UseSharedBoxMesh = false,
-        //    Transform = new TranslateTransform(100, 0, 0)
-        //};
-
-        //var box3 = new BoxModelNode("Box3")
-        //{
-        //    Position = new Vector3(0, -40, 0),
-        //    Size = new Vector3(300, 5, 100),
-        //    Material = StandardMaterials.Gray,
-        //    UseSharedBoxMesh = false,
-        //    Transform = new AxisAngleRotateTransform(new Vector3(0, 1, 0), 30)
-        //};
-
-        //_importedModel = new GroupNode("RootGroup");
-        //_importedModel.Transform = new TranslateTransform(20, 0, 50);
-        //_importedModel.Transform = new AxisAngleRotateTransform(new Vector3(0, 0, 1), 30);
-        //_importedModel.Add(box1);
-        //_importedModel.Add(box2);
-        //_importedModel.Add(box3);
-
-
-
-        if (_importedModel == null)
-            return;
-
-        if (_importedModel.WorldBoundingBox.IsUndefined)
-            _importedModel.Update();
+        scene.RootNode.Add(_slicesOnPlaneGroup);
+        scene.RootNode.Add(_wireframeLineNode);
 
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading = 25;
-            targetPositionCamera.Attitude = -15;
-
-            if (!_importedModel.WorldBoundingBox.IsUndefined)
-            {
-                targetPositionCamera.TargetPosition = _importedModel.WorldBoundingBox.GetCenterPosition();
-                targetPositionCamera.Distance = _importedModel.WorldBoundingBox.GetDiagonalLength() * 1.6f;
-            }
+            targetPositionCamera.Heading  = 50;
+            targetPositionCamera.Attitude = -20;
+            targetPositionCamera.Distance = 500;
         }
 
+        
+        UpdateScene();
+        
         UpdateSlicedModel();
+
+
+        // Load teapot and robot arm models so if user changes the scene type, they will be already loaded
+        _teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot);
+        _robotArmModel = await base.GetCommonSceneAsync(scene, CommonScenes.RobotArm);
+
+        // If initially the _currentSceneType was set to Teapot or Robotarm, then update the scene after the resources are loaded.
+        if (_currentSceneType == SceneTypes.Teapot || _currentSceneType == SceneTypes.Robotarm)
+        {
+            UpdateScene();
+            UpdateSlicedModel();
+        }
+    }
+
+    private void UpdateScene()
+    {
+        _originalMesh = null;
+        _originalGroupNode = null;
+        _modelBounds = BoundingBox.Undefined;
+        
+        switch (_currentSceneType)
+        {
+            case SceneTypes.Box:
+                _originalMesh = MeshFactory.CreateBoxMesh(centerPosition: new Vector3(0, 0, 0), size: new Vector3(120, 80, 100));
+                _modelBounds = _originalMesh.BoundingBox;
+                break;
+            
+            case SceneTypes.Sphere:
+                _originalMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 50, segments: 20);
+                _modelBounds = _originalMesh.BoundingBox;
+                break;
+            
+            case SceneTypes.Teapot:
+                if (_teapotMesh != null)
+                {
+                    _originalMesh = _teapotMesh;
+                    _modelBounds = _teapotMesh.BoundingBox;
+                }
+                break;
+            
+            case SceneTypes.MultipleModels:
+                _originalGroupNode = new GroupNode("MultipleModelsGroup");
+                
+                _originalGroupNode.Add(new PyramidModelNode(bottomCenterPosition: new Vector3(-360, -60, 0), size: new Vector3(120, 120, 120), StandardMaterials.Green));
+                
+                _originalGroupNode.Add(new BoxModelNode(centerPosition: new Vector3(-180, 0, 0), size: new Vector3(120, 120, 120), StandardMaterials.Green)
+                {
+                    // We must not use shared mesh because in this case the mesh is generated only after the BoxModelNode is added to the Scene (to get a shared box mesh).
+                    // But this BoxModelNode is never added to the Scene because it is only used to generate the sliced models.
+                    // When UseSharedBoxMesh is false, then mesh is created only for that instance of BoxModelNode.
+                    UseSharedBoxMesh = false 
+                });
+                
+                _originalGroupNode.Add(new TorusKnotModelNode(centerPosition: new Vector3(0, 0, 0), radius1: 40, radius2: 20, radius3: 10, StandardMaterials.Green) { P = 3, Q = 4 });
+                
+                _originalGroupNode.Add(new TubeModelNode(bottomCenterPosition: new Vector3(160, -60, 0), outerRadius: 60, innerRadius: 40, height: 120, segments: 4, StandardMaterials.Green)
+                {
+                    Transform = new StandardTransform(rotateY: 90) { PivotPoint = new Vector3(160, -60, 0) }
+                });
+                
+                _originalGroupNode.Add(new TubeModelNode(bottomCenterPosition: new Vector3(320, -60, 0), outerRadius: 60, innerRadius: 40, height: 120, segments: 30, StandardMaterials.Green));
+
+                _modelBounds = _originalGroupNode.GetLocalBoundingBox(updateIfDirty: true);
+                
+                break;
+            
+            case SceneTypes.Robotarm:
+                if (_robotArmModel != null)
+                {
+                    _originalGroupNode = _robotArmModel;
+                    _modelBounds = _robotArmModel.GetLocalBoundingBox();
+                }
+
+                break;
+        }
+
+        _rootModelSize = MathF.Sqrt(_modelBounds.SizeX * _modelBounds.SizeX + _modelBounds.SizeY * _modelBounds.SizeY + _modelBounds.SizeZ * _modelBounds.SizeZ);
+        
+        if (targetPositionCamera != null)
+            targetPositionCamera.Distance = 2 * _rootModelSize;
     }
 
     private void UpdateSlicedModel()
     {
-        if (_importedModel == null || Scene == null)
-            return;
+        _frontGroupNode.Clear();
+        _backGroupNode.Clear();
+        _slicesOnPlaneGroup.Clear();
 
-
-        // Get slice plane
-        var plane = _allPlanes[_selectedPlaneIndex];
-
-        // We will update the plane's D value by the slider's _slicePositionPercent value
+        _wireframeLineNode.Positions = null;
         
-        // First get the size and position of the model in the plane's normal direction
-        float modelSizeInNormalDirection = Vector3.Dot(_importedModel.WorldBoundingBox.GetSize(), plane.Normal);
-        float modelOffsetInNormalDirection = Vector3.Dot(_importedModel.WorldBoundingBox.GetCenterPosition(), plane.Normal);
-
-        float positionFactor = _slicePositionPercent / 100;
-        float actualSlicePosition = modelOffsetInNormalDirection - modelSizeInNormalDirection / 2 + modelSizeInNormalDirection * positionFactor;
         
-        plane.D = actualSlicePosition;
+        // Get the selected 3D plane
+        var plane = GetSelectedPlane();
 
+        // Transform the plane that will be used to slice the model
+        var planeTransform = GetSelectedPlaneTransform(updateTransformationAmount: true);
+        plane = Plane.Transform(plane, planeTransform.Value);
+        
 
-        if (_planeRotationAngle != 0)
+        // Update Slicer        
+        _slicer.Plane = plane;
+        _slicer.CloseSlicedMeshes = _closeMesh;
+
+        
+        SceneNode? frontSceneNode = null;
+        SceneNode? backSceneNode = null;
+
+        if (_originalMesh != null)
         {
-            var transform = new AxisAngleRotateTransform(new Vector3(plane.Normal.Y, plane.Normal.Z, plane.Normal.X), _planeRotationAngle); // Rotate around rotated plane's normal
-            plane = Plane.Transform(plane, transform.Value);
+            _slicer.SliceMesh(_originalMesh, transform: null, out var frontMesh, out var backMesh);
+            
+            // To get only front mesh, we can use the following method:
+            // frontMesh = _slicer.SliceMesh(_originalMesh); // optionally, we can set the transform parameter
+            // backMesh = null;
+
+            if (frontMesh != null)
+                frontSceneNode = new MeshModelNode(frontMesh, StandardMaterials.Gold, "FrontMeshNode");
+
+            if (backMesh != null)
+                backSceneNode = new MeshModelNode(backMesh, StandardMaterials.Gold, "BackMeshNode");
+        }
+        else if (_originalGroupNode != null)
+        {
+            _slicer.SliceGroupNode(_originalGroupNode, parentTransform: null, out var frontGroupNode, out var backGroupNode);
+            frontSceneNode = frontGroupNode;
+            backSceneNode = backGroupNode;
+            
+            // To get only front group node, we can use the following method:
+            // frontGroupNode = _slicer.SliceGroupNode(_originalGroupNode); // optionally, we can set the parentTransform parameter
+            // backGroupNode = null;
+
+            // You can also use:
+            // _slicer.SliceModelNode(modelNode);
+            // _slicer.SliceSceneNode(sceneNode);
+        }
+       
+        
+        ShowSlice(frontSceneNode, isFront: true);
+        ShowSlice(backSceneNode, isFront: false);
+        
+        
+        if (_showSliceMesh)
+        {
+            if (_originalMesh != null)
+            {
+                ShowSliceMesh(_originalMesh);
+            }
+            else if (_originalGroupNode != null)
+            {
+                _originalGroupNode.ForEachChild<ModelNode>(modelNode => ShowSliceMesh(modelNode.GetMesh()));
+            }
         }
 
-        // ModelUtils.SliceSceneNode slices the _importedModel by the plane.
-        // It returns frontSceneNodes and backSceneNodes.
-        // We can also call SliceGroupNode or SliceModelNode.
-        var(frontSceneNode, backSceneNode) = ModelUtils.SliceSceneNode(plane, _importedModel, parentTransform: null); // we can also remove the parentTransform parameter because its default value is null
-
-        // To slice a mesh, use:
-        //(var frontMesh, var backMesh) = MeshUtils.SliceMesh(plane, mesh, parentTransform);
-
-
-        // Define the separation (gap) between the models
-        float slicedModelsSeparation = modelSizeInNormalDirection * 0.1f;
-
-        // Set back material to red so we will easily see the inner parts of the model
-        if (frontSceneNode != null && _frontGroupNode != null && _frontGroupTranslateTransform != null)
+        
+        if (this.Scene != null)
         {
-            // Change back material to red, so we can more easily see inside the model
-            Utilities.ModelUtils.ChangeBackMaterial(frontSceneNode, _redBackMaterial);
+            if (_showEdgeLines)
+            {
+                _edgeLinesFactory ??= new EdgeLinesFactory(); // Reuse the EdgeLinesFactory object. This reuses the internal collections.
+                var edgeLines = _edgeLinesFactory.CreateEdgeLines(this.Scene.RootNode, edgeStartAngleInDegrees: 25);
 
-            // Create a new GroupNode because we need to apply separation transformation (and we do not want to overwrite any existing transform).
-            // We could also use Ab4d.SharpEngine.Utilities.TransformationUtils.CombineTransformations, but creating a new GroupNode is cleaner.
-            
-            _frontGroupNode.Clear();
-            _frontGroupNode.Add(frontSceneNode);
-
-            // Move front model for the 10% of the object size in the direction of plane's normal
-            _frontGroupTranslateTransform.SetTranslate(plane.Normal.X * slicedModelsSeparation, plane.Normal.Y * slicedModelsSeparation, plane.Normal.Z * slicedModelsSeparation);
-        }
-
-        if (backSceneNode != null && _backGroupNode != null && _backGroupTranslateTransform != null)
-        {
-            Utilities.ModelUtils.ChangeBackMaterial(backSceneNode, _redBackMaterial);
-            
-            _backGroupNode.Clear();
-            _backGroupNode.Add(backSceneNode);
-
-            // Move front model for the 10% of the object size in the opposite direction of plane's normal
-            _backGroupTranslateTransform.SetTranslate(plane.Normal.X * -slicedModelsSeparation, plane.Normal.Y * -slicedModelsSeparation, plane.Normal.Z * -slicedModelsSeparation);
-        }
-
-        UpdateEdgeLines();
-
-        UpdateVisibility();
-    }
-
-    private void UpdateEdgeLines()
-    {
-        if (Scene == null || !_showEdgeLines) // No need to update edge lines when they are not visible
-            return;
-
-        _edgeLinesFactory ??= new EdgeLinesFactory(); // Reuse the EdgeLinesFactory object. This reuses the internal collections.
-
-        if (_frontGroupNode != null && _frontEdgeLinesNode != null)
-        {
-            // Generate edge lines from the _frontGroupNode
-            var edgeLines = _edgeLinesFactory.CreateEdgeLines(_frontGroupNode, edgeStartAngleInDegrees: 25);
-            
-            // And update the line positions in the MultiLineNode
-            _frontEdgeLinesNode.Positions = edgeLines.ToArray();
-            //_frontEdgeLinesNode.Transform = _frontGroupNode.Transform; // _frontGroupNode is already transformed; but if we would create edge lines from frontSceneNode, then we would need to apply the transformation from _frontGroupNode
-        }
-
-        if (_backGroupNode != null && _backEdgeLinesNode != null)
-        {
-            // Generate edge lines from the _backGroupNode
-            var edgeLines = _edgeLinesFactory.CreateEdgeLines(_backGroupNode, edgeStartAngleInDegrees: 25);
-            
-            // And update the line positions in the MultiLineNode
-            _backEdgeLinesNode.Positions = edgeLines.ToArray();
+                _wireframeLineNode.Positions = edgeLines.ToArray();
+            }
+            else if (_showWireframe)
+            {
+                _wireframeLineNode.Positions = LineUtils.GetWireframeLinePositions(this.Scene.RootNode);
+            }
         }
     }
     
-    private void UpdateVisibility()
+    private void ShowSlice(SceneNode? sceneNode, bool isFront)
     {
-        if (_frontGroupNode != null)
-            _frontGroupNode.Visibility = _showFront ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+        if (sceneNode == null || (isFront && !_showFront) || (!isFront && !_showBack))
+            return;
 
-        if (_backGroupNode != null)
-            _backGroupNode.Visibility = _showBack ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
 
-        if (_frontEdgeLinesNode != null)
-            _frontEdgeLinesNode.Visibility = (_showFront && _showEdgeLines) ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+        // Set BackMaterial to red color to show the inner parts of the models
+        Utilities.ModelUtils.ChangeBackMaterial(sceneNode, StandardMaterials.Red);
 
-        if (_backEdgeLinesNode != null)
-            _backEdgeLinesNode.Visibility = (_showBack && _showEdgeLines) ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            
+        // Define separationTransform that separates the front and back models
+        var plane = _slicer.Plane;
+        float slicedModelsSeparation = _rootModelSize * 0.2f;
+
+        if (!isFront)
+            slicedModelsSeparation *= -1;
+
+        var separationTransform = new TranslateTransform(plane.Normal.X * slicedModelsSeparation, 
+                                                         plane.Normal.Y * slicedModelsSeparation, 
+                                                         plane.Normal.Z * slicedModelsSeparation);
+
+        sceneNode.Transform = separationTransform;
+
+
+        // Add to scene
+        if (isFront)
+            _frontGroupNode.Add(sceneNode);
+        else
+            _backGroupNode.Add(sceneNode);
+    }
+
+    private void ShowSliceMesh(Mesh? mesh)
+    {
+        if (mesh is not StandardMesh standardMesh)
+            return;
+        
+        var closedSliceMesh = _slicer.GetClosedSliceMesh(standardMesh, useMeshTransform: true);
+
+        if (closedSliceMesh != null)
+        {
+            var meshModelNode = new MeshModelNode(closedSliceMesh, StandardMaterials.Silver, "SliceMeshModel")
+            {
+                BackMaterial = StandardMaterials.Silver
+            };
+            
+            _slicesOnPlaneGroup.Add(meshModelNode);
+        }
+    }
+    
+    private Plane GetSelectedPlane() => _allPlanes[_selectedPlaneIndex];
+    
+    private Transform GetSelectedPlaneTransform(bool updateTransformationAmount)
+    {
+        var plane = GetSelectedPlane();
+
+        Transform transform;
+        if (_isTranslateTransform)
+        {
+            float offset = _transformSliderValue / 100;
+            offset = (plane.Normal.X * _modelBounds.Minimum.X + plane.Normal.Y * _modelBounds.Minimum.Y + plane.Normal.Z * _modelBounds.Minimum.Z) +
+                     (offset * (plane.Normal.X * _modelBounds.SizeX + plane.Normal.Y * _modelBounds.SizeY + plane.Normal.Z * _modelBounds.SizeZ));
+
+            transform = new TranslateTransform(plane.Normal.X * offset, plane.Normal.Y * offset, plane.Normal.Z * offset);
+
+            _transformationAmount = offset;
+        }
+        else
+        {
+            float angle = ((_transformSliderValue / 100) - 0.5f) * 360.0f;
+            var perpendicularNormal = new Vector3(plane.Normal.Y, plane.Normal.Z, plane.Normal.X);
+            transform = new AxisAngleRotateTransform(axis: perpendicularNormal, angle); 
+
+            _transformationAmount = angle;
+        }
+        
+        if (updateTransformationAmount) // Update only if needed (updating TextBlock is slow)
+            _transformAmountLabel?.UpdateValue();
+
+        return transform;
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
+        ui.CreateLabel("View:", isHeader: true);
+        
+        ui.CreateCheckBox("Show front", isInitiallyChecked: _showFront, isChecked =>
+        {
+            _showFront = isChecked;
+            UpdateSlicedModel();
+        });
+        
+        ui.CreateCheckBox("Show back", isInitiallyChecked: _showBack, isChecked =>
+        {
+            _showBack = isChecked;
+            UpdateSlicedModel();
+        });
+        
+        ui.CreateCheckBox("Show slice mesh on plane", isInitiallyChecked: _showSliceMesh, isChecked =>
+        {
+            _showSliceMesh = isChecked;
+            UpdateSlicedModel();
+        });
+        
+        ui.CreateCheckBox("Close meshes", isInitiallyChecked: _closeMesh, isChecked =>
+        {
+            _closeMesh = isChecked;
+            UpdateSlicedModel();
+        });
 
-        ui.CreateLabel("Plane for slicing:");
+        ui.AddSeparator();
+        
+        
+        _showEdgeLinesCheckBox = ui.CreateCheckBox("Show edge lines", isInitiallyChecked: _showEdgeLines, isChecked =>
+        {
+            _showEdgeLines = isChecked;
+            
+            if (isChecked && _showWireframe)
+                _showWireframeCheckBox!.SetValue(false); // show only edge lines, not wireframe
+            else
+                UpdateSlicedModel();
+        });
+        
+        _showWireframeCheckBox = ui.CreateCheckBox("Show wireframe", isInitiallyChecked: _showWireframe, isChecked =>
+        {
+            _showWireframe = isChecked;
+            
+            if (isChecked && _showEdgeLines)
+                _showEdgeLinesCheckBox!.SetValue(false); // show only wireframe, not edge lines
+            else
+                UpdateSlicedModel();
+        });
 
+        // Showing 2D slices shape is not yet implemented
+        // See sample for Ab3d.PowerToys library to see how to show 2D slice polylines.
+        // ui.CreateCheckBox("Show 2D slice", isInitiallyChecked: _show2DSlice, isChecked =>
+        // {
+        //     _show2DSlice = isChecked;
+        //     UpdateSlicedModel();
+        // });
+
+        
+        ui.CreateLabel("3D model:", isHeader: true);
+        ui.CreateRadioButtons(new string[]
+            {
+                "Box", 
+                "Sphere", 
+                "Teapot (?):Note that the the middle part of the teapot model cannot be closed\nbecause the model is not fully connected.", 
+                "Multiple models",
+                "RobotArm scene (?):Note that the teapot model cannot be closed because the model is not fully connected.\nCheck the 'Teapot' RadioButton for closer investigation of that problem."
+            },
+            (selectedIndex, selectedText) =>
+            {
+                _currentSceneType = (SceneTypes)selectedIndex;
+                UpdateScene();
+                UpdateSlicedModel();
+            },
+            (int)_currentSceneType);
+        
+        
+        ui.CreateLabel("Plane for slicing:", isHeader: true);
+                                                                                                                                                            
         var planeDescriptions = _allPlanes.Select(p => $"Normal: ({p.Normal.X}, {p.Normal.Y}, {p.Normal.Z})").ToArray();
         ui.CreateRadioButtons(planeDescriptions, 
                               (selectedIndex, selectedText) =>
@@ -292,58 +480,25 @@ public class SliceModelsSample : CommonSample
                               _selectedPlaneIndex);
 
 
-        ui.AddSeparator();
-        ui.CreateLabel("Slice position:\n(sets plane's D value)");
-        ui.CreateSlider(0, 100,
-                        () => _slicePositionPercent,
+        ui.CreateLabel("Transform:", isHeader: true);
+
+        _transformAmountLabel = ui.CreateKeyValueLabel("Transform amount:", () => _transformationAmount.ToString("N1"));
+        
+        ui.CreateSlider(1, 99,
+                        () => _transformSliderValue,
                         newValue =>
                         {
-                            if ((int)_slicePositionPercent != (int)newValue)
+                            if ((int)_transformSliderValue != (int)newValue)
                             {
-                                _slicePositionPercent = newValue;
+                                _transformSliderValue = newValue;
                                 UpdateSlicedModel();
                             }
-                        },
-                        width: 120,
-                        formatShownValueFunc: sliderValue => sliderValue.ToString("F0"));
+                        });
         
-        
-        ui.AddSeparator();
-        ui.CreateLabel("Plane rotation:");
-        ui.CreateSlider(-90, 90,
-                        () => _planeRotationAngle,
-                        newValue =>
-                        {
-                            if ((int)_planeRotationAngle != (int)newValue)
-                            {
-                                _planeRotationAngle = newValue;
-                                UpdateSlicedModel();
-                            }
-                        },
-                        width: 120,
-                        formatShownValueFunc: sliderValue => sliderValue.ToString("F0"));
-
-        ui.AddSeparator();
-        ui.CreateCheckBox("Show front", _showFront, isChecked =>
+        ui.CreateRadioButtons(new string[] { "Translate", "Rotate" }, (selectedIndex, selectedText) =>
         {
-            _showFront = isChecked;
-            UpdateVisibility();
-        });
-        
-        ui.CreateCheckBox("Show back", _showBack, isChecked =>
-        {
-            _showBack = isChecked;
-            UpdateVisibility();
-        });
-
-        ui.CreateCheckBox("Show edge lines", _showEdgeLines, isChecked =>
-        {
-            _showEdgeLines = isChecked;
-
-            if (isChecked)
-                UpdateEdgeLines(); // Regenerate edge lines
-
-            UpdateVisibility();
-        });
+            _isTranslateTransform = selectedIndex == 0;
+            UpdateSlicedModel();
+        }, selectedItemIndex: 0);
     }
 }

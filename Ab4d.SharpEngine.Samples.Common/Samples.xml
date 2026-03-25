@@ -55,7 +55,7 @@
   <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
   <Sample Location="AdvancedModels.TriangulatedExtrudedShapeSample" Title="Triangulated &amp; extruded shape"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
-  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane" IsUpdated="True" UpdateInfo="Added a new Slicer class that can slice 3D models and also generate closed meshes and 2D intersection polygons."/>
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
