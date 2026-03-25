@@ -2,6 +2,7 @@
 using System.Text;
 using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Samples.Common.Utils
 {
@@ -40,6 +41,8 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils
             Vector3[]? vertices = null;
             Color4[]? pixelColors = null;
 
+            fileName = FileUtils.FixDirectorySeparator(fileName);
+            
             using (var fs = System.IO.File.OpenRead(fileName))
             {
                 using (var reader = new BinaryReader(fs))
