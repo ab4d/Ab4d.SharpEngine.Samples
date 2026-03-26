@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.iOS;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Foundation;
 using UIKit;
 
@@ -20,7 +20,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS
         {
             return base.CustomizeAppBuilder(builder)
                 .WithInterFont()
-                .UseReactiveUI();
+                .UseReactiveUI(uiBuilder => {});
         }
     }
 }

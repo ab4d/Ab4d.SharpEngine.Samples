@@ -3,8 +3,9 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</RootNamespace>  
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0-ios</TargetFramework>
-    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    <TargetFramework>net10.0-ios</TargetFramework>
+    <RuntimeIdentifiers>ios-arm64</RuntimeIdentifiers>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>com.ab4d.sharpengine.samples.avaloniaui</ApplicationId>
     <!-- To start the app on iOS device you will need a provisioning profile. See:
@@ -14,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.iOS" Version="11.3.5" />
+    <PackageReference Include="Avalonia.iOS" Version="11.3.12" />
   </ItemGroup>
 
   <ItemGroup>

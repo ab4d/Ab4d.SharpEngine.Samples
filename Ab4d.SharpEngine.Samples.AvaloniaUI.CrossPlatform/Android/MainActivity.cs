@@ -2,7 +2,7 @@
 using Android.Content.PM;
 using Avalonia;
 using Avalonia.Android;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android
 {
@@ -26,7 +26,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android
 
             return base.CustomizeAppBuilder(builder)
                 .WithInterFont()
-                .UseReactiveUI();
+                .UseReactiveUI(uiBuilder => {});
         }
     }
 }

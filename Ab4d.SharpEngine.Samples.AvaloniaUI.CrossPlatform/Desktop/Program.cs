@@ -1,6 +1,6 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using System;
+using ReactiveUI.Avalonia;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Desktop
 {
@@ -28,7 +28,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Desktop
                 .UsePlatformDetect()
                 .WithInterFont()
                 .LogToTrace()
-                .UseReactiveUI();
+                .UseReactiveUI(uiBuilder => {});
         }
     }
 }
