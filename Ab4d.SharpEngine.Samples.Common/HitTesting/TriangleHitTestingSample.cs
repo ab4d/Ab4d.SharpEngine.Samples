@@ -1,10 +1,8 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
 using System.Diagnostics;
 using System.Numerics;
@@ -245,11 +243,13 @@ public class TriangleHitTestingSample : CommonSample
                 // The easies way to create a TriangleModelNode from an existing mesh is to use the CreateFromMesh static method.
                 // This will create a TriangleModelNode with the same triangle vertices and texture coordinates as the triangle in the mesh.
                 // You can also create the TriangleModelNode by using any of its constructors.
-                _selectedTriangleModelNode = TriangleModelNode.CreateFromMesh(_torusMesh, _lastTriangleIndex, StandardMaterials.Red, "SelectedTriangleNode");
-                _selectedTriangleModelNode.Offset = 0.001f; // Set small offset to avoid z-fighting with the torus mesh. This will move the triangle in the direction of its normal vector, so it will be moved outside of the torus mesh.
+                var selectedTriangleModelNode = TriangleModelNode.CreateFromMesh(_torusMesh, _lastTriangleIndex, StandardMaterials.Red, "SelectedTriangleNode");
+                selectedTriangleModelNode.Offset = 0.001f; // Set small offset to avoid z-fighting with the torus mesh. This will move the triangle in the direction of its normal vector, so it will be moved outside of the torus mesh.
 
-                if (Scene != null && _selectedTriangleModelNode != null)
-                    Scene.RootNode.Add(_selectedTriangleModelNode!);
+                if (Scene != null)
+                    Scene.RootNode.Add(selectedTriangleModelNode);
+
+                _selectedTriangleModelNode = selectedTriangleModelNode;
             }
             else
             {
