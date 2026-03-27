@@ -181,62 +181,13 @@ public class FogEffectTechnique : EffectTechnique
 
 
         Color4 diffuseColor;
+        GpuImage? diffuseTexture;
+        GpuSampler? diffuseTextureSampler;
+        CommonSamplerTypes diffuseSamplerType;
         
-        if (material is StandardMaterialBase standardMaterial)
-        {
-            diffuseColor = new Color4(standardMaterial.DiffuseColor, standardMaterial.Opacity);
-
-            //if (standardMaterial.DiffuseTexture != null && uniforms.DiffuseSampler > 0)
-            //{
-            //    // Activate texture unit and bind
-            //    GL.ActiveTexture(TextureUnit.Texture0); // Use texture unit 0
-            //    GL.BindTexture(TextureTarget.Texture2D, standardMaterial.DiffuseTexture.Image);
-
-            //    // Pass texture unit index to shader
-            //    GL.Uniform1("TEXTURE0", uniforms.DiffuseSampler, 0); // 0 corresponds to TEXTURE0
-
-
-            //    if (standardMaterial.DiffuseTexture.HasNoMipMaps)
-            //    {
-            //        // If texture has no mipmaps (for example when using WebGL 1), then set different wrapping and filtering
-            //        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-            //        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-            //        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            //    }
-            //    else if (standardMaterial.DiffuseTextureSampler != null)
-            //    {
-            //        standardMaterial.DiffuseTextureSampler.ApplySampler(renderingContext);
-            //    }
-
-            //    alphaClipThreshold = standardMaterial.AlphaClipThreshold;
-            //    isTexture = true;
-            //}
-        }
-        else
-        {
-            if (material is IDiffuseMaterial diffuseMaterial)
-                diffuseColor = new Color4(diffuseMaterial.DiffuseColor, diffuseMaterial.Opacity);
-            else
-                diffuseColor = Color4.Black;
-
-            //if (material is IDiffuseTextureMaterial diffuseTextureMaterial)
-            //{
-            //    alphaClipThreshold = diffuseTextureMaterial.AlphaClipThreshold;
-            //    isTexture = diffuseTextureMaterial.DiffuseTexture != null;
-            //}
-        }
-
-        // Here we do not support transparent materials
-        GL.Disable(EnableCap.Blend);
-
-        // Set color after blend type because we may need to alpha-premultiply the diffuseColor
-        if (uniforms.DiffuseColor >= 0)
-            GL.Uniform4("diffuseColor", uniforms.DiffuseColor, diffuseColor);
-
-
-
         if (material is FogMaterial fogMaterial)
         {
+            // Set fog specific properties
             if (uniforms.FogStart >= 0)
                 GL.Uniform1("fogStart", uniforms.FogStart, fogMaterial.FogStart);
 
@@ -245,8 +196,68 @@ public class FogEffectTechnique : EffectTechnique
 
             if (uniforms.FogColor >= 0)
                 GL.Uniform3("fogColor", uniforms.FogColor, fogMaterial.FogColor);
+            
+            
+            // Read standard material properties
+            diffuseColor = new Color4(fogMaterial.DiffuseColor, fogMaterial.Opacity);
+
+            diffuseTexture        = fogMaterial.DiffuseTexture;
+            diffuseTextureSampler = fogMaterial.DiffuseTextureSampler;
+            diffuseSamplerType    = fogMaterial.DiffuseTextureSamplerType;
+        }
+        else
+        {
+            if (material is IDiffuseMaterial diffuseMaterial)
+                diffuseColor = new Color4(diffuseMaterial.DiffuseColor, diffuseMaterial.Opacity);
+            else
+                diffuseColor = Color4.Black;
+
+            if (material is IDiffuseTextureMaterial diffuseTextureMaterial)
+            {
+                diffuseTexture        = diffuseTextureMaterial.DiffuseTexture;
+                diffuseTextureSampler = diffuseTextureMaterial.DiffuseTextureSampler;
+                diffuseSamplerType    = diffuseTextureMaterial.DiffuseTextureSamplerType;
+            }
+            else
+            {
+                diffuseTexture        = null;
+                diffuseTextureSampler = null;
+                diffuseSamplerType    = CommonSamplerTypes.Other;
+            }
         }
 
+        if (diffuseTexture != null && uniforms.DiffuseSampler > 0)
+        {
+            // Activate texture unit and bind
+            GL.ActiveTexture(TextureUnit.Texture0); // Use texture unit 0
+            GL.BindTexture(TextureTarget.Texture2D, diffuseTexture.Image);
+
+            // Pass texture unit index to shader
+            GL.Uniform1("TEXTURE0", uniforms.DiffuseSampler, 0); // 0 corresponds to TEXTURE0
+
+            if (diffuseTexture.HasNoMipMaps)
+            {
+                // If texture has no mipmaps (for example when using WebGL 1), then set different wrapping and filtering
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            }
+            else
+            {
+                if (diffuseTextureSampler == null && diffuseSamplerType != CommonSamplerTypes.Other)
+                    diffuseTextureSampler = renderingContext.GpuDevice.SamplerFactory.GetSampler(diffuseSamplerType);
+                    
+                if (diffuseTextureSampler != null)
+                    diffuseTextureSampler.ApplySampler(renderingContext);
+            }
+        }        
+
+        // Here we do not support transparent materials
+        GL.Disable(EnableCap.Blend);
+
+        // Set color after blend type because we may need to alpha-premultiply the diffuseColor
+        if (uniforms.DiffuseColor >= 0)
+            GL.Uniform4("diffuseColor", uniforms.DiffuseColor, diffuseColor);
 
         _lastMaterial = material;
     }
