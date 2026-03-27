@@ -10,7 +10,7 @@ public class AxesBoxNodeSample : CommonSample
     public override string Title => "AxesBoxNode";
     public override string Subtitle => "AxesBoxNode can show all 6 axes with tick lines and value labels.\nIt automatically switches and orients the shown axes.\nTick lines and value labels can be shown as 3D text or as 2D text.";
     
-    private AxesBoxNode _axesBoxNode = null!;
+    private AxesBoxNode? _axesBoxNode;
     
     private Color4[]? _gradientColors;
     
@@ -65,6 +65,9 @@ public class AxesBoxNodeSample : CommonSample
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.XAxis, minimumValue: 0, maximumValue: 100, majorTicksStep: 10, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.YAxis, minimumValue: 0, maximumValue: 100, majorTicksStep: 10, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
         _axesBoxNode.SetAxisDataRange(AxesBoxNode.AxisTypes.ZAxis, minimumValue: -20, maximumValue: 200, majorTicksStep: 20, minorTicksStep: 5, snapMaximumValueToMajorTicks: true);
+
+        if (_axesBoxNode.Camera == null && SceneView != null)
+            ShowDemoAxes(SceneView);
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
@@ -75,6 +78,9 @@ public class AxesBoxNodeSample : CommonSample
 
     private void ShowDemoAxes(SceneView sceneView)
     {
+        if (_axesBoxNode == null)
+            return;
+
         _axesBoxNode.Camera = sceneView.Camera;
         sceneView.Scene.RootNode.Add(_axesBoxNode);
     }
