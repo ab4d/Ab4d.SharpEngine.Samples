@@ -69,7 +69,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
     <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
   </ItemGroup>
 
