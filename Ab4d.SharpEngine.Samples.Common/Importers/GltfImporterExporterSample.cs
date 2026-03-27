@@ -177,6 +177,13 @@ public class GltfImporterExporterSample : CommonSample
             return;
         }
 
+
+        // If you know that only a single model is stored in the glTF file,
+        // or if you need only the first model, then you can also use:
+        //var modelNode = glTfImporter.Import(fileName)!.GetFirstModelNode();
+        //var standardMesh = glTfImporter.Import(fileName)!.GetFirstStandardMesh();
+
+
         if (_importedModelNodes != null)
         {
             Scene.RootNode.Add(_importedModelNodes);

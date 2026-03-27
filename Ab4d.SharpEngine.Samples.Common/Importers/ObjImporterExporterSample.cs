@@ -118,6 +118,12 @@ public class ObjImporterExporterSample : CommonSample
             return;
         }
 
+        // If you know that only a single model is stored in the obj file,
+        // or if you need only the first model, then you can also use:
+        //var modelNode = objImporter.Import(fileName).GetFirstModelNode();
+        //var geometryMesh = objImporter.Import(fileName).GetFirstMesh<Meshes.GeometryMesh>(); // ObjImporter creates GeometryMesh objects - GeometryMesh is derived from StandardMesh object
+        //var standardMesh = objImporter.Import(fileName).GetFirstStandardMesh();
+
 
         // By default, textures are read from the same directory as the obj file.
         // If they are not stored in some other folder, then the folder can be specified in the texturesDirectory parameter.

@@ -265,6 +265,13 @@ Properly sign and notarize the library";
             return;
         }
 
+
+        //// If you know that only a single model is stored in the read file,
+        //// or if you need only the first model, then you can also use:
+        //var modelNode = _assimpImporter.Import(fileName)!.GetFirstModelNode();
+        //var standardMesh = _assimpImporter.Import(fileName)!.GetFirstStandardMesh();
+
+
         if (_importedModelNodes != null)
         {
             // Check animations:
