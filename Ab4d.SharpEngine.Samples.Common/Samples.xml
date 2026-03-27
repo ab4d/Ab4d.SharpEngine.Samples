@@ -77,7 +77,7 @@
   <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter"/>
   <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter"/>
   <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing and rendering PBR materials"/>
-  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter"/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter" IsUpdated="True" UpdateInfo="Added native Assimp library for macOS"/>
   <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
   <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer" Condition="IsWpf, IsAvalonia, IsWinForms"/>
   

@@ -89,9 +89,11 @@ public class AssimpImporterSample : CommonSample
 
         string? assimpLibFileName = null;
         
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
             assimpLibFileName = Environment.Is64BitProcess ? "Assimp64.dll" : "Assimp32.dll";
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Environment.Is64BitProcess)
+        else if (OperatingSystem.IsMacOS() && Environment.Is64BitProcess)
+            assimpLibFileName = "libassimp*.dylib"; // this will be uses as a search parameter to get the latest version
+        else if (OperatingSystem.IsLinux() && Environment.Is64BitProcess)
             assimpLibFileName = "libassimp.so*"; // this will be uses as a search parameter to get the latest version
 
         if (assimpLibFileName == null)
@@ -140,12 +142,37 @@ public class AssimpImporterSample : CommonSample
         }
         catch (Exception ex)
         {
-            showErrorMessageAction?.Invoke(@$"Error loading native Assimp library:
-{ex.Message}
+            string additionalMessage;
 
-The most common cause of this error is that the Visual C++ Redistributable for Visual Studio 2019 is not installed on the system. 
+            if (OperatingSystem.IsWindows())
+            {
+                additionalMessage = @"
+
+The most common cause of this error is that the Visual C++ Redistributable for Visual Studio is not installed on the system. 
 See the following web page for more info:
-https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170");
+https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170";
+            }
+            else if (OperatingSystem.IsMacOS() && ex.Message.Contains("disallowed"))
+            {
+                additionalMessage = @"
+
+This is caused because the native Assimp library is not trusted on the system.
+
+Quick fix (for development):
+System Settings → Privacy & Security → Security section  
+You will see a message like:
+“libassimp.6.0.4.dylib was blocked because it is not from an identified developer.”
+Click “Allow Anyway”.
+
+Proper fix (for distribution):
+Properly sign and notarize the library";
+            }
+            else
+            {
+                additionalMessage = "";
+            }
+
+            showErrorMessageAction?.Invoke($"Error loading native Assimp library:\n{ex.Message}{additionalMessage}");
 
             return null;
         }
