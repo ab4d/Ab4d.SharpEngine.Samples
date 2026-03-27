@@ -1,12 +1,13 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
+using Ab4d.Vulkan;
 using System.Diagnostics;
 using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Meshes;
-using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 
@@ -28,6 +29,9 @@ public class TriangleHitTestingSample : CommonSample
 
     private bool _isIdBitmapDirty;
 
+    private bool _showTriangleLines = true;
+    private bool _showTriangleModelNode = true;
+
     private Vector2 _lastMousePosition;
     private uint _lastPixelColor;
     private int _lastTriangleIndex;
@@ -41,7 +45,8 @@ public class TriangleHitTestingSample : CommonSample
 
     private Vector3[] _selectedTriangleLinePositions;
     private MultiLineNode? _selectedTriangleLinesNode;
-    
+    private TriangleModelNode? _selectedTriangleModelNode;
+
     private ICommonSampleUIElement? _mousePositionLabel;
     private ICommonSampleUIElement? _pixelColorLabel;
     private ICommonSampleUIElement? _triangleIndexLabel;
@@ -72,8 +77,8 @@ public class TriangleHitTestingSample : CommonSample
         // Add MultiLineNode that will show the selected triangle
         _selectedTriangleLinesNode = new MultiLineNode(_selectedTriangleLinePositions, isLineStrip: true)
         {
-            LineColor = Colors.Red,
-            LineThickness = 2,
+            LineColor = Colors.Black,
+            LineThickness = 1,
             DepthBias = 0.001f, 
             Visibility = SceneNodeVisibility.Hidden // Initially hide the lines
         };
@@ -82,7 +87,9 @@ public class TriangleHitTestingSample : CommonSample
         
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Distance = 330;
+            targetPositionCamera.Heading = 44.7f;
+            targetPositionCamera.Attitude = 8f;
+            targetPositionCamera.Distance = 102.38067f;
 
             // On each camera change, we need to render the ID bitmap again
             targetPositionCamera.CameraChanged += OnTargetPositionCameraChanged;
@@ -225,31 +232,66 @@ public class TriangleHitTestingSample : CommonSample
         if (_lastPixelColor == 0)
             _lastTriangleIndex = -1;
 
-        
-        // Show selected triangle
-        if (_selectedTriangleLinesNode != null)
+        UpdateSelectedTriangle();
+    }
+
+    private void UpdateSelectedTriangle()
+    {
+        // Show selected triangle as a single triangle model
+        if (_showTriangleModelNode && _lastTriangleIndex >= 0)
         {
-            if (_lastTriangleIndex >= 0)
+            if (_selectedTriangleModelNode == null)
+            {
+                // The easies way to create a TriangleModelNode from an existing mesh is to use the CreateFromMesh static method.
+                // This will create a TriangleModelNode with the same triangle vertices and texture coordinates as the triangle in the mesh.
+                // You can also create the TriangleModelNode by using any of its constructors.
+                _selectedTriangleModelNode = TriangleModelNode.CreateFromMesh(_torusMesh, _lastTriangleIndex, StandardMaterials.Red, "SelectedTriangleNode");
+                _selectedTriangleModelNode.Offset = 0.001f; // Set small offset to avoid z-fighting with the torus mesh. This will move the triangle in the direction of its normal vector, so it will be moved outside of the torus mesh.
+
+                if (Scene != null && _selectedTriangleModelNode != null)
+                    Scene.RootNode.Add(_selectedTriangleModelNode!);
+            }
+            else
+            {
+                _selectedTriangleModelNode.UpdateFromMesh(_torusMesh, _lastTriangleIndex);
+                _selectedTriangleModelNode.Visibility = SceneNodeVisibility.Visible;
+            }
+        }
+        else
+        {
+            if (_selectedTriangleModelNode != null)
+                _selectedTriangleModelNode.Visibility = SceneNodeVisibility.Hidden;
+        }
+
+
+        // Show selected triangle lines
+        if (_showTriangleLines)
+        {
+            if (_selectedTriangleLinesNode != null && _lastTriangleIndex >= 0)
             {
                 int startIndex = _lastTriangleIndex * 3; // Each triangle has 3 indices
 
                 int i0 = _torusMesh.TriangleIndices![startIndex];
                 int i1 = _torusMesh.TriangleIndices[startIndex + 1];
                 int i2 = _torusMesh.TriangleIndices[startIndex + 2];
-                
+
                 _selectedTriangleLinePositions[0] = _torusMesh.Vertices![i0].Position;
                 _selectedTriangleLinePositions[1] = _torusMesh.Vertices[i1].Position;
                 _selectedTriangleLinePositions[2] = _torusMesh.Vertices[i2].Position;
                 _selectedTriangleLinePositions[3] = _selectedTriangleLinePositions[0]; // close the lines
-                
+
                 _selectedTriangleLinesNode.UpdatePositions();
                 _selectedTriangleLinesNode.Visibility = SceneNodeVisibility.Visible;
-            }
-            else
-            {
-                _selectedTriangleLinesNode.Visibility = SceneNodeVisibility.Hidden; // no triangle selected
+
+                _selectedTriangleLinesNode.Visibility = SceneNodeVisibility.Visible;
             }
         }
+        else
+        {
+            if (_selectedTriangleLinesNode != null)
+                _selectedTriangleLinesNode.Visibility = SceneNodeVisibility.Hidden;
+        }
+
 
         _pixelColorLabel?.UpdateValue();
         _triangleIndexLabel?.UpdateValue();
@@ -350,6 +392,21 @@ public class TriangleHitTestingSample : CommonSample
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateCheckBox("Show triangle lines", _showTriangleLines, isChecked =>
+        {
+            _showTriangleLines = isChecked;
+            UpdateSelectedTriangle();
+        });
+        
+        ui.CreateCheckBox("Show triangle model node", _showTriangleLines, isChecked =>
+        {
+            _showTriangleModelNode = isChecked;
+            UpdateSelectedTriangle();
+        });
+
+        ui.AddSeparator();
+
 
         _mousePositionLabel = ui.CreateKeyValueLabel("Mouse position: ", () => $"{_lastMousePosition.X:F0} {_lastMousePosition.Y:F0}", keyTextWidth: 100);
         _pixelColorLabel = ui.CreateKeyValueLabel("ID Bitmap color: ", () => $"0x{_lastPixelColor:X8}", keyTextWidth: 100);

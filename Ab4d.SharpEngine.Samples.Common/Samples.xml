@@ -125,7 +125,7 @@
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" />
   <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" />
-  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap"/>
+  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap" IsUpdated="True" UpdateInfo="Using new TriangleModelNode"/>
   <Sample Location="HitTesting.PointCloudHitTestingSample" Title="Point-cloud hit testing" IsNew="True"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
