@@ -213,7 +213,7 @@ export async function createImageFromBytes(canvasId, imageBytes, mimeType, image
 
 async function loadImageBytesFromBlob(blob, canvasId, url) {
     try {
-        const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' });
+        const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' }); // note: using premultiply does not work reliably, so we need to do that after the bitmap is loaded
 
         const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
         const ctx = canvas.getContext('2d');
