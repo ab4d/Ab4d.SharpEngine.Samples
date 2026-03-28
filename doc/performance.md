@@ -18,9 +18,42 @@ See also [RenderingStatistics online help](https://www.ab4d.com/help/SharpEngine
 When a laptop has multiple graphics cards (integrated and dedicated), Windows, by default, chooses to use the integrated graphics card for your application.
 This which can lead to poor performance. 
 
+The following 3 options can be used to improve the performance in that case:
+- [Configure Windows Graphics Settings](#configure-windows-graphics-settings)
+- [Dedicated GPU for Avalonia with Vulkan backend](#dedicated-gpu-for-avalonia-with-vulkan-backend)
+- [Force using dedicated GPU for Ab4d.SharpEngine](#force-using-dedicated-gpu-for-ab4dsharpengine)
+
+
+### Configure Windows Graphics Settings
+
+On a computer with multiple graphics card, the most reliable and the best option is that the users configure the app to
+use the dedicated graphics card.
+
+On Windows this can be done by the following steps:
+- open the **Window Graphics Settings**
+- add your application and set it to use the **"High Performance" option** (instead of "Let Windows decide").
+
+This will configure Windows to use the dedicated GPU for your application, which can significantly improve performance when rendering complex 3D scenes.
+
+This must be done by the end users of your application.
+
+But you can detect that situation by using the following code (`MainSceneView` is of type `SharpEngineSceneView`):
+
+```csharp
+MainSceneView.GpuDeviceCreated += (sender, args) =>
+{
+    if (args.GpuDevice.IsIntegratedGpu && 
+        args.GpuDevice.VulkanInstance.AllPhysicalDeviceDetails.Any(p => p.DeviceProperties.DeviceType == PhysicalDeviceType.DiscreteGpu))
+    {
+        // Show message box that user should open "Graphics Settings" and set "High performance" for this application to use the discrete GPU instead of integrated GPU.
+    }
+};
+```
+
+
 ### Dedicated GPU for Avalonia with Vulkan backend
 
-**Avalonia** apps can be created with Vulkan backend. In this case both the UI (rendered by Avalonia) and the 3D graphics (rendered by Ab4d.SharpEngine) are rendered by Vulkan. In this case, it is possible to set `PreferDiscreteGpu` to true and this forces to use dedicated GPU by both Avalonia and Ab4d.SharpEngine. 
+**Avalonia** apps can be created with **Vulkan backend**. In this case both the UI (rendered by Avalonia) and the 3D graphics (rendered by Ab4d.SharpEngine) are rendered by Vulkan. In this case, it is possible to set `PreferDiscreteGpu` to true and this forces to use dedicated GPU by both Avalonia and Ab4d.SharpEngine. 
 
 The following code in the Program.cs configures the Avalonia app to use Vulkan backend and tries to use a dedicated GPU:
 ```csharp
@@ -64,33 +97,6 @@ public static AppBuilder BuildAvaloniaApp()
 
 
 Note that behind the scenes Windows may still need to copy the rendered Window content to the primary GPU.
-
-
-### Configure Windows Graphics Settings
-
-On a computer with multiple graphics card, the most reliable and the best option is that the users configure the app to
-use the dedicated graphics card.
-
-On Windows this can be done by the following steps:
-- open the Window Graphics Settings
-- add your application and set it to use the **"High Performance" option** (instead of "Let Windows decide").
-
-This will force Windows to use the dedicated GPU for your application, which can significantly improve performance when rendering complex 3D scenes.
-
-This must be done by the end users of your application.
-
-But you can detect that situation by using the following code (`MainSceneView` is of type `SharpEngineSceneView`):
-
-```csharp
-MainSceneView.GpuDeviceCreated += (sender, args) =>
-{
-    if (args.GpuDevice.IsIntegratedGpu && 
-        args.GpuDevice.VulkanInstance.AllPhysicalDeviceDetails.Any(p => p.DeviceProperties.DeviceType == PhysicalDeviceType.DiscreteGpu))
-    {
-        // Show message box that user should open "Graphics Settings" and set "High performance" for this application to use the discrete GPU instead of integrated GPU.
-    }
-};
-```
 
 
 ### Force using dedicated GPU for Ab4d.SharpEngine
