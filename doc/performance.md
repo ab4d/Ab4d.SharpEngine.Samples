@@ -2,7 +2,7 @@
 
 Performance is an important aspect of any 3D engine, and Ab4d.SharpEngine is designed to be fast and efficient. Here are some tips to help you get the best performance out of Ab4d.SharpEngine.
 
-### General performance tips
+## General performance tips
 
 - Try to **lower the number of draw calls** (individual SceneNode objects). Rendering a few complex objects is usually faster than rendering many simple objects because the GPU can be fully utilized without waiting for the API and driver to process many draw calls.
 - Use **instancing** (InstancedMeshNode) when rendering many similar objects. This allows the GPU to render multiple instances of the same geometry with a single draw call, which can significantly improve performance.
@@ -13,13 +13,68 @@ Before the `Statistics` is collected, you need to enable it by setting `SceneVie
 See also [RenderingStatistics online help](https://www.ab4d.com/help/SharpEngine/html/T_Ab4d_SharpEngine_Core_RenderingStatistics.htm).
 
 
-### Use a dedicated GPU on a laptop with multiple graphics cards (for Windows)
+## Use a dedicated GPU on a laptop with multiple graphics cards (for Windows)
 
 When a laptop has multiple graphics cards (integrated and dedicated), Windows, by default, chooses to use the integrated graphics card for your application.
 This which can lead to poor performance. 
 
-To ensure that your app and Ab4d.SharpEngine use the dedicated graphics card, 
-open the Window Graphics Settings, add your application and set it to use the **"High Performance" option** (instead of "Let Windows decide").
+### Dedicated GPU for Avalonia with Vulkan backend
+
+**Avalonia** apps can be created with Vulkan backend. In this case both the UI (rendered by Avalonia) and the 3D graphics (rendered by Ab4d.SharpEngine) are rendered by Vulkan. In this case, it is possible to set `PreferDiscreteGpu` to true and this forces to use dedicated GPU by both Avalonia and Ab4d.SharpEngine. 
+
+The following code in the Program.cs configures the Avalonia app to use Vulkan backend and tries to use a dedicated GPU:
+```csharp
+        public static AppBuilder BuildAvaloniaApp()
+            => AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .With(new Win32PlatformOptions
+                {
+                    RenderingMode = new[]
+                    {
+                        Win32RenderingMode.Vulkan
+                    }
+                })
+                .With(new X11PlatformOptions
+                {
+                    RenderingMode = new[]
+                    {
+                        X11RenderingMode.Vulkan
+                    }
+                })
+                .With(new Avalonia.Vulkan.VulkanOptions()
+                {
+                    VulkanDeviceCreationOptions = new VulkanDeviceCreationOptions()
+                    {
+                        // When the following option is set, then on a laptop with multiple GPUs
+                        // Avalonia and SharpEngine will use a discrete GPU even if the "High performance"
+                        // is not selected for this app in the Windows Graphics Settings.
+                        //
+                        // It is still recommended to use "High performance" to prevent potential
+                        // copying of the window's content to the primary graphics card.
+                        //
+                        // Comment this setting if you want to use integrated GPU and improve battery life.
+                        PreferDiscreteGpu = true
+                    },
+                    //VulkanInstanceCreationOptions = new Avalonia.Vulkan.VulkanInstanceCreationOptions()
+                    //{
+                    //    UseDebug = true // Use Vulkan debug layers for Avalonia UI operations
+                    //}
+                })
+```
+
+
+Note that behind the scenes Windows may still need to copy the rendered Window content to the primary GPU.
+
+
+### Configure Windows Graphics Settings
+
+On a computer with multiple graphics card, the most reliable and the best option is that the users configure the app to
+use the dedicated graphics card.
+
+On Windows this can be done by the following steps:
+- open the Window Graphics Settings
+- add your application and set it to use the **"High Performance" option** (instead of "Let Windows decide").
+
 This will force Windows to use the dedicated GPU for your application, which can significantly improve performance when rendering complex 3D scenes.
 
 This must be done by the end users of your application.
@@ -38,7 +93,9 @@ MainSceneView.GpuDeviceCreated += (sender, args) =>
 ```
 
 
-Another option is to **force using dedicated GPU** for Ab4d.SharpEngine.
+### Force using dedicated GPU for Ab4d.SharpEngine
+
+Even when the UI of the application is rendered by the integrated GPU, it is possible to **force using dedicated GPU** for Ab4d.SharpEngine.
 
 This is done by setting the `EngineCreateOptions.DeviceSelectionType` to `BestPhysicalDevice` (from `DefaultDevice`), for example:
 
