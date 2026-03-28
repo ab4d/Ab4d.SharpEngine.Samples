@@ -24,42 +24,42 @@ This which can lead to poor performance.
 
 The following code in the Program.cs configures the Avalonia app to use Vulkan backend and tries to use a dedicated GPU:
 ```csharp
-        public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
-                .UsePlatformDetect()
-                .With(new Win32PlatformOptions
-                {
-                    RenderingMode = new[]
-                    {
-                        Win32RenderingMode.Vulkan
-                    }
-                })
-                .With(new X11PlatformOptions
-                {
-                    RenderingMode = new[]
-                    {
-                        X11RenderingMode.Vulkan
-                    }
-                })
-                .With(new Avalonia.Vulkan.VulkanOptions()
-                {
-                    VulkanDeviceCreationOptions = new VulkanDeviceCreationOptions()
-                    {
-                        // When the following option is set, then on a laptop with multiple GPUs
-                        // Avalonia and SharpEngine will use a discrete GPU even if the "High performance"
-                        // is not selected for this app in the Windows Graphics Settings.
-                        //
-                        // It is still recommended to use "High performance" to prevent potential
-                        // copying of the window's content to the primary graphics card.
-                        //
-                        // Comment this setting if you want to use integrated GPU and improve battery life.
-                        PreferDiscreteGpu = true
-                    },
-                    //VulkanInstanceCreationOptions = new Avalonia.Vulkan.VulkanInstanceCreationOptions()
-                    //{
-                    //    UseDebug = true // Use Vulkan debug layers for Avalonia UI operations
-                    //}
-                })
+public static AppBuilder BuildAvaloniaApp()
+    => AppBuilder.Configure<App>()
+        .UsePlatformDetect()
+        .With(new Win32PlatformOptions
+        {
+            RenderingMode = new[]
+            {
+                Win32RenderingMode.Vulkan
+            }
+        })
+        .With(new X11PlatformOptions
+        {
+            RenderingMode = new[]
+            {
+                X11RenderingMode.Vulkan
+            }
+        })
+        .With(new Avalonia.Vulkan.VulkanOptions()
+        {
+            VulkanDeviceCreationOptions = new VulkanDeviceCreationOptions()
+            {
+                // When the following option is set, then on a laptop with multiple GPUs
+                // Avalonia and SharpEngine will use a discrete GPU even if the "High performance"
+                // is not selected for this app in the Windows Graphics Settings.
+                //
+                // It is still recommended to use "High performance" to prevent potential
+                // copying of the window's content to the primary graphics card.
+                //
+                // Comment this setting if you want to use integrated GPU and improve battery life.
+                PreferDiscreteGpu = true
+            },
+            //VulkanInstanceCreationOptions = new Avalonia.Vulkan.VulkanInstanceCreationOptions()
+            //{
+            //    UseDebug = true // Use Vulkan debug layers for Avalonia UI operations
+            //}
+        });
 ```
 
 
