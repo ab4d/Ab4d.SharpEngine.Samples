@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <Version>3.2.9501</Version>
+    <Version>4.0.9584</Version>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
@@ -28,9 +28,9 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="3.2.9501" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="3.2.9501" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="3.2.9502" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="4.0.9584" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="4.0.9584" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.0.9584" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />

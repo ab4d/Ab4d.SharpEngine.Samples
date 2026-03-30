@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine.WebGL" Version="0.9.9543-rc1" />
+    <PackageReference Include="Ab4d.SharpEngine.WebGL" Version="4.0.9584" />
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.WebGL\Ab4d.SharpEngine.WebGL.csproj" />
