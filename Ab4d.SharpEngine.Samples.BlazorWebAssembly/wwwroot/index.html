@@ -5,8 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ab4d.SharpEngine.Samples.BlazorWebAssembly</title>
-    <!--<base href="/sharp-engine-browser-demo/" />-->
+
+    <!-- Base href values are based on the scenario: -->
+    <!-- - For deploying to a subfolder: "/sharp-engine-browser-demo/" -->
+    <!-- - For running in Electron app: "./"  -->
+    <!-- - For running as Blazor WebAssembly: "/"  Note that this is changed in the "start-electron-app" script. -->
+    <!--   If in Blazor app this is changed to "./" then internal app links will work, but pasting a url to the browser will not work anymore -->
     <base href="/" />
+
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
