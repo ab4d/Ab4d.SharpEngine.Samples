@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/ab4d/Ab4d.SharpEngine.Samples#readme",
   "devDependencies": {
-    "electron": "^40.6.1",
+    "electron": "^40.8.5",
     "electron-devtools-installer": "^4.0.0"
   }
 }
