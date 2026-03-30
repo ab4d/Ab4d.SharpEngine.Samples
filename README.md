@@ -212,6 +212,9 @@ The following .Net solutions (.sln files) are available for browser and browser 
   This solution provides files and batch scripts that can prepare and start Node.js (with Express) or Python (SocketServer) web server.
   The sample uses a simple `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project that shows only a simple 3D scene and provides code for simple JavaScript interop (updating the 3D scene from JavaScript).
   See [readme](Ab4d.SharpEngine.Samples.HtmlWebPage/README.md).
+  
+- **Ab4d.SharpEngine.Samples.NodeJs**\
+  This solution is the same as Ab4d.SharpEngine.Samples.HtmlWebPage. The separate sln file is provided to easily see the support for Node.js web server.
 
 - **Ab4d.SharpEngine.Samples.AspNetCore**\
   This solution is same a HtmlWebPage but it uses ASP.NET Core to copy the required files into wwwroot folder and start the web server. 

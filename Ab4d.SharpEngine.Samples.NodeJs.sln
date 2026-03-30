@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11505.172 d18.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.WebAssemblyDemo", "Ab4d.SharpEngine.Samples.WebAssemblyDemo\Ab4d.SharpEngine.Samples.WebAssemblyDemo.csproj", "{0A4FF5D7-4AD1-2F12-E73B-F93E5F1DF9CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ab4d.SharpEngine.Samples.HtmlWebPage", "Ab4d.SharpEngine.Samples.HtmlWebPage\Ab4d.SharpEngine.Samples.HtmlWebPage.csproj", "{718A22D8-5E2B-4CC6-973E-D05B221D1548}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A4FF5D7-4AD1-2F12-E73B-F93E5F1DF9CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A4FF5D7-4AD1-2F12-E73B-F93E5F1DF9CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A4FF5D7-4AD1-2F12-E73B-F93E5F1DF9CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A4FF5D7-4AD1-2F12-E73B-F93E5F1DF9CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718A22D8-5E2B-4CC6-973E-D05B221D1548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718A22D8-5E2B-4CC6-973E-D05B221D1548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718A22D8-5E2B-4CC6-973E-D05B221D1548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718A22D8-5E2B-4CC6-973E-D05B221D1548}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC46855F-F6EE-44B9-863A-AF2996DE35F5}
+	EndGlobalSection
+EndGlobal
