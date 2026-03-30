@@ -19,31 +19,30 @@ fi
 
 echo "Checking WebAssembly files in wwwroot folder"
 
-if [ -f "wwwroot/index.html" ]; then
-  # The following line will enable showing console log messages from the web page to this console window
-  export ELECTRON_ENABLE_LOGGING=true
-  npm run start
-  read -p "Press enter to continue"
-  exit 0
+if [ ! -f "wwwroot/index.html" ]; then
+
+  if [ ! -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot" ]; then
+    echo "Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly"
+	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release
+  fi
+  
+  echo "Copying published files to local wwwroot"
+  cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot/* wwwroot/
+  
+  # Delete compressed files because they are not used by Electron - serving files from the local hard disk is very fast.
+  # When creating an installer for Electron app, the files will be compressed so the distribuited installer size will be small.
+  find wwwroot -type f -name "*.gz" -delete
+  find wwwroot -type f -name "*.br" -delete
+  
+  # Fix the base href path for the Electron app (replace "/" with "./")
+  sed -i 's|<base href="/" />|<base href="./" />|' wwwroot/index.html  
+  
 fi
 
-if [ -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/browser-wasm/publish/wwwroot" ]; then
-  cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/browser-wasm/publish/wwwroot/* wwwroot/
-  # The following line will enable showing console log messages from the web page to this console window
-  export ELECTRON_ENABLE_LOGGING=true
-  npm run start
-  read -p "Press enter to continue"
-  exit 0
-fi
-
-if [ -d "../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot" ]; then
-  cp -r ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/* wwwroot/
-  # The following line will enable showing console log messages from the web page to this console window
-  export ELECTRON_ENABLE_LOGGING=true
-  npm run start
-  read -p "Press enter to continue"
-  exit 0
-fi
-
-echo "Cannot get the published WebAssembly wwwroot folder. To do that publish the Ab4d.SharpEngine.Samples.BlazorWebAssembly project or run \"compile_publish_version.sh\" in the Ab4d.SharpEngine.Samples.HtmlWebPage folder."
+echo "Starting Electron app"
+ 
+# The following line will enable showing console log messages from the web page to this console window (showing SharpEngine warnings and errors)
+# export ELECTRON_ENABLE_LOGGING=true  
+  
+npm run start
 read -p "Press enter to continue"
