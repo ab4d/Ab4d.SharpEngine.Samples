@@ -88,6 +88,9 @@ public class AxesBoxNodeSample : CommonSample
     
     private void UpdateZAxisCustomization()
     {
+        if (_axesBoxNode == null)
+            return;
+
         var originalValueLabels = _axesBoxNode.ZAxis1.GetValueLabels();
         int valueLabelsCount = originalValueLabels.Length;
 
@@ -145,6 +148,9 @@ public class AxesBoxNodeSample : CommonSample
 
     private void RandomizeAxesBox()
     {
+        if (_axesBoxNode == null)
+            return;
+
         _axesBoxNode.AxisTitleColor = GetRandomHsvColor4();
         _axesBoxNode.AxisTitleFontSize = GetRandomFloat() * 5 + 5;
 
@@ -181,37 +187,37 @@ RightmostAxis: AxesBoxNode will automatically show and hide vertical axes so tha
         var strategies = new string[] { "None", "FrontFacingPlanes", "LeftmostAxis", "RightmostAxis" };
         ui.CreateComboBox(strategies, (selectedIndex, selectedText) =>
         {
-            _axesBoxNode.AxisShowingStrategy = (AxesBoxNode.AxisShowingStrategies)selectedIndex;
+            _axesBoxNode!.AxisShowingStrategy = (AxesBoxNode.AxisShowingStrategies)selectedIndex;
         }, selectedItemIndex: 1);
         
         ui.AddSeparator();
         ui.CreateLabel("Axes visibility:", isHeader: true);
 
-        ui.CreateCheckBox("Show bottom X axis (XAxis1)", true, isChecked => _axesBoxNode.IsXAxis1Visible = isChecked);
-        ui.CreateCheckBox("Show top X axis (XAxis2)", false, isChecked => _axesBoxNode.IsXAxis2Visible = isChecked);
+        ui.CreateCheckBox("Show bottom X axis (XAxis1)", true, isChecked => _axesBoxNode!.IsXAxis1Visible = isChecked);
+        ui.CreateCheckBox("Show top X axis (XAxis2)", false, isChecked => _axesBoxNode!.IsXAxis2Visible = isChecked);
         ui.AddSeparator();
         
-        ui.CreateCheckBox("Show bottom Y axis (YAxis1)", true, isChecked => _axesBoxNode.IsYAxis1Visible = isChecked);
-        ui.CreateCheckBox("Show top Y axis (YAxis2)", false, isChecked => _axesBoxNode.IsYAxis2Visible = isChecked);
+        ui.CreateCheckBox("Show bottom Y axis (YAxis1)", true, isChecked => _axesBoxNode!.IsYAxis1Visible = isChecked);
+        ui.CreateCheckBox("Show top Y axis (YAxis2)", false, isChecked => _axesBoxNode!.IsYAxis2Visible = isChecked);
         ui.AddSeparator();
         
-        ui.CreateCheckBox("Show first Z axis (ZAxis1)", true, isChecked => _axesBoxNode.IsZAxis1Visible = isChecked);
-        ui.CreateCheckBox("Show second Z axis (ZAxis2)", true, isChecked => _axesBoxNode.IsZAxis2Visible = isChecked);
+        ui.CreateCheckBox("Show first Z axis (ZAxis1)", true, isChecked => _axesBoxNode!.IsZAxis1Visible = isChecked);
+        ui.CreateCheckBox("Show second Z axis (ZAxis2)", true, isChecked => _axesBoxNode!.IsZAxis2Visible = isChecked);
         
         ui.AddSeparator();
         ui.CreateLabel("Connection lines visibility:", isHeader: true);
 
-        ui.CreateCheckBox("Show X axis connection lines", false, isChecked => _axesBoxNode.ShowXAxisConnectionLines = isChecked);
-        ui.CreateCheckBox("Show Y axis connection lines", false, isChecked => _axesBoxNode.ShowYAxisConnectionLines = isChecked);
-        ui.CreateCheckBox("Show Z axis connection lines", true, isChecked => _axesBoxNode.ShowZAxisConnectionLines = isChecked);
+        ui.CreateCheckBox("Show X axis connection lines", false, isChecked => _axesBoxNode!.ShowXAxisConnectionLines = isChecked);
+        ui.CreateCheckBox("Show Y axis connection lines", false, isChecked => _axesBoxNode!.ShowYAxisConnectionLines = isChecked);
+        ui.CreateCheckBox("Show Z axis connection lines", true, isChecked => _axesBoxNode!.ShowZAxisConnectionLines = isChecked);
         ui.AddSeparator();
 
-        ui.CreateCheckBox("Show bottom connection lines", true, isChecked => _axesBoxNode.ShowBottomConnectionLines = isChecked);
-        ui.CreateCheckBox("Show back connection lines", true, isChecked => _axesBoxNode.ShowBackConnectionLines = isChecked);
+        ui.CreateCheckBox("Show bottom connection lines", true, isChecked => _axesBoxNode!.ShowBottomConnectionLines = isChecked);
+        ui.CreateCheckBox("Show back connection lines", true, isChecked => _axesBoxNode!.ShowBackConnectionLines = isChecked);
         ui.AddSeparator();
         
-        ui.CreateCheckBox("IsWireBoxFullyClosed", false, isChecked => _axesBoxNode.IsWireBoxFullyClosed = isChecked);
-        ui.CreateCheckBox("AdjustFirstAndLastLabelPositions", true, isChecked => _axesBoxNode.AdjustFirstAndLastLabelPositions = isChecked);
+        ui.CreateCheckBox("IsWireBoxFullyClosed", false, isChecked => _axesBoxNode!.IsWireBoxFullyClosed = isChecked);
+        ui.CreateCheckBox("AdjustFirstAndLastLabelPositions", true, isChecked => _axesBoxNode!.AdjustFirstAndLastLabelPositions = isChecked);
         
         ui.AddSeparator();
 
