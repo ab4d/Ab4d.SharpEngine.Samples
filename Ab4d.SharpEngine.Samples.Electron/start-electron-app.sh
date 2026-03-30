@@ -26,6 +26,10 @@ if [ ! -f "wwwroot/index.html" ]; then
 	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release
   fi
   
+  if [ ! -d wwwroot ]; then
+    mkdir wwwroot
+  fi
+    
   echo "Copying published files to local wwwroot"
   cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot/* wwwroot/
   
@@ -35,7 +39,7 @@ if [ ! -f "wwwroot/index.html" ]; then
   find wwwroot -type f -name "*.br" -delete
   
   # Fix the base href path for the Electron app (replace "/" with "./")
-  sed -i 's|<base href="/" />|<base href="./" />|' wwwroot/index.html  
+  sed -i '' 's|<base href="/" />|<base href="./" />|g' "./wwwroot/index.html" 
   
 fi
 
