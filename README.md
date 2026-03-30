@@ -8,13 +8,8 @@ Welcome to the Samples for Ab4d.SharpEngine.
 
 <br>
 
-The engine uses [Vulkan](https://www.vulkan.org/) for desktop and mobile apps (samples use [Ab4d.SharpEngine.Vulkan](https://www.nuget.org/packages/Ab4d.SharpEngine.Vulkan) NuGet package).
-For the browser and browser based apps like Electron, the engine uses WebGL (samples use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
-
-> [!NOTE]  
-> The [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package (without `.Vulkan` or `.WebGL`) was used
-> for the previous versions of the engine (up to v3.2) and it used only Vulkan renderer. 
-> Starting with v4.0, the Ab4d.SharpEngine.WebGL was introduced and to make the naming cleaner, the Ab4d.SharpEngine assembly was renamed to Ab4d.SharpEngine.Vulkan.
+The engine uses [Vulkan](https://www.vulkan.org/) for **desktop and mobile apps** (samples use [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package).
+For the **browser and browser based apps** like Electron, the engine uses WebGL (samples use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
 
 <br>
 
@@ -35,7 +30,7 @@ For the browser and browser based apps like Electron, the engine uses WebGL (sam
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
 - Assimp importer that uses a [third-party library](https://github.com/assimp/assimp) to import 3D models from almost any file format <sup>*</sup>
 
- <sup>*</sup> Some features are not available for the browser (WebGL) version of the engine. See [Ab4d.SharpEngine.WebGL implementation details](#ab4d.sharpengine.webgl-implementation-details).
+ <sup>*</sup> Some features are not available for the browser (WebGL) version of the engine. See [Ab4d.SharpEngine.WebGL implementation details](doc/ab4d-sharpengine-webgl-implemented-features.md).
 
 
  <br>
@@ -48,7 +43,7 @@ To get a trial license for your own projects (not needed for the sample projects
 
 ### Desktop and mobile platforms
 
-Desktop and mobile platforms require [Ab4d.SharpEngine.Vulkan](https://www.nuget.org/packages/Ab4d.SharpEngine.Vulkan) NuGet package that uses Vulkan for rendering.
+Desktop and mobile platforms require [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package that uses Vulkan for rendering.
 For the browser and browser based apps like Electron, the engine uses WebGL (samples use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
 
 
@@ -99,7 +94,7 @@ To show the 3D scene in the browser, you can use any web server. The samples for
 
 
 ### Dependencies:
-- The core Ab4d.SharpEngine.Vulkan library has NO EXTERNAL dependencies.
+- The core Ab4d.SharpEngine library has NO EXTERNAL dependencies.
 - The core Ab4d.SharpEngine.WebGL library has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.Wpf has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.WinUI has NO EXTERNAL dependencies.
@@ -196,7 +191,7 @@ The following .Net solutions (.sln files) are available for desktop and mobile p
 
 - **Ab4d.SharpEngine.Samples.ImGui**
   This solution shows how to render a user interface that is defined by ImGui.
-  It includes the ImGuiRenderingStep class with full source code that shows how to render ImGui by using Ab4d.SharpEngine.Vulkan.
+  It includes the ImGuiRenderingStep class with full source code that shows how to render ImGui by using Ab4d.SharpEngine.
   The solution is using a third-party ImGui.NET library (https://github.com/ImGuiNET/ImGui.NET).
 
 ### Browser based samples
@@ -329,15 +324,15 @@ Ab3d.PowerToys and Ab3d.DXEngine will still be actively developed, will get new 
 
 ### How to share the code with for desktop, mobile and browser platforms
 
-This section describes how to **share source code** that can be used **for the browser** (requires Ab4d.SharpEngine.WebGL) and **for the desktop and mobile devices** (requires Ab4d.SharpEngine.Vulkan).
+This section describes how to **share source code** that can be used **for the browser** (requires Ab4d.SharpEngine.WebGL) and **for the desktop and mobile devices** (requires Ab4d.SharpEngine).
 
-Because both Ab4d.SharpEngine.Vulkan and Ab4d.SharpEngine.WebGL define the same namespaces and class names, it is not possible to add references to both libraries. 
+Because both Ab4d.SharpEngine and Ab4d.SharpEngine.WebGL define the same namespaces and class names, it is not possible to add references to both libraries. 
 
-Maybe in the future (not in the near future) there will be a common library (Ab4d.SharpEngine.Core or something similar) and a NuGet package that will load different assemblies based on the current platform. 
+Maybe in the future (not in the near future) the Ab4d.SharpEngine may define only the common shared classes and the rendering code will be moved to the specialized .Vulkan and .WebGL libraries. 
 
 However, to use shared code now, I recommend using **two projects with linked files**.
 
-In this case, you create two class library projects. One that references Ab4d.SharpEngine.Vulkan and the other that references Ab4d.SharpEngine.WebGL. You define the classes and files in the first project and use linked files in the second (to add the same files as defined in the first project). You can add linked files by using an IDE or by editing the csproj file. The latter is useful when you want to add multiple files. 
+In this case, you create two class library projects. One that references Ab4d.SharpEngine and the other that references Ab4d.SharpEngine.WebGL. You define the classes and files in the first project and use linked files in the second (to add the same files as defined in the first project). You can add linked files by using an IDE or by editing the csproj file. The latter is useful when you want to add multiple files. 
 
 For example, the following code from csproj file add links to all cs files in `..\SharedGraphicsLib\Shared` folder and a single `..\SharedGraphicsLib\Custom\CusomFile.cs` file.
 ```
@@ -347,7 +342,7 @@ For example, the following code from csproj file add links to all cs files in `.
 </ItemGroup>
 ```
 
-I also recommend that in the project with Ab4d.SharpEngine.Vulkan you define the `VULKAN` compiler constant. In the other project (with Ab4d.SharpEngine.WebGL) you define the `WEB_GL` compiler constant.
+I also recommend that in the project with Ab4d.SharpEngine you define the `VULKAN` compiler constant. In the other project (with Ab4d.SharpEngine.WebGL) you define the `WEB_GL` compiler constant.
 This can be defined by the adding `VULKAN` or `WEB_GL` to `DefineConstants` element in csproj file. For example, add the following to the root `PropertyGroup`:
 ```
 <DefineConstants>VULKAN</DefineConstants>
@@ -410,7 +405,8 @@ The following projects can be started on **iOS**:
 The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
 
 - Add libMoltenVK.dylib from the Vulkan SDK to the project so that the library can be loaded at runtime. Note that there are different builds for iOS and for macOS / MacCatalyst. The libMoltenVK.dylib is also available in the libs folder in this repository. For example, in the Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform solution the csproj file for the Desktop project has the following:
-  ```
+
+```
   <!-- MacOS and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
   <ItemGroup Condition="$([MSBuild]::IsOSPlatform('macos'))">
     <Content Include="../../lib/MoltenVK/macos-arm64_x86_64/libMoltenVK.dylib" PublishFolderType="Assembly">
@@ -418,9 +414,11 @@ The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>    
-  ```
-  The following is used for iOS project:
-  ```
+```
+  
+The following is used for iOS project:
+  
+```
   <!-- iOS requires libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
   <!-- When starting iOS simulator, use the dylib from ios-arm64_x86_64-simulator folder -->
   <ItemGroup>
@@ -429,8 +427,9 @@ The following changes are required to use Ab4d.SharpEngine on macOS and iOS:
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>  
-  ```
-  Another option for macOS (not for iOS) is to install the Vulkan SDK to the computer (https://vulkan.lunarg.com/sdk/home#mac). In this case the Ab4d.SharpEngine should be able to find the libMoltenVK.dylib from the default location and you do not need to add it to the csproj. But in this case you will not be able to distribute the app to another computer that does not have Vulkan SDK installed.
+```
+
+Another option for macOS (not for iOS) is to install the Vulkan SDK to the computer (https://vulkan.lunarg.com/sdk/home#mac). In this case the Ab4d.SharpEngine should be able to find the libMoltenVK.dylib from the default location and you do not need to add it to the csproj. But in this case you will not be able to distribute the app to another computer that does not have Vulkan SDK installed.
 
 - For MAUI apps, the 3D scene that is rendered by Ab4d.SharpEngine is shown by using SKCanvasView. To use that control, add a reference to SkiaSharp.Views.Maui.Controls NuGet package. Then add ".UseSkiaSharp()" to the builder setup in the MauiProgram.cs file.
   
@@ -510,60 +509,6 @@ You can also easily start the project from **Visual Studio Code** or **Rider** f
 
 To get **better error diagnostics when running dotnet build**, add the following parameters: `-v diag /p:WarningLevel=4 --tl:off`
 
-### Ab4d.SharpEngine.WebGL implementation details
-
-The Ab4d.SharpEngine.WebGL does not yet have all the features of the Ab4d.SharpEngine.Vulkan version.
-
-Namespace implementation status:
-- **Animation**: 100% implemented :heavy_check_mark:
-- **Cameras**: 100% implemented :heavy_check_mark:
-- **Materials**:
-    - StandardEffect - 100% implemented :heavy_check_mark:
-    - ThickLineEffect - LineThickness, line patterns and line caps and hidden lines are not supported.   
-      WebGL does not support thick lines or geometry shader so this requires a different approach (probably CPU based mesh generation). This will be supported after v1.0. Use TubeLineModelNode and TubePathModelNode with SolidColorMaterial for thick lines (here the line thickness in not in screen space values).
-    - PixelEffect - planned for next version :hourglass_flowing_sand:
-    - SpriteEffect - planned for next version :hourglass_flowing_sand:
-    - VertexColorEffect - planned for next version :hourglass_flowing_sand:
-    - VolumeRenderingEffect - supported later :two:
-- **Lights**: 100% implemented :heavy_check_mark:
-- **Materials**: 
-    - StandardMaterial - 100% implemented :heavy_check_mark:
-    - SolidColorMaterial - (using StandardEffect) - 100% implemented :heavy_check_mark:
-    - LineMaterial - Rendering colored lines with 1px line thickness. See comment with ThickLineEffect for more info.
-    - PolyLineMaterial - Polylines are rendered as multiple individual lines. Because line thickness is limited to 1px, no mitered and beveled joints are required.
-    - PositionColoredLineMaterial - supported later :two:
-    - VertexColorMaterial - planned for next version :hourglass_flowing_sand:
-    - PrimitiveIdMaterial - planned after v1.1 :hourglass_flowing_sand:
-    - DepthOnlyMaterial - supported later :two:
-    - VolumeMaterial - supported later :two:
-- **Meshes**: all supported except SubMesh (planned for next version) :hourglass_flowing_sand:
-- **OverlayPanels**: CameraAxisPanel planned for next version :hourglass_flowing_sand:
-- **PostProcessing**: planned after v1.1 :hourglass_flowing_sand:
-- **SceneNodes**: all supported except: MultiMaterialModelNode and PixelsNode. All planned for next version :hourglass_flowing_sand:
-- **Transformations**: 100% implemented :heavy_check_mark:
-- **Utilities**: implemented all except:
-    - BezierCurve, BSpline - 100% implemented :heavy_check_mark:
-    - BitmapTextCreator - 100% implemented :heavy_check_mark:
-    - CameraController - 100% implemented :heavy_check_mark:
-    - EdgeLinesFactory - 100% implemented :heavy_check_mark:
-    - CameraUtils, LineUtils, MathUtils, MeshUtils, ModelUtils, TransformationUtils - 100% implemented :heavy_check_mark:
-    - LineSelectorData (used for line selection) - 100% implemented :heavy_check_mark:
-    - MeshBooleanOperations - 100% implemented :heavy_check_mark:
-    - MeshOctree - 100% implemented :heavy_check_mark:
-    - MeshTrianglesSorter - 100% implemented :heavy_check_mark:
-    - ModelMover, ModelRotator and ModelScalar - planned for next version :hourglass_flowing_sand:
-    - ObjImporter - 100% implemented :heavy_check_mark:
-    - ObjExporter - planned for next version :hourglass_flowing_sand:
-    - StlImporter - 100% implemented :heavy_check_mark:
-    - StlExporter - planned for next version :hourglass_flowing_sand:
-    - glTFImporter - 100% implemented :heavy_check_mark:
-    - TextureLoader, TextureFactory - 100% implemented :heavy_check_mark:
-    - Triangulator - 100% implemented :heavy_check_mark:
-    - TrueTypeFontLoader, VectorFontFactory - 100% implemented :heavy_check_mark:
-    - SpriteBatch - planned for next version :hourglass_flowing_sand:
-   
-Other not implemented features:
-- Super-sampling (planned for later)
 
 
 ## Troubleshooting
