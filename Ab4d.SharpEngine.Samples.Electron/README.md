@@ -52,7 +52,7 @@ To debug the WebAssembly code, you will need to use a Blazor project. If you use
 ### Troubleshooting
 
 If start the Electron app with invalid base href value, you get the following:
-![Invalid base href](doc/electron-invalid-base-href.png)
+![Invalid base href](../doc/electron-invalid-base-href.png)
 
 Tho solve that, open the `wwwroot/index.html` and change the `base href` to `./`.
 This will make sure that the files will be read relative to the current path (in Electron the files are read from local hard disk and not from url).
