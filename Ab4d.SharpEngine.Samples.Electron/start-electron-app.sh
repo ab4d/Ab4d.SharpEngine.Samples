@@ -16,6 +16,11 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+if [ ! -f "package-lock.json" ]; then
+  echo "Installing Electron"
+  npm i electron
+fi
+
 
 echo "Checking WebAssembly files in wwwroot folder"
 
