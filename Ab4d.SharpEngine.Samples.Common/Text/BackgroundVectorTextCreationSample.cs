@@ -149,6 +149,10 @@ public class BackgroundVectorTextCreationSample : CommonSample
         _textsVertexBuffer = await gpuDevice.CreateBufferAsync(textMesh.Vertices,        Ab4d.Vulkan.BufferUsageFlags.VertexBuffer, name: "VectorTextVertexBuffer");
         _textsIndexBuffer  = await gpuDevice.CreateBufferAsync(textMesh.TriangleIndices, Ab4d.Vulkan.BufferUsageFlags.IndexBuffer,  name: "VectorTextIndexBuffer");
 
+        if (this.IsDisposed) // If this samples was disposed while we were creating the text, then we need to dispose the created buffers and return
+            return;
+
+
         // Assign the created buffers to the textsMesh in the MAIN thread
         textsMesh.SetCustomVertexBuffer(textMesh.Vertices, _textsVertexBuffer, textMesh.BoundingBox);
         textsMesh.SetCustomIndexBuffer(textMesh.TriangleIndices, _textsIndexBuffer);
