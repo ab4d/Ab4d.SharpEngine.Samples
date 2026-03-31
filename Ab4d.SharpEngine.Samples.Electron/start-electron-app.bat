@@ -9,8 +9,9 @@ call npm -v
 if errorlevel 1 goto node_error
 
 if not exist package-lock.json (
-call npm i electron
-if errorlevel 1 goto node_error
+   echo Installing Electron
+   call npm i electron
+   if errorlevel 1 goto node_error
 )
 
 
