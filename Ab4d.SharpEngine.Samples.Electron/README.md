@@ -47,3 +47,14 @@ To redirect the console output to the terminal, set the following environment va
 You can also use the Chromium developer tools to debug the web page. To open the developer tools, select the "View" - "Toggle Developer Tools" menu item in the Electron app or press "CTRL + SHIFT + I".
 
 To debug the WebAssembly code, you will need to use a Blazor project. If you use a WebAssembly project without a Blazor project, then it is recommened to create a new Blazor WebAssemply project that uses linked .cs files from the main project (Ab4d.SharpEngine.Samples.WebAssemblyDemo). This way you can start the Blazor project and debug its code. See also [Ab4d.SharpEngine.Samples.BlazorWebAssemblyTesterApp project](../Ab4d.SharpEngine.Samples.BlazorWebAssemblyTesterApp/README.md).
+
+
+### Troubleshooting
+
+If start the Electron app with invalid base href value, you get the following:
+![Invalid base href](doc/electron-invalid-base-href.png)
+
+Tho solve that, open the `wwwroot/index.html` and change the `base href` to `./`.
+This will make sure that the files will be read relative to the current path (in Electron the files are read from local hard disk and not from url).
+
+To see errors, you can open **Developer Tools** from the View menu.
