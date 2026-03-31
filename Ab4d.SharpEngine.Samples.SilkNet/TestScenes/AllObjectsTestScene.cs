@@ -211,7 +211,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
                     };
 
                     // Use async method to load texture in background thread and when loaded set that to Material:
-                    TextureLoader.CreateTextureAsync(
+                    TextureLoader.CreateTexture(
                         @"Resources\Textures\10x10-texture.png", gpuDevice, 
                         textureCreatedCallback: createdGpuImage => geometryModel7.Material = new StandardMaterial(createdGpuImage),
                         generateMipMaps: false, useGpuDeviceCache: false);
@@ -253,7 +253,7 @@ namespace Ab4d.SharpEngine.Samples.TestScenes
 
                 if (gpuDevice != null)
                 {
-                    TextureLoader.CreateTextureAsync(
+                    TextureLoader.CreateTexture(
                         @"Resources\Textures\uvchecker2.jpg", gpuDevice,
                         textureCreatedCallback: createdGpuImage =>
                         {
