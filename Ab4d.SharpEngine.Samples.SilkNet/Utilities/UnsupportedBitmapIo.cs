@@ -42,13 +42,13 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(string fileName)
+        public RawImageData LoadBitmap(string fileName, BitmapLoadOptions? options = null)
         {
             throw new NotSupportedException();
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
+        public RawImageData LoadBitmap(Stream fileStream, string fileExtension, BitmapLoadOptions? options = null)
         {
             throw new NotSupportedException();
         }

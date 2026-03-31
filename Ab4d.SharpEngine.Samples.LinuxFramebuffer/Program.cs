@@ -30,76 +30,70 @@ class Program
         }
 
         /* Command-line parser */
-        var outputDeviceOption = new Option<FileInfo?>(
-            name: "--output-device",
-            description: "Output framebuffer device (/dev/fbX or /dev/dri/cardX)."
-        );
-        var vulkanDeviceIndexOption = new Option<int>(
-            name: "--vulkan-device-index",
-            description: "Index of Vulkan device used for off-screen rendering."
-        );
-        var drawCursorOption = new Option<bool>(
-            name: "--draw-cursor",
-            description: "Draw mouse cursor.",
-            getDefaultValue: () => true
-        );
-        var widthOption = new Option<int>(
-            name: "--width",
-            description: "Request specified horizontal resolution instead of preferred one."
-        );
-        var heightOption = new Option<int>(
-            name: "--height",
-            description: "Request specified vertical resolution instead of preferred one."
-        );
-        var switchConsoleModeOption = new Option<bool>(
-            name: "--switch-console-mode",
-            description: "Switch console to graphical mode and disable kernel keyboard processing."
-        );
+        var outputDeviceOption = new Option<FileInfo?>(name: "--output-device") { Description = "Output framebuffer device (/dev/fbX or /dev/dri/cardX)." };
+        
+        var vulkanDeviceIndexOption = new Option<int>(name: "--vulkan-device-index") { Description = "Index of Vulkan device used for off-screen rendering." };
+
+        var drawCursorOption = new Option<bool>(name: "--draw-cursor") { Description = "Draw mouse cursor.", DefaultValueFactory = result => true, };
+
+        var widthOption = new Option<int>(name: "--width") { Description =  "Request specified horizontal resolution instead of preferred one." };
+
+        var heightOption = new Option<int>(name: "--height") { Description = "Request specified vertical resolution instead of preferred one." };
+        
+        var switchConsoleModeOption = new Option<bool>(name: "--switch-console-mode") { Description =  "Switch console to graphical mode and disable kernel keyboard processing." };
+
 
         var rootCommand = new RootCommand("Linux framebuffer demo with off-screen Vulkan renderer.");
-        rootCommand.AddGlobalOption(outputDeviceOption);
-        rootCommand.AddGlobalOption(vulkanDeviceIndexOption);
-        rootCommand.AddGlobalOption(drawCursorOption);
-        rootCommand.AddGlobalOption(widthOption);
-        rootCommand.AddGlobalOption(heightOption);
-        rootCommand.AddGlobalOption(switchConsoleModeOption);
+        rootCommand.Options.Add(outputDeviceOption);
+        rootCommand.Options.Add(vulkanDeviceIndexOption);
+        rootCommand.Options.Add(drawCursorOption);
+        rootCommand.Options.Add(widthOption);
+        rootCommand.Options.Add(heightOption);
+        rootCommand.Options.Add(switchConsoleModeOption);
 
-        rootCommand.SetHandler((outputDevice, vulkanDeviceIndex, drawCursor, width, height, switchConsoleMode) =>
+        var parseResult = rootCommand.Parse(args);
+
+
+        var outputDevice = parseResult.GetValue<FileInfo?>(outputDeviceOption);
+        var vulkanDeviceIndex = parseResult.GetValue<int>(vulkanDeviceIndexOption);
+        var drawCursor = parseResult.GetValue<bool>(drawCursorOption);
+        var width = parseResult.GetValue<int>(widthOption);
+        var height = parseResult.GetValue<int>(heightOption);
+        var switchConsoleMode = parseResult.GetValue<bool>(switchConsoleModeOption);
+
+        /* Set up logging */
+        var loggerFactory = LoggerFactory.Create(builder =>
         {
-            /* Set up logging */
-            var loggerFactory = LoggerFactory.Create(builder =>
-            {
-                builder.SetMinimumLevel(LogLevel.Warning)
-                    .AddFilter("Ab4d.SharpEngine.Samples.LinuxFramebuffer", LogLevel.Information)
-                    .AddSimpleConsole(options =>
-                    {
-                        options.SingleLine = true;
-                    });
-            });
-            var logger = loggerFactory.CreateLogger<Program>();
+            builder.SetMinimumLevel(LogLevel.Warning)
+                .AddFilter("Ab4d.SharpEngine.Samples.LinuxFramebuffer", LogLevel.Information)
+                .AddSimpleConsole(options =>
+                {
+                    options.SingleLine = true;
+                });
+        });
+        var logger = loggerFactory.CreateLogger<Program>();
 
-            /* Create program instance and run it */
-            try {
-                var program = new Program(
-                    outputDevice?.FullName,
-                    vulkanDeviceIndex,
-                    drawCursor,
-                    width,
-                    height,
-                    switchConsoleMode,
-                    loggerFactory,
-                    logger);
-                program.ProgramMain();
-                returnCode = 0;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Error during program execution!");
-                returnCode = -1;
-            }
-        }, outputDeviceOption, vulkanDeviceIndexOption, drawCursorOption, widthOption, heightOption, switchConsoleModeOption);
+        /* Create program instance and run it */
+        try {
+            var program = new Program(
+                outputDevice?.FullName,
+                vulkanDeviceIndex,
+                drawCursor,
+                width,
+                height,
+                switchConsoleMode,
+                loggerFactory,
+                logger);
+            program.ProgramMain();
+            returnCode = 0;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error during program execution!");
+            returnCode = -1;
+        }
 
-        rootCommand.Invoke(args);
+
         return returnCode;
     }
 

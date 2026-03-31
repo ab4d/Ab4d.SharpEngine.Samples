@@ -1,11 +1,6 @@
 //#define TESTS
 
 using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Ab4d.SharpEngine.Common;
 using Android.Content.Res;
 using Android.Graphics;
@@ -23,6 +18,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         private static readonly string[] SupportedLoadFileExtensions = { "png", "jpg", "gif", "bmp", "webp", "heic", "heif" };
 
         /// <inheritdoc/>
+        [Obsolete("ConvertToSupportedFormat is obsolete. Please use the ConvertToSupportedFormat property in the BitmapLoadOptions structure that can be passed to the LoadBitmap method.")]
         public bool ConvertToSupportedFormat { get; set; } = true;
 
         /// <summary>
@@ -58,7 +54,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(string fileName)
+        public RawImageData LoadBitmap(string fileName, BitmapLoadOptions? options = null)
         {
             var androidBitmap = LoadAndroidBitmap(fileName);
 
@@ -69,13 +65,15 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
+        public RawImageData LoadBitmap(Stream fileStream, string fileExtension, BitmapLoadOptions? options = null)
         {
-            var options = new BitmapFactory.Options();
+            var decodeOptions = new BitmapFactory.Options();
             if (PreventAndroidBitmapScale)
-                options.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
+                decodeOptions.InScaled = false; // see: https://developer.android.com/reference/android/graphics/BitmapFactory.Options#inScaled
 
-            var androidBitmap = BitmapFactory.DecodeStream(fileStream, null, options);
+            decodeOptions.InPremultiplied = options?.PremultiplyAlpha ?? true;
+
+            var androidBitmap = BitmapFactory.DecodeStream(fileStream, null, decodeOptions);
             return ConvertAndroidBitmapToRawImageData(androidBitmap);
         }
 

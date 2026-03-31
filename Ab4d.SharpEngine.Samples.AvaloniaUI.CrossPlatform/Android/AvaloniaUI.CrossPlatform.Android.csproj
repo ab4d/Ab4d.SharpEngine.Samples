@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Android</RootNamespace>  
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0-android</TargetFramework>
+    <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion> <!-- require Android 9 (API 28) that supports Vulkan v1.1; SharpEngine is also able to work with Vulkan v1.0 on Android 7 (API 24), but some features do not work so it is recommended to use Vulkan 1.1 -->
     <Nullable>enable</Nullable>
     <ApplicationId>com.ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</ApplicationId>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia.Android" Version="11.3.5" />
+    <PackageReference Include="Avalonia.Android" Version="11.3.8" />
     <PackageReference Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.16" />
 
     <!-- Add support for Android 16KB page size - see https://avaloniaui.net/blog/preparing-your-avalonia-apps-for-android-s-16-kb-page-size-requirement -->
