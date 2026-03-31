@@ -26,7 +26,7 @@ if not exist "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\
 
 echo Copying published files to local wwwroot
 
-xcopy /E /Y "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\publish\wwwroot\*" "wwwroot\"
+xcopy /E /Y /C "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\publish\wwwroot\*" "wwwroot\"
 
 rem Delete compressed files because they are not used by Electron - serving files from the local hard disk is very fast.
 rem When creating an installer for Electron app, the files will be compressed so the distribuited installer size will be small.
