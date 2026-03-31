@@ -257,6 +257,9 @@ paket-files/
 
 .DS_STORE
 
+# npm package lock file
+package-lock.json
+
 # Prevent commiting files that are copied from compiled _framework folder
 Ab4d.SharpEngine.Samples.AspNetCoreApp/wwwroot/_framework/
 Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/
