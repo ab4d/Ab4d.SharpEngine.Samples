@@ -51,7 +51,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(string fileName)
+        public RawImageData LoadBitmap(string fileName, BitmapLoadOptions? options = null)
         {
             var image = LoadImage(fileName);
             var gpuImageData = CreateRawImageData(image);
@@ -60,7 +60,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
+        public RawImageData LoadBitmap(Stream fileStream, string fileExtension, BitmapLoadOptions? options = null)
         {
             throw new System.NotImplementedException();
         }

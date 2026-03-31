@@ -25,8 +25,8 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         };
 
         /// <inheritdoc/>
+        [Obsolete("ConvertToSupportedFormat is obsolete. Please use the ConvertToSupportedFormat property in the BitmapLoadOptions structure that can be passed to the LoadBitmap method.")]
         public bool ConvertToSupportedFormat { get; set; } = true;
-
 
         /// <inheritdoc />
         public Func<string, string?>? FileNotFoundResolver { get; set; }
@@ -48,78 +48,61 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public bool IsStreamSupported()
+        public bool IsStreamSupported() => true;
+
+        /// <inheritdoc />
+        public RawImageData LoadBitmap(string fileName, BitmapLoadOptions? options = null)
         {
-            return false;
+            #pragma warning disable CS0618 // ConvertToSupportedFormat is obsolete
+            var convertToSupportedFormat = options?.ConvertToSupportedFormat ?? ConvertToSupportedFormat;
+            #pragma warning restore CS0618
+
+            var premultiplyAlpha = options?.PremultiplyAlpha ?? true;
+
+            var skBitmap = LoadSkBitmap(fileName, premultiplyAlpha);
+            var rawImageData = CreateRawImageData(skBitmap, convertToSupportedFormat, premultiplyAlpha);
+
+            return rawImageData ;
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(string fileName)
+        public RawImageData LoadBitmap(Stream fileStream, string fileExtension, BitmapLoadOptions? options = null)
         {
-            var skBitmap = LoadSkBitmap(fileName);
+            #pragma warning disable CS0618 // ConvertToSupportedFormat is obsolete
+            var convertToSupportedFormat = options?.ConvertToSupportedFormat ?? ConvertToSupportedFormat;
+            #pragma warning restore CS0618
 
+            var premultiplyAlpha = options?.PremultiplyAlpha ?? true;
 
-            RawImageData gpuImageData;
+            var skBitmap = LoadSkBitmap(fileStream, premultiplyAlpha);
+            var rawImageData = CreateRawImageData(skBitmap, convertToSupportedFormat, premultiplyAlpha);
 
-            if (skBitmap.BytesPerPixel == 4)
-            {
-                Format vkFormat = skBitmap.ColorType == SKColorType.Rgba8888 ? Format.R8G8B8A8Unorm
-                                                                             : Format.B8G8R8A8Unorm;
-
-                gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, vkFormat, skBitmap.Bytes, checkTransparency: false);
-
-
-                if (skBitmap.AlphaType == SKAlphaType.Opaque)
-                {
-                    gpuImageData.HasTransparentPixels = false;
-                    gpuImageData.IsPreMultipliedAlpha = true;
-                }
-                else
-                {
-                    // if we already have premultipled alpha then we just need to check for transparency
-                    if (skBitmap.AlphaType == SKAlphaType.Premul)
-                    {
-                        gpuImageData.CheckTransparency(); // check transparency is faster then CheckTransparencyAndConvertToPremultipliedAlpha
-                        gpuImageData.IsPreMultipliedAlpha = true;
-                    }
-                    else
-                    {
-                        gpuImageData.CheckTransparencyAndConvertToPremultipliedAlpha();
-                    }
-                }
-            }
-            else if (skBitmap.BytesPerPixel == 1) //.ColorType == SKColorType.Gray8)
-            {
-                // Single-channel grayscale image; needs to be converted to RGBA for compatibility with the rest of the code...
-                if (ConvertToSupportedFormat)
-                {
-                    var rgbaBytes = ConvertGrayscaleImageDataToBgra(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, skBitmap.Bytes);
-                    gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.Width * 4, Format.R8G8B8A8Unorm, rgbaBytes, checkTransparency: false);
-                }
-                else
-                {
-                    gpuImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, Format.R8Unorm, skBitmap.Bytes, checkTransparency: false);
-                }
-
-                // No transparency in grayscale (8 bit) images
-                gpuImageData.HasTransparentPixels = false;
-                gpuImageData.IsPreMultipliedAlpha = true;
-            }
-            else
-            {
-                throw new NotSupportedException("Unsupported bitmap image format. Only images with four bytes (32 bit) per pixel or one byte (8 bit) per pixel are supported");
-            }
-
-            return gpuImageData;
+            return rawImageData ;
         }
 
-        /// <inheritdoc />
-        public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
+
+        private SKBitmap LoadSkBitmap(Stream fileStream, bool premultiplyAlpha)
         {
-            throw new System.NotImplementedException();
+            // This is equivalent to the SKBitmap.Decode(string) method, which ends up calling SKBitmap.Decode(SKCodec),
+            // which in turn automatically forces bitmapInfo.AlphaType to SKAlphaType.Premul. Instead, we control the
+            // alpha premultiplication via PremultiplyAlpha setting.
+            using var codec = SKCodec.Create(fileStream);
+            var bitmapInfo = codec.Info;
+            if (premultiplyAlpha && bitmapInfo.AlphaType == SKAlphaType.Unpremul)
+                bitmapInfo.AlphaType = SKAlphaType.Premul;
+            bitmapInfo.ColorSpace = null;
+            return SKBitmap.Decode(codec, bitmapInfo);
         }
 
-        public SKBitmap LoadSkBitmap(string fileName)
+        /// <summary>
+        /// LoadSkBitmap methods loads the file with the specified file name and returns a Skia's SKBitmap.
+        /// </summary>
+        /// <param name="fileName">fileName</param>
+        /// <param name="premultiplyAlpha">premultiply data with alpha channel or not (enabled by default)</param>
+        /// <returns>Skia's SKBitmap</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        public SKBitmap LoadSkBitmap(string fileName, bool premultiplyAlpha = true)
         {
             if (fileName == null)
                 throw new ArgumentNullException(nameof(fileName));
@@ -127,7 +110,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             // Use backslash on Windows and slash in other OS
             fileName = FileUtils.FixDirectorySeparator(fileName);
 
-            if (!System.IO.File.Exists(fileName))
+            if (!File.Exists(fileName))
             {
                 bool isResolved;
 
@@ -158,7 +141,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
                     if (fileStream != null)
                     {
-                        var imageFromStream = SkiaSharp.SKBitmap.Decode(fileStream);
+                        var imageFromStream = LoadSkBitmap(fileStream, premultiplyAlpha);
                         fileStream.Close();
 
                         return imageFromStream;
@@ -166,25 +149,90 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                 }
 
                 if (!isResolved)
+                {
+                    // Use CommonFileNotFoundResolver that tries to find the file
+                    isResolved = FileUtils.CommonFileNotFoundResolver(ref fileName);
+                }
+
+                if (!isResolved)
                     throw new FileNotFoundException("File not found: " + fileName, fileName); // Throw exception here because System.Drawing.Bitmap throws "Parameter invalid" exception when file does not exist (?!)
             }
 
-            var skBitmap = SkiaSharp.SKBitmap.Decode(fileName);
-
-            return skBitmap;
+            // This is equivalent to the SKBitmap.Decode(string) method, which ends up calling SKBitmap.Decode(SKCodec),
+            // which in turn automatically forces bitmapInfo.AlphaType to SKAlphaType.Premul. Instead, we control the
+            // alpha premultiplication via PremultiplyAlpha setting.
+            using var codec = SKCodec.Create(fileName);
+            var bitmapInfo = codec.Info;
+            if (premultiplyAlpha && bitmapInfo.AlphaType == SKAlphaType.Unpremul)
+                bitmapInfo.AlphaType = SKAlphaType.Premul;
+            bitmapInfo.ColorSpace = null;
+            return SKBitmap.Decode(codec, bitmapInfo);
         }
 
-        public void SaveBitmap(RawImageData imageData, string fileName, SKEncodedImageFormat fileFormat, int quality = 80)
+        private RawImageData CreateRawImageData(SKBitmap skBitmap, bool convertToSupportedFormat, bool premultiplyAlpha)
         {
-            using (var stream = File.OpenWrite(fileName))
+            RawImageData rawImageData ;
+
+            if (skBitmap.BytesPerPixel == 4)
             {
-                SaveBitmap(imageData, stream, fileFormat, quality);
+                Format vkFormat = skBitmap.ColorType == SKColorType.Rgba8888 ? Format.R8G8B8A8Unorm
+                                                                             : Format.B8G8R8A8Unorm;
+
+                rawImageData  = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, vkFormat, skBitmap.Bytes, checkTransparency: false);
+
+                if (skBitmap.AlphaType == SKAlphaType.Opaque)
+                {
+                    rawImageData.HasTransparentPixels = false;
+                    rawImageData.IsPreMultipliedAlpha = premultiplyAlpha; // be consistent with premultiplyAlpha setting
+                }
+                else
+                {
+                    // if we already have premultipled alpha then we just need to check for transparency
+                    if (skBitmap.AlphaType == SKAlphaType.Premul)
+                    {
+                        rawImageData.CheckTransparency(); // check transparency is faster then CheckTransparencyAndConvertToPremultipliedAlpha
+                        rawImageData.IsPreMultipliedAlpha = true;
+                    }
+                    else if (premultiplyAlpha)
+                    {
+                        rawImageData.CheckTransparencyAndConvertToPremultipliedAlpha();
+                    }
+                    else
+                    {
+                        rawImageData.CheckTransparency();
+                        rawImageData.IsPreMultipliedAlpha = false;
+                    }
+                }
             }
+            else if (skBitmap.BytesPerPixel == 1) //.ColorType == SKColorType.Gray8)
+            {
+                // Single-channel grayscale image; needs to be converted to RGBA for compatibility with the rest of the code...
+                if (convertToSupportedFormat)
+                {
+                    var rgbaBytes = ConvertGrayscaleImageDataToBgra(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, skBitmap.Bytes);
+                    rawImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.Width * 4, Format.R8G8B8A8Unorm, rgbaBytes, checkTransparency: false);
+                }
+                else
+                {
+                    rawImageData = new RawImageData(skBitmap.Width, skBitmap.Height, skBitmap.RowBytes, Format.R8Unorm, skBitmap.Bytes, checkTransparency: false);
+                }
+
+                // No transparency in grayscale (8 bit) images
+                rawImageData.HasTransparentPixels = false;
+                rawImageData.IsPreMultipliedAlpha = premultiplyAlpha; // be consistent with premultiplyAlpha setting
+            }
+            else
+            {
+                throw new NotSupportedException("Unsupported bitmap image format. Only images with four bytes (32 bit) per pixel or one byte (8 bit) per pixel are supported");
+            }
+
+            return rawImageData ;
         }
 
+        /// <inheritdoc />
         public void SaveBitmap(RawImageData imageData, string fileName)
         {
-            var fileExtension = System.IO.Path.GetExtension(fileName);
+            var fileExtension = Path.GetExtension(fileName);
             var fileFormat = GetImageFormatFromFileExtension(fileExtension);
             SaveBitmap(imageData, fileName, fileFormat);
         }
@@ -196,6 +244,28 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             SaveBitmap(imageData, fileStream, fileFormat);
         }
 
+        /// <summary>
+        /// Save bitmap from the RawImageData to the specified file and by using special file format options that are defied by the fileFormat and quality parameters.
+        /// </summary>
+        /// <param name="imageData">RawImageData</param>
+        /// <param name="fileName">fileName</param>
+        /// <param name="fileFormat">SKEncodedImageFormat</param>
+        /// <param name="quality">quality (80 by default)</param>
+        public void SaveBitmap(RawImageData imageData, string fileName, SKEncodedImageFormat fileFormat, int quality = 80)
+        {
+            using (var stream = File.OpenWrite(fileName))
+            {
+                SaveBitmap(imageData, stream, fileFormat, quality);
+            }
+        }
+
+        /// <summary>
+        /// Save bitmap from the RawImageData to the specified fileStream and by using special file format options that are defied by the fileFormat and quality parameters.
+        /// </summary>
+        /// <param name="imageData">RawImageData</param>
+        /// <param name="fileStream">fileStream</param>
+        /// <param name="fileFormat">SKEncodedImageFormat</param>
+        /// <param name="quality">quality (80 by default)</param>
         public void SaveBitmap(RawImageData imageData, Stream fileStream, SKEncodedImageFormat fileFormat, int quality = 80)
         {
             var skBitmap = CreateSKBitmap(imageData);
@@ -206,8 +276,12 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             }
         }
 
-
-        public SKBitmap CreateSKBitmap(RawImageData imageData)
+        /// <summary>
+        /// CreateSKBitmap method takes the <see cref="RawImageData"/> and returns the Skia's SKBitmap.
+        /// </summary>
+        /// <param name="imageData">RawImageData</param>
+        /// <returns>Skia's SKBitmap</returns>
+        public unsafe SKBitmap CreateSKBitmap(RawImageData imageData)
         {
             // create an empty bitmap
             var bitmap = new SKBitmap();
@@ -215,22 +289,30 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             // install the pixels with the color type of the pixel data
             var info = new SKImageInfo(imageData.Width, imageData.Height,
                 GetSkiaFormat(imageData.Format),
-                (imageData.IsPreMultipliedAlpha ?? false) ? SKAlphaType.Premul : SKAlphaType.Unpremul);
+                imageData.IsPreMultipliedAlpha ?? false ? SKAlphaType.Premul : SKAlphaType.Unpremul);
 
-            var dataHandle = GCHandle.Alloc(imageData.Data, GCHandleType.Pinned);
+            // We need to provide memory that will store the data for the SKBitmap.
+            // To prevent moving the data around with GC, we need to create unmanaged memory for that.
+            var dataLength = imageData.Data.Length;
+            var nativeBytesPtr = (nint)NativeMemory.AlignedAlloc((nuint)dataLength, alignment: 64); // 64-byte alignment for SIMD
 
-            try
-            {
-                bitmap.InstallPixels(info, dataHandle.AddrOfPinnedObject(), imageData.Stride);
-            }
-            finally
-            {
-                dataHandle.Free();
-            }
+            var sourceSpan = new ReadOnlySpan<byte>(imageData.Data);
+            var destSpan = new Span<byte>((void*)nativeBytesPtr, dataLength);
+            sourceSpan.CopyTo(destSpan);
+
+            // Set the SKBitmap size and back buffer that points to _renderedSceneBytesPtr
+            // IMPORTANT: This method does not copy the data from _renderedSceneBytesPtr to some internal storage
+            //            so we need to maintain the memory until this SKBitmap is released - in this case the releaseProc Action is called.
+            bitmap.InstallPixels(info, nativeBytesPtr, imageData.Stride, releaseProc: (address, context) => NativeMemory.AlignedFree((void*)address));
 
             return bitmap;
         }
 
+        /// <summary>
+        /// GetSkiaFormat returns the Skia's SKColorType from the Vulkan's format
+        /// </summary>
+        /// <param name="vulkanFormat">Vulkan's format</param>
+        /// <returns>Skia's SKColorType</returns>
         public static SKColorType GetSkiaFormat(Format vulkanFormat)
         {
             if (vulkanFormat == Format.R8G8B8A8Unorm)
@@ -255,6 +337,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
             throw new Exception("Unrecognized file extension: " + fileExtension);
         }
+
 
         private static bool IsFileFormatSupported(string fileExtension, string[] fileFormats)
         {
@@ -305,5 +388,5 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             }
             return rgbaData;
         }
-    }
+    } 
 }

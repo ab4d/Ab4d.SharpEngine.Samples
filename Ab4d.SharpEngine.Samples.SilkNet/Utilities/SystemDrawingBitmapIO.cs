@@ -26,6 +26,7 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         public Func<string, Stream?>? FileStreamResolver { get; set; }
 
         /// <inheritdoc/>
+        [Obsolete("ConvertToSupportedFormat is obsolete. Please use the ConvertToSupportedFormat property in the BitmapLoadOptions structure that can be passed to the LoadBitmap method.")]
         public bool ConvertToSupportedFormat { get; set; } = true;
 
 
@@ -42,73 +43,13 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public bool IsStreamSupported()
-        {
-            return false;
-        }
+        public bool IsStreamSupported() => true;
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(string fileName)
+        public RawImageData LoadBitmap(string fileName, BitmapLoadOptions? options = null)
         {
             var bitmap = LoadDrawingBitmap(fileName);
-
-            // It looks like all bitmap formats are stored as Format32bppArgb
-            // The only exception are indexed file formats (Format8bppIndexed) 
-            // There we would need to lock bits and then copy the indexes that reference color values from Palette property (here the colors are in ARGB format).
-            // So it is best to leave the convertion to Bitmap class and use Format32bppPArgb to also convert to premultiplied alpha.
-
-            //if (!ConvertToBgra && bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
-            //{
-            //    var grayscaleBitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
-
-            //    int grayscaleImageBytesLength = grayscaleBitmapData.Stride * grayscaleBitmapData.Height;
-
-            //    //var vkFormat = Format.R8G8B8A8Unorm;
-            //    //var vkFormat = Format.B8G8R8A8Unorm;
-
-            //    var grayscaleDataBytes = new byte[grayscaleImageBytesLength];
-
-            //    System.Runtime.InteropServices.Marshal.Copy(grayscaleBitmapData.Scan0, grayscaleDataBytes, 0, grayscaleImageBytesLength);
-
-            //    bitmap.UnlockBits(grayscaleBitmapData);
-
-            //    // We need to convert RGB to BGR
-            //    //BitmapUtils.ConvertBgraToRgba(dataBytes);
-
-            //    var grayscaleGpuImageData = new RawImageData(bitmap.Width, bitmap.Height, grayscaleBitmapData.Stride, Format.R8Unorm, grayscaleDataBytes, checkTransparency: false)
-            //    {
-            //        IsPreMultipliedAlpha = false
-            //    };
-
-            //    bitmap.Dispose();
-
-            //    return grayscaleGpuImageData;
-            //}
-
-            // NOTE:
-            // System.Drawing.Bitmap always creates a 32 bit bitmap (even when reading 8 bit png file the PixelFormat will be Format32bppArgb)
-            // When using WPF to read bitmap "new System.Windows.Media.Imaging.BitmapImage(new System.Uri(fileName));" then the bitmap has the original bitmap format (for example Gray8)
-
-            // LockBits and if needed also convert to pre-multiplied alpha (Format32bppPArgb instead of Format32bppArgb)
-            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
-
-            int imageBytesLength = bitmapData.Stride * bitmapData.Height;
-
-            // It looks like all bitmap formats (at least Format32bppArgb, Format24bppRgb, Format8bppIndexed) are stored as B8G8R8A8Unorm in raw format where file is read by System.Drawing.Bitmap
-            var vkFormat = Format.B8G8R8A8Unorm;
-            var dataBytes = new byte[imageBytesLength];
-
-            System.Runtime.InteropServices.Marshal.Copy(bitmapData.Scan0, dataBytes, 0, imageBytesLength);
-
-            bitmap.UnlockBits(bitmapData);
-
-            var gpuImageData = new RawImageData(bitmap.Width, bitmap.Height, bitmapData.Stride, vkFormat, dataBytes, checkTransparency: false)
-            {
-                IsPreMultipliedAlpha = true // IsPreMultipliedAlpha can be set to true, because we LockBits with Format32bppPArgb and this converts image to pre-multiplied form is it is not already
-            };
-
-            // Now that we have the image data array filled, we can update HasTransparency property
-            gpuImageData.CheckTransparency();
+            var gpuImageData = CreateRawImageData(bitmap, options);
 
             bitmap.Dispose();
 
@@ -116,9 +57,14 @@ namespace Ab4d.SharpEngine.Samples.Utilities
         }
 
         /// <inheritdoc />
-        public RawImageData LoadBitmap(Stream fileStream, string fileExtension)
+        public RawImageData LoadBitmap(Stream fileStream, string fileExtension, BitmapLoadOptions? options = null)
         {
-            throw new NotImplementedException();
+            var imageFromStream = new System.Drawing.Bitmap(fileStream);
+            fileStream.Close();
+
+            var gpuImageData = CreateRawImageData(imageFromStream, options);
+
+            return gpuImageData;
         }
 
         public System.Drawing.Bitmap LoadDrawingBitmap(string fileName)
@@ -168,6 +114,12 @@ namespace Ab4d.SharpEngine.Samples.Utilities
                 }
 
                 if (!isResolved)
+                {
+                    // Use CommonFileNotFoundResolver that tries to find the file
+                    isResolved = FileUtils.CommonFileNotFoundResolver(ref fileName);
+                }
+
+                if (!isResolved)
                     throw new FileNotFoundException("File not found: " + fileName, fileName); // Throw exception here because System.Drawing.Bitmap throws "Parameter invalid" exception when file does not exist (?!)
             }
 
@@ -182,10 +134,16 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             if (imageData == null)
                 return;
 
-            byte[] imageDataArray = imageData.Data;
+            byte[] imageDataArray;
 
             if (imageData.Format == Format.R8G8B8A8Unorm)
-                 ConvertRgbaToBgra(imageDataArray); // converted RGBA to BGRA
+            {
+                // converted RGBA to BGRA
+                imageData.SwapRedAndBlueColors();
+                imageDataArray = imageData.Data; 
+            }
+            else
+                imageDataArray = imageData.Data;
 
             var bitmap = new System.Drawing.Bitmap(imageData.Width, imageData.Height, imageData.Stride,
                                                    System.Drawing.Imaging.PixelFormat.Format32bppArgb,
@@ -200,8 +158,72 @@ namespace Ab4d.SharpEngine.Samples.Utilities
             throw new NotImplementedException();
         }
 
+        public static RawImageData CreateRawImageData(System.Drawing.Bitmap bitmap, BitmapLoadOptions? options)
+        {
+            // It looks like all bitmap formats are stored as Format32bppArgb
+            // The only exception are indexed file formats (Format8bppIndexed) 
+            // There we would need to lock bits and then copy the indexes that reference color values from Palette property (here the colors are in ARGB format).
+            // So it is best to leave the convertion to Bitmap class and use Format32bppPArgb to also convert to premultiplied alpha.
 
-        // From BitmapUtils.cs:
+            //if (!ConvertToBgra && bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+            //{
+            //    var grayscaleBitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
+
+            //    int grayscaleImageBytesLength = grayscaleBitmapData.Stride * grayscaleBitmapData.Height;
+
+            //    //var vkFormat = Format.R8G8B8A8Unorm;
+            //    //var vkFormat = Format.B8G8R8A8Unorm;
+
+            //    var grayscaleDataBytes = new byte[grayscaleImageBytesLength];
+
+            //    System.Runtime.InteropServices.Marshal.Copy(grayscaleBitmapData.Scan0, grayscaleDataBytes, 0, grayscaleImageBytesLength);
+
+            //    bitmap.UnlockBits(grayscaleBitmapData);
+
+            //    // We need to convert RGB to BGR
+            //    //BitmapUtils.ConvertBgraToRgba(dataBytes);
+
+            //    var grayscaleGpuImageData = new RawImageData(bitmap.Width, bitmap.Height, grayscaleBitmapData.Stride, Format.R8Unorm, grayscaleDataBytes, checkTransparency: false)
+            //    {
+            //        IsPreMultipliedAlpha = false
+            //    };
+
+            //    bitmap.Dispose();
+
+            //    return grayscaleGpuImageData;
+            //}
+
+            // NOTE:
+            // System.Drawing.Bitmap always creates a 32 bit bitmap (even when reading 8 bit png file the PixelFormat will be Format32bppArgb)
+            // When using WPF to read bitmap "new System.Windows.Media.Imaging.BitmapImage(new System.Uri(fileName));" then the bitmap has the original bitmap format (for example Gray8)
+
+            var premultiplyAlpha = options?.PremultiplyAlpha ?? true;
+            var format = premultiplyAlpha ? PixelFormat.Format32bppPArgb : PixelFormat.Format32bppArgb;
+
+            // LockBits and if needed also convert to pre-multiplied alpha (Format32bppPArgb instead of Format32bppArgb)
+            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, format);
+
+            int imageBytesLength = bitmapData.Stride * bitmapData.Height;
+
+            // It looks like all bitmap formats (at least Format32bppArgb, Format24bppRgb, Format8bppIndexed) are stored as B8G8R8A8Unorm in raw format where file is read by System.Drawing.Bitmap
+            var vkFormat = Format.B8G8R8A8Unorm;
+            var dataBytes = new byte[imageBytesLength];
+
+            System.Runtime.InteropServices.Marshal.Copy(bitmapData.Scan0, dataBytes, 0, imageBytesLength);
+
+            bitmap.UnlockBits(bitmapData);
+
+            var gpuImageData = new RawImageData(bitmap.Width, bitmap.Height, bitmapData.Stride, vkFormat, dataBytes, checkTransparency: false)
+            {
+                IsPreMultipliedAlpha = premultiplyAlpha // IsPreMultipliedAlpha can be set to true, because we LockBits with Format32bppPArgb and this converts image to pre-multiplied form is it is not already
+            };
+
+            // Now that we have the image data array filled, we can update HasTransparency property
+            gpuImageData.CheckTransparency();
+
+            return gpuImageData;
+        }
+
         private static bool IsFileFormatSupported(string fileExtension, string[] fileFormats)
         {
             if (fileExtension == null) throw new ArgumentNullException(nameof(fileExtension));
@@ -217,19 +239,9 @@ namespace Ab4d.SharpEngine.Samples.Utilities
 
             return false;
         }
-
-        public static void ConvertRgbaToBgra(byte[] imageDataArray)
-        {
-            for (int i = 0; i < imageDataArray.Length; i += 4)
-            {
-                // ReSharper disable once SwapViaDeconstruction
-                var temp = imageDataArray[i + 0];
-                imageDataArray[i + 0] = imageDataArray[i + 2];
-                imageDataArray[i + 2] = temp;
-            }
-        }
     }
 }
+
 
 
 #endif
