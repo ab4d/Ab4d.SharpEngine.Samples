@@ -3,7 +3,7 @@
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
 
-<PageTitle>Ab4d.SharpEngine.Web - Common samples</PageTitle>
+<PageTitle>@page_title</PageTitle>
 
 <div class="ui-container">
     <div style="background: white; padding: 20px;">
@@ -15,6 +15,8 @@
 
     [Parameter]
     public string? TitleId { get; set; }
+    
+    private string page_title = "Ab4d.SharpEngine";
 
     private IJSObjectReference? _markedJSModule;
     private string _markdownHtmlContent = "";
@@ -38,6 +40,8 @@
 
         if (titleId == null)
             return;
+        
+        page_title = "Ab4d.SharpEngine - "  + titleId.Substring(titleId.IndexOf('/') + 1);
 
         _ = ShowMarkdown(titleId); // Do not wait for ShowMarkdown to finish
     }

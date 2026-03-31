@@ -6,7 +6,7 @@
 @using Ab4d.SharpEngine.Samples.Blazor.UIProvider
 @inject NavigationManager Navigation
 
-<PageTitle>Ab4d.SharpEngine.Web - Common samples</PageTitle>
+<PageTitle>@page_title</PageTitle>
 
 <div class="ui-container">
     <SharpEngineSceneView @ref="sharpEngineSceneView" style="display: block; width: 100%; height: 100%; overflow: hidden;"></SharpEngineSceneView>
@@ -35,6 +35,7 @@
     private static readonly bool ShowCaptureInSpector = false;
 
     private SharpEngineSceneView sharpEngineSceneView = null!;
+    private string page_title = "Ab4d.SharpEngine - Common samples";
     private string sample_title = "";
     private string sample_subtitle = "";
 
@@ -135,6 +136,8 @@
             createdSample.IsTestEnvironment = true;
             createdSample.UseCommonRandomSeed = true;
         }
+        
+        page_title = "Ab4d.SharpEngine - " + sampleId.Substring(sampleId.IndexOf('-') + 1);
         
         CurrentCommonSample = createdSample;
     }
