@@ -1,3 +1,4 @@
+@echo off
 echo This script clears the compiled files so when start-electron-app script is started agian, it recompiles all the projects.
 
 rd wwwroot /s /q
