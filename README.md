@@ -6,14 +6,14 @@ Welcome to the Samples for Ab4d.SharpEngine.
 
 **Ab4d.SharpEngine is a cross-platform 3D rendering engine for desktop, mobile and browser .Net applications.**
 
-<br>
+<br/>
 
-The engine uses [Vulkan](https://www.vulkan.org/) for **desktop and mobile apps** (samples use [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package).
-For the **browser and browser based apps** like Electron, the engine uses WebGL (samples use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
+The engine uses [Vulkan](https://www.vulkan.org/) for **desktop and mobile apps** (use [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package).<br/>
+For the **browser and browser based apps** like Electron, the engine uses WebGL (use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
 
-<br>
+<br/>
 
-**Key featrues of the engine:**
+**Key features of the engine:**
 - Using any coordinate system (y-up or z-up, right-handed or left-handed)
 - Many SceneNode objects (boxes, spheres, planes, cones, lines, poly-lines, curves, etc.)
 - Render line caps (arrows, etc.), line with pattern, poly-lines with miter or bevel connections, hidden lines <sup>*</sup>
@@ -32,11 +32,11 @@ For the **browser and browser based apps** like Electron, the engine uses WebGL 
 
  <sup>*</sup> Some features are not available for the browser (WebGL) version of the engine. See [Ab4d.SharpEngine.WebGL implementation details](doc/ab4d-sharpengine-webgl-implemented-features.md).
 
+<br/>
 
- <br>
-Ab4d.SharpEngine library is a **commercial library** but it is also **free for non-commercial open-source projects**.
+Ab4d.SharpEngine library is a **commercial library**, but it is also **free for non-commercial open-source projects**.
 
-The commercial license can be purchased from [purchase web page](https://www.ab4d.com/Purchase.aspx). With a commercial license, you also get priority email support and other benefits (feature requests, online support on your projects with sharing screen, etc.).
+The commercial license can be purchased from [purchase web page](https://www.ab4d.com/Purchase.aspx). With a commercial license, you also get priority email support and other benefits (feature requests, online support on your projects with screen sharing, etc.).
 To get a trial license for your own projects (not needed for the sample projects in this repo) or to apply for the free open-source license, see the [ab4d.com/trial](https://www.ab4d.com/trial).
 
 ## Platforms and UI frameworks
@@ -44,7 +44,7 @@ To get a trial license for your own projects (not needed for the sample projects
 ### Desktop and mobile platforms
 
 Desktop and mobile platforms require [Ab4d.SharpEngine](https://www.nuget.org/packages/Ab4d.SharpEngine) NuGet package that uses Vulkan for rendering.
-For the browser and browser based apps like Electron, the engine uses WebGL (samples use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package).
+For the browser and browser based apps like Electron, the engine uses WebGL (use [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package) - see below.
 
 
 **Windows:**
@@ -82,7 +82,7 @@ For the browser and browser based apps like Electron, the engine uses WebGL (sam
 
 Browser and browser based apps like Electron require [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package that uses WebGL rendering.
 
-- **Blazor WebAssembly** provided best integration and is the only platform that supports full debugging.
+- **Blazor WebAssembly** provided the best integration and is the only platform that supports full debugging.
   
 - **HTML and JavaScript** are enough to run the project with Ab4d.SharpEngine.WebGL that was compiled into wasm.
 To show the 3D scene in the browser, you can use any web server. The samples for the following web servers are provided:
