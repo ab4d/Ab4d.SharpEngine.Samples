@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
@@ -13,9 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('AVALONIA_12'))">
-    <PackageReference Include="Avalonia" Version="12.0.0-rc1" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.0-rc1" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.0-rc1" />
+    <PackageReference Include="Avalonia" Version="12.0.0-rc2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.0-rc2" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.0-rc2" />
   </ItemGroup>
   <ItemGroup Condition="!$(DefineConstants.Contains('AVALONIA_12'))">
     <PackageReference Include="Avalonia" Version="11.3.13" />
