@@ -99,7 +99,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-            InitializeComponent(); // To generate the source for InitializeComponent include XamlNameReferenceGenerator
+            InitializeComponent();
 
 
 #if VULKAN_BACKEND
