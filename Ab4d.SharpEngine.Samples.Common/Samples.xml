@@ -74,7 +74,7 @@
   <Sample Location="Text.InstancedTextNodeSample" Title="Instanced text"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
-  <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter"/>
+  <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing 3D lines from obj files"/>
   <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter"/>
   <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing and rendering PBR materials"/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter" IsUpdated="True" UpdateInfo="Added native Assimp library for macOS"/>
