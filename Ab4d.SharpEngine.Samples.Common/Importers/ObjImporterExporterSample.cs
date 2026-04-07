@@ -105,6 +105,7 @@ public class ObjImporterExporterSample : CommonSample
         {
             UseTwoSidedMaterials = _isTwoSidedMaterials,
             Read3DLines = _isReading3DLines, // When true (by default), then 3D lines are read from the obj file and LineNode or MultiLineNode objects are created.
+            DefaultLineColor = Colors.Black, // DefaultLineColor set the line color for all read lines. When set to null, then the color is read from the material library file (mtl file).
             LineDepthBias = 0.0005f // when 3D lines are read from, then this value is used as DepthBias for the created LineMaterial. This can be used to avoid z-fighting when lines are rendered together with the solid objects. The default value is 0.0005f, but it can be changed if needed.
         };
 
