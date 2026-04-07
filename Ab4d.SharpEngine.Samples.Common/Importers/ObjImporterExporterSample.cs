@@ -14,8 +14,7 @@ public class ObjImporterExporterSample : CommonSample
     private string _subtitle = "ObjImporter and ObjExporter classes are part of the core Ab4d.SharpEngine library.\nThey can import from .obj and .mtl (contains material definitions) files and export the current scene to that file format.";
     public override string? Subtitle => _subtitle;
 
-    //private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
-    private readonly string _initialFileName = "D:\\Wpf\\my 3d objects\\obj files\\simple line.obj";
+    private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
 
     private bool _isTwoSidedMaterials = true;
     private bool _isReading3DLines = true;
