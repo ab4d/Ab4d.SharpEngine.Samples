@@ -14,9 +14,11 @@ public class ObjImporterExporterSample : CommonSample
     private string _subtitle = "ObjImporter and ObjExporter classes are part of the core Ab4d.SharpEngine library.\nThey can import from .obj and .mtl (contains material definitions) files and export the current scene to that file format.";
     public override string? Subtitle => _subtitle;
 
-    private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
+    //private readonly string _initialFileName = "Resources\\Models\\robotarm.obj";
+    private readonly string _initialFileName = "D:\\Wpf\\my 3d objects\\obj files\\simple line.obj";
 
     private bool _isTwoSidedMaterials = true;
+    private bool _isReading3DLines = true;
     
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
@@ -102,7 +104,9 @@ public class ObjImporterExporterSample : CommonSample
         // it is also recommended to set GpuDevice (if not, then textures will be created later when GpuDevice is initialized).
         var objImporter = new ObjImporter(this.BitmapIO, this.GpuDevice)
         {
-            UseTwoSidedMaterials = _isTwoSidedMaterials
+            UseTwoSidedMaterials = _isTwoSidedMaterials,
+            Read3DLines = _isReading3DLines, // When true (by default), then 3D lines are read from the obj file and LineNode or MultiLineNode objects are created.
+            LineDepthBias = 0.0005f // when 3D lines are read from, then this value is used as DepthBias for the created LineMaterial. This can be used to avoid z-fighting when lines are rendered together with the solid objects. The default value is 0.0005f, but it can be changed if needed.
         };
 
         try
@@ -293,6 +297,13 @@ public class ObjImporterExporterSample : CommonSample
         ui.CreateCheckBox("Two-sided materials", _isTwoSidedMaterials, isChecked =>
         {
             _isTwoSidedMaterials = isChecked;
+            if (_importedFileName != null)
+                ImportFile(_importedFileName);
+        });
+        
+        ui.CreateCheckBox("Read 3D lines", _isReading3DLines, isChecked =>
+        {
+            _isReading3DLines = isChecked;
             if (_importedFileName != null)
                 ImportFile(_importedFileName);
         });
