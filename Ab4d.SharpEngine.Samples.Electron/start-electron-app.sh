@@ -2,6 +2,7 @@
 
 echo "Checking prerequisites"
 
+echo "Node.js version:"
 node -v
 if [ $? -ne 0 ]; then
   echo "Node.js is not installed. Please check the https://nodejs.org/en/download/ web page on how to install it."
@@ -9,9 +10,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+echo "npm version:"
 npm -v
 if [ $? -ne 0 ]; then
-  echo "Node.js is not installed. Please check the https://nodejs.org/en/download/ web page on how to install it."
+  echo "npm is not installed. Please check the https://nodejs.org/en/download/ web page on how to install it."
   read -p "Press enter to continue"
   exit 1
 fi
@@ -29,6 +31,12 @@ if [ ! -f "wwwroot/index.html" ]; then
   if [ ! -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot" ]; then
     echo "Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly"
 	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release /p:PublishProfile=../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Properties/PublishProfiles/FolderProfile.pubxml
+  
+     if [ $? -ne 0 ]; then
+      echo "Error compiling and publishing Ab4d.SharpEngine.Samples.BlazorWebAssembly."
+      read -p "Press enter to continue"
+      exit 1
+    fi  
   fi
   
   if [ ! -d wwwroot ]; then
@@ -37,6 +45,13 @@ if [ ! -f "wwwroot/index.html" ]; then
     
   echo "Copying published files to local wwwroot"
   cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot/* wwwroot/
+  
+  if [ $? -ne 0 ]; then
+    echo "Error copying from Ab4d.SharpEngine.Samples.BlazorWebAssembly to local wwwroot folder."
+    read -p "Press enter to continue"
+    exit 1
+  fi 
+  
   
   # Delete compressed files because they are not used by Electron - serving files from the local hard disk is very fast.
   # When creating an installer for Electron app, the files will be compressed so the distribuited installer size will be small.
