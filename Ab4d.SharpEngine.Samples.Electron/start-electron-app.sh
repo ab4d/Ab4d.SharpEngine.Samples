@@ -28,7 +28,7 @@ if [ ! -f "wwwroot/index.html" ]; then
 
   if [ ! -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot" ]; then
     echo "Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly"
-	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release
+	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release /p:PublishProfile=../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Properties/PublishProfiles/FolderProfile.pubxml
   fi
   
   if [ ! -d wwwroot ]; then

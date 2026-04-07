@@ -9,8 +9,9 @@ call npm -v
 if errorlevel 1 goto node_error
 
 if not exist package-lock.json (
-call npm i electron
-if errorlevel 1 goto node_error
+   echo Installing Electron
+   call npm i electron
+   if errorlevel 1 goto node_error
 )
 
 
@@ -20,7 +21,7 @@ if exist "wwwroot\index.html" goto start_electron
 
 if not exist "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\publish\wwwroot" (
     echo Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly 
-	dotnet publish ..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release
+	dotnet publish ..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release /p:PublishProfile=..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\Properties\PublishProfiles\FolderProfile.pubxml
 )
 
 
