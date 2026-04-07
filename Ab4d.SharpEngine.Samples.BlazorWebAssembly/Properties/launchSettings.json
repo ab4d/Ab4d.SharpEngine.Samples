@@ -10,8 +10,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-      //,"commandLineArgs": "--pathbase=/sharp-engine-browser-demo",
-      //"launchUrl": "sharp-engine-browser-demo"
     },
     "https": {
       "commandName": "Project",
@@ -22,8 +20,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-      //,"commandLineArgs": "--pathbase=/sharp-engine-browser-demo",
-      //"launchUrl": "sharp-engine-browser-demo"
     },
     "PlaywrightTests": {
       "commandName": "Project",
@@ -34,8 +30,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-      //,"commandLineArgs": "--pathbase=/sharp-engine-browser-demo",
-      //"launchUrl": "sharp-engine-browser-demo"
     }
   }
 }
