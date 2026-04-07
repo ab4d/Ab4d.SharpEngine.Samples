@@ -1,15 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
-    <Version>4.0.9584</Version>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>4.0.9593</Version>
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
     
-    <!--<DefineConstants>AVALONIA_12</DefineConstants>-->
+    <!-- Uncomment the following to use Avalonia v12 -->
+    <!--<DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>-->
   </PropertyGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('AVALONIA_12'))">
@@ -24,9 +25,9 @@
   </ItemGroup>
   
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="4.0.9584" />
-    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="4.0.9584" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.0.9584" />    
+    <PackageReference Include="Ab4d.SharpEngine" Version="4.0.9593" />
+    <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="4.0.9593" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.0.9593" />    
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
