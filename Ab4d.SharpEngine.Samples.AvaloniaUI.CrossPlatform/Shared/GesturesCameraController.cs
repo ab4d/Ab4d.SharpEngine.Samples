@@ -22,28 +22,45 @@ public class GesturesCameraController : PointerCameraController
     public bool IsScrollGestureEnabled { get; set; } = true;
 
     public bool RotateCameraWithScrollGesture { get; set; } = true;
-    
+
     public bool RotateWithPinchGesture { get; set; } = false;
 
     private float _previousPinchScale = 1;
     private Vector3? _lastPinchRotationCenterPosition;
 
-    public GesturesCameraController(SharpEngineSceneView sharpEngineSceneView, InputElement? eventsSourceElement = null) 
+    public GesturesCameraController(SharpEngineSceneView sharpEngineSceneView, InputElement? eventsSourceElement = null)
         : base(sharpEngineSceneView, eventsSourceElement)
     {
         if (eventsSourceElement == null)
             eventsSourceElement = sharpEngineSceneView;
-        
-        eventsSourceElement.GestureRecognizers.Add(new PinchGestureRecognizer());
 
+        eventsSourceElement.GestureRecognizers.Add(new PinchGestureRecognizer());
+        eventsSourceElement.GestureRecognizers.Add(new ScrollGestureRecognizer() { CanHorizontallyScroll = true, CanVerticallyScroll = true });
+        
+#if AVALONIA_12 
+
+        // Avalonia v12 code:
+        // In Avalonia v12 the gesture events are moved from Gestures to InputElement and the events are directly on the control instead of attached events.
+        // https://github.com/AvaloniaUI/Avalonia/commit/dc8dc3bd2e8199c8bed710ae5af8f5882be78581
+        sharpEngineSceneView.Pinch              += PinchEventHandler;
+        sharpEngineSceneView.PinchEnded         += PinchEndedEventHandler;
+        sharpEngineSceneView.ScrollGesture      += ScrollGestureHandler;
+        sharpEngineSceneView.ScrollGestureEnded += ScrollGestureEndedHandler;
+
+        // The following can be also used:
+        //sharpEngineSceneView.AddHandler(InputElement.PinchEvent, PinchEventHandler);
+        //sharpEngineSceneView.AddHandler(InputElement.PinchEndedEvent, PinchEndedEventHandler);
+        //eventsSourceElement.AddHandler(InputElement.ScrollGestureEvent, ScrollGestureHandler);
+        //eventsSourceElement.AddHandler(InputElement.ScrollGestureEndedEvent, ScrollGestureEndedHandler);
+        
+#else
+        // Avalonia v11 code:
         sharpEngineSceneView.AddHandler(Gestures.PinchEvent, PinchEventHandler);
         sharpEngineSceneView.AddHandler(Gestures.PinchEndedEvent, PinchEndedEventHandler);
 
-
-        eventsSourceElement.GestureRecognizers.Add(new ScrollGestureRecognizer() { CanHorizontallyScroll = true, CanVerticallyScroll = true });
-
         eventsSourceElement.AddHandler(Gestures.ScrollGestureEvent, ScrollGestureHandler);
         eventsSourceElement.AddHandler(Gestures.ScrollGestureEndedEvent, ScrollGestureEndedHandler);
+#endif          
     }
 
 
@@ -81,7 +98,7 @@ public class GesturesCameraController : PointerCameraController
 
 
         EndPointerProcessing(); // This is required to prevent invalid camera rotation after next touch (this will not be needed anymore in the next version)
-        
+
         args.Handled = true;
 
 #if WRITE_INFO_TO_OUTPUT
@@ -101,7 +118,7 @@ public class GesturesCameraController : PointerCameraController
         var pointerPosition = new Vector2((float)args.ScaleOrigin.X, (float)args.ScaleOrigin.Y);
         bool resetRotationCenterPosition = false;
         bool isCameraRotationCenterPositionUpdated = false;
-        
+
         // Save RotationCenterPosition so it can be reset at the end of this method
         Vector3? savedRotationCenterPosition = GetCameraRotationCenterPosition();
 
@@ -120,7 +137,7 @@ public class GesturesCameraController : PointerCameraController
 
                 float headingChange = 0;
                 float attitudeChange = 0;
-                
+
                 if (this.IsHeadingRotationEnabled)
                 {
                     headingChange = angleDelta;
@@ -164,7 +181,7 @@ public class GesturesCameraController : PointerCameraController
                     resetRotationCenterPosition = true;
                     isCameraRotationCenterPositionUpdated = true;
                 }
-                
+
                 Camera.RotateCamera(headingChange, attitudeChange);
             }
 

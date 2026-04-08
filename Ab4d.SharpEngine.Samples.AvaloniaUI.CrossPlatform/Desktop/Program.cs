@@ -26,7 +26,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.Desktop
 
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .WithInterFont()
+#if !AVALONIA_12 
+                .WithInterFont() // Only for Avalonia v11
+#endif
                 .LogToTrace()
                 .UseReactiveUI(uiBuilder => {});
         }
