@@ -9,14 +9,14 @@
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
     
-    <!-- Uncomment the following to use Avalonia v12 -->
-    <!--<DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>-->
+    <!-- Comment the following to use Avalonia v11 -->
+    <DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="$(DefineConstants.Contains('AVALONIA_12'))">
-    <PackageReference Include="Avalonia" Version="12.0.0-rc2" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.0-rc2" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.0-rc2" />
+    <PackageReference Include="Avalonia" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.0" />
   </ItemGroup>
   <ItemGroup Condition="!$(DefineConstants.Contains('AVALONIA_12'))">
     <PackageReference Include="Avalonia" Version="11.3.13" />
