@@ -49,7 +49,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             _renderForm = new SharpEngineRenderForm(Width, Height, windowTitle: "Ab4d.SharpEngine RenderForm");
             
             // Set to false (true by default) to fix the window size and prevent user from resizing the window
-            _renderForm.AllowUserResizing = false; 
+            _renderForm.AllowUserResizing = true; 
             
             // Set to false (by default), to render only frames where there are any changes
             _renderForm.ForceRenderingEveryFrame = true; 
@@ -58,7 +58,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             _renderForm.IsFullscreen = false; 
 
             // Set to true (false by default) to allow pressing ALT + ENTER to switch to full-screen mode and back.
-            _renderForm.AllowFullScreenWithAltEnter = false; 
+            _renderForm.AllowFullScreenWithAltEnter = true; 
 
             // CreateOptions provide many options that are used to initialize the SharpEngine
             _renderForm.CreateOptions.EnableStandardValidation = EnableStandardValidation;
