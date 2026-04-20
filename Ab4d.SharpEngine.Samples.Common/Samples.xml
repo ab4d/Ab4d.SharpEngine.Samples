@@ -8,6 +8,7 @@
   <Sample Location="Titles.QuickStartTitle.md" IsTitle="True" Title="Quick Start" />
   <Sample Location="QuickStart.SharpEngineSceneViewInCode" Title="SharpEngineSceneView in code" />
   <Sample Location="QuickStart.SharpEngineSceneViewInXaml" Title="SharpEngineSceneView in XAML" Condition="IsNotWinForms"/>
+  <Sample Location="QuickStart.RenderFormSampleInfo" Title="RenderForm sample" Condition="IsWinForms"/>
   
   <Sample Location="Titles.CamerasTitle.md" IsTitle="True" Title="Cameras"/>
   <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
