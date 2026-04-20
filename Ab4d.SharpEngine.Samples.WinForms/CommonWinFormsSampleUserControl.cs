@@ -51,13 +51,13 @@ public class CommonWinFormsSampleUserControl : UserControl
         TitleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         TitleLabel.Location = new Point(10, 10);
         Controls.Add(TitleLabel);
-
-
+        
+        
         SubtitleLabel = new Label();
         SubtitleLabel.Font = new Font(TitleLabel.Font.FontFamily, 10, FontStyle.Regular);
         SubtitleLabel.AutoSize = true;
         SubtitleLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        SubtitleLabel.Location = new Point(13, 43);
+        SubtitleLabel.Location = new Point(13, TitleLabel.PreferredHeight + 10);
         Controls.Add(SubtitleLabel);
 
 
