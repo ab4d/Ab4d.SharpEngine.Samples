@@ -20,6 +20,8 @@ public class SliderUIElement : WinFormsUIElement
 
     private float _valueScale;
 
+    private bool _isInternalChange;
+
     public override bool IsUpdateSupported => true;
 
     public SliderUIElement(WinFormsUIProvider winFormsUIProvider,
@@ -76,8 +78,11 @@ public class SliderUIElement : WinFormsUIElement
 
         _trackBar.ValueChanged += (sender, args) =>
         {
-            _setValueAction?.Invoke((float)(_trackBar.Value / _valueScale));
-            UpdateShownValue();
+            if (!_isInternalChange)
+            {
+                _setValueAction?.Invoke((float)(_trackBar.Value / _valueScale));
+                UpdateShownValue();
+            }
         };
 
 
@@ -162,8 +167,10 @@ public class SliderUIElement : WinFormsUIElement
     {
         float newValue = _getValueFunc() * _valueScale;
 
+        _isInternalChange = true; // prevent calling setValueAction
         _trackBar.Value = Math.Min(_trackBar.Maximum, Math.Max(_trackBar.Minimum, (int)newValue)); // It is not allowed to set Value outsize of Min - Max
-
+        _isInternalChange = false;
+        
         UpdateShownValue();
     }
 
