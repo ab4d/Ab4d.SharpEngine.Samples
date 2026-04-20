@@ -61,7 +61,7 @@ public class SliderUIElement : WinFormsUIElement
             TickStyle = TickStyle.None,
             BackColor = Color.White,
             AutoSize = false,
-            Height = 30,
+            Height = (int)(20 * winFormsUIProvider.UIScale),
             Width = (int)(width * winFormsUIProvider.UIScale),
             Margin = new Padding(0, 0, 0, 0),
         };
@@ -104,8 +104,14 @@ public class SliderUIElement : WinFormsUIElement
 
                 if (keyTextWidth > 0)
                 {
+                    // when AutoSize is false, then we need to set the Height.
+                    // To do this we measure the size of the label.
+                    var controlWidth = (int)(keyTextWidth * winFormsUIProvider.UIScale);
+                    var size = _keyLabel.GetPreferredSize(new Size(controlWidth, 0));
+                    
                     _keyLabel.AutoSize = false;
-                    _keyLabel.Width = (int)(keyTextWidth * winFormsUIProvider.UIScale);
+                    _keyLabel.Width = controlWidth;
+                    _keyLabel.Height = size.Height;
                 }
                 else
                 {
@@ -134,6 +140,12 @@ public class SliderUIElement : WinFormsUIElement
                 else if (shownValueWidth == 0)
                     _valueLabel.Width = MeasureShownValueTextBlock(minValue / _valueScale, maxValue / _valueScale);
                 // else: when less then zero, then do not set the width
+                
+                // when AutoSize is false, then we need to set the Height.
+                // To do this we measure the size of the label.
+                var controlWidth = (int)(keyTextWidth * winFormsUIProvider.UIScale);
+                var size = _valueLabel.GetPreferredSize(new Size(_valueLabel.Width, 0));
+                _valueLabel.Height = size.Height;
 
                 _flowLayoutPanel.Controls.Add(_valueLabel);
             }

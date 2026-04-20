@@ -46,8 +46,14 @@ public class KeyValueLabelUIElement : WinFormsUIElement
 
             if (keyTextWidth > 0)
             {
+                // when AutoSize is false, then we need to set the Height.
+                // To do this we measure the size of the label.
+                var controlWidth = (int)(keyTextWidth * winFormsUIProvider.UIScale);
+                var size = _keyLabel.GetPreferredSize(new Size(controlWidth, 0));
+                
                 _keyLabel.AutoSize = false;
-                _keyLabel.Width = (int)(keyTextWidth * winFormsUIProvider.UIScale);
+                _keyLabel.Width = controlWidth;
+                _keyLabel.Height = size.Height;
             }
             else
             {
