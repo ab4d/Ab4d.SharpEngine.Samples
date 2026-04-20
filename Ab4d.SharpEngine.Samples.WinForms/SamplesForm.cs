@@ -31,7 +31,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
         private Font? _headerItemFont;
 
         private Control? _currentSampleControl;
-        
+
         private CommonWinFormsSampleUserControl? _commonWinFormsSampleUserControl;
         private WebView2? _titleWebView;
 
@@ -42,6 +42,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
         private string? _currentSampleLocationText;
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
+
+        private System.Windows.Forms.Timer? _fpsTimer;
 
         public SamplesForm()
         {
@@ -70,7 +72,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             // TODO: Implement Diagnostics window
             // Hide diagnosticsButton for now:
             diagnosticsButton.Visible = false;
-            panel3.Size = new Size(panel3.Size.Width, 134);
+            usedGpuTextLabel.Visible = false;
+            gpuInfoLabel.Visible = false;
 
 
             WinFormsSamplesContext.Current.CurrentSharpEngineSceneViewChanged += OnCurrentSharpEngineSceneViewChanged;
@@ -78,14 +81,16 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             UpdateGraphicsCardInfo();
 
             LoadSamples();
+
+            this.Closing += (sender, args) => UnsubscribeToUpdateFps();
         }
 
 
         private void LoadSamples()
         {
             string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Samples.xml");
-            var samplesXmlNodList = CommonSample.LoadSamples(fileName, 
-                                                             uiFramework: "WinForms", 
+            var samplesXmlNodList = CommonSample.LoadSamples(fileName,
+                                                             uiFramework: "WinForms",
                                                              errorMessage => MessageBox.Show(errorMessage));
 
             samplesListView.Columns.Add(new ColumnHeader() { Width = samplesListView.Width - 4 - SystemInformation.VerticalScrollBarWidth });
@@ -146,15 +151,15 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                     case "istitle":
                         isTitle = true;
                         break;
-                    
+
                     case "isnew":
                         isNew = true;
                         break;
-                    
+
                     case "isupdated":
                         isUpdated = true;
                         break;
-                    
+
                     case "updateinfo":
                         updateInfo = attribute.Value.Replace("\\n", "\n");
                         break;
@@ -170,7 +175,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                 title = "  " + title;
 
             string? tooltip = null;
-            
+
             if (isNew)
             {
                 title += "  (NEW)";
@@ -211,7 +216,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             var sampleLocation = selectedListViewItem.Tag as string;
 
-            if (sampleLocation == null || sampleLocation == _currentSampleLocationText) 
+            if (sampleLocation == null || sampleLocation == _currentSampleLocationText)
                 return;
 
 
@@ -228,12 +233,14 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             {
                 _currentCommonSample.Dispose();
                 _currentCommonSample = null;
+
+                UnsubscribeToUpdateFps();
             }
 
             if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
                 var markdownText = GetMarkdownText(sampleLocation);
-                    
+
                 if (markdownText != null)
                 {
                     var markdownHtml = Markdig.Markdown.ToHtml(markdownText);
@@ -306,6 +313,20 @@ namespace Ab4d.SharpEngine.Samples.WinForms
                     sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
 
                 WinFormsSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
+
+                if (sharpEngineSceneView != null)
+                {
+                    SubscribeToUpdateFps();
+
+                    if (sharpEngineSceneView.GpuDevice != null)
+                    {
+                        UpdateGpuName();
+                    }
+                    else
+                    {
+                        sharpEngineSceneView.GpuDeviceCreated += SharpEngineSceneViewOnGpuDeviceCreated;
+                    }
+                }
             }
 
             if (!(samplePanel.Controls.Count > 0 && samplePanel.Controls[0] == _currentSampleControl))
@@ -315,6 +336,67 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             }
 
             _currentSampleLocationText = sampleLocation;
+        }
+
+        private void SharpEngineSceneViewOnGpuDeviceCreated(object sender, GpuDeviceCreatedEventArgs e)
+        {
+            if (sender is ISharpEngineSceneView sharpEngineSceneView)
+                sharpEngineSceneView.GpuDeviceCreated -= SharpEngineSceneViewOnGpuDeviceCreated;
+         
+            UpdateGpuName();
+        }
+
+        private void SubscribeToUpdateFps()
+        {
+            if (_fpsTimer != null)
+                return;
+
+            _fpsTimer = new System.Windows.Forms.Timer()
+            {
+                Interval = 1000, // once per second
+            };
+
+            _fpsTimer.Tick += OnFpsTimerTick;
+            _fpsTimer.Start();
+        }
+
+        private void UnsubscribeToUpdateFps()
+        {
+            if (_fpsTimer == null)
+                return;
+
+            _fpsTimer.Stop();
+            _fpsTimer.Tick -= OnFpsTimerTick;
+            _fpsTimer = null;
+        }
+
+        private void OnFpsTimerTick(object? sender, EventArgs e)
+        {
+            string fpsText;
+
+            var sharpEngineSceneView = WinFormsSamplesContext.Current.CurrentSharpEngineSceneView as SharpEngineSceneView;
+            if (sharpEngineSceneView == null || sharpEngineSceneView.FramesPerSecond == 0)
+                fpsText = "";
+            else
+                fpsText = $" ({sharpEngineSceneView.FramesPerSecond} FPS)";
+
+            this.Text = "Ab4d.SharpEngine WinForms samples" + fpsText;
+        }
+        
+        private void UpdateGpuName()
+        {
+            var sharpEngineSceneView = WinFormsSamplesContext.Current.CurrentSharpEngineSceneView;
+            if (sharpEngineSceneView != null && sharpEngineSceneView.GpuDevice != null)
+            {
+                gpuInfoLabel.Visible = true;
+                gpuInfoLabel.Text = sharpEngineSceneView.GpuDevice.GpuName;
+                usedGpuTextLabel.Visible = true;
+            }
+            else
+            {
+                usedGpuTextLabel.Visible = false;
+                gpuInfoLabel.Visible = false;
+            }
         }
 
         // Searches the logical controls tree and returns the first instance of SharpEngineSceneView if found
@@ -346,7 +428,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
             return foundDViewportView;
         }
-        
+
         private string? GetMarkdownText(string location)
         {
             var markdownText = GetMarkdownText(this.GetType().Assembly, location);
@@ -429,7 +511,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
                 usedGpuTextLabel.Text = "";
                 gpuInfoLabel.Text = "";
-                
+
 
                 if (sharpEngineSceneView != null)
                 {
@@ -454,7 +536,7 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             {
                 usedGpuTextLabel.Text = "";
                 gpuInfoLabel.Text = "";
-                
+
             }
 
             //ToolTip.SetTip(SelectedGraphicInfoTextBlock, null);
@@ -479,6 +561,12 @@ namespace Ab4d.SharpEngine.Samples.WinForms
         {
             if (samplesListView.SelectedItems.Count > 0)
                 await ShowSelectedSample(samplesListView.SelectedItems[0]);
+        }
+
+        private void renderAsManyFramesAsPossibleCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (WinFormsSamplesContext.Current.CurrentSharpEngineSceneView is SharpEngineSceneView sharpEngineSceneView)
+                sharpEngineSceneView.RenderAsManyFramesAsPossible = renderAsManyFramesAsPossibleCheckBox.Checked;
         }
     }
 }

@@ -13,9 +13,10 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             ApplicationConfiguration.Initialize();
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2); // Similar to PerMonitor, but enables child window DPI change notification, improved scaling of comctl32 controls, and dialog scaling.
             
+            // To start RenderFormSample, comment the following line:
             Application.Run(new SamplesForm());
 
-            // Uncomment to run RenderFormSample:
+            // and uncomment the following:
             //using (var game = new RenderFormSample())
             //    game.Run();
         }
