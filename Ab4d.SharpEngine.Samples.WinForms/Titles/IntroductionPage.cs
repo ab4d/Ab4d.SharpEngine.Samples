@@ -37,23 +37,6 @@ public class IntroductionPage : UserControl
         PlayAgainButton.Click += PlayAgainButtonOnClick;
 
         this.Controls.Add(PlayAgainButton);
-
-
-        _infoPanel = new Panel()
-        {
-            Dock = DockStyle.Bottom,
-            Height = 80,
-            BackColor = Color.White
-        };
-
-        _sceneViewPanel = new Panel()
-        {
-            Dock = DockStyle.Fill,
-            BackColor = Color.White
-        };
-
-        this.Controls.Add(_sceneViewPanel);
-        this.Controls.Add(_infoPanel);
         
 
         InfoLabel = new Label
@@ -67,6 +50,23 @@ public class IntroductionPage : UserControl
         };
         InfoLabel.Font = new Font(InfoLabel.Font.FontFamily, 16);
 
+        
+        _infoPanel = new Panel()
+        {
+            Dock = DockStyle.Bottom,
+            Height = InfoLabel.PreferredHeight + 10,
+            BackColor = Color.White
+        };
+
+        _sceneViewPanel = new Panel()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.White
+        };
+
+        this.Controls.Add(_sceneViewPanel);
+        this.Controls.Add(_infoPanel);
+        
         _infoPanel.Controls.Add(InfoLabel);
 
 
