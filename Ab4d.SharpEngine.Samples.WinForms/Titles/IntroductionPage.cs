@@ -70,7 +70,7 @@ public class IntroductionPage : UserControl
         _infoPanel.Controls.Add(InfoLabel);
 
 
-        if (SkipInitializingSharpEngine)
+        if (SkipInitializingSharpEngine || Control.ModifierKeys.HasFlag(Keys.Control))
         {
             ShowStaticSharpEngineLogo();
             ShowInfoTextBlock();
