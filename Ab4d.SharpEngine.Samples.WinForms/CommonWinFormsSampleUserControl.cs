@@ -99,6 +99,9 @@ public class CommonWinFormsSampleUserControl : UserControl
 
     private void OnHandleDestroyed(object? sender, EventArgs e)
     {
+        if (CurrentCommonSample != null)
+            CurrentCommonSample.Dispose();
+        
         if (!MainSceneView.IsDisposed)
             MainSceneView.Dispose();
     }
