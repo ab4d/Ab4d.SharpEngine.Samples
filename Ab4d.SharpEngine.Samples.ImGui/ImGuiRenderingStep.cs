@@ -88,7 +88,7 @@ public class ImGuiRenderingStep : RenderingStep
             CreatePipeline(renderingContext);
 
         // Retrieve Vulkan command buffer
-        if (!renderingContext.IsCurrentCommandBufferDirty)
+        if (!renderingContext.IsPrimaryCommandBufferDirty)
         {
             return true; // Skip filling command buffer again as it is still valid; return true to continue rendering
         }

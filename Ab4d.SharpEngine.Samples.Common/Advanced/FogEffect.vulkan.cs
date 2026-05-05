@@ -39,9 +39,6 @@ public class FogEffect : Effect
 
     private DescriptorSetsCache? _textureDescriptorSetsCache;
 
-    private int _swapChainImageIndex;
-
-
     // See Resources/Shaders/txt/FogShader.frag.json to see the FieldOffset values
     [StructLayout(LayoutKind.Explicit, Size = FogMaterialUniformBuffer.SizeInBytes)]
     internal struct FogMaterialUniformBuffer
@@ -137,11 +134,11 @@ public class FogEffect : Effect
         _vertexBufferDescription = gpuDevice.VertexBufferDescriptionsManager.GetPositionNormalTextureVertexBufferDescription();
 
 
-        int poolCapacity = Math.Max(16, 8 * Scene.SwapChainImagesCount); // Make pool size multiple of swapChainImagesCount because we will allocate in chunks of swapChainImagesCount (this also prevents error that is described in VulkanDescriptorSetFactory.CreateDescriptorSets)
+        int poolCapacity = Math.Max(16, 8 * Scene.InFlightFramesCount); // Make pool size multiple of InFlightFramesCount because we will allocate in chunks of InFlightFramesCount (this also prevents error that is described in VulkanDescriptorSetFactory.CreateDescriptorSets)
         (_standardDescriptorPoolFactory, _standardDescriptorPoolFactoryDisposeToken) = VulkanDescriptorSetFactory.Create(gpuDevice, DescriptorType.StorageBuffer, fogMaterialsDescriptorSetLayout, poolCapacity, name: "FogEffect-DescriptorPool");
         
 
-        (_materialsDataBlockPool, _materialsDataBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>.Create(Scene, FogMaterialUniformBuffer.SizeInBytes, Scene.SwapChainImagesCount, "MaterialMemoryBlocks");
+        (_materialsDataBlockPool, _materialsDataBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>.Create(Scene, FogMaterialUniformBuffer.SizeInBytes, Scene.InFlightFramesCount, "MaterialMemoryBlocks");
 
         // Assign DescriptorSets to each created memory block
         _materialsDataBlockPool.CreateDescriptorSetsAction = gpuBuffers => _standardDescriptorPoolFactory?.CreateDescriptorSets(gpuBuffers);
@@ -314,19 +311,18 @@ public class FogEffect : Effect
     {
         DisposeEffectTechniques();
     }
-
+    
     /// <inheritdoc />
     public override void OnBeginUpdate(RenderingContext renderingContext)
     {
-        _swapChainImageIndex = renderingContext.CurrentSwapChainImageIndex;
     }
-
+    
     /// <inheritdoc />
-    public override void OnEndUpdate()
+    public override void OnEndUpdate(RenderingContext renderingContext)
     {
         EnsureMaterialsDataBlockPool(); // this makes sure that _materialsDataBlockPool is set
 
-        _materialsDataBlockPool.UpdateDataBlocks(_swapChainImageIndex);
+        _materialsDataBlockPool.UpdateDataBlocks(renderingContext.CurrentInFlightFrameIndex);
     }
 
     public override void Cleanup(bool increaseFrameNumber, bool freeEmptyMemoryBlocks)
@@ -474,7 +470,7 @@ public class FogEffect : Effect
         if (Scene == null)
             throw new SharpEngineException("Cannot create GpuDynamicMemoryBlockPool because Scene is null");
 
-        (_materialsDataBlockPool, _materialsDataBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>.Create(Scene, FogMaterialUniformBuffer.SizeInBytes, Scene.SwapChainImagesCount, "FogMaterialMemoryBlocks");
+        (_materialsDataBlockPool, _materialsDataBlockPoolDisposeToken) = GpuDynamicMemoryBlockPool<FogMaterialUniformBuffer>.Create(Scene, FogMaterialUniformBuffer.SizeInBytes, Scene.InFlightFramesCount, "FogMaterialMemoryBlocks");
 
         // Assign DescriptorSets to each created memory block
         _materialsDataBlockPool.CreateDescriptorSetsAction = gpuBuffers => _standardDescriptorPoolFactory?.CreateDescriptorSets(gpuBuffers);
@@ -644,7 +640,7 @@ public class FogEffect : Effect
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_pipelineLayout.Handle, typeof(PipelineLayout));
                 _pipelineLayout = PipelineLayout.Null;
             }
-
+            
             if (_texturedPipelineLayout.IsNotNull())
             {
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_texturedPipelineLayout.Handle, typeof(PipelineLayout));
