@@ -645,6 +645,12 @@ public class FogEffect : Effect
                 _pipelineLayout = PipelineLayout.Null;
             }
 
+            if (_texturedPipelineLayout.IsNotNull())
+            {
+                Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_texturedPipelineLayout.Handle, typeof(PipelineLayout));
+                _texturedPipelineLayout = PipelineLayout.Null;
+            }
+
             if (_fogMaterialsDescriptorSetLayout.IsNotNull())
             {
                 Scene.GpuDevice.DisposeVulkanResourceOnMainThreadAfterFrameRendered(_fogMaterialsDescriptorSetLayout.Handle, typeof(DescriptorSetLayout));
