@@ -149,6 +149,9 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             int selectedIndex = 0;
             foreach (SamplesXmlReader.SampleItem sampleItem in sampleItems)
             {
+                if (!CommonSample.CheckSampleCondition(sampleItem.Condition, "Avalonia"))
+                    continue;
+                
                 var listBoxItem = CreateListBoxItem(sampleItem);
 
                 if (listBoxItem != null)

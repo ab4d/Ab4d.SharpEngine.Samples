@@ -192,52 +192,72 @@ public abstract class CommonSample
 
         foreach (System.Xml.XmlNode xmlNode in xmlNodeList)
         {
-            if (xmlNode.Attributes != null)
-            {
-                var conditionAttribute = xmlNode.Attributes["Condition"];
-
-                if (conditionAttribute != null)
-                {
-                    var AllConditionsText = conditionAttribute.Value;
-
-                    var allConditions = AllConditionsText.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                    bool isIncluded = false;
-                    bool isSkipped = false;
-
-                    foreach (var oneCondition in allConditions)
-                    {
-                        if (!oneCondition.StartsWith("Is", StringComparison.OrdinalIgnoreCase))
-                            throw new Exception("Invalid Condition in Samples.xml: " + oneCondition);
-
-                        bool negateCondition = oneCondition.Contains("Not", StringComparison.OrdinalIgnoreCase);
-                        int uiFrameworkPosition = negateCondition ? 5 : 2; // Skip "IsNot" or "Is"
-
-                        string uiFrameworkInCondition = oneCondition.Substring(uiFrameworkPosition);
-
-                        if (negateCondition)
-                        {
-                            if (uiFramework == uiFrameworkInCondition)
-                                isSkipped = true; // for example, skip Wpf if condition is IsNotWpf
-                            else
-                                isIncluded = true; // for example, when IsNotWinForms then include that sample for Wpf
-                        }
-                        else
-                        {
-                            if (uiFramework == uiFrameworkInCondition)
-                                isIncluded = true; // for example, only include this sample when condition IsWpf and uiFramework is Wpf
-                        }
-                    }
-
-                    if (isSkipped || !isIncluded)
-                        continue;
-                }
-            }
+            if (!CheckSampleCondition(xmlNode, uiFramework))
+                continue;
 
             filteredXmlNodeList.Add(xmlNode);
         }
 
         return filteredXmlNodeList;
+    }
+
+    // Returns false if this sample should be skipped based on the Condition attribute in the Samples.xml; otherwise returns true.
+    public static bool CheckSampleCondition(System.Xml.XmlNode xmlNode, string uiFramework)
+    {
+        if (xmlNode.Attributes != null)
+        {
+            var conditionAttribute = xmlNode.Attributes["Condition"];
+
+            if (conditionAttribute != null)
+            {
+                var allConditionsText = conditionAttribute.Value;
+
+                if (!CheckSampleCondition(allConditionsText, uiFramework))
+                    return false;
+            }
+        }
+        
+        return true;
+    }
+
+    public static bool CheckSampleCondition(string? allConditionsText, string uiFramework)
+    {
+        if (allConditionsText == null)
+            return true;
+        
+        var allConditions = allConditionsText.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        bool isIncluded = false;
+        bool isSkipped = false;
+
+        foreach (var oneCondition in allConditions)
+        {
+            if (!oneCondition.StartsWith("Is", StringComparison.OrdinalIgnoreCase))
+                throw new Exception("Invalid Condition in Samples.xml: " + oneCondition);
+
+            bool negateCondition = oneCondition.Contains("Not", StringComparison.OrdinalIgnoreCase);
+            int uiFrameworkPosition = negateCondition ? 5 : 2; // Skip "IsNot" or "Is"
+
+            string uiFrameworkInCondition = oneCondition.Substring(uiFrameworkPosition);
+
+            if (negateCondition)
+            {
+                if (uiFramework == uiFrameworkInCondition)
+                    isSkipped = true; // for example, skip Wpf if condition is IsNotWpf
+                else
+                    isIncluded = true; // for example, when IsNotWinForms then include that sample for Wpf
+            }
+            else
+            {
+                if (uiFramework == uiFrameworkInCondition)
+                    isIncluded = true; // for example, only include this sample when condition IsWpf and uiFramework is Wpf
+            }
+        }
+
+        if (isSkipped || !isIncluded)
+            return false;
+        
+        return true;        
     }
 
     public static object? CreateSampleObject(string uiFramework, string sampleLocation, object commonSamplesContext, Action<string>? showErrorAction)
