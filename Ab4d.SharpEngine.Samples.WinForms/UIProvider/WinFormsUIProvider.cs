@@ -31,7 +31,7 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
     // But when they are used in WinForms with font size 10, then the size is slightly too small and some text may be clipped.
     // Therefore we need to scale the UI by small amount. This is applied to UIScale that is used instead of DpiScale.
     // If we would use font size 9, then there is too much space when applying Dpi scale and too little space when no Dpi scale is applied.
-    public const float UIScaleFactor = 1.05f; 
+    public const float UIScaleFactor = 1.1f; 
 
     private Dictionary<string, string?> _settings;
 
