@@ -33,7 +33,10 @@ public class RenderingLayerCustomCameraSample : CommonSample
             SceneView.SceneUpdating -= SceneViewOnSceneUpdating;
 
         if (Scene != null && _customRenderingLayer != null)
+        {
             Scene.RemoveRenderingLayer(_customRenderingLayer);
+            _customRenderingLayer.Dispose();
+        }
         
         base.OnDisposed();
     }
