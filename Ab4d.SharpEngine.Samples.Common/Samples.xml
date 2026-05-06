@@ -146,7 +146,7 @@
   <Sample Location="Animations.CustomAnimationSample" Title="Custom animation" IsNew="True"/>
 
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
-  <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia"/>
+  <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia, IsWinForms"/>
   <Sample Location="Advanced.ComplexSceneSample" Title="Complex scene sample" />
   <Sample Location="Advanced.AsyncUploadSample" Title="Async upload" />
   <Sample Location="Advanced.ModelOptimizerSample" Title="ModelOptimizer" />
