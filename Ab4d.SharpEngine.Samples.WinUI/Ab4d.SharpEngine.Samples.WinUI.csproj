@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ab4d.Assimp" Version="1.2.9502" />
+    <PackageReference Include="Ab4d.Assimp" Version="1.3.9624" />
    </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
     <PackageReference Include="Ab4d.SharpEngine" Version="4.0.9594" />
