@@ -146,6 +146,17 @@ public class ComboBoxUIElement : WinFormsUIElement
     
     public override void SetValue(object newValue)
     {
+        if (newValue is string[] newItems)
+        {
+            _items = newItems;
+            
+            _comboBox.Items.Clear();
+            foreach (var item in newItems)
+                _comboBox.Items.Add(item);
+            
+            return;
+        }
+        
         if (newValue is int newIndex)
         {
             _comboBox.SelectedIndex = newIndex;

@@ -112,6 +112,13 @@ public class ComboBoxUIElement : AvaloniaUIElement
     
     public override void SetValue(object newValue)
     {
+        if (newValue is string[] newItems)
+        {
+            _items = newItems;
+            _comboBox.ItemsSource = newItems;
+            return;
+        }
+        
         if (newValue is int newIndex)
         {
             _comboBox.SelectedIndex = newIndex;
