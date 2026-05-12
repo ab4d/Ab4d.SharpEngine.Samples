@@ -114,6 +114,9 @@ public class ObjImporterExporterSample : CommonSample
         {
             _importedModelNodes = objImporter.Import(fileName);
             
+            // You can also use the async version of the Import method (in this case this method must be decorated with async keyword)
+            //_importedModelNodes = await objImporter.ImportAsync(fileName);
+            
             _importedFileName = fileName;
             UpdateExportFileName();
         }
