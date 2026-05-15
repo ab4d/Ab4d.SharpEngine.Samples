@@ -147,11 +147,9 @@ public class ImportedAssimpAnimation : CommonSample
         if (_importedModelNodes == null)
             return;
         
-        
         // Add importer model to the Scene
         scene.RootNode.Add(_importedModelNodes);
-                
-
+              
         if (_assimpImporter.AnimatedSkeletonMeshes != null)
         {
             foreach (var oneMesh in _assimpImporter.AnimatedSkeletonMeshes)
@@ -170,13 +168,15 @@ public class ImportedAssimpAnimation : CommonSample
             
             _animationCombobox.SetValue(importedAnimationNames[initialAnimationIndex]); // passing a single string will set the selected item
         }
-        else
-        {
-            ChangeSelectedAnimation(initialAnimationIndex);
-            _initialAnimationIndex = initialAnimationIndex;
-        }
+        
+        ChangeSelectedAnimation(initialAnimationIndex);
+        _initialAnimationIndex = initialAnimationIndex;
 
         StartAnimation();
+        
+        // Before getting the bones matrices, we need to manually call Update to get the correct parent transformations.                
+        scene.RootNode.Update();
+
         UpdateShownBones();
         
                 
@@ -424,12 +424,8 @@ public class ImportedAssimpAnimation : CommonSample
                                 usedSceneNode = meshModelNode;
                         });
 
-                        if (usedSceneNode != null)
-                        {
-                            usedSceneNode.Update();
-                            if (!usedSceneNode.IsWorldMatrixIdentity)
-                                parentTransform = new MatrixTransform(usedSceneNode.WorldMatrix);
-                        }
+                        if (usedSceneNode != null && !usedSceneNode.IsWorldMatrixIdentity)
+                            parentTransform = new MatrixTransform(usedSceneNode.WorldMatrix);
                     }
 
                     AddBoneMarkers(rootSkeletonNode, lineThickness: 6, parentTransform);
