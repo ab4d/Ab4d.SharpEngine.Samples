@@ -383,6 +383,7 @@ public class ImportedAssimpAnimation : CommonSample
         {
             if (_boneMarkersGroupNode != null && Scene != null)
             {
+                _skeletonNodeBoneMarkerLines.Clear();
                 Scene.RootNode.Remove(_boneMarkersGroupNode);
                 _boneMarkersGroupNode = null;
             }
