@@ -25,7 +25,7 @@
   <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.RotateAroundCustomPointSample" Title="Rotate around custom point"/>
   <Sample Location="CameraControllers.ZoomToCustomPointSample" Title="Zoom to a custom point"/>
-  <Sample Location="CameraControllers.CameraSmoothingSample" Title="Camera smoothing" IsNew="True"/>
+  <Sample Location="CameraControllers.CameraSmoothingSample" Title="Camera smoothing"/>
 
   <Sample Location="Titles.StandardModelsTitle.md" IsTitle="True" Title="Standard 3D models"/>
   <Sample Location="StandardModels.MeshModelNodeSample" Title="MeshModelNode"/>
@@ -48,7 +48,7 @@
   <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
-  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap" IsUpdated="True" UpdateInfo="Added CreateContourLine that can be used to create contour lines at any height.&#x0a;Added FlattenContours method to flatten all contour lines."/>
+  <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
   <Sample Location="AdvancedModels.MultiMaterialModelNodeSample" Title="MultiMaterialModelNode"/>
   <Sample Location="AdvancedModels.TubesSample" Title="3D Tubes"/>
   <Sample Location="AdvancedModels.TubePathsSample" Title="3D Tube paths"/>
@@ -56,20 +56,20 @@
   <Sample Location="AdvancedModels.LatheSample" Title="Lathe 3D models"/>
   <Sample Location="AdvancedModels.TriangulatedExtrudedShapeSample" Title="Triangulated &amp; extruded shape"/>
   <Sample Location="AdvancedModels.ExtrudeAlongPathSample" Title="Extruded along path"/>
-  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane" IsUpdated="True" UpdateInfo="Added a new Slicer class that can slice 3D models and also generate closed meshes and 2D intersection polygons."/>
+  <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options"/>
-  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows" IsUpdated="True" UpdateInfo="Added PlanarShadowNode that provides a faster option to render planar shadows."/>
-  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox" IsUpdated="True" UpdateInfo="Updating the position of the sky box so it is always rendered from the camera's position."/>
-  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites" IsUpdated="True" UpdateInfo="Added NotifyTextureChange method to SpriteBatch that can be used&#x0a;to render a new frame without recreating the command buffers."/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
+  <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
   <Sample Location="AdvancedModels.VolumeRenderingSample" Title="Volume rendering"/>
 
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
   <Sample Location="Text.VectorTextSample" Title="Vector text from TrueType font"/>
-  <Sample Location="Text.BackgroundVectorTextCreationSample" Title="Background vector text creation" IsNew="True"/>
+  <Sample Location="Text.BackgroundVectorTextCreationSample" Title="Background vector text creation"/>
   <Sample Location="Text.BitmapTextSample" Title="Bitmap text"/>
   <Sample Location="Text.InstancedTextNodePerformanceSample" Title="Instanced text performance"/>
   <Sample Location="Text.InstancedTextNodeSample" Title="Instanced text"/>
@@ -87,7 +87,7 @@
   <Sample Location="Lines.LineCapsSample" Title="Lines with caps"/>
   <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
-  <Sample Location="Lines.CurveLineSample" Title="Curve lines" IsUpdated="True" UpdateInfo="Improved BezierCurve and BSpline classes by adding methods that use an adaptive algorithm\nthat generates the curve position based on angle change so more positions are generated\nat sharper curve bends and fewer positions at straighter curve segments."/>
+  <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
   <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
@@ -100,20 +100,20 @@
   <Sample Location="Lights.LightsSample" Title="Lights"/>
 
   <Sample Location="Titles.GraphsTitle.md" IsTitle="True" Title="Graphs"/>
-  <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo" IsNew="True"/>
-  <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels" IsNew="True"/>
-  <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode" IsNew="True"/>
-  <Sample Location="Graphs.Plot3DSample" Title="3D Plot" IsNew="True"/>
+  <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo"/>
+  <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels"/>
+  <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode"/>
+  <Sample Location="Graphs.Plot3DSample" Title="3D Plot"/>
   
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
-  <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True" UpdateInfo="Added support for PhysicallyBasedMaterial (PBR material).\nAdded IsSolidColor, DiffuseColor, Opacity and IsTwoSided property to VertexColorMaterial"/>
+  <Sample Location="Materials.MaterialsSample" Title="Materials"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
-  <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering" IsNew="True"/>
+  <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering"/>
   <Sample IsSeparator="True" />
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
   <Sample IsSeparator="True" />
-  <Sample Location="Materials.TransparencySortingSample" Title="Transparency sorting" IsNew="True"/>
+  <Sample Location="Materials.TransparencySortingSample" Title="Transparency sorting"/>
   <Sample Location="Materials.TrianglesSortingSample" Title="Triangles sorting" />
   
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
@@ -126,8 +126,8 @@
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.HitTestingWithIdBitmapSample" Title="Hit-testing with ID bitmap" />
   <Sample Location="HitTesting.{uiFramework}RectangularSelectionSample" Title="Rectangular selection" Condition="IsNotWinForms" />
-  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap" IsUpdated="True" UpdateInfo="Using new TriangleModelNode"/>
-  <Sample Location="HitTesting.PointCloudHitTestingSample" Title="Point-cloud hit testing" IsNew="True"/>
+  <Sample Location="HitTesting.TriangleHitTestingSample" Title="Triangle hit testing with ID bitmap"/>
+  <Sample Location="HitTesting.PointCloudHitTestingSample" Title="Point-cloud hit testing"/>
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
   <Sample IsSeparator="True" />
@@ -144,7 +144,7 @@
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
   <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
   <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
-  <Sample Location="Animations.CustomAnimationSample" Title="Custom animation" IsNew="True"/>
+  <Sample Location="Animations.CustomAnimationSample" Title="Custom animation"/>
 
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
   <Sample Location="Advanced.MultipleSceneViewsSample" Title="Multiple SceneViews" Condition="IsWpf, IsAvalonia, IsWinForms"/>
@@ -156,10 +156,10 @@
   <Sample Location="Advanced.PostProcessingSample" Title="Post-processing" />
   <Sample Location="Advanced.CustomPostProcessSample" Title="Custom Post-process" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Effect" />
-  <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" IsUpdated="True" UpdateInfo="Improved performance of rendering when only overlay texture is changed:\ncalling spriteBatch.NotifyTextureChange instead of spriteBatch.Begin / End." />
+  <Sample Location="Advanced.CustomOverlayPanelSample" Title="Custom Overlay Panel" />
   <Sample Location="Advanced.OutlinesOverObjectsSample" Title="Outlines over objects" />
-  <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" IsNew="True" />
-  <Sample Location="Advanced.FrustumCullingSample" Title="Frustum culling" IsNew="True" />
+  <Sample Location="Advanced.OffScreenRenderingSample" Title="Off-screen rendering" />
+  <Sample Location="Advanced.FrustumCullingSample" Title="Frustum culling" />
   <Sample Location="Advanced.DepthPrePassSample" Title="Depth pre-pass rendering" />
   <Sample Location="Advanced.RenderingLayerCustomCameraSample" Title="CustomCamera in RenderingLayer" />
   <Sample Location="Advanced.AvaloniaMultiTouchSample" Title="Avalonia Multi-touch camera controller" Condition="IsAvalonia" />
