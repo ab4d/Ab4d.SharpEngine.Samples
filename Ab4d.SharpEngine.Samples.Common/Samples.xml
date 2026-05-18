@@ -77,8 +77,8 @@
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers"/>
   <Sample Location="Importers.ObjImporterExporterSample" Title="Obj Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing 3D lines from obj files"/>
   <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter"/>
-  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing and rendering PBR materials"/>
-  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter" IsUpdated="True" UpdateInfo="Added native Assimp library for macOS"/>
+  <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing keyframe and skeletal animations.&#x0a;See 'Animation/Imported animations' sample for more info."/>
+  <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter" IsUpdated="True" UpdateInfo="Added support for importing keyframe and skeletal animations.&#x0a;See 'Animation/Imported animations' sample for more info."/>
   <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
   <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer" Condition="IsWpf, IsAvalonia, IsWinForms"/>
   
@@ -136,7 +136,7 @@
   <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
-  <Sample Location="Animations.ImportedAssimpAnimation" Title="Assimp imported animation" IsNew="True"/>
+  <Sample Location="Animations.ImportedAnimationsSample" Title="Imported animations" IsNew="True"/>
   <Sample Location="Animations.TransformationAnimationSample" Title="Transformation animation 1"/>
   <Sample Location="Animations.TransformationAnimationSample2" Title="Transformation animation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>

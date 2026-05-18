@@ -24,6 +24,7 @@ public class AssimpImporterSample : CommonSample
     private ICommonSampleUIElement? _textBoxElement;
     private ICommonSampleUIPanel? _infoPanel;
     private ICommonSampleUIElement? _infoLabel;
+    private ICommonSampleUIElement? _animationInfoLabel;
     private MultiLineNode? _objectLinesNode;
     private GroupNode? _importedModelNodes;
 
@@ -345,6 +346,9 @@ Properly sign and notarize the library";
                 targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 1.5f;
             }
         }
+        
+        bool hasAnimations = _assimpImporter.Animations != null && _assimpImporter.Animations.Count > 0;
+        _animationInfoLabel?.SetIsVisible(hasAnimations);
     }
 
     private void UpdateShownLines()
@@ -490,6 +494,9 @@ Note: The current version does not support exporting SharpEngine Scene objects, 
 
         //ui.AddSeparator();
         //ui.CreateButton("Export scene", ExportScene);
+        
+        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230).SetIsVisible(false);
+
 
 
         _infoPanel = ui.CreateStackPanel(PositionTypes.Center, addBorder: true, isSemiTransparent: true);

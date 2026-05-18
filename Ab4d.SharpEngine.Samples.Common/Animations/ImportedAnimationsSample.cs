@@ -1,6 +1,7 @@
 ﻿using Ab4d.SharpEngine.Animation;
 using Ab4d.SharpEngine.Assimp;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.glTF;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
@@ -9,43 +10,49 @@ using System.Text;
 
 namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
-public class ImportedAssimpAnimation : CommonSample
+public class ImportedAnimationsSample : CommonSample
 {
-    public override string Title => "Animation imported by using Assimp importer";
+    public override string Title => "Animations imported by using glTF or Assimp importer";
     private string _subtitle = "";
     public override string? Subtitle => _subtitle;
     
     private readonly string _initialFileName = "Resources/Models/soldier.x";
     
+    private glTFImporter? _gltfImporter;
     private AssimpImporter? _assimpImporter;
+    
     private GroupNode? _importedModelNodes;
     private GroupNode? _boneMarkersGroupNode;
+
+    private List<AnimationGroup>? _importedAnimations;
+    private List<Skeleton>? _importedSkeletons;
+    private List<Ab4d.SharpEngine.Meshes.Mesh>? _importedAnimatedSkeletonMeshes;
     
     private Dictionary<SkeletonNode, LineNode> _skeletonNodeBoneMarkerLines = new();
     
     private bool _isAnimationStarted;
     private bool _isAnimationTimeManuallyChanged;
     private bool _showBones = true;
+    private int _initialAnimationIndex = 2;
     
     private ICommonSampleUIElement? _animationCombobox;
     private ICommonSampleUIElement? _animationTimeLabel;
     private ICommonSampleUIElement? _animationTimeSlider;
     private ICommonSampleUIElement? _startStopAnimationButton;
     private bool _isInternalTimeUpdate;
-    private int _initialAnimationIndex = 2;
 
     private ICommonSampleUIElement? _textBoxElement;
     private ICommonSampleUIPanel? _infoPanel;
     private ICommonSampleUIElement? _infoLabel;
     private Vector2? _savedAxisPanelPosition;
 
-    private Ab4d.SharpEngine.Assimp.AssimpAnimation? _selectedAssimpAnimation;
+    private AnimationGroup? _selectedAnimation;
     private IAnimation? _subscribedAnimation;
     private float _animationDuration;
     private float _animationTimeRelative;
 
 
-    public ImportedAssimpAnimation(ICommonSamplesContext context)
+    public ImportedAnimationsSample(ICommonSamplesContext context)
         : base(context)
     {
         ShowCameraAxisPanel = true;
@@ -121,10 +128,104 @@ public class ImportedAssimpAnimation : CommonSample
             _subscribedAnimation = null;
         }
 
-        _selectedAssimpAnimation = null;
+        _selectedAnimation = null;
         _animationDuration = 0;
+
+
+        if (fileName.EndsWith(".gltf", StringComparison.OrdinalIgnoreCase) ||
+            fileName.EndsWith(".glb", StringComparison.OrdinalIgnoreCase))
+        {
+            ImportGltfFile(fileName, scene);    
+        }
+        else
+        {
+            ImportAssimpFile(fileName, scene); 
+        }
+        
+
+        if (_importedModelNodes == null)
+            return;
+        
+        // Use the "Run" animation for the initial solder.x file (do start the "Idle" animation because it is still)
+        int initialAnimationIndex = fileName.EndsWith("soldier.x") ? 2 : 0;
+        
+        if (_animationCombobox != null)
+        {
+            // Update the animations ComboBox
+            var importedAnimationNames = GetImportedAnimationNames();
+            _animationCombobox.SetValue(importedAnimationNames); // passing a string array will set the ItemsSource
+            
+            _animationCombobox.SetValue(importedAnimationNames[initialAnimationIndex]); // passing a single string will set the selected item
+        }
+        
+        ChangeSelectedAnimation(initialAnimationIndex);
+        _initialAnimationIndex = initialAnimationIndex;
+
+        StartAnimation();
+        
+        // Set camera to show the imported model
+        scene.UpdateAnimations();
+        
+        // Before getting the bones matrices, we need to manually call Update to get the correct parent transformations.                
+        scene.RootNode.Update();
         
         
+        UpdateShownBones();
+        
+        if (_importedModelNodes.WorldBoundingBox.IsUndefined)
+            _importedModelNodes.Update();
+        
+        if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
+        {
+            targetPositionCamera.Heading = 30;
+            targetPositionCamera.Attitude = -10;
+            targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
+            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2f;
+        }
+    }
+
+    private void ImportGltfFile(string fileName, Scene scene)
+    {
+        _gltfImporter = new glTFImporter(this.BitmapIO);
+        
+        
+        // The following two properties control if animation is read by the AssimpImporter
+        // By default they are already set to true, but are still written here for clearance.
+        _gltfImporter.ReadAnimations = true;
+        _gltfImporter.ReadSkeletalAnimation = true;
+        
+
+        _importedModelNodes = _gltfImporter.Import(fileName);
+        
+        if (_importedModelNodes == null)
+            return;
+        
+        
+        // Add importer model to the Scene
+        scene.RootNode.Add(_importedModelNodes);
+
+        _importedAnimations = _gltfImporter.Animations;
+        _importedAnimatedSkeletonMeshes = _gltfImporter.AnimatedSkeletonMeshes;
+
+        if (_gltfImporter.AnimatedSkeletonMeshes != null)
+        {
+            foreach (var oneMesh in _gltfImporter.AnimatedSkeletonMeshes)
+                scene.AddAnimatedSkeletonMesh(oneMesh, oneMesh.Skeleton!);
+        }
+
+        if (_gltfImporter.Skeletons != null)
+        {
+            var skeletonsCount = _gltfImporter.Skeletons.Count;
+
+            // Convert from an array of glTFSkeleton to an array of Skeleton (base classes)
+            _importedSkeletons = new List<Skeleton>(skeletonsCount);
+            for (int i = 0; i < skeletonsCount; i++)
+                _importedSkeletons.Add(_gltfImporter.Skeletons[i]); 
+        }
+    }
+
+    private void ImportAssimpFile(string fileName, Scene scene)
+    {
         if (_assimpImporter == null)
         {
             _assimpImporter = Importers.AssimpImporterSample.InitAssimpLibrary(scene.GpuDevice, this.BitmapIO, "assimp-lib", ShowErrorMessage);
@@ -150,55 +251,33 @@ public class ImportedAssimpAnimation : CommonSample
         // Add importer model to the Scene
         scene.RootNode.Add(_importedModelNodes);
               
+
+        _importedAnimations = _assimpImporter.Animations;
+        _importedAnimatedSkeletonMeshes = _assimpImporter.AnimatedSkeletonMeshes;
+        
         if (_assimpImporter.AnimatedSkeletonMeshes != null)
         {
             foreach (var oneMesh in _assimpImporter.AnimatedSkeletonMeshes)
                 scene.AddAnimatedSkeletonMesh(oneMesh, oneMesh.Skeleton!);
         }
 
-        
-        // Use the "Run" animation for the initial solder.x file (do start the "Idle" animation because it is still)
-        int initialAnimationIndex = fileName.EndsWith("soldier.x") ? 2 : 0;
-        
-        if (_animationCombobox != null)
+        if (_assimpImporter.Skeletons != null)
         {
-            // Update the animations ComboBox
-            var importedAnimationNames = GetImportedAnimationNames();
-            _animationCombobox.SetValue(importedAnimationNames); // passing a string array will set the ItemsSource
-            
-            _animationCombobox.SetValue(importedAnimationNames[initialAnimationIndex]); // passing a single string will set the selected item
-        }
-        
-        ChangeSelectedAnimation(initialAnimationIndex);
-        _initialAnimationIndex = initialAnimationIndex;
+            var skeletonsCount = _assimpImporter.Skeletons.Count;
 
-        StartAnimation();
-        
-        // Before getting the bones matrices, we need to manually call Update to get the correct parent transformations.                
-        scene.RootNode.Update();
-
-        UpdateShownBones();
-        
-                
-        // Set camera to show the imported model
-        scene.UpdateAnimations();
-        
-        if (_importedModelNodes.WorldBoundingBox.IsUndefined)
-            _importedModelNodes.Update();
-        
-        if (targetPositionCamera != null && !_importedModelNodes.WorldBoundingBox.IsUndefined)
-        {
-            targetPositionCamera.TargetPosition = _importedModelNodes.WorldBoundingBox.GetCenterPosition();
-            targetPositionCamera.Distance = _importedModelNodes.WorldBoundingBox.GetDiagonalLength() * 2f;
+            // Convert from an array of AssimpSkeleton to an array of Skeleton (base classes)
+            _importedSkeletons = new List<Skeleton>(skeletonsCount);
+            for (int i = 0; i < skeletonsCount; i++)
+                _importedSkeletons.Add(_assimpImporter.Skeletons[i]); 
         }
     }
 
     private void OnAnimationUpdated(object? sender, EventArgs e)
     {
-        if (_selectedAssimpAnimation == null)
+        if (_selectedAnimation == null)
             return;
         
-        _animationTimeRelative = _selectedAssimpAnimation.Animations.Max(a => a.Progress);
+        _animationTimeRelative = _selectedAnimation.Animations.Max(a => a.Progress);
 
         if (!_isInternalTimeUpdate)
         {
@@ -212,13 +291,13 @@ public class ImportedAssimpAnimation : CommonSample
 
     private void ShowSkeletonsInfo()
     {
-        if (_assimpImporter == null || _assimpImporter.Skeletons == null)
+        if (_importedSkeletons == null)
             return;
 
 
         var sb = new StringBuilder();
 
-        foreach (var skeleton in _assimpImporter.Skeletons)
+        foreach (var skeleton in _importedSkeletons)
         {
             sb.AppendFormat("Skeleton '{0}'", skeleton.Name);
             sb.AppendLine();
@@ -263,23 +342,23 @@ public class ImportedAssimpAnimation : CommonSample
     
     private string[] GetImportedAnimationNames()
     {
-        if (_assimpImporter == null || _assimpImporter.Animations == null)
+        if (_importedAnimations == null)
             return new string[] { "" };
         
-        return _assimpImporter.Animations.Select(a => string.IsNullOrEmpty(a.Name) ? "UNNAMED" : a.Name).ToArray();
+        return _importedAnimations.Select(a => string.IsNullOrEmpty(a.Name) ? "UNNAMED" : a.Name).ToArray();
     }
     
     private void SetAnimationTime(float relativeAnimationTime)
     {
-        if (_isInternalTimeUpdate || _selectedAssimpAnimation == null)
+        if (_isInternalTimeUpdate || _selectedAnimation == null)
             return;
         
         _animationTimeRelative = relativeAnimationTime;
 
         _isInternalTimeUpdate = true;
         
-        for (var i = 0; i < _selectedAssimpAnimation.Animations.Length; i++)
-            _selectedAssimpAnimation.Animations[i].Seek(_selectedAssimpAnimation.Duration * relativeAnimationTime);
+        for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
+            _selectedAnimation.Animations[i].Seek(_selectedAnimation.Duration * relativeAnimationTime);
 
         // After we manually updated the animation time (calling Seek), we also need to manually call UpdateAnimatedSkeletons.
         if (Scene != null)
@@ -310,33 +389,31 @@ public class ImportedAssimpAnimation : CommonSample
 
     private void ChangeSelectedAnimation(int selectedAnimationIndex)
     {
-        if (_assimpImporter == null || _assimpImporter.Animations == null || selectedAnimationIndex < 0 || _assimpImporter.Animations.Count <= selectedAnimationIndex)
+        if (_importedAnimations == null || selectedAnimationIndex < 0 || _importedAnimations.Count <= selectedAnimationIndex)
             return;
         
         if (_subscribedAnimation != null)
             _subscribedAnimation.Updated -= OnAnimationUpdated;
             
-        _selectedAssimpAnimation = _assimpImporter.Animations[selectedAnimationIndex];
+        _selectedAnimation = _importedAnimations[selectedAnimationIndex];
 
-        _subscribedAnimation = _selectedAssimpAnimation.Animations[0];
+        _subscribedAnimation = _selectedAnimation.Animations[0];
         _subscribedAnimation.Updated += OnAnimationUpdated;
             
-        for (var i = 0; i < _selectedAssimpAnimation.Animations.Length; i++)
+        for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
         {
             // Initialize the animation to calculate the Duration value
-            _selectedAssimpAnimation.Animations[i].Initialize();
-                    
-            if (_selectedAssimpAnimation.Animations[i].TotalDuration > _animationDuration)
-                _animationDuration = _selectedAssimpAnimation.Animations[i].TotalDuration;
+            _selectedAnimation.Animations[i].Initialize();
+            _animationDuration = MathF.Max(_animationDuration, _selectedAnimation.Animations[i].TotalDuration);
         }
     }
 
     private bool IsAnyAnimationRunning()
     {
-        if (_selectedAssimpAnimation == null)
+        if (_selectedAnimation == null)
             return false;
 
-        return _selectedAssimpAnimation.Animations.Any(a => a.IsRunning);
+        return _selectedAnimation.Animations.Any(a => a.IsRunning);
     }
     
     private void UpdateStartStopAnimationButton()
@@ -349,14 +426,14 @@ public class ImportedAssimpAnimation : CommonSample
 
     private void StartAnimation()
     {
-        if (_selectedAssimpAnimation == null)
+        if (_selectedAnimation == null)
             return;
 
-        for (var i = 0; i < _selectedAssimpAnimation.Animations.Length; i++)
+        for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
         {
-            _selectedAssimpAnimation.Animations[i].Stop();
-            _selectedAssimpAnimation.Animations[i].Rewind();
-            _selectedAssimpAnimation.Animations[i].Start();
+            _selectedAnimation.Animations[i].Stop();
+            _selectedAnimation.Animations[i].Rewind();
+            _selectedAnimation.Animations[i].Start();
         }
         
         _isAnimationStarted = true;
@@ -366,11 +443,11 @@ public class ImportedAssimpAnimation : CommonSample
     
     private void StopAnimation()
     {
-        if (_selectedAssimpAnimation == null)
+        if (_selectedAnimation == null)
             return;
 
-        for (var i = 0; i < _selectedAssimpAnimation.Animations.Length; i++)
-            _selectedAssimpAnimation.Animations[i].Stop();
+        for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
+            _selectedAnimation.Animations[i].Stop();
 
         _isAnimationStarted = false;
             
@@ -392,7 +469,7 @@ public class ImportedAssimpAnimation : CommonSample
         }
         
 
-        if (_selectedAssimpAnimation == null)
+        if (_selectedAnimation == null)
             return;
 
 
@@ -402,9 +479,9 @@ public class ImportedAssimpAnimation : CommonSample
             Scene.RootNode.Add(_boneMarkersGroupNode);
         }
 
-        if (_assimpImporter != null && _assimpImporter.AnimatedSkeletonMeshes != null)
+        if (_importedAnimatedSkeletonMeshes != null)
         {
-            foreach (var animatedSkeletonMesh in _assimpImporter.AnimatedSkeletonMeshes)
+            foreach (var animatedSkeletonMesh in _importedAnimatedSkeletonMeshes)
             {
                 if (animatedSkeletonMesh.Skeleton == null)
                     continue;
@@ -482,7 +559,7 @@ public class ImportedAssimpAnimation : CommonSample
     
     private void UpdateShownBones()
     {
-        if (_importedModelNodes == null || _assimpImporter == null || _assimpImporter.Skeletons == null)
+        if (_importedModelNodes == null || _importedSkeletons == null)
             return;
         
         if (_showBones)
@@ -534,15 +611,15 @@ public class ImportedAssimpAnimation : CommonSample
         
         ui.CreateButton("Dump animation to VS Output", () =>
         {
-            if (_selectedAssimpAnimation == null)
+            if (_selectedAnimation == null)
                 return;
 
-            for (var i = 0; i < _selectedAssimpAnimation.Animations.Length; i++)
+            for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
             {
-                if (!_selectedAssimpAnimation.Animations[i].IsRunning)
-                    _selectedAssimpAnimation.Animations[i].Initialize(); 
+                if (!_selectedAnimation.Animations[i].IsRunning)
+                    _selectedAnimation.Animations[i].Initialize(); 
                 
-                var infoText = _selectedAssimpAnimation.Animations[i].GetInfoText();
+                var infoText = _selectedAnimation.Animations[i].GetInfoText();
                 System.Diagnostics.Debug.WriteLine(infoText);
             }
         });
@@ -555,7 +632,7 @@ public class ImportedAssimpAnimation : CommonSample
 
         if (isDragAndDropSupported)
         {
-            _subtitle += "Drag and drop file here to open it.";
+            _subtitle += "Drag and drop a file here to open it.";
         }
         else
         {

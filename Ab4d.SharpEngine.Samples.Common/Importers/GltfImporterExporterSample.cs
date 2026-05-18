@@ -32,6 +32,8 @@ public class GltfImporterExporterSample : CommonSample
     private string? _exportFileName;
     private ICommonSampleUIElement? _exportFileNameTextBox;
     private ICommonSampleUIElement? _exportSuccessfulLabel;
+    private ICommonSampleUIElement? _animationInfoLabel;
+
 
     private EdgeLinesFactory? _edgeLinesFactory;
 
@@ -217,6 +219,9 @@ public class GltfImporterExporterSample : CommonSample
             _importedFileName = fileName;
             UpdateExportFileName();
         }
+
+        bool hasAnimations = glTfImporter.Animations != null && glTfImporter.Animations.Count > 0;
+        _animationInfoLabel?.SetIsVisible(hasAnimations);
     }
 
     private void UpdateShownLines()
@@ -415,6 +420,8 @@ public class GltfImporterExporterSample : CommonSample
         ui.AddSeparator();
         _exportSuccessfulLabel = ui.CreateLabel("Exported to:", width: 230).SetColor(Colors.Green).SetIsVisible(false);
 
+        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230).SetIsVisible(false);
+        
 
         // Try to register for file drag-and-drop
         bool isDragAndDropSupported = ui.RegisterFileDropped(".*", ImportFile);
