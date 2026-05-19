@@ -255,8 +255,16 @@ public class ImportedAnimationsSample : CommonSample
         _importedAnimations = _assimpImporter.Animations;
         _importedAnimatedSkeletonMeshes = _assimpImporter.AnimatedSkeletonMeshes;
         
+        // IMPORTANT:
+        // Before the animations are started, we also need to add the animated skeleton meshes to the Scene.
+        // This is done by calling AddAnimatedSkeletonMeshes to get all the meshes with skeleton in some GroupNode,
+        // or by calling AddAnimatedSkeletonMesh to add each mesh and its skeleton individually.
         if (_assimpImporter.AnimatedSkeletonMeshes != null)
         {
+            // The easiest way to add all skeleton meshes is to call AddAnimatedSkeletonMeshes and pass the parent GroupNode.
+            //scene.AddAnimatedSkeletonMeshes(_importedModelNodes);
+
+            // But because we have a list of all meshes with skeletons, it is faster to add each individual mesh:
             foreach (var oneMesh in _assimpImporter.AnimatedSkeletonMeshes)
                 scene.AddAnimatedSkeletonMesh(oneMesh, oneMesh.Skeleton!);
         }
@@ -429,6 +437,12 @@ public class ImportedAnimationsSample : CommonSample
         if (_selectedAnimation == null)
             return;
 
+        // IMPORTANT:
+        // Before the animations are started, we also need to add the animated skeleton meshes to the Scene.
+        // This is done by calling AddAnimatedSkeletonMeshes to get all the meshes with skeleton in some GroupNode,
+        // or by calling AddAnimatedSkeletonMesh to add each mesh and its skeleton individually.
+        // See the code after the objects are imported.
+        
         for (var i = 0; i < _selectedAnimation.Animations.Length; i++)
         {
             _selectedAnimation.Animations[i].Stop();
