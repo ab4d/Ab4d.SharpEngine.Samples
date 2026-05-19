@@ -267,6 +267,9 @@ public class ImportedAnimationsSample : CommonSample
             // But because we have a list of all meshes with skeletons, it is faster to add each individual mesh:
             foreach (var oneMesh in _assimpImporter.AnimatedSkeletonMeshes)
                 scene.AddAnimatedSkeletonMesh(oneMesh, oneMesh.Skeleton!);
+            
+            // To remove the skeleton meshes from the scene, call
+            //scene.RemoveAnimatedSkeleton, scene.RemoveAnimatedSkeletonMesh or scene.RemoveAllSkeletonAnimations
         }
 
         if (_assimpImporter.Skeletons != null)
