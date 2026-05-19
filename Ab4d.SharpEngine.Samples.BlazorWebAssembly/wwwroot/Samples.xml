@@ -56,7 +56,7 @@
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers" />
   <Sample Location="objFileViewer.razor" Title="OBJ file viewer" />
   <Sample Location="StlFileViewer.razor" Title="STL file viewer" />
-  <Sample Location="gltfFileViewer.razor" Title="glTF file viewer" />
+  <Sample Location="gltfFileViewer.razor" Title="glTF file viewer" IsUpdated="True" UpdateInfo="Implemented importing keyframe and skeletal animations from glTF files." />
 
   <Sample Location="Titles.TextTitle.md" IsTitle="True" Title="3D text"/>
   <Sample Location="Text.VectorTextSample" Title="Vector text from TrueType font"/>

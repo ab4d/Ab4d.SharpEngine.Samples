@@ -1,5 +1,6 @@
 @page "/gltfFileViewer"
 @using System.Numerics
+@using Ab4d.SharpEngine.Animation
 @using Ab4d.SharpEngine.Cameras
 @using Ab4d.SharpEngine.Common
 @using Ab4d.SharpEngine.SceneNodes
@@ -7,6 +8,7 @@
 @using Ab4d.SharpEngine.Core
 @using Ab4d.SharpEngine.Materials
 @using Ab4d.SharpEngine.glTF
+@using Ab4d.SharpEngine.Meshes
 @implements IDisposable
 @inject IJSRuntime JS
 
@@ -21,7 +23,7 @@
     <SharpEngineSceneView @ref="sharpEngineSceneView" style="width: 100%; min-width: 400px; max-width: 1000px; height: 500px; margin-top: 10pt; border: solid black 1px"></SharpEngineSceneView>
 
     <br />
-    <p>@_infoText</p>
+    <p>@((MarkupString)_infoText)</p>
 
     <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
         Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
@@ -156,6 +158,7 @@
     private byte[]?[]? _uploadedFileContents;
     private int _uploadedFilesCount;
     private int _uploadedImagesCount;
+
     private List<(string fileName, RawImageData rawImageData)>? _uploadedImages;
 
 
@@ -418,6 +421,9 @@
     {
         ShowInfoMessage($"Start importing '{fileName}'");
 
+        ClearShownModel();
+
+
         _gltfImporter ??= new glTFImporter(gpuDevice: sharpEngineSceneView.Scene.GpuDevice);
 
         // Create a memory stream from the byte array
@@ -440,6 +446,8 @@
             }
 
             ShowImportedModel(importedMeshModelNode);
+
+            StartImportedAnimation(importedMeshModelNode, _gltfImporter.Animations, _gltfImporter.AnimatedSkeletonMeshes);
         }
         catch (Exception ex)
         {
@@ -476,13 +484,6 @@
     {
         var scene = sharpEngineSceneView.Scene;
 
-        if (_importedSceneNode != null)
-        {
-            scene.RootNode.Remove(_importedSceneNode);
-            _importedSceneNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
-            _importedSceneNode = null;
-        }
-
         if (importedSceneNode == null)
             return;
 
@@ -493,6 +494,69 @@
         _importedSceneNode = importedSceneNode;
 
         ShowInfoMessage("Imported model shown");
+    }
+
+    private void ClearShownModel()
+    {
+        var scene = sharpEngineSceneView.Scene;
+
+        scene.RemoveAllAnimations();
+        scene.RemoveAllSkeletonAnimations();
+
+        if (_importedSceneNode != null)
+        {
+            scene.RootNode.Remove(_importedSceneNode);
+            _importedSceneNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true, disposeTextures: true);
+            _importedSceneNode = null;
+        }
+    }
+
+    private void StartImportedAnimation(GroupNode? importedNode, List<AnimationGroup>? importerAnimations, List<Mesh>? animatedSkeletonMeshes)
+    {
+        if (importerAnimations == null || importerAnimations.Count == 0)
+            return;
+
+        // IMPORTANT:
+        // Before the animations are started, we also need to add the animated skeleton meshes to the Scene.
+        // This is done by calling AddAnimatedSkeletonMeshes to get all the meshes with skeleton in some GroupNode,
+        // or by calling AddAnimatedSkeletonMesh to add each mesh and its skeleton individually.
+        if (animatedSkeletonMeshes != null)
+        {
+            // The easiest way to add all skeleton meshes is to call AddAnimatedSkeletonMeshes and pass the parent GroupNode.
+            //sharpEngineSceneView.Scene.AddAnimatedSkeletonMeshes(_importedSceneNode);
+
+            // But because we have a list of all meshes with skeletons, it is faster to add each individual mesh:
+            foreach (var oneMesh in animatedSkeletonMeshes)
+                sharpEngineSceneView.Scene.AddAnimatedSkeletonMesh(oneMesh, oneMesh.Skeleton!);
+        }
+
+        // Start the first AnimationGroup (it can define multiple Animations - each for its Target SceneNode)
+        var firstAnimationGroup = importerAnimations[0];
+        foreach (var oneAnimation in firstAnimationGroup.Animations)
+            oneAnimation.Start();
+
+        sharpEngineSceneView.Scene.UpdateAnimations();
+        sharpEngineSceneView.Scene.RootNode.Update();
+
+        // Skeletal animation can change the size of the meshes and objects, so we update the camera's distance
+        if (_targetPositionCamera != null && _importedSceneNode != null)
+        {
+            var boundingBox = _importedSceneNode.GetLocalBoundingBox();
+
+            if (!boundingBox.IsUndefined)
+            {
+                _targetPositionCamera.Heading  = 30;
+                _targetPositionCamera.Attitude = -10;
+                _targetPositionCamera.TargetPosition = boundingBox.GetCenterPosition();
+                _targetPositionCamera.Distance       = boundingBox.GetDiagonalLength() * 2f;
+            }
+        }
+
+        var message = "Animation of imported model started.";
+        if (animatedSkeletonMeshes != null)
+            message += "<br/><br/>Performance note:<br/>Skeletal animation can be very slow when running in Debug or Release build. Start the sample in Deployed build to run at full speed.";
+
+        ShowInfoMessage(message);
     }
 
     private void ShowInfoMessage(string message)
