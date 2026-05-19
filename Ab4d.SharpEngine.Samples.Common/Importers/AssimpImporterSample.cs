@@ -248,6 +248,11 @@ Properly sign and notarize the library";
             _assimpImporter.IsVerboseLoggingEnabled = false;
         }
 
+        // You can set the following two properties to false to skip reading animation data.
+        // See 'Animation/Imported animations' sample for more info about reading animations.
+        _assimpImporter.ReadAnimations = true;
+        _assimpImporter.ReadSkeletalAnimation = true;
+        
         try
         {
             // To import file from stream use the following code:

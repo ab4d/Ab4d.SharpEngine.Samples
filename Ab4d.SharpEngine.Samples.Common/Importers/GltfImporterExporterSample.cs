@@ -155,7 +155,11 @@ public class GltfImporterExporterSample : CommonSample
         // When "Enable full logging" CheckBox is checked, then we show full logging; otherwise only warnings and errors are shown
         glTfImporter.LogInfoMessages = _isFullLoggingEnabled;
         glTfImporter.LoggerCallback = (logLevel, message) => System.Diagnostics.Debug.WriteLine($"glTfImporter: {logLevel} {message}");
-        
+
+        // You can set the following two properties to false to skip reading animation data.
+        // See 'Animation/Imported animations' sample for more info about reading animations.
+        glTfImporter.ReadAnimations = true;
+        glTfImporter.ReadSkeletalAnimation = true;
         
         // To support Draco compressed meshes we need to set the DracoMeshReaderFactory.
         // The MyDracoReader class is defined below and uses Openize.Drako library to read Draco compressed meshes.Add commentMore actions
