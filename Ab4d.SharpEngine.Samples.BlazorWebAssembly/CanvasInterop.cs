@@ -10,6 +10,7 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Ab4d.SharpEngine.Utilities;
 
 // IMPORTANT:
 // If you change this namespace, then you also need to change the code in sharp-engine.js: interop = exports.Ab4d.SharpEngine.WebGL.CanvasInterop;
@@ -419,8 +420,8 @@ public partial class CanvasInterop : ICanvasInterop
         callbacks.Add((onTextureLoadedCallback, onLoadErrorCallback));
 
         _imageBytesLoadedCallbacks.Add(fileName, callbacks);
-
-        LoadImageBytesJs(this.CanvasId, fileName);
+        
+        LoadImageBytesJs(this.CanvasId, fileName);  // When image is loaded, the OnImageBytesLoaded is called from JS
     }
 
     public async Task<RawImageData> LoadImageBytesAsync(string fileName)
@@ -874,7 +875,16 @@ public partial class CanvasInterop : ICanvasInterop
 
             // Maybe more than one callback is registered for the same imageUrl
             foreach (var callback in callbacks)
-                callback.onError?.Invoke(errorText);
+            {
+                try
+                {
+                    callback.onError?.Invoke(errorText);
+                }
+                catch (Exception e)
+                {
+                    Log.Error?.Write("CanvasInterop", "Exception occured when calling onLoadErrorCallback after the GpuImage was created: " + e.Message, e);
+                }
+            }
         }
         else
         {
@@ -882,7 +892,16 @@ public partial class CanvasInterop : ICanvasInterop
 
             // Maybe more than one callback is registered for the same imageUrl
             foreach (var callback in callbacks)
-                callback.onLoaded(rawImageData);
+            {
+                try
+                {
+                    callback.onLoaded(rawImageData);
+                }
+                catch (Exception e)
+                {
+                    Log.Error?.Write("CanvasInterop", "Exception occured when calling onTextureLoadedCallback after the GpuImage was created: " + e.Message, e);
+                }
+            }                
         }
     }
 
