@@ -500,7 +500,9 @@ Note: The current version does not support exporting SharpEngine Scene objects, 
         //ui.AddSeparator();
         //ui.CreateButton("Export scene", ExportScene);
         
-        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230).SetIsVisible(false);
+        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230)
+            .SetColor(Colors.Red)
+            .SetIsVisible(false);
 
 
 

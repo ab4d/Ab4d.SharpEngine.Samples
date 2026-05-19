@@ -424,7 +424,9 @@ public class GltfImporterExporterSample : CommonSample
         ui.AddSeparator();
         _exportSuccessfulLabel = ui.CreateLabel("Exported to:", width: 230).SetColor(Colors.Green).SetIsVisible(false);
 
-        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230).SetIsVisible(false);
+        _animationInfoLabel = ui.CreateLabel("\nThe imported file defines animations.\nOpen the file in the 'Animation/Imported animations' sample to play the animations.", width: 230)
+            .SetColor(Colors.Red)
+            .SetIsVisible(false);
         
 
         // Try to register for file drag-and-drop
