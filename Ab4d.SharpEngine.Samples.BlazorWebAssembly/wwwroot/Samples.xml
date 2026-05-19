@@ -98,6 +98,7 @@
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
+  <Sample Location="importedAnimations.razor" Title="Imported animations" IsNew="True"/>
   <Sample Location="Animations.TransformationAnimationSample" Title="Transformation animation 1"/>
   <Sample Location="Animations.TransformationAnimationSample2" Title="Transformation animation 2"/>
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
