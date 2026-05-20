@@ -9,7 +9,7 @@
   <Sample Location="Cameras.TargetPositionCameraSample" Title="TargetPositionCamera"/>
   <Sample Location="Cameras.FreeCameraSample" Title="FreeCamera"/>
   <Sample Location="Cameras.FirstPersonCameraSample" Title="FirstPersonCamera"/>
-  <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView"/>
+  <Sample Location="Cameras.FitIntoViewSample" Title="FitIntoView" IsUpdated="True" UpdateInfo="Added support to animate FitIntoView camera change"/>
   <Sample Location="Cameras.Point3DTo2DSample" Title="Point3DTo2D"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
   <Sample Location="Cameras.OffCenterCameraSample" Title="Off-center scene rendering"/>

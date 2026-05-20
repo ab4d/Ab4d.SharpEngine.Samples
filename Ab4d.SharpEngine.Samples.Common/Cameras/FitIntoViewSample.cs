@@ -16,7 +16,7 @@ public class FitIntoViewSample : CommonSample
     private bool _areBoxesIncluded = true;
     private float _marginAdjustmentFactor = 1.0f;
 
-    private bool _isAdjustingDistance;
+    private bool _isInFitIntoViewCall;
 
     private bool _isTargetPositionCamera = true; // false: FreeCamera
     private ProjectionTypes _projectionType = ProjectionTypes.Orthographic;
@@ -55,31 +55,102 @@ public class FitIntoViewSample : CommonSample
         return CreateCamera();
     }
 
-    private void FitIntoView()
+    private void FitIntoView(bool isAnimated = false)
     {
         if (_boxesGroup == null || Scene == null)
             return;
 
-        _isAdjustingDistance = true; // Prevent infinite recursion (FitIntoView is called from CameraChanged)
+        _isInFitIntoViewCall = true; // Prevent infinite recursion (FitIntoView is called from CameraChanged)
 
+        int animationDuration;
+        Func<float, float>? easingFunction;
+
+        if (isAnimated)
+        {
+            animationDuration = 330; // 1/3 second
+            easingFunction = Ab4d.SharpEngine.Common.EasingFunctions.CubicEaseInOutFunction;
+
+            //if (_selectedCamera is TargetPositionCamera targetPositionCamera2)
+            //{
+            //    if (_isWireGridIncluded && _areBoxesIncluded)
+            //    {
+            //        // When we want to include all objects into FitIntoView, then we can call FitIntoView that does not take sceneNode as the first parameter
+            //        targetPositionCamera2.FitIntoView(animationDurationInMilliseconds: animationDuration, 
+            //            easingFunction: easingFunction,
+            //            fitIntoViewType: FitIntoViewType.CheckAllPositions, // CheckAllPositions can take some time bigger scenes. In this case you can use the CheckBounds
+            //            adjustTargetPosition: _adjustTargetPosition, // Adjust TargetPosition to better fit into view; set to false to preserve the current TargetPosition
+            //            adjustmentFactor: _marginAdjustmentFactor, // adjustmentFactor can be used to specify the margin
+            //            waitUntilCameraIsValid: true); // waitUntilSceneViewSizeIsValid is set to true by default. This is used when the FitIntoView is called before the size of the SceneView is set - in this case the FitIntoView will be called when the size is set.
+                    
+            //        //public bool FitIntoView(int animationDurationInMilliseconds, 
+            //        //    Func<float, float>? easingFunction = null, 
+            //        //    FitIntoViewType fitIntoViewType = FitIntoViewType.CheckAllPositions, 
+            //        //    bool adjustTargetPosition = true, 
+            //        //    float adjustmentFactor = 1.0f, 
+            //        //    bool waitUntilCameraIsValid = true)                
+            //    }
+            //    else if (_areBoxesIncluded)
+            //    {
+            //        // Use only objects inside _boxesGroup for FitIntoView
+            //        targetPositionCamera2.FitIntoView(_boxesGroup,
+            //            animationDuration, easingFunction,
+            //            fitIntoViewType: FitIntoViewType.CheckAllPositions,
+            //            adjustTargetPosition: _adjustTargetPosition,
+            //            adjustmentFactor: _marginAdjustmentFactor,
+            //            waitUntilCameraIsValid: true);
+            //    }
+            //    else if (_isWireGridIncluded && _wireGridNode != null)
+            //    {
+            //        // When we have only WireGrid, we could call FitIntoView by passing WireGrid's BoundingBox or its corners:
+            //        //var boundingBox = new BoundingBox(new Vector3(-50, 0, -50), new Vector3(50, 0, 50));
+            //        var boundingBox = _wireGridNode.GetLocalBoundingBox();
+
+            //        _corners ??= new Vector3[8]; // reuse the corners array
+            //        boundingBox.GetCorners(_corners);
+            //        //var cornerPositions = boundingBox.GetCorners(); // The following always creates a new array
+
+
+            //        targetPositionCamera2.FitIntoView(_corners,
+            //            animationDuration, easingFunction,
+            //            adjustTargetPosition: _adjustTargetPosition,
+            //            adjustmentFactor: _marginAdjustmentFactor,
+            //            waitUntilCameraIsValid: true);
+            //    }
+            //    // else - no FitIntoView
+            //}
+
+            //return;
+        }
+        else
+        {
+            // To immediately change the camera without any animation, we can call FitIntoView method
+            // that does not take animationDuration, easingFunction parameters.
+            // But here we simplify the code and just set animationDuration to 0 - this also prevent creating an animation.
+            
+            animationDuration = 0;
+            easingFunction = null;
+        }
+        
         if (_selectedCamera is IFitIntoViewCamera fitIntoViewCamera)
         {
             if (_isWireGridIncluded && _areBoxesIncluded)
             {
                 // When we want to include all objects into FitIntoView, then we can call FitIntoView that does not take sceneNode as the first parameter
-                fitIntoViewCamera.FitIntoView(fitIntoViewType: FitIntoViewType.CheckAllPositions, // CheckAllPositions can take some time bigger scenes. In this case you can use the CheckBounds
+                fitIntoViewCamera.FitIntoView(animationDuration, easingFunction,
+                                              fitIntoViewType: FitIntoViewType.CheckAllPositions, // CheckAllPositions can take some time bigger scenes. In this case you can use the CheckBounds
                                               adjustTargetPosition: _adjustTargetPosition,        // Adjust TargetPosition to better fit into view; set to false to preserve the current TargetPosition
                                               adjustmentFactor: _marginAdjustmentFactor,          // adjustmentFactor can be used to specify the margin
-                                              waitUntilSceneViewSizeIsValid: true);               // waitUntilSceneViewSizeIsValid is set to true by default. This is used when the FitIntoView is called before the size of the SceneView is set - in this case the FitIntoView will be called when the size is set.
+                                              waitUntilCameraIsValid: true);                      // waitUntilSceneViewSizeIsValid is set to true by default. This is used when the FitIntoView is called before the size of the SceneView is set - in this case the FitIntoView will be called when the size is set.
             }
             else if (_areBoxesIncluded)
             {
                 // Use only objects inside _boxesGroup for FitIntoView
                 fitIntoViewCamera.FitIntoView(_boxesGroup,
+                                              animationDuration, easingFunction,
                                               fitIntoViewType: FitIntoViewType.CheckAllPositions,
                                               adjustTargetPosition: _adjustTargetPosition,
                                               adjustmentFactor: _marginAdjustmentFactor,
-                                              waitUntilSceneViewSizeIsValid: true);
+                                              waitUntilCameraIsValid: true);
             }
             else if (_isWireGridIncluded && _wireGridNode != null)
             {
@@ -93,14 +164,15 @@ public class FitIntoViewSample : CommonSample
 
 
                 fitIntoViewCamera.FitIntoView(_corners,
+                                              animationDuration, easingFunction,
                                               adjustTargetPosition: _adjustTargetPosition,
                                               adjustmentFactor: _marginAdjustmentFactor,
-                                              waitUntilSceneViewSizeIsValid: true);
+                                              waitUntilCameraIsValid: true);
             }
             // else - no FitIntoView
         }
 
-        _isAdjustingDistance = false;
+        _isInFitIntoViewCall = false;
     }
 
     private void CreateRandomScene()
@@ -186,7 +258,7 @@ public class FitIntoViewSample : CommonSample
     // Call FitIntoView when automatic fit into view is enabled
     private void UpdateFitIntoView()
     {
-        if (_automaticallyFitIntoView && !_isAdjustingDistance)
+        if (_automaticallyFitIntoView && !_isInFitIntoViewCall)
             FitIntoView();
     }
 
@@ -249,7 +321,8 @@ public class FitIntoViewSample : CommonSample
 
         ui.AddSeparator();
 
-        ui.CreateButton("Fit into view", () => FitIntoView());
+        ui.CreateButton("Fit into view (?): To test this method, uncheck the 'Auto fit' checkbox,\nrotate and move the camera and then click this button.", () => FitIntoView(isAnimated: false));
+        ui.CreateButton("Fit into view (animated) (?): To test this method, uncheck the 'Auto fit' checkbox,\nrotate and move the camera and then click this button.", () => FitIntoView(isAnimated: true));
         ui.CreateButton("Recreate scene", () =>
         {
             CreateRandomScene();
