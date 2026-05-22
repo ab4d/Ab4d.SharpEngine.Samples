@@ -10,16 +10,19 @@ public class FitIntoViewSample : CommonSample
 {
     public override string Title => "FitIntoView";
 
-    private bool _automaticallyFitIntoView = true;
+    private bool _automaticallyFitIntoView = false;
     private bool _adjustTargetPosition = true;
     private bool _isWireGridIncluded = true;
     private bool _areBoxesIncluded = true;
+    private bool _showSceneBoundingBox = false;
     private float _marginAdjustmentFactor = 1.0f;
+
+    private FitIntoViewType _fitIntoViewType = FitIntoViewType.CheckAllPositions;
 
     private bool _isInFitIntoViewCall;
 
     private bool _isTargetPositionCamera = true; // false: FreeCamera
-    private ProjectionTypes _projectionType = ProjectionTypes.Orthographic;
+    private ProjectionTypes _projectionType = ProjectionTypes.Perspective;
 
     private Random _rnd = new Random();
 
@@ -28,6 +31,7 @@ public class FitIntoViewSample : CommonSample
     private WireGridNode? _wireGridNode;
 
     private Vector3[]? _corners;
+    private WireBoxNode? _sceneWireBoundingBoxNode;
 
     public FitIntoViewSample(ICommonSamplesContext context)
         : base(context)
@@ -50,6 +54,17 @@ public class FitIntoViewSample : CommonSample
         FitIntoView();
     }
 
+    protected override void OnDisposed()
+    {
+        if (_selectedCamera != null)
+        {
+            _selectedCamera.CameraChanged -= OnCameraChanged;
+            _selectedCamera = null;
+        }
+        
+        base.OnDisposed();
+    }
+
     protected override Camera OnCreateCamera()
     {
         return CreateCamera();
@@ -69,57 +84,6 @@ public class FitIntoViewSample : CommonSample
         {
             animationDuration = 330; // 1/3 second
             easingFunction = Ab4d.SharpEngine.Common.EasingFunctions.CubicEaseInOutFunction;
-
-            //if (_selectedCamera is TargetPositionCamera targetPositionCamera2)
-            //{
-            //    if (_isWireGridIncluded && _areBoxesIncluded)
-            //    {
-            //        // When we want to include all objects into FitIntoView, then we can call FitIntoView that does not take sceneNode as the first parameter
-            //        targetPositionCamera2.FitIntoView(animationDurationInMilliseconds: animationDuration, 
-            //            easingFunction: easingFunction,
-            //            fitIntoViewType: FitIntoViewType.CheckAllPositions, // CheckAllPositions can take some time bigger scenes. In this case you can use the CheckBounds
-            //            adjustTargetPosition: _adjustTargetPosition, // Adjust TargetPosition to better fit into view; set to false to preserve the current TargetPosition
-            //            adjustmentFactor: _marginAdjustmentFactor, // adjustmentFactor can be used to specify the margin
-            //            waitUntilCameraIsValid: true); // waitUntilSceneViewSizeIsValid is set to true by default. This is used when the FitIntoView is called before the size of the SceneView is set - in this case the FitIntoView will be called when the size is set.
-                    
-            //        //public bool FitIntoView(int animationDurationInMilliseconds, 
-            //        //    Func<float, float>? easingFunction = null, 
-            //        //    FitIntoViewType fitIntoViewType = FitIntoViewType.CheckAllPositions, 
-            //        //    bool adjustTargetPosition = true, 
-            //        //    float adjustmentFactor = 1.0f, 
-            //        //    bool waitUntilCameraIsValid = true)                
-            //    }
-            //    else if (_areBoxesIncluded)
-            //    {
-            //        // Use only objects inside _boxesGroup for FitIntoView
-            //        targetPositionCamera2.FitIntoView(_boxesGroup,
-            //            animationDuration, easingFunction,
-            //            fitIntoViewType: FitIntoViewType.CheckAllPositions,
-            //            adjustTargetPosition: _adjustTargetPosition,
-            //            adjustmentFactor: _marginAdjustmentFactor,
-            //            waitUntilCameraIsValid: true);
-            //    }
-            //    else if (_isWireGridIncluded && _wireGridNode != null)
-            //    {
-            //        // When we have only WireGrid, we could call FitIntoView by passing WireGrid's BoundingBox or its corners:
-            //        //var boundingBox = new BoundingBox(new Vector3(-50, 0, -50), new Vector3(50, 0, 50));
-            //        var boundingBox = _wireGridNode.GetLocalBoundingBox();
-
-            //        _corners ??= new Vector3[8]; // reuse the corners array
-            //        boundingBox.GetCorners(_corners);
-            //        //var cornerPositions = boundingBox.GetCorners(); // The following always creates a new array
-
-
-            //        targetPositionCamera2.FitIntoView(_corners,
-            //            animationDuration, easingFunction,
-            //            adjustTargetPosition: _adjustTargetPosition,
-            //            adjustmentFactor: _marginAdjustmentFactor,
-            //            waitUntilCameraIsValid: true);
-            //    }
-            //    // else - no FitIntoView
-            //}
-
-            //return;
         }
         else
         {
@@ -137,7 +101,7 @@ public class FitIntoViewSample : CommonSample
             {
                 // When we want to include all objects into FitIntoView, then we can call FitIntoView that does not take sceneNode as the first parameter
                 fitIntoViewCamera.FitIntoView(animationDuration, easingFunction,
-                                              fitIntoViewType: FitIntoViewType.CheckAllPositions, // CheckAllPositions can take some time bigger scenes. In this case you can use the CheckBounds
+                                              fitIntoViewType: _fitIntoViewType,
                                               adjustTargetPosition: _adjustTargetPosition,        // Adjust TargetPosition to better fit into view; set to false to preserve the current TargetPosition
                                               adjustmentFactor: _marginAdjustmentFactor,          // adjustmentFactor can be used to specify the margin
                                               waitUntilCameraIsValid: true);                      // waitUntilSceneViewSizeIsValid is set to true by default. This is used when the FitIntoView is called before the size of the SceneView is set - in this case the FitIntoView will be called when the size is set.
@@ -147,27 +111,34 @@ public class FitIntoViewSample : CommonSample
                 // Use only objects inside _boxesGroup for FitIntoView
                 fitIntoViewCamera.FitIntoView(_boxesGroup,
                                               animationDuration, easingFunction,
-                                              fitIntoViewType: FitIntoViewType.CheckAllPositions,
+                                              fitIntoViewType: _fitIntoViewType,
                                               adjustTargetPosition: _adjustTargetPosition,
                                               adjustmentFactor: _marginAdjustmentFactor,
                                               waitUntilCameraIsValid: true);
             }
             else if (_isWireGridIncluded && _wireGridNode != null)
             {
-                // When we have only WireGrid, we could call FitIntoView by passing WireGrid's BoundingBox or its corners:
-                //var boundingBox = new BoundingBox(new Vector3(-50, 0, -50), new Vector3(50, 0, 50));
-                var boundingBox = _wireGridNode.GetLocalBoundingBox();
-
-                _corners ??= new Vector3[8]; // reuse the corners array
-                boundingBox.GetCorners(_corners);
-                //var cornerPositions = boundingBox.GetCorners(); // The following always creates a new array
-
-
-                fitIntoViewCamera.FitIntoView(_corners,
+                fitIntoViewCamera.FitIntoView(_wireGridNode,
                                               animationDuration, easingFunction,
+                                              fitIntoViewType: _fitIntoViewType,
                                               adjustTargetPosition: _adjustTargetPosition,
                                               adjustmentFactor: _marginAdjustmentFactor,
                                               waitUntilCameraIsValid: true);
+                
+                // // When we have only WireGrid, we could call FitIntoView by passing WireGrid's BoundingBox or its corners:
+                // //var boundingBox = new BoundingBox(new Vector3(-50, 0, -50), new Vector3(50, 0, 50));
+                // var boundingBox = _wireGridNode.GetLocalBoundingBox();
+                //
+                // _corners ??= new Vector3[8]; // reuse the corners array
+                // boundingBox.GetCorners(_corners);
+                // //var cornerPositions = boundingBox.GetCorners(); // The following always creates a new array
+                //
+                //
+                // fitIntoViewCamera.FitIntoView(_corners,
+                //                               animationDuration, easingFunction,
+                //                               adjustTargetPosition: _adjustTargetPosition,
+                //                               adjustmentFactor: _marginAdjustmentFactor,
+                //                               waitUntilCameraIsValid: true);
             }
             // else - no FitIntoView
         }
@@ -210,6 +181,31 @@ public class FitIntoViewSample : CommonSample
 
             _boxesGroup.Add(boxVisual3D);
         }
+        
+        
+        _sceneWireBoundingBoxNode = new WireBoxNode(Colors.Red, 1, "SceneBoundingBox");
+        UpdateSceneWireBoundingBox();
+        
+        Scene.RootNode.Add(_sceneWireBoundingBoxNode);
+    }
+
+    private void UpdateSceneWireBoundingBox()
+    {
+        if (_sceneWireBoundingBoxNode == null)
+            return;
+
+        var boundingBox = BoundingBox.Undefined;
+        
+        if (_isWireGridIncluded && _wireGridNode != null)
+            boundingBox.Add(_wireGridNode.GetLocalBoundingBox());
+
+        if (_areBoxesIncluded && _boxesGroup != null)
+            boundingBox.Add(_boxesGroup.GetLocalBoundingBox());
+
+        _sceneWireBoundingBoxNode.Visibility = _showSceneBoundingBox && !boundingBox.IsZeroSize ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+        
+        _sceneWireBoundingBoxNode.Position = boundingBox.GetCenterPosition();
+        _sceneWireBoundingBoxNode.Size = boundingBox.GetSize();
     }
 
     private Camera CreateCamera()
@@ -246,25 +242,28 @@ public class FitIntoViewSample : CommonSample
 
             _selectedCamera = newFreeCamera;
         }
-
-        _selectedCamera.CameraChanged += OnCameraChanged;
-
+        
         if (SceneView != null)
+        {
             SceneView.Camera = _selectedCamera;
+            _selectedCamera.Update();
+        }
+        
+        _selectedCamera.CameraChanged += OnCameraChanged;
 
         return _selectedCamera;
     }
 
     // Call FitIntoView when automatic fit into view is enabled
-    private void UpdateFitIntoView()
+    private void UpdateFitIntoView(bool forceUpdate = true)
     {
-        if (_automaticallyFitIntoView && !_isInFitIntoViewCall)
+        if (!_isInFitIntoViewCall && (_automaticallyFitIntoView || forceUpdate))
             FitIntoView();
     }
 
     private void OnCameraChanged(object? sender, EventArgs e)
     {
-        UpdateFitIntoView();
+        UpdateFitIntoView(forceUpdate: false); // FitIntoView only when _automaticallyFitIntoView is true
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
@@ -274,7 +273,7 @@ public class FitIntoViewSample : CommonSample
         ui.CreateCheckBox("Auto fit", _automaticallyFitIntoView, isChecked =>
         {
             _automaticallyFitIntoView = isChecked;
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: isChecked);
         });
 
         ui.CreateCheckBox("AdjustTargetPosition (?):When checked the camera will also reset to view the center of the scene. When unchecked the camera will look at (0, 0, 0)", _adjustTargetPosition, isChecked =>
@@ -282,6 +281,8 @@ public class FitIntoViewSample : CommonSample
             _adjustTargetPosition = isChecked;
             if (!isChecked && _selectedCamera is ITargetPositionCamera selectedTargetPositionCamera)
                 selectedTargetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
+            else
+                UpdateFitIntoView(forceUpdate: isChecked);
         });
 
 
@@ -292,14 +293,40 @@ public class FitIntoViewSample : CommonSample
         ui.CreateCheckBox("Boxes", _areBoxesIncluded, isChecked =>
         {
             _areBoxesIncluded = isChecked;
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: false);
+            UpdateSceneWireBoundingBox();
         });
 
         ui.CreateCheckBox("WireGrid", _isWireGridIncluded, isChecked =>
         {
             _isWireGridIncluded = isChecked;
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: false);
+            UpdateSceneWireBoundingBox();
         });
+
+
+        ui.AddSeparator();
+
+        ui.CreateLabel(
+@"FitIntoViewType: (?):CheckBounds: Check BoundingBoxes of all SceneNodes.
+This is not as precise as CheckAllPositions but can be much faster when there are objects with a lot of positions in the scene.
+
+CheckAllPositions: Check Positions of all SceneNodes.
+This is more precise than CheckBounds but can take much longer when there are objects with a lot of positions in the scene.");
+        
+        ui.CreateComboBox(new string[] { 
+                "CheckBounds", 
+                "CheckAllPositions" },
+            (selectedIndex, selectedText) =>
+            {
+                _fitIntoViewType = (FitIntoViewType)selectedIndex;
+                UpdateFitIntoView(forceUpdate: false);
+
+                // Show wire bounding box when CheckBounds is selected. This shows what is included in th FitIntoView check
+                if (_sceneWireBoundingBoxNode != null)
+                    _sceneWireBoundingBoxNode.Visibility = _fitIntoViewType == FitIntoViewType.CheckBounds ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
+            }, 
+            selectedItemIndex:(int)_fitIntoViewType);
 
 
         ui.AddSeparator();
@@ -315,7 +342,7 @@ public class FitIntoViewSample : CommonSample
                 _ => 1f
             };
 
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: false);
         }, 0);
 
 
@@ -323,13 +350,8 @@ public class FitIntoViewSample : CommonSample
 
         ui.CreateButton("Fit into view (?): To test this method, uncheck the 'Auto fit' checkbox,\nrotate and move the camera and then click this button.", () => FitIntoView(isAnimated: false));
         ui.CreateButton("Fit into view (animated) (?): To test this method, uncheck the 'Auto fit' checkbox,\nrotate and move the camera and then click this button.", () => FitIntoView(isAnimated: true));
-        ui.CreateButton("Recreate scene", () =>
-        {
-            CreateRandomScene();
-            UpdateFitIntoView();
-        });
-
-
+        
+        
         ui.AddSeparator();
 
         ui.CreateLabel("Camera type:");
@@ -337,7 +359,7 @@ public class FitIntoViewSample : CommonSample
         {
             _isTargetPositionCamera = itemIndex == 0;
             CreateCamera();
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: false);
         }, selectedItemIndex: _isTargetPositionCamera ? 0 : 1);
 
 
@@ -348,9 +370,18 @@ public class FitIntoViewSample : CommonSample
         {
             _projectionType = itemIndex == 0 ? ProjectionTypes.Perspective : ProjectionTypes.Orthographic;
             CreateCamera();
-            UpdateFitIntoView();
+            UpdateFitIntoView(forceUpdate: false);
         }, selectedItemIndex: _projectionType == ProjectionTypes.Perspective ? 0 : 1);
 
+        
+        ui.AddSeparator();
+        
+        ui.CreateButton("Recreate scene", () =>
+        {
+            CreateRandomScene();
+            UpdateFitIntoView(forceUpdate: false);
+        });
+        
         base.OnCreateUI(ui);
     }
 }
