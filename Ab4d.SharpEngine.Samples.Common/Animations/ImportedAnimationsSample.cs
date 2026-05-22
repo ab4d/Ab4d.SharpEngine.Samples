@@ -60,7 +60,8 @@ public class ImportedAnimationsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        ImportFile(_initialFileName, scene);
+        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
+        ImportFile(fileName, scene);
     }
 
     protected override void OnSceneViewInitialized(SceneView sceneView)
