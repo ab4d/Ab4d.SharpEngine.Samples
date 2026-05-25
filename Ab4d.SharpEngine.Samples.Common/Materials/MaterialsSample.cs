@@ -25,6 +25,14 @@ public class MaterialsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -15;
+            targetPositionCamera.Distance = 800;
+        }
+        
+        
         int sphereRadius = 30;
 
         var sphereMesh = MeshFactory.CreateSphereMesh(new Vector3(0, 0, 0), radius: sphereRadius);
@@ -391,14 +399,6 @@ public class MaterialsSample : CommonSample
             _testModelsGroup.Add(pbrModelNode);
         }
 #endif
-
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 25;
-            targetPositionCamera.Attitude = -15;
-            targetPositionCamera.Distance = 800;
-        }
 
 
 
