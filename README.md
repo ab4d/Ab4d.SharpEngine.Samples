@@ -309,6 +309,7 @@ Those two libraries provide more features and come with more samples that can be
 The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v3.2; this is not the full list):
 - Effects: XRay and face color effect
 - Shadows
+- CameraNavigationCircles
 
 
 ### Advantages of Ab4d.SharpEngine
