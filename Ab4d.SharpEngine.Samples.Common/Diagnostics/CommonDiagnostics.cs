@@ -950,7 +950,8 @@ PipelineChangesCount: {8:#,##0}",
                 if (propertyInfo.PropertyType.IsValueType || 
                     propertyInfo.PropertyType == typeof(string) ||
                     (propertyInfo.PropertyType.Assembly.FullName != null &&
-                     propertyInfo.PropertyType.Assembly.FullName.StartsWith("Ab4d."))) // Only show referenced objects for types that are declared in this class
+                     propertyInfo.PropertyType.Assembly.FullName.StartsWith("Ab4d.")) && // Only show referenced objects for types that are declared in this class
+                    propertyInfo.Name != "Item") // Skip "this[string name]" property because we cannot get value without an index / name
                 {
                     string valueText;
 
