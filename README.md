@@ -306,9 +306,10 @@ In my opinion, if you already have a complex application that is built by using 
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.8.
 
 Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
-The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v3.2; this is not the full list):
+The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v4.0; this is not the full list):
 - Effects: XRay and face color effect
 - Shadows
+- CameraNavigationCircles
 
 
 ### Advantages of Ab4d.SharpEngine
