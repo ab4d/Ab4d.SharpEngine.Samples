@@ -371,6 +371,9 @@ public class MaterialsSample : CommonSample
             // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
             var normalMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_nor_gl_1k.png", scene);
 
+            if (this.IsDisposed) // If the sample is changed while we were loading the textures, return now
+                return;
+            
             // Metalness and roughness maps are used to define how the light is reflected from the surface.
             var metalnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_metal_1k.png");
             var roughnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_rough_1k.png");
