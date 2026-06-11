@@ -105,7 +105,7 @@
   <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode"/>
   <Sample Location="Graphs.Plot3DSample" Title="3D Plot"/>
   
-  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
+  <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials" IsUpdated="True" UpdateInfo="PhysicallyBasedMaterial can now automatically combine individual metalness and roughness textures into a single MetalnessRoughness texture."/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering"/>

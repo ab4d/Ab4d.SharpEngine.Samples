@@ -358,57 +358,51 @@ public class MaterialsSample : CommonSample
         // 7) Physically Based Rendering (PBR) material
         //
 
-        var gpuDevice = scene.GpuDevice;
+        string metalPlateFolderName = GetCommonTexturePath("metal_plate_1k/");
 
-        if (gpuDevice != null)
+
+        var physicallyBasedMaterial = new PhysicallyBasedMaterial(name: "PhysicallyBasedMaterial");
+
+        // Base color texture is the same as diffuse texture. It provides the color of the pixels.
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, metalPlateFolderName + "metal_plate_diff_1k.png");
+        
+        // Normal map is used to adjust the normals of the pixels to create more detailed lighting effects.
+        // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.NormalMap, metalPlateFolderName + "metal_plate_nor_gl_1k.png");
+
+        // Provide metalness and roughness textures - those two textures define how the light is reflected from the surface.
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.Metalness, metalPlateFolderName + "metal_plate_metal_1k.png");
+        physicallyBasedMaterial.SetTextureMap(TextureMapTypes.Roughness, metalPlateFolderName + "metal_plate_rough_1k.png");
+        
+
+        // NOTE:
+        // PhysicallyBasedEffect requires a single texture with metalness and roughness values (metalness in blue channel and roughness in green channel).
+        // If this is available (for example, this is standard for glFT 2 files), then we could use:
+        //physicallyBasedMaterial.SetTextureMap(TextureMapTypes.MetalnessRoughness, metalPlateFolderName + "metal_plate_metal_rough_1k");
+        //
+        // But here we have separate metalness and roughness textures.
+        // In this case the PhysicallyBasedMaterial will generate the combined texture behind the scene.
+        //
+        // If we want to manually combine the textures and save that into one combined texture file, we can use the following code:
+        //var metalnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_metal_1k.png");
+        //var roughnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_rough_1k.png");
+        //var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
+        //gpuDevice.DefaultBitmapIO.SaveBitmap(metalnessRoughnessRawImage, metalPlateFolderName + "metal_plate_metal_rough_1k.png");
+
+        
+        // The code above used lazy-loading. We could also load the texture in async way and then use that for SetTextureMap, for example:
+        //var baseColorGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_diff_1k.png", scene);
+        //physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
+        
+        
+        // PhysicallyBasedMaterial also supports environment map, but this is not used here - see PhysicallyBasedMaterialSample for a demo.
+
+        var pbrModelNode = new MeshModelNode(sphereMesh, physicallyBasedMaterial, "PBRModel")
         {
-            string metalPlateFolderName = GetCommonTexturePath("metal_plate_1k/");
+            Transform = new TranslateTransform(350, 0, 0)
+        };
 
-            // Base color texture is the same as diffuse texture. It provides the color of the pixels.
-            var baseColorGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_diff_1k.png", scene);
-
-            // Normal map is used to adjust the normals of the pixels to create more detailed lighting effects.
-            // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
-            var normalMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_nor_gl_1k.png", scene);
-
-            if (this.IsDisposed) // If the sample is changed while we were loading the textures, return now
-                return;
-            
-            // Metalness and roughness maps are used to define how the light is reflected from the surface.
-            var metalnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_metal_1k.png");
-            var roughnessRawImage = gpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_rough_1k.png");
-
-            // The current version of the PBR shader requires that metalness and roughness values are stored in the same texture (metalness in blue channel and roughness in green channel).
-            // This is also standard for glTF models that use a combined metalness-roughness map.
-            //
-            // But if we have separate metalness and roughness textures, then we need to combine them into one texture:
-            var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
-            
-            // You can also use the following code to save the combined metalness-roughness texture to a file.
-            // After that you can load that texture directly into metalnessRoughnessMapGpuImage (see commented code below)
-            //gpuDevice.DefaultBitmapIO.SaveBitmap(metalnessRoughnessRawImage, metalPlateFolderName + "metal_plate_metal_rough_1k.png");
-            
-            var metalnessRoughnessMapGpuImage = new GpuImage(gpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
-
-            // If you have the metalness and roughness values already stored in the same texture, then you can directly load that texture without the need to combine them:
-            //var metalnessRoughnessMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_metal_rough_1k.png", scene);
-
-
-            var physicallyBasedMaterial = new PhysicallyBasedMaterial(name: "PhysicallyBasedMaterial");
-
-            physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
-            physicallyBasedMaterial.SetTextureMap(TextureMapTypes.NormalMap, normalMapGpuImage);
-            physicallyBasedMaterial.SetTextureMap(TextureMapTypes.MetalnessRoughness, metalnessRoughnessMapGpuImage);
-
-            // PhysicallyBasedMaterial also supports environment map, but this is not used here - see PhysicallyBasedMaterialSample for a demo.
-
-            var pbrModelNode = new MeshModelNode(sphereMesh, physicallyBasedMaterial, "PBRModel")
-            {
-                Transform = new TranslateTransform(350, 0, 0)
-            };
-
-            _testModelsGroup.Add(pbrModelNode);
-        }
+        _testModelsGroup.Add(pbrModelNode);
 #endif
 
 
