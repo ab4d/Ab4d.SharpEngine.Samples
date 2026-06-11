@@ -383,7 +383,15 @@ public class MaterialsSample : CommonSample
             //
             // But if we have separate metalness and roughness textures, then we need to combine them into one texture:
             var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
+            
+            // You can also use the following code to save the combined metalness-roughness texture to a file.
+            // After that you can load that texture directly into metalnessRoughnessMapGpuImage (see commented code below)
+            //gpuDevice.DefaultBitmapIO.SaveBitmap(metalnessRoughnessRawImage, metalPlateFolderName + "metal_plate_metal_rough_1k.png");
+            
             var metalnessRoughnessMapGpuImage = new GpuImage(gpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
+
+            // If you have the metalness and roughness values already stored in the same texture, then you can directly load that texture without the need to combine them:
+            //var metalnessRoughnessMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_metal_rough_1k.png", scene);
 
 
             var physicallyBasedMaterial = new PhysicallyBasedMaterial(name: "PhysicallyBasedMaterial");
