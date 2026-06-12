@@ -73,6 +73,9 @@ This works well for models with rounded edges, but is not that nice on objects w
         {
             var dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, position: new Vector3(-50, 0, 0), positionType: PositionTypes.Bottom, finalSize: new Vector3(100, 100, 100));
 
+            if (this.IsDisposed) // If the sample is changed while we were loading the textures, return now
+                return;
+            
             _dragonModelNode = new MeshModelNode(dragonMesh, StandardMaterials.Silver, "DragonModel");
             _objectsGroupNode.Add(_dragonModelNode);
 
