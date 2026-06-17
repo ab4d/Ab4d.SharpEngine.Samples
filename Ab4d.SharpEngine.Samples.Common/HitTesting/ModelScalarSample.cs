@@ -13,7 +13,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 public class ModelScalarSample : CommonSample
 {
     public override string Title => "ModelScalar sample";
-    public override string Subtitle => "Scale the selected teapot. Click on other teapot to select it.\nRotate the camera with the right mouse button.";
+    public override string Subtitle => "Scale the selected teapot. Click on other teapot to select it.";
 
     private ModelScalar? _modelScalar;
 
@@ -30,6 +30,7 @@ public class ModelScalarSample : CommonSample
 
     private bool _recreatedUI;
     private ManualInputEventsManager? _inputEventsManager;
+    private ManualPointerCameraController? _pointerCameraController;
 
     public ModelScalarSample(ICommonSamplesContext context)
         : base(context)
@@ -37,8 +38,11 @@ public class ModelScalarSample : CommonSample
         _commonMaterial = StandardMaterials.Silver;
         _selectedMaterial = StandardMaterials.Orange;
 
-        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
-        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
+        // With the following code we could assign right mouse button to camera controller for camera rotation and movement.
+        // But here we demonstrate how to use the same left mouse button for camera controller and ModelScaler.
+        // To set up this we set PointerMoveThreshold to 2 and disable camera controller when starting model scaling.
+        //RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        //MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;   
 
         ShowCameraAxisPanel = true;
     }
@@ -97,6 +101,16 @@ public class ModelScalarSample : CommonSample
             ReCreateUI();
             _recreatedUI = false;
         }
+    }
+    
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
+    {
+        // Require pointer to move for 2 pixels before starting rotate, move or other event.
+        // This prevents starting camera rotation before the ModelRotator starts model rotation.
+        pointerCameraController.PointerMoveThreshold = 2;
+        
+        _pointerCameraController = pointerCameraController;
+        base.InitializePointerCameraController(pointerCameraController);
     }
 
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
@@ -157,6 +171,10 @@ public class ModelScalarSample : CommonSample
                 _startScaleFactors = standardTransform.GetScaleFactors();
             else
                 _startScaleFactors = new Vector3(1, 1, 1); // no initial scale
+            
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;
         };
 
         _modelScalar.ModelScaled += (sender, args) =>
@@ -188,12 +206,14 @@ public class ModelScalarSample : CommonSample
 
         _modelScalar.ModelScaleEnded += (sender, args) =>
         {
-            // Nothing to do here in this sample
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
         };
 
 
 
-        // !!! IMPORTAMT !!!
+        // !!! IMPORTANT !!!
         // To show ModelScalar we need to add ModelScalarGroupNode (as GroupNode) to the Scene.RootNode
 
         Scene.RootNode.Add(_modelScalar.ModelScalarGroupNode);

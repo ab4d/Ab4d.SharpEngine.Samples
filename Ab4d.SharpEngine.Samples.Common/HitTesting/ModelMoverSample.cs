@@ -13,7 +13,7 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 public class ModelMoverSample : CommonSample
 {
     public override string Title => "ModelMover sample";
-    public override string Subtitle => "Move selected sphere around. Click on other sphere to select it.\nRotate the camera with the right mouse button.";
+    public override string Subtitle => "Move selected sphere around. Click on other sphere to select it.";
 
     private ModelMover? _modelMover;
 
@@ -30,6 +30,8 @@ public class ModelMoverSample : CommonSample
     private GroupNode? _testSpheresGroupNode;
     private PlanarShadowMeshCreator? _planarShadowMeshCreator;
     private MeshModelNode? _shadowModel;
+    
+    private ManualPointerCameraController? _pointerCameraController;
 
     private bool _preventCollisions = true;
     private bool _preventMovingBlowPlane = true;
@@ -41,8 +43,11 @@ public class ModelMoverSample : CommonSample
         _selectedMaterial = StandardMaterials.Orange;
         _invalidPositionMaterial = StandardMaterials.Red;
 
-        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
-        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
+        // With the following code we could assign right mouse button to camera controller for camera rotation and movement.
+        // But here we demonstrate how to use the same left mouse button for camera controller and ModelMover.
+        // To set up this we set PointerMoveThreshold to 2 and disable camera controller when starting model movement.
+        //RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        //MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;        
 
         ShowCameraAxisPanel = true;
     }
@@ -81,7 +86,17 @@ public class ModelMoverSample : CommonSample
 
         SetupPlanarShadow(scene);
     }
-
+    
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
+    {
+        // Require pointer to move for 2 pixels before starting rotate, move or other event.
+        // This prevents starting camera rotation before the ModelRotator starts model rotation.
+        pointerCameraController.PointerMoveThreshold = 2;
+        
+        _pointerCameraController = pointerCameraController;
+        base.InitializePointerCameraController(pointerCameraController);
+    }
+    
     /// <inheritdoc />
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
     {
@@ -139,6 +154,10 @@ public class ModelMoverSample : CommonSample
                 _startCenterPosition = _movingSphere.CenterPosition;
             else
                 _startCenterPosition = Vector3.Zero;
+            
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;
         };
 
         _modelMover.ModelMoved += (sender, args) =>
@@ -194,12 +213,14 @@ public class ModelMoverSample : CommonSample
 
         _modelMover.ModelMoveEnded += (sender, args) =>
         {
-            // Nothing to do here in this sample
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
         };
 
 
 
-        // !!! IMPORTAMT !!!
+        // !!! IMPORTANT !!!
         // To show ModelMover we need to add ModelMoverGroupNode (as GroupNode) to the Scene.RootNode
 
         Scene.RootNode.Add(_modelMover.ModelMoverGroupNode);
