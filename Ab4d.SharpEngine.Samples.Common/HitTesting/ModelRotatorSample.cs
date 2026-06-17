@@ -12,8 +12,10 @@ namespace Ab4d.SharpEngine.Samples.Common.HitTesting;
 public class ModelRotatorSample : CommonSample
 {
     public override string Title => "ModelRotator sample";
-    public override string Subtitle => "Rotate the selected teapot. Click on other teapot to select it.\nRotate the camera with the right mouse button.";
+    public override string Subtitle => "Rotate the selected teapot. Click on other teapot to select it.";
 
+    public static readonly bool UseQuaternionTransform = false; // Set to true to use StandardQuaternionTransform instead of StandardTransform
+    
     private ModelRotator? _modelRotator;
 
     private readonly StandardMaterial _commonMaterial;
@@ -24,6 +26,7 @@ public class ModelRotatorSample : CommonSample
     private float _startRotateX;
     private float _startRotateY;
     private float _startRotateZ;
+    private Quaternion _startQuaternion;
 
     private ModelNode? _rotatingModel;
     private GroupNode? _testModelsGroupNode;
@@ -32,6 +35,7 @@ public class ModelRotatorSample : CommonSample
 
     private bool _recreatedUI;
     private ManualInputEventsManager? _inputEventsManager;
+    private ManualPointerCameraController? _pointerCameraController;
 
     public ModelRotatorSample(ICommonSamplesContext context)
         : base(context)
@@ -39,8 +43,11 @@ public class ModelRotatorSample : CommonSample
         _commonMaterial = StandardMaterials.Silver;
         _selectedMaterial = StandardMaterials.Orange;
 
-        RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
-        MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
+        // With the following code we could assign right mouse button to camera controller for camera rotation and movement.
+        // But here we demonstrate how to use the same left mouse button for camera controller and ModelRotator.
+        // To set up this we set PointerMoveThreshold to 2 and disable camera controller when starting model rotation.
+        //RotateCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed;
+        //MoveCameraConditions = PointerAndKeyboardConditions.RightPointerButtonPressed | PointerAndKeyboardConditions.ControlKey;
 
         ShowCameraAxisPanel = true;
     }
@@ -59,8 +66,7 @@ public class ModelRotatorSample : CommonSample
 
         if (targetPositionCamera != null)
             targetPositionCamera.Distance = 800;
-
-
+        
 
         float teapotSize = 80;
 
@@ -78,10 +84,14 @@ public class ModelRotatorSample : CommonSample
             if (!IsPositionFree(randomPosition, freeRadius: teapotSize * 1.2f, _testModelsGroupNode))
                 continue; // Find another position
 
-            var teapotModel = new MeshModelNode(teapotMesh, _commonMaterial, $"Teapot_{_testModelsGroupNode.Count}")
-            {
-                Transform = new StandardTransform(translateX: randomPosition.X, translateY: randomPosition.Y, translateZ: randomPosition.Z)
-            };
+            
+            var teapotModel = new MeshModelNode(teapotMesh, _commonMaterial, $"Teapot_{_testModelsGroupNode.Count}");
+
+            if (UseQuaternionTransform)
+                teapotModel.Transform = new StandardQuaternionTransform(translateX: randomPosition.X, translateY: randomPosition.Y, translateZ: randomPosition.Z);
+            else
+                teapotModel.Transform = new StandardTransform(translateX: randomPosition.X, translateY: randomPosition.Y, translateZ: randomPosition.Z);
+            
 
             _testModelsGroupNode.Add(teapotModel);
         }
@@ -100,6 +110,16 @@ public class ModelRotatorSample : CommonSample
             ReCreateUI();
             _recreatedUI = false;
         }
+    }
+    
+    public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
+    {
+        // Require pointer to move for 2 pixels before starting rotate, move or other event.
+        // This prevents starting camera rotation before the ModelRotator starts model rotation.
+        pointerCameraController.PointerMoveThreshold = 2;
+        
+        _pointerCameraController = pointerCameraController;
+        base.InitializePointerCameraController(pointerCameraController);
     }
 
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
@@ -160,18 +180,30 @@ public class ModelRotatorSample : CommonSample
         // Handle events:
         _modelRotator.ModelRotateStarted += (sender, args) =>
         {
-            if (_rotatingModel != null && _rotatingModel.Transform is StandardTransform standardTransform)
+            if (_rotatingModel != null)
             {
-                _startRotateX = standardTransform.RotateX;
-                _startRotateY = standardTransform.RotateY;
-                _startRotateZ = standardTransform.RotateZ;
+                if (_rotatingModel.Transform is StandardTransform standardTransform)
+                {
+                    _startRotateX = standardTransform.RotateX;
+                    _startRotateY = standardTransform.RotateY;
+                    _startRotateZ = standardTransform.RotateZ;
+                }
+                else if (_rotatingModel.Transform is StandardQuaternionTransform standardQuaternionTransform)
+                {
+                    _startQuaternion = standardQuaternionTransform.GetQuaternion();
+                }
             }
             else
             {
                 _startRotateX = 0;
                 _startRotateY = 0;
                 _startRotateZ = 0;
+                _startQuaternion = new Quaternion();
             }
+
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;
         };
 
         _modelRotator.ModelRotated += (sender, args) =>
@@ -186,6 +218,15 @@ public class ModelRotatorSample : CommonSample
                 standardTransform.RotateY = _startRotateY + args.RotateY;
                 standardTransform.RotateZ = _startRotateZ + args.RotateZ;
             }
+            else if (_rotatingModel.Transform is StandardQuaternionTransform standardQuaternionTransform)
+            {
+                var (axis, axisVector, angle) = MathUtils.GetMaxAxisAngle(args.RotateX, args.RotateY, args.RotateZ);;
+                
+                var diffQuaternion = Quaternion.CreateFromAxisAngle(axisVector, MathUtils.DegreesToRadians(angle));
+                var newQuaternion = _startQuaternion * diffQuaternion;
+                
+                standardQuaternionTransform.SetQuaternion(newQuaternion);
+            }
 
 
             if (_planarShadowMeshCreator != null && _shadowModel != null)
@@ -199,12 +240,14 @@ public class ModelRotatorSample : CommonSample
 
         _modelRotator.ModelRotateEnded += (sender, args) =>
         {
-            // Nothing to do here in this sample
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
         };
 
 
 
-        // !!! IMPORTAMT !!!
+        // !!! IMPORTANT !!!
         // To show ModelRotator we need to add ModelRotatorGroupNode (as GroupNode) to the Scene.RootNode
 
         Scene.RootNode.Add(_modelRotator.ModelRotatorGroupNode);

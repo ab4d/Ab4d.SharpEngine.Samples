@@ -131,9 +131,9 @@
   <Sample IsSeparator="True" />
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
   <Sample IsSeparator="True" />
-  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover"/>
-  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar"/>
-  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator"/>
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover" IsUpdated="true" UpdateInfo="Using left mouse button the same left mouse button for camera controller and ModelRotator."/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar" IsUpdated="true" UpdateInfo="Using left mouse button the same left mouse button for camera controller and ModelRotator."/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator" IsUpdated="true" UpdateInfo="Added option to use quaternion rotation (StandardQuaternionTransform instead of StandardTransform)\nUsing left mouse button the same left mouse button for camera controller and ModelRotator."/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
   <Sample Location="Animations.ImportedAnimationsSample" Title="Imported animations" IsNew="True"/>
