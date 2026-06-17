@@ -147,17 +147,31 @@ public class ModelMoverSample : CommonSample
         // (see handling of the "Use custom transform" button click at the end of this file).
         //_modelMover.IsAutomaticallyMoved = true;
 
-        // Handle ModelMoveStarted and ModelMoved
+        // Handle events:
+        _modelMover.AxesSelected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Selected move axes: {args.Axes}");
+            
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;
+        };
+        
+        _modelMover.AxesDeselected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Deselected move axes: {args.Axes}");
+            
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
+        };
+        
         _modelMover.ModelMoveStarted += (sender, args) =>
         {
             if (_movingSphere != null)
                 _startCenterPosition = _movingSphere.CenterPosition;
             else
                 _startCenterPosition = Vector3.Zero;
-            
-            // Disable camera controller when using ModelRotator
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = false;
         };
 
         _modelMover.ModelMoved += (sender, args) =>
@@ -213,13 +227,10 @@ public class ModelMoverSample : CommonSample
 
         _modelMover.ModelMoveEnded += (sender, args) =>
         {
-            // Enable camera controller
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = true;
+            // Nothing to do in this sample.
         };
 
-
-
+        
         // !!! IMPORTANT !!!
         // To show ModelMover we need to add ModelMoverGroupNode (as GroupNode) to the Scene.RootNode
 

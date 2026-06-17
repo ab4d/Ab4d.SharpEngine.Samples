@@ -178,6 +178,24 @@ public class ModelRotatorSample : CommonSample
         _modelRotator.CustomRenderingLayer = Scene.OverlayRenderingLayer;
 
         // Handle events:
+        _modelRotator.AxisSelected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Selected rotation axis: {args.Axes}");
+            
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;
+        };
+        
+        _modelRotator.AxisDeselected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Deselected rotation axis: {args.Axes}");
+            
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
+        };
+
         _modelRotator.ModelRotateStarted += (sender, args) =>
         {
             if (_rotatingModel != null)
@@ -200,10 +218,6 @@ public class ModelRotatorSample : CommonSample
                 _startRotateZ = 0;
                 _startQuaternion = new Quaternion();
             }
-
-            // Disable camera controller when using ModelRotator
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = false;
         };
 
         _modelRotator.ModelRotated += (sender, args) =>
@@ -240,11 +254,8 @@ public class ModelRotatorSample : CommonSample
 
         _modelRotator.ModelRotateEnded += (sender, args) =>
         {
-            // Enable camera controller
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = true;
+            // Nothing to do in this sample.
         };
-
 
 
         // !!! IMPORTANT !!!

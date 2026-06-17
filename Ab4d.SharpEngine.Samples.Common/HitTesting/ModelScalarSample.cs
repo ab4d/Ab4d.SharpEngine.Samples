@@ -165,16 +165,30 @@ public class ModelScalarSample : CommonSample
         _modelScalar.CustomRenderingLayer = Scene.OverlayRenderingLayer;
 
         // Handle events:
+        _modelScalar.AxesSelected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Selected scale axes: {args.Axes}");
+            
+            // Disable camera controller when using ModelRotator
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = false;            
+        };
+        
+        _modelScalar.AxesDeselected += (sender, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"Deselected scale axes: {args.Axes}");
+            
+            // Enable camera controller
+            if (_pointerCameraController != null)
+                _pointerCameraController.IsEnabled = true;
+        };
+        
         _modelScalar.ModelScaleStarted += (sender, args) =>
         {
             if (_scalingModel != null && _scalingModel.Transform is StandardTransform standardTransform)
                 _startScaleFactors = standardTransform.GetScaleFactors();
             else
                 _startScaleFactors = new Vector3(1, 1, 1); // no initial scale
-            
-            // Disable camera controller when using ModelRotator
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = false;
         };
 
         _modelScalar.ModelScaled += (sender, args) =>
@@ -206,11 +220,8 @@ public class ModelScalarSample : CommonSample
 
         _modelScalar.ModelScaleEnded += (sender, args) =>
         {
-            // Enable camera controller
-            if (_pointerCameraController != null)
-                _pointerCameraController.IsEnabled = true;
+            // Nothing to do in this sample.
         };
-
 
 
         // !!! IMPORTANT !!!
