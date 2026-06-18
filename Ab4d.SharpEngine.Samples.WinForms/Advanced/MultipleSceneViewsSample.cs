@@ -137,10 +137,10 @@ namespace Ab4d.SharpEngine.Samples.WinForms.Advanced
                 {
                     var sharpEngineSceneView = new SharpEngineSceneView(_mainScene, $"SceneView_{rowIndex + 1}_{columnIndex + 1}");
 
-                    sharpEngineSceneView.MultisampleCount = 1;
-                    sharpEngineSceneView.SupersamplingCount = 1;
-                    sharpEngineSceneView.CreateOptions.PreferredSwapChainImagesCount = 3;
-                    sharpEngineSceneView.CreateOptions.PreferredInFlightFramesCount = 3;
+                    //sharpEngineSceneView.MultisampleCount = 1;
+                    //sharpEngineSceneView.SupersamplingCount = 1;
+                    //sharpEngineSceneView.CreateOptions.PreferredSwapChainImagesCount = 3;
+                    //sharpEngineSceneView.CreateOptions.PreferredInFlightFramesCount = 3;
 
                     var (cameraHeading, cameraAttitude, distance, renderingType) = initialCameraSettings[(rowIndex * 2 + columnIndex) % initialCameraSettings.Length];
 
