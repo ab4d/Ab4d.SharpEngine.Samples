@@ -5,12 +5,8 @@ using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using SkiaSharp;
 using Windows.Foundation;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.UnoPlatform;
-using Microsoft.UI.Xaml.Shapes;
 using Uno.WinUI.Graphics2DSK;
 using DisplayInformation = Windows.Graphics.Display.DisplayInformation;
-using SolidColorBrush = Microsoft.UI.Xaml.Media.SolidColorBrush;
 using Ab4d.Vulkan;
 
 namespace Ab4d.SharpEngine.Samples.UnoPlatform;
@@ -223,7 +219,7 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         
     #endregion
     
-    public SharpEngineSceneView()
+    public SharpEngineSceneView(string? name = null)
     {
         Id = ResourceTracker.GetNextId(this);
         
@@ -232,11 +228,13 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         
         Log.Info?.Write(LogArea, Id, "Creating SharpEngineSceneView");
         
-        Scene = new Scene(Name ?? "SharpEngineScene");
-        SceneView = new SceneView(Scene, Name ?? nameof(SharpEngineSceneView))
+        Scene = new Scene(name ?? "SharpEngineScene");
+        SceneView = new SceneView(Scene, name ?? nameof(SharpEngineSceneView))
         {
             Format = StandardBitmapFormats.Bgra
         };
+
+        Name = name;
 
         Loaded += OnLoaded;
         
@@ -682,7 +680,10 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
 
         if (SceneView.Width != pixelWidth || SceneView.Height != pixelHeight)
         {
-            SceneView.Resize(pixelWidth, pixelHeight, renderNextFrameAfterResize: false);
+            if (SceneView.BackBuffersInitialized)
+                SceneView.Resize(pixelWidth, pixelHeight, renderNextFrameAfterResize: false);
+            else
+                InitializeInt(throwException: false);
         }
 
         if (_isRenderedSceneBitmapDirty ||
@@ -693,12 +694,13 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
             PaintSkCanvas();
         }
 
-        canvas.DrawBitmap(_renderedSceneBitmap, 0, 0);
+        if (_renderedSceneBitmap != null)
+            canvas.DrawBitmap(_renderedSceneBitmap, 0, 0);
     }
 
     private void PaintSkCanvas()
     {
-        if (!SceneView.IsInitialized)
+        if (!SceneView.BackBuffersInitialized)
             return;
 
         // Use RenderToGpuBuffer to render the 3D scene to a staging GpuBuffer.
