@@ -11,6 +11,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Lights;
 public class PCSShadowsSample : CommonSample
 {
     public override string Title => "Percentage Closer Soft Shadows (PCSS)";
+    public override string Subtitle => "See also 'Advanced 3D models / Planar shadows' sample.";
     
     private DirectionalLight? _directionalLight;
     private SpotLight? _spotLight;
