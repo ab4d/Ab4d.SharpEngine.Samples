@@ -102,11 +102,11 @@ public abstract class AvaloniaUIElement : ICommonSampleUIElement
     
     public virtual void UpdateValue()
     {
-        throw new InvalidOperationException(); // This must be provided by a derived element (if supported)
+        throw new NotImplementedException($"UpdateValue for {this.GetType().Name} is not implemented"); // This must be provided by a derived element (if supported)
     }
     
     public virtual void SetValue(object newValue)
     {
-        throw new NotImplementedException($"SetValue for {this.GetType().Name} not implemented"); // This must be provided by a derived element (if supported)
+        throw new NotImplementedException($"SetValue for {this.GetType().Name} is not implemented"); // This must be provided by a derived element (if supported)
     }
 }
