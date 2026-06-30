@@ -3,7 +3,6 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
-using System.Globalization;
 using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lights;
@@ -11,7 +10,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Lights;
 public class PCSShadowsSample : CommonSample
 {
     public override string Title => "Percentage Closer Soft Shadows (PCSS)";
-    public override string Subtitle => "See also 'Advanced 3D models / Planar shadows' sample.";
+    public override string Subtitle => "See also 'Advanced 3D models / Planar shadows' sample for simple planar shadows.";
     
     private DirectionalLight? _directionalLight;
     private SpotLight? _spotLight;
@@ -24,10 +23,28 @@ public class PCSShadowsSample : CommonSample
     private float _spotLightXPosition = 0;
     private float _spotLightYPosition = 150;
     private float _lightDistance = 500;
+    private float _ambientLight = 0.3f;
     
+    private int _shadowMapSize = 1024;
+    private float _shadowNormalBias = 1;
+    private float _shadowConstantBias = 0;
+    private float _shadowSlopeBias = 2;
+    private int _shadowSamplesCount = 16;
+    private float _shadowBlur = 1.5f;
+    private float _shadowLightSize = 6;
+    private float _shadowBlockerSearchRadius = 30;
+    
+    private int _savedShadowSamplesCount;
+    private float _savedShadowLightSize;
+    private float _savedShadowBlockerSearchRadius;
+    
+    private int[]? _shadowSamplesCountOptions;
     private ICommonSampleUIElement? _spotlightPositionLabel;
     private ICommonSampleUIElement? _spotlightXPositionSlider;
     private ICommonSampleUIElement? _spotlightYPositionSlider;
+    private ICommonSampleUIElement? _shadowSamplesCountComboBox;
+    private ICommonSampleUIElement? _lightSizeSlider;
+    private ICommonSampleUIElement? _blockerSearchRadiusSlider;
 
     public PCSShadowsSample(ICommonSamplesContext context)
         : base(context)
@@ -110,7 +127,7 @@ public class PCSShadowsSample : CommonSample
 
 
         // Set ambient light (illuminates the objects from all directions)
-        scene.SetAmbientLight(intensity: 0.3f);
+        scene.SetAmbientLight(intensity: _ambientLight);
         
         UpdateLights();
         
@@ -157,153 +174,24 @@ public class PCSShadowsSample : CommonSample
                 _spotLightWireCross.Position = _spotLight.Position;
         }
     }
+    
+    
+    private void UpdateShadowSettings()
+    {
+        if (_softShadowRenderingProvider == null)
+            return;
 
-    //private void UpdateShadowSettings()
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
+        _softShadowRenderingProvider.ShadowMapSize = _shadowMapSize;
+        _softShadowRenderingProvider.ShadowSamplesCount = _shadowSamplesCount;
 
-    //    _softShadowRenderingProvider.ShadowMapSize = GetComboBoxIntValue(ShadowMapSizeComboBox, defaultValue: 1024);
-    //    _softShadowRenderingProvider.ShadowSamplesCount = GetComboBoxIntValue(ShadowSamplesCountComboBox, defaultValue: 1);
+        _softShadowRenderingProvider.ShadowNormalBias = _shadowNormalBias;
+        _softShadowRenderingProvider.ShadowConstantBias = _shadowConstantBias;
+        _softShadowRenderingProvider.ShadowSlopeBias = _shadowSlopeBias;
 
-    //    _softShadowRenderingProvider.ShadowNormalBias   = GetComboBoxFloatValue(NormalDepthBiasComboBox);
-    //    _softShadowRenderingProvider.ShadowConstantBias = GetComboBoxFloatValue(ConstantBiasComboBox);
-    //    _softShadowRenderingProvider.ShadowSlopeBias    = GetComboBoxFloatValue(SlopeBiasComboBox);
-
-    //    _softShadowRenderingProvider.ShadowBlur = (float)BlurSlider.Value;
-    //    _softShadowRenderingProvider.ShadowLightSize = (float)LightSizeSlider.Value;
-    //    _softShadowRenderingProvider.ShadowBlockerSearchRadius = (float)ShadowBlockerSearchRadiusSlider.Value;
-    //}
-
-    //private void ShadowMapSizeComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowMapSize = GetComboBoxIntValue(ShadowMapSizeComboBox, defaultValue: 1024);
-    //}
-
-    //private void ShadowSamplesCount_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowSamplesCount = GetComboBoxIntValue(ShadowSamplesCountComboBox, defaultValue: 1);
-    //}
-
-    //private void DepthBiasComboBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowNormalBias   = GetComboBoxFloatValue(NormalDepthBiasComboBox);
-    //    _softShadowRenderingProvider.ShadowConstantBias = GetComboBoxFloatValue(ConstantBiasComboBox);
-    //    _softShadowRenderingProvider.ShadowSlopeBias    = GetComboBoxFloatValue(SlopeBiasComboBox);
-    //}
-
-    //private int GetComboBoxIntValue(ComboBox comboBox, int defaultValue = 0)
-    //{
-    //    if (comboBox.SelectedItem is ComboBoxItem comboBoxItem && comboBoxItem.Content is string stringContent)
-    //        return int.Parse(stringContent);
-
-    //    return defaultValue;
-    //}
-
-    //private float GetComboBoxFloatValue(ComboBox comboBox, float defaultValue = 0)
-    //{
-    //    if (comboBox.SelectedItem is ComboBoxItem comboBoxItem && comboBoxItem.Content is string stringContent)
-    //        return float.Parse(stringContent, NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-
-    //    return defaultValue;
-    //}
-
-    //private void LightDirectionSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (!this.IsLoaded)
-    //        return;
-
-    //    _lightHorizontalAngle = (float)HorizontalDirectionSlider.Value;
-    //    _lightVerticalAngle = (float)VerticalDirectionSlider.Value;
-
-    //    UpdateLights();
-    //}
-
-    //private void SpotLightPositionSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (_spotLight == null)
-    //        return;
-
-    //    _spotLight.Position = new Vector3((float)SpotLightXPositionSlider.Value, 
-    //                                      (float)SpotLightYPositionSlider.Value,
-    //                                      400);
-
-    //    if (_spotLightWireCross != null)
-    //        _spotLightWireCross.Position = _spotLight.Position;
-
-    //    UpdateLights();
-    //}
-
-    //private void BlurSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowBlur = (float)BlurSlider.Value;
-    //    BlurTextBlock.Text = _softShadowRenderingProvider.ShadowBlur.ToString("F1");
-    //}
-
-    //private void LightSizeSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowLightSize = (float)LightSizeSlider.Value;
-    //    LightSizeTextBlock.Text = _softShadowRenderingProvider.ShadowLightSize.ToString("F1");
-    //}
-
-    //private void AmbientLightSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    var ambientLight = 0.01f * (float)AmbientLightSlider.Value;
-    //    _sharpEngineSceneView.Scene.SetAmbientLight(ambientLight);
-    //    AmbientLightTextBlock.Text = AmbientLightSlider.Value.ToString("N0");
-    //}
-
-    //private void ShadowBlockerSearchRadiusSlider_OnValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
-    //{
-    //    if (_softShadowRenderingProvider == null)
-    //        return;
-
-    //    _softShadowRenderingProvider.ShadowBlockerSearchRadius = (float)ShadowBlockerSearchRadiusSlider.Value;
-    //    RadiusValueTextBlock.Text = _softShadowRenderingProvider.ShadowBlockerSearchRadius.ToString("F0");
-    //}
-
-    //private void EnableShadowCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
-    //{
-    //    if (!this.IsLoaded)
-    //        return;
-
-    //    bool isEnabled = EnableShadowCheckBox.IsChecked ?? false;
-
-    //    if (_softShadowRenderingProvider != null && !isEnabled)
-    //    {
-    //        //_sharpEngineSceneView.Scene.RemoveShadowLight(_directionalLight);
-
-    //        _softShadowRenderingProvider.Dispose();
-    //        _softShadowRenderingProvider = null;
-    //    }
-    //    else if (_softShadowRenderingProvider == null && isEnabled)
-    //    {
-    //        if (_directionalLight != null)
-    //            _softShadowRenderingProvider = _sharpEngineSceneView.Scene.AddShadowLight(_directionalLight);
-    //        else if (_spotLight != null)
-    //            _softShadowRenderingProvider = _sharpEngineSceneView.Scene.AddShadowLight(_spotLight);
-
-    //        UpdateShadowSettings();
-    //    }
-    //}
+        _softShadowRenderingProvider.ShadowBlur = _shadowBlur;
+        _softShadowRenderingProvider.ShadowLightSize = _shadowLightSize;
+        _softShadowRenderingProvider.ShadowBlockerSearchRadius = _shadowBlockerSearchRadius;
+    }
 
     private void ChangeLightType(bool isSpotLight)
     {
@@ -353,16 +241,161 @@ public class PCSShadowsSample : CommonSample
                 _spotLightWireCross = null;
             }
         }
+        
+        UpdateShadowSettings();
 
         _spotlightPositionLabel?.SetIsVisible(_spotLight != null);
         _spotlightXPositionSlider?.SetIsVisible(_spotLight != null);
         _spotlightYPositionSlider?.SetIsVisible(_spotLight != null);
     }
 
+    private void EnableDisableShadows(bool isEnabled)
+    {
+        if (_softShadowRenderingProvider != null && !isEnabled)
+        {
+            //_sharpEngineSceneView.Scene.RemoveShadowLight(_directionalLight);
+            
+            _softShadowRenderingProvider.Dispose();
+            _softShadowRenderingProvider = null;
+        }
+        else if (_softShadowRenderingProvider == null && isEnabled && Scene != null)
+        {
+            if (_directionalLight != null)
+                _softShadowRenderingProvider = Scene.AddShadowLight(_directionalLight);
+            else if (_spotLight != null)
+                _softShadowRenderingProvider = Scene.AddShadowLight(_spotLight);
+
+            UpdateShadowSettings();
+        }
+    }
+    
+    private void UpdatePercentageCloserBlur(bool isEnabled)
+    {
+        if (isEnabled)
+        {
+            _shadowLightSize = _savedShadowLightSize;
+            _shadowBlockerSearchRadius = _savedShadowBlockerSearchRadius;
+            _shadowSamplesCount = _savedShadowSamplesCount;
+        }
+        else
+        {
+            _savedShadowLightSize = _shadowLightSize;
+            _savedShadowBlockerSearchRadius = _shadowBlockerSearchRadius;
+            _savedShadowSamplesCount = _shadowSamplesCount;
+                
+            _shadowSamplesCount = 1;
+            _shadowLightSize = 0;
+            _shadowBlockerSearchRadius = 0;
+        }
+        
+        _lightSizeSlider?.UpdateValue();
+        _blockerSearchRadiusSlider?.UpdateValue();
+
+        if (_shadowSamplesCountOptions != null && _shadowSamplesCountComboBox != null)
+        {
+            var index = Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount);
+            _shadowSamplesCountComboBox.SetValue(index);
+            
+            //UpdateShadowSettings(); // SetValue will call UpdateShadowSettings
+        }
+    }
+
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
+        
+        ui.CreateLabel("Shadow settings:", isHeader: true);
+        
+
+        ui.CreateCheckBox("Shadow rendering", true, isChecked => EnableDisableShadows(isChecked));
+
+        ui.CreateCheckBox("Percentage closer blur", true, isChecked => UpdatePercentageCloserBlur(isChecked));
+        
+        ui.AddSeparator();
+
+        var shadowMapSizes = new int[] { 512, 1024, 2048, 4096 };
+        ui.CreateComboBox(shadowMapSizes.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowMapSize = shadowMapSizes[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(shadowMapSizes, _shadowMapSize), 
+            width: 80, 
+            keyText: "ShadowMapSize:", keyTextWidth: 150);
+        
+        var shadowBiases = new float[] { 0f, 0.0001f, 0.001f, 0.005f, 0.01f, 0.02f, 0.05f, 0.1f, 0.5f, 1f, 2f, 5f, 10f };
+        ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowNormalBias = shadowBiases[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowNormalBias), 
+            width: 80, 
+            keyText: "NormalDepthBias:", keyTextWidth: 150);
+        
+        ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowConstantBias = shadowBiases[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowConstantBias), 
+            width: 80, 
+            keyText: "ConstantDepthBias:", keyTextWidth: 150);
+        
+        ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowSlopeBias = shadowBiases[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowSlopeBias), 
+            width: 80, 
+            keyText: "SlopeDepthBias:", keyTextWidth: 150);
+        
+        
+        _shadowSamplesCountOptions = new int[] { 1, 4, 8, 16, 32, 64 };
+        _shadowSamplesCountComboBox = ui.CreateComboBox(_shadowSamplesCountOptions.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowSamplesCount = _shadowSamplesCountOptions[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount), 
+            width: 80, 
+            keyText: "ShadowSamplesCount:", keyTextWidth: 150);
+
+        
+        ui.AddSeparator();
+                
+        _lightSizeSlider = ui.CreateSlider(0, 20, () => _shadowLightSize, newValue =>
+            {
+                _shadowLightSize = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "LightSize:", keyTextWidth: 140, 
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
+        
+        _blockerSearchRadiusSlider = ui.CreateSlider(0, 200, () => _shadowBlockerSearchRadius, newValue =>
+            {
+                _shadowBlockerSearchRadius = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "BlockerSearchRadius:", keyTextWidth: 140,
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N0"));
+        
+        ui.CreateSlider(0, 10, () => _shadowBlur, newValue =>
+            {
+                _shadowBlur = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "Blur:", keyTextWidth: 140, 
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
+
+
+        ui.AddSeparator();
+        
+        ui.CreateLabel("Light settings:", isHeader: true);
+        
         ui.CreateRadioButtons(new string[] { "DirectionalLight", "SpotLight" }, (selectedIndex, selectedText) =>
         {
             ChangeLightType(isSpotLight: selectedIndex == 1);
@@ -370,31 +403,43 @@ public class PCSShadowsSample : CommonSample
         
         ui.AddSeparator();
         
-        ui.CreateLabel("Light direction:");
         ui.CreateSlider(-180, 180, () => _lightHorizontalAngle, newValue =>
-        {
-            _lightHorizontalAngle = newValue;
-            UpdateLights();
-        }, width: 120);
+            {
+                _lightHorizontalAngle = newValue;
+                UpdateLights();
+            }, width: 120,
+            keyText: "Light direction:", keyTextWidth: 140);
         
         ui.CreateSlider(0, 90, () => _lightVerticalAngle, newValue =>
-        {
-            _lightVerticalAngle = newValue;
-            UpdateLights();
-        }, width: 120);
+            {
+                _lightVerticalAngle = newValue;
+                UpdateLights();
+            }, width: 120,
+            keyText: " ", keyTextWidth: 140);
         
         
-        _spotlightPositionLabel = ui.CreateLabel("\nSpotLight position:").SetIsVisible(false);
         _spotlightXPositionSlider = ui.CreateSlider(-200, 200, () => _lightHorizontalAngle, newValue =>
-        {
-            _spotLightXPosition = newValue;
-            UpdateLights();
-        }, width: 120).SetIsVisible(false);
+            {
+                _spotLightXPosition = newValue;
+                UpdateLights();
+            }, width: 120,
+            keyText: "SpotLight position:", keyTextWidth: 140).SetIsVisible(false);
         
         _spotlightYPositionSlider = ui.CreateSlider(0, 300, () => _lightVerticalAngle, newValue =>
-        {
-            _spotLightYPosition = newValue;
-            UpdateLights();
-        }, width: 120).SetIsVisible(false);
+            {
+                _spotLightYPosition = newValue;
+                UpdateLights();
+            }, width: 120,
+            keyText: " ", keyTextWidth: 140).SetIsVisible(false);
+        
+        
+        ui.AddSeparator();
+        
+        ui.CreateSlider(0, 100, () => _ambientLight * 100, newValue =>
+            {
+                _ambientLight = newValue / 100f;
+                Scene?.SetAmbientLight(_ambientLight);
+            }, width: 120,
+            keyText: "Ambient light:", keyTextWidth: 140);
     }    
 }
