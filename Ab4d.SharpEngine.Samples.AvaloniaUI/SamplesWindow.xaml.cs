@@ -872,7 +872,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                                                                sampleSelectorAction: sampleIndex => SamplesList.SelectedIndex = sampleIndex,
                                                                beginInvokeAction: action => Dispatcher.UIThread.InvokeAsync(action, DispatcherPriority.ApplicationIdle),
                                                                customLogAction: null,
-                                                               showCurrentlyRunningSample: false); // set to true to show current sample in VS Output (this reduces the speed of showing samples)
+                                                               showCurrentlyRunningSample: true); // set to true to show current sample in VS Output (this reduces the speed of showing samples)
             }
 
             if (_randomSamplesRunner.IsRunning)
