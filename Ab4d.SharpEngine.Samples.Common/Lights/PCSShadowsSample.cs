@@ -4,6 +4,7 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
+using Ab4d.SharpEngine.Cameras;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lights;
 
@@ -105,8 +106,12 @@ public class PCSShadowsSample : CommonSample
     protected override void OnDisposed()
     {
         // This will dispose all shadow resources and remove the shadow light from the Scene
-        _softShadowRenderingProvider?.Dispose();
-        
+        if (_softShadowRenderingProvider != null && !_softShadowRenderingProvider.IsDisposed)
+        {
+            _softShadowRenderingProvider.Dispose();
+            _softShadowRenderingProvider = null;
+        }
+
         base.OnDisposed();
     }
 
@@ -194,7 +199,11 @@ public class PCSShadowsSample : CommonSample
         if (Scene == null)
             return;
         
-        _softShadowRenderingProvider?.Dispose();
+        if (_softShadowRenderingProvider != null && !_softShadowRenderingProvider.IsDisposed)
+        {
+            _softShadowRenderingProvider.Dispose();
+            _softShadowRenderingProvider = null;
+        }
 
         if (isSpotLight)
         {
