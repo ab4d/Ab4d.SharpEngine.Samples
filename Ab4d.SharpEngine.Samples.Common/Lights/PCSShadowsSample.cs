@@ -26,15 +26,14 @@ public class PCSShadowsSample : CommonSample
     private float _ambientLight = 0.3f;
     
     private int _shadowMapSize = 1024;
-    private float _shadowNormalBias = 1;
-    private float _shadowConstantBias = 0;
-    private float _shadowSlopeBias = 2;
+    private float _shadowNormalBias = 1.0f;
+    private float _shadowConstantBias = 0.001f;
+    private float _shadowSlopeBias = 1.0f;
     private int _shadowSamplesCount = 16;
     private float _shadowBlur = 1.5f;
     private float _shadowLightSize = 6;
     private float _shadowBlockerSearchRadius = 30;
     
-    private int _savedShadowSamplesCount;
     private float _savedShadowLightSize;
     private float _savedShadowBlockerSearchRadius;
     
@@ -54,14 +53,14 @@ public class PCSShadowsSample : CommonSample
     private void SetupShadowRendering(Scene scene)
     {
         if (_softShadowRenderingProvider != null)
-            return;
-        
-        if (_directionalLight != null)
-            _softShadowRenderingProvider = scene.AddShadowLight(_directionalLight);
-        else if (_spotLight != null)
-            _softShadowRenderingProvider = scene.AddShadowLight(_spotLight);
-        else
-            return;
+            return; // already created
+
+        var shadowLight = (ILight?)_directionalLight ?? (ILight?)_spotLight;
+        if (shadowLight != null)
+        {
+            _softShadowRenderingProvider = scene.CreateSoftShadowRenderingProvider(shadowLight);
+            UpdateShadowSettings();
+        }
     }
     
     protected override void OnCreateScene(Scene scene)
@@ -107,9 +106,6 @@ public class PCSShadowsSample : CommonSample
     {
         // This will dispose all shadow resources and remove the shadow light from the Scene
         _softShadowRenderingProvider?.Dispose();
-        
-        // We could also call:
-        //Scene.RemoveShadowLight(_directionalLight);
         
         base.OnDisposed();
     }
@@ -216,8 +212,6 @@ public class PCSShadowsSample : CommonSample
             _directionalLight = null;
 
             Scene.Lights.Add(_spotLight);
-            _softShadowRenderingProvider = Scene.AddShadowLight(_spotLight);
-
 
             _spotLightWireCross = new WireCrossNode(_spotLight.Position, Colors.Yellow, 20, 2, "SpotLightWireCross");
             Scene.RootNode.Add(_spotLightWireCross);
@@ -233,7 +227,6 @@ public class PCSShadowsSample : CommonSample
             _spotLight = null;
 
             Scene.Lights.Add(_directionalLight);
-            _softShadowRenderingProvider = Scene.AddShadowLight(_directionalLight);
 
             if (_spotLightWireCross != null)
             {
@@ -242,7 +235,8 @@ public class PCSShadowsSample : CommonSample
             }
         }
         
-        UpdateShadowSettings();
+        // Create a new SoftShadowRenderingProvider based on the current _directionalLight / _spotLight
+        SetupShadowRendering(Scene);
 
         _spotlightPositionLabel?.SetIsVisible(_spotLight != null);
         _spotlightXPositionSlider?.SetIsVisible(_spotLight != null);
@@ -251,21 +245,22 @@ public class PCSShadowsSample : CommonSample
 
     private void EnableDisableShadows(bool isEnabled)
     {
+        if (Scene == null)
+            return;
+        
         if (_softShadowRenderingProvider != null && !isEnabled)
         {
-            //_sharpEngineSceneView.Scene.RemoveShadowLight(_directionalLight);
+            Scene.RemoveShadowRenderingProvider(disposeResources: true);
             
-            _softShadowRenderingProvider.Dispose();
+            // Instead of Scene.RemoveShadowRenderingProvider we could also call Dispose:
+            //_softShadowRenderingProvider.Dispose();
+            
             _softShadowRenderingProvider = null;
         }
-        else if (_softShadowRenderingProvider == null && isEnabled && Scene != null)
+        else if (_softShadowRenderingProvider == null && isEnabled)
         {
-            if (_directionalLight != null)
-                _softShadowRenderingProvider = Scene.AddShadowLight(_directionalLight);
-            else if (_spotLight != null)
-                _softShadowRenderingProvider = Scene.AddShadowLight(_spotLight);
-
-            UpdateShadowSettings();
+            // Create a new SoftShadowRenderingProvider and add it to the Scene  
+            SetupShadowRendering(Scene);
         }
     }
     
@@ -275,29 +270,26 @@ public class PCSShadowsSample : CommonSample
         {
             _shadowLightSize = _savedShadowLightSize;
             _shadowBlockerSearchRadius = _savedShadowBlockerSearchRadius;
-            _shadowSamplesCount = _savedShadowSamplesCount;
+            
+            _lightSizeSlider?.UpdateValue();
+            _blockerSearchRadiusSlider?.UpdateValue();
         }
         else
         {
             _savedShadowLightSize = _shadowLightSize;
             _savedShadowBlockerSearchRadius = _shadowBlockerSearchRadius;
-            _savedShadowSamplesCount = _shadowSamplesCount;
-                
-            _shadowSamplesCount = 1;
+         
+            // Setting ShadowLightSize or ShadowBlockerSearchRadius to 0 disables the Percentage Closer Soft Shadows (PCSS) effect
+            // and renders hard shadows (note that we can still use ShadowBlur that applies constant blur)
             _shadowLightSize = 0;
             _shadowBlockerSearchRadius = 0;
         }
         
-        _lightSizeSlider?.UpdateValue();
-        _blockerSearchRadiusSlider?.UpdateValue();
+        _shadowSamplesCountComboBox?.SetIsVisible(isVisible: isEnabled);
+        _lightSizeSlider?.SetIsVisible(isVisible: isEnabled);
+        _blockerSearchRadiusSlider?.SetIsVisible(isVisible: isEnabled);
 
-        if (_shadowSamplesCountOptions != null && _shadowSamplesCountComboBox != null)
-        {
-            var index = Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount);
-            _shadowSamplesCountComboBox.SetValue(index);
-            
-            //UpdateShadowSettings(); // SetValue will call UpdateShadowSettings
-        }
+        UpdateShadowSettings(); // SetValue will call UpdateShadowSettings
     }
 
     
@@ -307,14 +299,51 @@ public class PCSShadowsSample : CommonSample
 
         
         ui.CreateLabel("Shadow settings:", isHeader: true);
-        
 
         ui.CreateCheckBox("Shadow rendering", true, isChecked => EnableDisableShadows(isChecked));
 
-        ui.CreateCheckBox("Percentage closer blur", true, isChecked => UpdatePercentageCloserBlur(isChecked));
+        ui.CreateCheckBox("Percentage Closer Soft Shadow (PCSS)", true, isChecked => UpdatePercentageCloserBlur(isChecked));
+        
         
         ui.AddSeparator();
+        
+        ui.CreateSlider(0, 10, () => _shadowBlur, newValue =>
+            {
+                _shadowBlur = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "Blur:", keyTextWidth: 140, 
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
+        
+        _lightSizeSlider = ui.CreateSlider(0, 20, () => _shadowLightSize, newValue =>
+            {
+                _shadowLightSize = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "LightSize:", keyTextWidth: 140, 
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
+        
+        _blockerSearchRadiusSlider = ui.CreateSlider(0, 200, () => _shadowBlockerSearchRadius, newValue =>
+            {
+                _shadowBlockerSearchRadius = newValue;
+                UpdateShadowSettings();
+            }, width: 100,
+            keyText: "BlockerSearchRadius:", keyTextWidth: 140,
+            formatShownValueFunc: sliderValue => sliderValue.ToString("N0"));
 
+        _shadowSamplesCountOptions = new int[] { 8, 16, 32, 64 };
+        _shadowSamplesCountComboBox = ui.CreateComboBox(_shadowSamplesCountOptions.Select(f => f.ToString()).ToArray(),
+            (selectedIndex, selectedText) =>
+            {
+                _shadowSamplesCount = _shadowSamplesCountOptions[selectedIndex];
+                UpdateShadowSettings();
+            }, selectedItemIndex: Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount), 
+            width: 80, 
+            keyText: "ShadowSamplesCount:", keyTextWidth: 150);
+
+
+        ui.AddSeparator();
+        
         var shadowMapSizes = new int[] { 512, 1024, 2048, 4096 };
         ui.CreateComboBox(shadowMapSizes.Select(f => f.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
@@ -354,46 +383,6 @@ public class PCSShadowsSample : CommonSample
             keyText: "SlopeDepthBias:", keyTextWidth: 150);
         
         
-        _shadowSamplesCountOptions = new int[] { 1, 4, 8, 16, 32, 64 };
-        _shadowSamplesCountComboBox = ui.CreateComboBox(_shadowSamplesCountOptions.Select(f => f.ToString()).ToArray(),
-            (selectedIndex, selectedText) =>
-            {
-                _shadowSamplesCount = _shadowSamplesCountOptions[selectedIndex];
-                UpdateShadowSettings();
-            }, selectedItemIndex: Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount), 
-            width: 80, 
-            keyText: "ShadowSamplesCount:", keyTextWidth: 150);
-
-        
-        ui.AddSeparator();
-                
-        _lightSizeSlider = ui.CreateSlider(0, 20, () => _shadowLightSize, newValue =>
-            {
-                _shadowLightSize = newValue;
-                UpdateShadowSettings();
-            }, width: 100,
-            keyText: "LightSize:", keyTextWidth: 140, 
-            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
-        
-        _blockerSearchRadiusSlider = ui.CreateSlider(0, 200, () => _shadowBlockerSearchRadius, newValue =>
-            {
-                _shadowBlockerSearchRadius = newValue;
-                UpdateShadowSettings();
-            }, width: 100,
-            keyText: "BlockerSearchRadius:", keyTextWidth: 140,
-            formatShownValueFunc: sliderValue => sliderValue.ToString("N0"));
-        
-        ui.CreateSlider(0, 10, () => _shadowBlur, newValue =>
-            {
-                _shadowBlur = newValue;
-                UpdateShadowSettings();
-            }, width: 100,
-            keyText: "Blur:", keyTextWidth: 140, 
-            formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
-
-
-        ui.AddSeparator();
-        
         ui.CreateLabel("Light settings:", isHeader: true);
         
         ui.CreateRadioButtons(new string[] { "DirectionalLight", "SpotLight" }, (selectedIndex, selectedText) =>
@@ -417,6 +406,8 @@ public class PCSShadowsSample : CommonSample
             }, width: 120,
             keyText: " ", keyTextWidth: 140);
         
+        
+        ui.AddSeparator();
         
         _spotlightXPositionSlider = ui.CreateSlider(-200, 200, () => _lightHorizontalAngle, newValue =>
             {
