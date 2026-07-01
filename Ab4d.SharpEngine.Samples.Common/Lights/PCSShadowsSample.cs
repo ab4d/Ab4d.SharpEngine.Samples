@@ -311,7 +311,14 @@ public class PCSShadowsSample : CommonSample
 
         ui.CreateCheckBox("Shadow rendering", true, isChecked => EnableDisableShadows(isChecked));
 
-        ui.CreateCheckBox("Percentage Closer Soft Shadow (PCSS)", true, isChecked => UpdatePercentageCloserBlur(isChecked));
+        ui.CreateCheckBox(
+@"Percentage Closer Soft Shadow (PCSS) (?):By default the shadow generates soft shadows with a penumbra 
+(increased blur as the distance from the shadow casting object increases).
+This is controlled by the LightSize and BlockerSearchRadius. If those two values are 0,
+then we get hard shadows that are uniformly blurred based on the ShadowBlur value.
+
+Unchecking this value will set LightSize and BlockerSearchRadius to 0.", 
+            true, isChecked => UpdatePercentageCloserBlur(isChecked));
         
         
         ui.AddSeparator();
@@ -321,7 +328,10 @@ public class PCSShadowsSample : CommonSample
                 _shadowBlur = newValue;
                 UpdateShadowSettings();
             }, width: 100,
-            keyText: "Blur:", keyTextWidth: 140, 
+            keyText: 
+@"ShadowBlur: (?):ShadowBlur defines the blur amount for the shadows.
+This value uniformly blurs the shadow regardless of its distance from the shadow casting object.", 
+            keyTextWidth: 150, 
             formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
         
         _lightSizeSlider = ui.CreateSlider(0, 20, () => _shadowLightSize, newValue =>
@@ -329,7 +339,12 @@ public class PCSShadowsSample : CommonSample
                 _shadowLightSize = newValue;
                 UpdateShadowSettings();
             }, width: 100,
-            keyText: "LightSize:", keyTextWidth: 140, 
+            keyText: 
+@"ShadowLightSize: (?):ShadowLightSize controls the size of the light source used for generating soft shadows. 
+
+A larger value results in softer shadows with a more pronounced penumbra, 
+while a smaller value produces harder shadows.", 
+            keyTextWidth: 150, 
             formatShownValueFunc: sliderValue => sliderValue.ToString("N1"));
         
         _blockerSearchRadiusSlider = ui.CreateSlider(0, 200, () => _shadowBlockerSearchRadius, newValue =>
@@ -337,7 +352,13 @@ public class PCSShadowsSample : CommonSample
                 _shadowBlockerSearchRadius = newValue;
                 UpdateShadowSettings();
             }, width: 100,
-            keyText: "BlockerSearchRadius:", keyTextWidth: 140,
+            keyText: 
+@"BlockerSearchRadius: (?):BlockerSearchRadius defines a radius used to search for shadow blockers 
+in the Percentage Closer Soft Shadows (PCSS) algorithm. 
+
+A larger value increases the area used to determine the shadow blockers, which can result in softer shadows.
+The number of checked sample is defined by the ShadowSamplesCount value.", 
+            keyTextWidth: 150,
             formatShownValueFunc: sliderValue => sliderValue.ToString("N0"));
 
         _shadowSamplesCountOptions = new int[] { 8, 16, 32, 64 };
@@ -348,7 +369,12 @@ public class PCSShadowsSample : CommonSample
                 UpdateShadowSettings();
             }, selectedItemIndex: Array.IndexOf(_shadowSamplesCountOptions, _shadowSamplesCount), 
             width: 80, 
-            keyText: "ShadowSamplesCount:", keyTextWidth: 150);
+            keyText: 
+@"ShadowSamplesCount: (?):ShadowSamplesCount defines the number of samples used to generate the soft shadows.
+
+A larger value results in smoother shadows but requires more computational resources. 
+The search radius that is used by the samples is defined by the BlockerSearchRadius value.", 
+            keyTextWidth: 160);
 
 
         ui.AddSeparator();
@@ -361,7 +387,11 @@ public class PCSShadowsSample : CommonSample
                 UpdateShadowSettings();
             }, selectedItemIndex: Array.IndexOf(shadowMapSizes, _shadowMapSize), 
             width: 80, 
-            keyText: "ShadowMapSize:", keyTextWidth: 150);
+            keyText: 
+@"ShadowMapSize: (?):ShadowMapSize sets the size of a shadow depth map texture. 
+For example, 1024 means that a 1024 x 1024 texture is used. 
+Bigger texture will produce more detailed shadows but will be slower to render.", 
+            keyTextWidth: 160);
         
         var shadowBiases = new float[] { 0f, 0.0001f, 0.001f, 0.005f, 0.01f, 0.02f, 0.05f, 0.1f, 0.5f, 1f, 2f, 5f, 10f };
         ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
@@ -371,7 +401,10 @@ public class PCSShadowsSample : CommonSample
                 UpdateShadowSettings();
             }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowNormalBias), 
             width: 80, 
-            keyText: "NormalDepthBias:", keyTextWidth: 150);
+            keyText: 
+@"NormalDepthBias: (?):This value offsets the position of the shadow receiver along its normal vector. 
+Bias is used to reduce shadow artifacts, such as shadow acne, caused by precision issues in shadow mapping.", 
+            keyTextWidth: 160);
         
         ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
@@ -380,7 +413,10 @@ public class PCSShadowsSample : CommonSample
                 UpdateShadowSettings();
             }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowConstantBias), 
             width: 80, 
-            keyText: "ConstantDepthBias:", keyTextWidth: 150);
+            keyText: 
+@"ConstantDepthBias: (?):This value adjusts the bias based on the slope of the surface relative to the light direction.
+Bias is used to reduce shadow artifacts, such as shadow acne, caused by precision issues in shadow mapping.", 
+            keyTextWidth: 160);
         
         ui.CreateComboBox(shadowBiases.Select(f => f.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
@@ -389,7 +425,10 @@ public class PCSShadowsSample : CommonSample
                 UpdateShadowSettings();
             }, selectedItemIndex: Array.IndexOf(shadowBiases, _shadowSlopeBias), 
             width: 80, 
-            keyText: "SlopeDepthBias:", keyTextWidth: 150);
+            keyText: 
+@"SlopeDepthBias: (?):This value offsets the position of the shadow receiver along its normal vector.
+Bias is used to reduce shadow artifacts, such as shadow acne, caused by precision issues in shadow mapping.", 
+            keyTextWidth: 160);
         
         
         ui.CreateLabel("Light settings:", isHeader: true);
@@ -405,15 +444,15 @@ public class PCSShadowsSample : CommonSample
             {
                 _lightHorizontalAngle = newValue;
                 UpdateLights();
-            }, width: 120,
-            keyText: "Light direction:", keyTextWidth: 140);
+            }, width: 150,
+            keyText: "Light direction:", keyTextWidth: 120);
         
         ui.CreateSlider(0, 90, () => _lightVerticalAngle, newValue =>
             {
                 _lightVerticalAngle = newValue;
                 UpdateLights();
-            }, width: 120,
-            keyText: " ", keyTextWidth: 140);
+            }, width: 150,
+            keyText: " ", keyTextWidth: 120);
         
         
         ui.AddSeparator();
@@ -422,15 +461,15 @@ public class PCSShadowsSample : CommonSample
             {
                 _spotLightXPosition = newValue;
                 UpdateLights();
-            }, width: 120,
-            keyText: "SpotLight position:", keyTextWidth: 140).SetIsVisible(false);
+            }, width: 150,
+            keyText: "SpotLight position:", keyTextWidth: 120).SetIsVisible(false);
         
         _spotlightYPositionSlider = ui.CreateSlider(0, 300, () => _lightVerticalAngle, newValue =>
             {
                 _spotLightYPosition = newValue;
                 UpdateLights();
-            }, width: 120,
-            keyText: " ", keyTextWidth: 140).SetIsVisible(false);
+            }, width: 150,
+            keyText: " ", keyTextWidth: 120).SetIsVisible(false);
         
         
         ui.AddSeparator();
@@ -439,7 +478,7 @@ public class PCSShadowsSample : CommonSample
             {
                 _ambientLight = newValue / 100f;
                 Scene?.SetAmbientLight(_ambientLight);
-            }, width: 120,
-            keyText: "Ambient light:", keyTextWidth: 140);
+            }, width: 150,
+            keyText: "Ambient light:", keyTextWidth: 120);
     }    
 }
