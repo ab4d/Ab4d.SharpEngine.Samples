@@ -26,7 +26,7 @@ public class AvaloniaPoint3DTo2DSample : Point3DTo2DSample
 
     protected override void OnSphereScreenPositionChanged(Vector2 screenPosition)
     {
-        if (_rootCanvas == null)
+        if (_rootCanvas == null || this.IsDisposed)
             return;
 
         PositionUIElements(screenPosition);
@@ -35,7 +35,7 @@ public class AvaloniaPoint3DTo2DSample : Point3DTo2DSample
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
     protected override bool CreateCustomUI(ICommonSampleUIProvider ui)
     {
-        if (ui is not AvaloniaUIProvider avaloniaUIProvider)
+        if (ui is not AvaloniaUIProvider avaloniaUIProvider || this.IsDisposed)
             return false;
 
         var baseAvaloniaPanel = avaloniaUIProvider.BaseAvaloniaPanel;
