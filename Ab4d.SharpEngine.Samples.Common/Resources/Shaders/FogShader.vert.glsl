@@ -16,18 +16,33 @@ layout(set = 0, binding = 0) uniform sceneUniformBuffer {
 
 	vec2 viewSize;
 	float dpiScale;
-	float superSampling;
+	float supersamplingFactor;
 
 	vec3 ambientColor;	
 
-	int dirLightStart; // start index of Directional lights in allLights array
-	int dirLightCount;
-	
-	int pointLightStart; // start index of Point lights in allLights array
-	int pointLightCount;
-	
-	int spotLightStart; // start index of Spot lights in allLights array
-	int spotLightCount;
+    int dirLightStart; // start index of Directional lights in allLights array
+    int dirLightCount;
+    
+    int pointLightStart; // start index of Point lights in allLights array
+    int pointLightCount;
+    
+    int spotLightStart; // start index of Spot lights in allLights array
+    int spotLightCount;
+
+    float zNear;
+    float zFar;
+    
+    int shadowLightIndex;
+    int shadowSamplesCount;
+    float shadowNormalBias;
+    float shadowConstantBias;
+    float shadowBlockerSearchRadiusUV;
+    float shadowLightSize;
+    float shadowBlurUV;
+    float shadowDepthZNear;
+    float shadowDepthZFar;
+    mat4 shadowMatrix;
+    mat4 inverseShadowMatrix;
 } scene;
 
 //layout(set = 1, binding = 0) readonly buffer AllLightsBuffer { // used in fragment shader

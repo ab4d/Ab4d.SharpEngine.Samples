@@ -11,7 +11,7 @@ layout(set = 0, binding = 0, std140) uniform sceneUniformBuffer
     vec3 eyePosW;
     vec2 viewSize;
     float dpiScale;
-    float superSampling;
+    float supersamplingFactor;
     vec3 ambientColor;
     int dirLightStart;
     int dirLightCount;
@@ -19,6 +19,19 @@ layout(set = 0, binding = 0, std140) uniform sceneUniformBuffer
     int pointLightCount;
     int spotLightStart;
     int spotLightCount;
+    float zNear;
+    float zFar;
+    int shadowLightIndex;
+    int shadowSamplesCount;
+    float shadowNormalBias;
+    float shadowConstantBias;
+    float shadowBlockerSearchRadiusUV;
+    float shadowLightSize;
+    float shadowBlurUV;
+    float shadowDepthZNear;
+    float shadowDepthZFar;
+    mat4 shadowMatrix;
+    mat4 inverseShadowMatrix;
 } scene;
 
 layout(push_constant, std430) uniform indexSetup

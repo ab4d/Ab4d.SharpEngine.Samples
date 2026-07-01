@@ -54,7 +54,7 @@ ssbos
 ubos
 =============
 
- ID 099 : sceneUniformBuffer (Set : 0) (Binding : 0) (BlockSize : 132 bytes)
+ ID 099 : sceneUniformBuffer (Set : 0) (Binding : 0) (BlockSize : 304 bytes)
 =============
 
 push

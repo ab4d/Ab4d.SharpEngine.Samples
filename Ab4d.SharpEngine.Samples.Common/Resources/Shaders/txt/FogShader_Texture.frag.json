@@ -113,7 +113,7 @@
                     "offset" : 88
                 },
                 {
-                    "name" : "superSampling",
+                    "name" : "supersamplingFactor",
                     "type" : "float",
                     "offset" : 92
                 },
@@ -151,6 +151,73 @@
                     "name" : "spotLightCount",
                     "type" : "int",
                     "offset" : 128
+                },
+                {
+                    "name" : "zNear",
+                    "type" : "float",
+                    "offset" : 132
+                },
+                {
+                    "name" : "zFar",
+                    "type" : "float",
+                    "offset" : 136
+                },
+                {
+                    "name" : "shadowLightIndex",
+                    "type" : "int",
+                    "offset" : 140
+                },
+                {
+                    "name" : "shadowSamplesCount",
+                    "type" : "int",
+                    "offset" : 144
+                },
+                {
+                    "name" : "shadowNormalBias",
+                    "type" : "float",
+                    "offset" : 148
+                },
+                {
+                    "name" : "shadowConstantBias",
+                    "type" : "float",
+                    "offset" : 152
+                },
+                {
+                    "name" : "shadowBlockerSearchRadiusUV",
+                    "type" : "float",
+                    "offset" : 156
+                },
+                {
+                    "name" : "shadowLightSize",
+                    "type" : "float",
+                    "offset" : 160
+                },
+                {
+                    "name" : "shadowBlurUV",
+                    "type" : "float",
+                    "offset" : 164
+                },
+                {
+                    "name" : "shadowDepthZNear",
+                    "type" : "float",
+                    "offset" : 168
+                },
+                {
+                    "name" : "shadowDepthZFar",
+                    "type" : "float",
+                    "offset" : 172
+                },
+                {
+                    "name" : "shadowMatrix",
+                    "type" : "mat4",
+                    "offset" : 176,
+                    "matrix_stride" : 16
+                },
+                {
+                    "name" : "inverseShadowMatrix",
+                    "type" : "mat4",
+                    "offset" : 240,
+                    "matrix_stride" : 16
                 }
             ]
         },
@@ -317,7 +384,7 @@
         {
             "type" : "_97",
             "name" : "sceneUniformBuffer",
-            "block_size" : 132,
+            "block_size" : 304,
             "set" : 0,
             "binding" : 0
         }
