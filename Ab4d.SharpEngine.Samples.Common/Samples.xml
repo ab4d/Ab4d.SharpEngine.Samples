@@ -98,7 +98,7 @@
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>
-  <Sample Location="Lights.PCSShadowsSample" Title="Shadows"/>
+  <Sample Location="Lights.PCSShadowsSample" Title="Shadows" IsNew="True"/>
 
   <Sample Location="Titles.GraphsTitle.md" IsTitle="True" Title="Graphs"/>
   <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo"/>
