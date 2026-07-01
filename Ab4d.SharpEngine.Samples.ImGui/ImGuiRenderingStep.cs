@@ -93,7 +93,7 @@ public class ImGuiRenderingStep : RenderingStep
             return true; // Skip filling command buffer again as it is still valid; return true to continue rendering
         }
 
-        var commandBuffer = renderingContext.CurrentCommandBuffer;
+        var commandBuffer = renderingContext.CurrentPrimaryCommandBuffer;
         var vk = renderingContext.GpuDevice.Vk;
 
         // Fetch ImGui data
