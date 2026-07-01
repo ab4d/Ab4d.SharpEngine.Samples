@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>  
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Version>4.0.9594</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
