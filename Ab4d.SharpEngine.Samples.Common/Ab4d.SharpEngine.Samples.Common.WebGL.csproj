@@ -47,6 +47,8 @@
     <Compile Remove="Lines\MiterLimitSample.cs" />
     <Compile Remove="Lines\SpecialLineRenderingSample.cs" />
     
+    <Compile Remove="Lights\PCSShadowsSample.cs" />
+    
     <Compile Remove="Materials\PhysicallyBasedMaterialSample.cs" />
     
     <Compile Remove="Animations\ImportedAnimationsSample.cs" />
