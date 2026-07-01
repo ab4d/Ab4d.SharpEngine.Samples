@@ -33,6 +33,9 @@ public class SpritesSample : CommonSample
         _uvCheckerTexture = await base.GetCommonTextureAsync(scene, CommonTextures.UVChecker);
         _treeTexture      = await base.GetCommonTextureAsync(scene, CommonTextures.Tree);
         
+        if (this.IsDisposed) // If the sample is unloaded before we load the textures, then we should not continue with creating the sprite batch
+            return;
+        
         // Create SpriteBatch on the Scene object (note that there we CANNOT use absolute coordinates and can use only relative coordinates, that are in range from 0 to 1)
         // It is also possible to create SpiteBatch on SceneView (see OnSceneViewInitialized below). In this case absolute coordinates can be used.
         var sceneSpriteBatch = scene.CreateOverlaySpriteBatch("SceneOverlaySpriteBatch");
