@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Ab4d.SharpEngine.Samples.Common;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using Windows.UI;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;

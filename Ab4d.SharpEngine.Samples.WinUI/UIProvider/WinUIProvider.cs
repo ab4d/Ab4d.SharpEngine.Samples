@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Windows;
 using System.Windows.Input;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common;

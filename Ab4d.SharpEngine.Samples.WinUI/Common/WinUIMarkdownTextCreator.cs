@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
-using System.Windows;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.Utilities;

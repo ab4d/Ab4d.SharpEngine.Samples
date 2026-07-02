@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
 using System.Windows.Input;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Samples.WinUI.Common;

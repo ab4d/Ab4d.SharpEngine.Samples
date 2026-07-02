@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Globalization;
-using System.Windows;
 using Windows.Foundation;
 using Windows.UI;
 

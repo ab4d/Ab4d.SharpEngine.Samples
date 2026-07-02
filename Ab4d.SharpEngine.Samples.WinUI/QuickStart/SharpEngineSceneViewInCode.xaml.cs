@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Security.Policy;
-using System.Windows;
 using Ab4d.SharpEngine;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;

@@ -1,6 +1,5 @@
 ﻿using Ab4d.SharpEngine.Samples.Common;
 using System;
-using System.Windows;
 using Windows.UI;
 using Windows.UI.Text;
 using Microsoft.UI.Text;
