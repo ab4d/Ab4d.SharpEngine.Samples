@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
@@ -75,7 +75,7 @@
 	    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0" />
 	</ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-	    <PackageReference Include="Ab4d.SharpEngine" Version="4.1.9678" />
+	    <PackageReference Include="Ab4d.SharpEngine" Version="4.1.9680" />
 	</ItemGroup>
 	<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
 	    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
