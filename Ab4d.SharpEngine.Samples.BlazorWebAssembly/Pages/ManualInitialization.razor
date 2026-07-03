@@ -37,7 +37,7 @@
         // Initialize the browser interop (load sharp-engine.js file and from javascript get access to exported methods in the CanvasInterop class)
         // Because Blazor uses Single Page Applications style, this needs to be executed only once
         await CanvasInterop.InitializeInterop();
-        
+
         // Set the JSRuntime in CanvasInterop so it can be used to call JavaScript methods from CanvasInterop class
         // Note that JS is available only from a Blazor assembly and not from a pure .Net assembly.
         CanvasInterop.JS = JS;
@@ -124,9 +124,11 @@
         };
 
 
+        var sharpEnginVersion = typeof(SceneView).Assembly.GetName().Version!;
+
         // In this sample we also display the device info:
         //_deviceInfo = $"Device name: {gpuDevice.DeviceName}\nOpenGL version: {gpuDevice.OpenGLVersion}\nGLSL version: {gpuDevice.OpenGLShadingLanguageVersion}";
-        _deviceInfo = $"Device name: {gpuDevice.DeviceName}\nOpenGL version: {gpuDevice.OpenGLVersion}";
+        _deviceInfo = $"Ab4d.SharpEngine version: {sharpEnginVersion.Major}.{sharpEnginVersion.Minor}.{sharpEnginVersion.Build}\nDevice name: {gpuDevice.DeviceName}\nOpenGL version: {gpuDevice.OpenGLVersion}";
 
         StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
     }
