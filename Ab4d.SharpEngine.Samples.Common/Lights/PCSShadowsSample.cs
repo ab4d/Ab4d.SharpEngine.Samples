@@ -457,14 +457,14 @@ Bias is used to reduce shadow artifacts, such as shadow acne, caused by precisio
         
         ui.AddSeparator();
         
-        _spotlightXPositionSlider = ui.CreateSlider(-200, 200, () => _lightHorizontalAngle, newValue =>
+        _spotlightXPositionSlider = ui.CreateSlider(-500, 500, () => _spotLightXPosition, newValue =>
             {
                 _spotLightXPosition = newValue;
                 UpdateLights();
             }, width: 150,
             keyText: "SpotLight position:", keyTextWidth: 120).SetIsVisible(false);
         
-        _spotlightYPositionSlider = ui.CreateSlider(0, 300, () => _lightVerticalAngle, newValue =>
+        _spotlightYPositionSlider = ui.CreateSlider(0, 300, () => _spotLightYPosition, newValue =>
             {
                 _spotLightYPosition = newValue;
                 UpdateLights();
