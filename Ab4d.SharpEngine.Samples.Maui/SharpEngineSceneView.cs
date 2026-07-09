@@ -581,7 +581,7 @@ public class SharpEngineSceneView : SKCanvasView, IDisposable
                                                 releaseProc:(address, context) =>
                                                 {
                                                     // When the SKBitmap is disposed, we can also release the GCHandle and byte array
-                                                    if (ReferenceEquals(gcHandle, _renderedSceneBitmapGCHandle))
+                                                    if (gcHandle == _renderedSceneBitmapGCHandle)
                                                     {
                                                         _renderedSceneBitmapGCHandle = new GCHandle(); // set to null
                                                         _renderedSceneBitmapBytes = null; // also release the byte array
