@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<AssemblyName>Ab4d.SharpEngine.Samples.Maui</AssemblyName>
 		<RootNamespace>Ab4d.SharpEngine.Samples.Maui</RootNamespace>			
 
-        <TargetFrameworks>net10.0-android</TargetFrameworks>
+    <TargetFrameworks>net10.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 
@@ -21,7 +21,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!--<AllowUnsafeBlocks>true</AllowUnsafeBlocks>--> <!-- Uncomment to allow using NativeMemory in SharpEngineSceneView -->
 
     <!-- Enable XAML source generation for faster build times and improved performance.
 		     This generates C# code from XAML at compile time instead of runtime inflation.
