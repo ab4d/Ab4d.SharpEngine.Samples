@@ -1,4 +1,12 @@
-using System.Numerics;
+// By default, this SharpEngineSceneView class is using pinned byte array to store the bitmap data for the SKBitmap.
+// This does not require unsafe code to be enabled in the csproj.
+//
+// Another option is to use unmanaged memory for the SKBitmap (uncomment the "#define USE_NATIVE_MEMORY" below).
+// This requires unsafe code to be enabled in the csproj.
+// To enable this, uncomment the "<AllowUnsafeBlocks>true</AllowUnsafeBlocks>" in csproj.
+//#define USE_NATIVE_MEMORY
+
+using System.Runtime.InteropServices;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Utilities;
@@ -8,6 +16,7 @@ using Windows.Foundation;
 using Uno.WinUI.Graphics2DSK;
 using DisplayInformation = Windows.Graphics.Display.DisplayInformation;
 using Ab4d.Vulkan;
+using Uno.Disposables;
 
 namespace Ab4d.SharpEngine.Samples.UnoPlatform;
 
@@ -16,6 +25,16 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
     private static readonly string LogArea = typeof(SharpEngineSceneView).FullName!;
 
     private SKBitmap? _renderedSceneBitmap;
+    
+#if USE_NATIVE_MEMORY    
+    private nint _renderedSceneBytesPtr;
+    private int _renderedSceneBytesLength;
+    private readonly List<nint> _allocatedSceneBytes = new ();
+#else    
+    private byte[]? _renderedSceneBitmapBytes;
+    private GCHandle _renderedSceneBitmapGCHandle;
+#endif    
+    
     private bool _isRenderedSceneBitmapDirty;
     private bool _isGpuDeviceCreatedHere;
     private bool _isFailedToCreateGpuDevice;
@@ -240,8 +259,15 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         
         RegisterPropertyChangedCallback(VisibilityProperty, OnVisibilityChanged);
     }
-
-
+    
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (GpuDevice == null)
+            InitializeInt(throwException: false); // Do not throw exception from Loaded event handler in case the VulkanDevice cannot be created
+             
+        Refresh();
+    }
+    
     private void OnVisibilityChanged(DependencyObject sender, DependencyProperty dp)
     {
         if (!IsVisible && StopRenderingWhenHidden)
@@ -262,6 +288,7 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         {
             if (!(forceRender | forceUpdate))
                 return;
+            
             Log.Warn?.Write(LogArea, "Cannot render the scene because GpuDevice is null");
             return;
         }
@@ -270,6 +297,7 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         {
             if (!(forceRender | forceUpdate))
                 return;
+            
             Log.Warn?.Write(LogArea, "Cannot render because SceneView is not initialized");
             return;
         }
@@ -319,45 +347,6 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
         PresentationTypeChanged?.Invoke(this, reason);
     }
 
-    void IDisposable.Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (IsDisposed || IsDisposing)
-            return;
-
-        IsDisposing = true;
-        OnDisposing(disposing);
-
-        if (disposing)
-        {
-            if (_renderedSceneBitmap != null)
-            {
-                _renderedSceneBitmap.Dispose();
-                _renderedSceneBitmap = null;
-            }
-
-            SceneView.Dispose();
-            Scene.Dispose();
-
-            if (GpuDevice != null)
-            {
-                if (_isGpuDeviceCreatedHere && !GpuDevice.IsDisposed)
-                    GpuDevice.Dispose();
-                    
-                GpuDevice = null;
-            }
-        }
-
-        IsDisposed = true;
-        IsDisposing = false;
-        OnDisposed(disposing);
-    }
-
     protected virtual void OnDisposing(bool disposing)
     {
         Disposing?.Invoke(this, disposing);
@@ -366,14 +355,6 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
     protected virtual void OnDisposed(bool disposing)
     {
         Disposed?.Invoke(this, disposing);
-    }
-    
-    private void OnLoaded(object sender, RoutedEventArgs e)
-    {
-        if (GpuDevice == null)
-            InitializeInt(throwException: false); // Do not throw exception from Loaded event handler in case the VulkanDevice cannot be created
-             
-        Refresh();
     }
 
     public void Refresh()
@@ -688,10 +669,11 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
 
         if (_isRenderedSceneBitmapDirty ||
             _renderedSceneBitmap == null ||
-            _renderedSceneBitmap.Width != SceneView.Width || 
-            _renderedSceneBitmap.Height != SceneView.Height)
+            _renderedSceneBitmap.Width != pixelWidth || 
+            _renderedSceneBitmap.Height != pixelHeight)
         {
             PaintSkCanvas();
+            //_renderedSceneBitmap = CreateTestSkBitmap(pixelWidth, pixelHeight);
         }
 
         if (_renderedSceneBitmap != null)
@@ -704,33 +686,172 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
             return;
 
         // Use RenderToGpuBuffer to render the 3D scene to a staging GpuBuffer.
-        // We can then map the staging buffer and get its address that can be used to copy 
-        // the bitmap to some other source, in our case to the _renderedSceneBitmap.
         SceneView.RenderToGpuBuffer(
             preserveGpuImage: true,
             stagingGpuImageReady: (GpuBuffer stagingGpuBuffer, int width, int height) =>
             {
-                if (_renderedSceneBitmap == null || _renderedSceneBitmap.Width != width || _renderedSceneBitmap.Height != height)
-                {
-                    if (_renderedSceneBitmap != null)
-                        _renderedSceneBitmap.Dispose();
-
-                    _renderedSceneBitmap = new SKBitmap();
-                }
-
-                var mappedMemoryPtr = stagingGpuBuffer.GetMappedMemoryPtr();
-
-                // Copy the rendered bitmap to _renderedSceneBitmap
-                var skImageInfo = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
-                _renderedSceneBitmap.InstallPixels(skImageInfo, mappedMemoryPtr);
-
-                stagingGpuBuffer.UnmapMemory();
-            });
+                CopyStagingBufferToSKBitmap(width, height, stagingGpuBuffer);
+            });            
 
         // Mark that the _renderedSceneBitmap has been updated
         _isRenderedSceneBitmapDirty = false;
     }
     
+#if USE_NATIVE_MEMORY    
+    private unsafe void CopyStagingBufferToSKBitmap(int width, int height, GpuBuffer stagingGpuBuffer)
+    {
+        if (_renderedSceneBitmap == null || _renderedSceneBitmap.Width != width || _renderedSceneBitmap.Height != height)
+        {
+            if (_renderedSceneBitmap != null)
+                _renderedSceneBitmap.Dispose();
+
+            _renderedSceneBitmap = new SKBitmap();
+        }        
+               
+        var skImageInfo = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        var bytesSize = skImageInfo.BytesSize;
+
+
+        bool isNewAlloc;
+
+        if (bytesSize != _renderedSceneBytesLength)
+        {
+            // We need to provide memory that will store the data for the SKBitmap.
+            // To prevent moving the data around with GC, we need to create unmanaged memory for that.
+            //
+            // Note that using NativeMemory.AlignedAlloc (actually NativeMemory.AlignedFree) requires unsafe block.
+            // If you must not use that, then use Marshal.AllocHGlobal() and Marshal.FreeHGlobal(), but note that 
+            // for cross-platform apps it is recommended (and much faster) to use NativeMemory.AlignedAlloc.
+            _renderedSceneBytesPtr = (nint)NativeMemory.AlignedAlloc((nuint)bytesSize, alignment: 64); // 64-byte alignment for SIMD
+            _renderedSceneBytesLength = bytesSize;
+
+            isNewAlloc = true;
+
+            lock (this)
+                _allocatedSceneBytes.Add(_renderedSceneBytesPtr);
+        }
+        else
+        {
+            // Size the same => just 
+            isNewAlloc = false;
+        }
+
+
+        // Copy from stagingGpuBuffer to _renderedSceneBytesPtr:
+
+        var mappedMemoryPtr = stagingGpuBuffer.GetMappedMemoryPtr();
+
+        NativeMemory.Copy((void*)mappedMemoryPtr, (void*)_renderedSceneBytesPtr, (nuint)bytesSize);
+                
+        // Copy without using unsafe block:
+        //var sourceSpan = new ReadOnlySpan<byte>(mappedMemoryPtr.ToPointer(), bytesSize);
+        //var destSpan = new Span<byte>(_renderedSceneBytesPtr.ToPointer(), bytesSize);
+        //sourceSpan.CopyTo(destSpan);
+
+        stagingGpuBuffer.UnmapMemory();
+
+
+        if (isNewAlloc)
+        {
+            // Set the SKBitmap size and back buffer that points to _renderedSceneBytesPtr
+            // IMPORTANT: This method does not copy the data from _renderedSceneBytesPtr to some internal storage
+            //            so we need to maintain the memory until this SKBitmap is released - in this case the ReleaseSKBitmapMemory is called.
+            _renderedSceneBitmap.InstallPixels(skImageInfo, _renderedSceneBytesPtr, rowBytes: width * 4, releaseProc: ReleaseSKBitmapMemory);
+        }
+        else
+        {
+            // Just notify the SKBitmap that the content of the _renderedSceneBytesPtr has changed
+            _renderedSceneBitmap.NotifyPixelsChanged();
+        }
+    }
+    
+    private unsafe void ReleaseSKBitmapMemory(nint address, object context)
+    {
+        lock (this)
+        {
+            var isRemoved = _allocatedSceneBytes.Remove(address);
+            if (isRemoved) // if removed, then we have not yet released this memory
+                NativeMemory.AlignedFree(address.ToPointer());
+        }
+    }    
+#else
+    private void CopyStagingBufferToSKBitmap(int width, int height, GpuBuffer stagingGpuBuffer)
+    {
+        bool isNewBitmap = _renderedSceneBitmap == null || _renderedSceneBitmap.Width != width || _renderedSceneBitmap.Height != height;
+
+        if (isNewBitmap)
+        {
+            _renderedSceneBitmap = new SKBitmap();
+            _renderedSceneBitmapBytes = new byte[width * height * 4];
+
+            isNewBitmap = true;
+        }
+
+        // Copy from a staging GpuBuffer to _renderedSceneBitmapBytes
+        var bytesSpan = new Span<byte>(_renderedSceneBitmapBytes);
+        stagingGpuBuffer.ReadFromBuffer(bytesSpan);
+
+        if (isNewBitmap)
+        {
+            // If we created a new SKBitmap than set the address of the _renderedSceneBitmapBytes to be used a backbuffer for the SKBitmap
+            var gcHandle = GCHandle.Alloc(_renderedSceneBitmapBytes, GCHandleType.Pinned);
+            _renderedSceneBitmapGCHandle = gcHandle;
+            
+            var skImageInfo = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
+            
+            // InstallPixels does not copy the bitmap data but use the specified pointer as the back buffer for the SKBitmap
+            _renderedSceneBitmap!.InstallPixels(skImageInfo, 
+                                                gcHandle.AddrOfPinnedObject(),
+                                                rowBytes: width * 4, 
+                                                releaseProc:(address, context) =>
+                                                {
+                                                    // When the SKBitmap is disposed, we can also release the GCHandle and byte array
+                                                    if (gcHandle == _renderedSceneBitmapGCHandle)
+                                                    {
+                                                        _renderedSceneBitmapGCHandle = new GCHandle(); // set to null
+                                                        _renderedSceneBitmapBytes = null; // also release the byte array
+                                                    }
+                                                    
+                                                    gcHandle.Free();
+                                                });
+        }
+        else
+        {
+            // If we only updated the 3D scene without creating a new SKBitmap (size is the same), 
+            // then just notify SKBitmap that the pixels data have changed.
+            _renderedSceneBitmap!.NotifyPixelsChanged();
+        }        
+    }
+#endif    
+
+    // test code:
+    // private SKBitmap CreateTestSkBitmap(int pixelWidth, int pixelHeight)
+    // {
+    //     var imageBytes = new byte[pixelWidth * pixelHeight * 4];
+    //     int pos = 0;
+    //     for (int y = 0; y < pixelHeight; y++)
+    //     {
+    //         for (int x = 0; x < pixelWidth; x++)
+    //         {
+    //             imageBytes[pos]     = 0;
+    //             imageBytes[pos + 1] = (byte)(255 * y / pixelHeight);
+    //             imageBytes[pos + 2] = (byte)(255 * x / pixelWidth);
+    //             imageBytes[pos + 3] = 255;
+    //
+    //             pos += 4;
+    //         }
+    //     }
+    //     
+    //     var renderedSceneBitmap = new SKBitmap();
+    //     var skImageInfo = new SKImageInfo(pixelWidth, pixelHeight, SKColorType.Bgra8888, SKAlphaType.Premul);
+    //     
+    //     var gcHandle = GCHandle.Alloc(imageBytes, GCHandleType.Pinned);
+    //     renderedSceneBitmap.InstallPixels(skImageInfo, gcHandle.AddrOfPinnedObject());
+    //     gcHandle.Free();
+    //
+    //     return renderedSceneBitmap;
+    // }
+
     /// <summary>
     /// OnSceneViewInitialized
     /// </summary>
@@ -845,4 +966,64 @@ public class SharpEngineSceneView : SKCanvasElement, ISharpEngineSceneView, ICom
 
         return isSupported && additionalInfo == null;
     }
+
+    void IDisposable.Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (IsDisposed || IsDisposing)
+            return;
+
+        IsDisposing = true;
+        OnDisposing(disposing);
+
+        if (disposing)
+        {
+            if (_renderedSceneBitmap != null)
+            {
+                _renderedSceneBitmap.Dispose();
+                _renderedSceneBitmap = null;
+            }
+
+#if USE_NATIVE_MEMORY        
+            lock (this)
+            {
+                unsafe
+                {
+                    for (var i = 0; i < _allocatedSceneBytes.Count; i++)
+                        NativeMemory.AlignedFree(_allocatedSceneBytes[i].ToPointer());
+
+                    _allocatedSceneBytes.Clear();
+                }
+            }
+#else            
+            if (_renderedSceneBitmapGCHandle.IsAllocated)
+            {
+                _renderedSceneBitmapGCHandle.Free();
+                _renderedSceneBitmapGCHandle = new GCHandle(); // set to null
+            }
+
+            _renderedSceneBitmapBytes = null; // also release the byte array
+#endif
+            
+            SceneView.Dispose();
+            Scene.Dispose();
+
+            if (GpuDevice != null)
+            {
+                if (_isGpuDeviceCreatedHere && !GpuDevice.IsDisposed)
+                    GpuDevice.Dispose();
+                    
+                GpuDevice = null;
+            }
+        }
+
+        IsDisposed = true;
+        IsDisposing = false;
+        OnDisposed(disposing);
+    }    
 }
