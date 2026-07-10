@@ -378,19 +378,26 @@ The search radius that is used by the samples is defined by the BlockerSearchRad
 
 
         ui.AddSeparator();
+
+        // Create a list of possible shadow map sizes. The minimum is 128. The maximum size is defined by the GPU device.
+        // Here we limit the maximum size to 16384, because using larger map sizes is very slow and can cause out of memory errors on some GPUs (even 16384 x 16384 texture may not have enough memory - it requires 1 GB).
+        var maxImageDimension = Math.Min(Scene?.GpuDevice?.PhysicalDeviceDetails.MaxImageDimension ?? 16384, 16384);
+        var shadowMapSizes = new List<int>();
+        for (int shadowMapSize = 128; shadowMapSize <= maxImageDimension; shadowMapSize *= 2)
+            shadowMapSizes.Add(shadowMapSize);
         
-        var shadowMapSizes = new int[] { 512, 1024, 2048, 4096 };
         ui.CreateComboBox(shadowMapSizes.Select(f => f.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
             {
                 _shadowMapSize = shadowMapSizes[selectedIndex];
                 UpdateShadowSettings();
-            }, selectedItemIndex: Array.IndexOf(shadowMapSizes, _shadowMapSize), 
+            }, selectedItemIndex: shadowMapSizes.IndexOf(_shadowMapSize), 
             width: 80, 
             keyText: 
 @"ShadowMapSize: (?):ShadowMapSize sets the size of a shadow depth map texture. 
 For example, 1024 means that a 1024 x 1024 texture is used. 
-Bigger texture will produce more detailed shadows but will be slower to render.", 
+Bigger texture will produce more detailed shadows but will be slower to render.
+The minimum is 128. The maximum size is defined by the GPU device.", 
             keyTextWidth: 160);
         
         var shadowBiases = new float[] { 0f, 0.0001f, 0.001f, 0.005f, 0.01f, 0.02f, 0.05f, 0.1f, 0.5f, 1f, 2f, 5f, 10f };
