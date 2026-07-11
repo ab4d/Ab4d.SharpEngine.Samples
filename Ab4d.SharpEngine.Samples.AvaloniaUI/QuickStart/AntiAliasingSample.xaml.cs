@@ -12,6 +12,7 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
@@ -28,7 +29,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
     /// <summary>
     /// Interaction logic for AntiAliasingSample.xaml
     /// </summary>
-    public partial class AntiAliasingSample : UserControl
+    public partial class AntiAliasingSample : UserControl, IDisposableSampleControl
     {
         private GroupNode? _groupNode;
         
@@ -37,6 +38,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
         private float _lineThickness = 1;
 
+        private Task? _disposeTask;
+        
         private readonly int[] _possibleMultiSamplingValues = new int[] { 1, 2, 4, 8 };
         private readonly float[] _possibleSuperSamplingValues = new float[] { 1, 2, 3, 4, 9, 16 };
 
@@ -61,17 +64,38 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
                 AddSharpEngineSceneView(gpuDevice: sharpEngineSceneView.GpuDevice, columnIndex: 1, rowIndex: 2, multiSampleCount: 4, supersamplingCount: 4);
             }
             
-            this.Unloaded += (sender, args) =>
-            {
-                // Dispose in reverse order so the GpuDevice gets disposed last (in the fist created SharpEngineSceneViews)
-                for (var i = _sharpEngineSceneViews.Count - 1; i >= 0; i--)
-                {
-                    var oneSharpEngineSceneView = _sharpEngineSceneViews[i];
-                    RootGrid.Children.Remove(oneSharpEngineSceneView);
-                    oneSharpEngineSceneView.Dispose();
-                }
-            };
+            this.Unloaded += (sender, args) => _ = DisposeSampleAsync();
         }
+
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= DisposeAllSceneViewsAsync();
+        }
+
+        private async Task DisposeAllSceneViewsAsync()
+        {
+            // Dispose in reverse order so the GpuDevice gets disposed last (it is owned by the first created
+            // SharpEngineSceneView; the other views only reference it).
+            // Awaiting each DisposeAsync ensures the VulkanDevice is fully destroyed before this Task completes,
+            // so SamplesWindow can wait for it before creating the next sample's VulkanDevice.
+            for (var i = _sharpEngineSceneViews.Count - 1; i >= 0; i--)
+            {
+                var oneSharpEngineSceneView = _sharpEngineSceneViews[i];
+                RootGrid.Children.Remove(oneSharpEngineSceneView);
+
+                try
+                {
+                    await oneSharpEngineSceneView.DisposeAsync();
+                }
+                catch
+                {
+                    // pass
+                }
+            }
+        }      
 
         private SharpEngineSceneView AddSharpEngineSceneView(VulkanDevice? gpuDevice, int columnIndex, int rowIndex, int multiSampleCount, float supersamplingCount)
         {

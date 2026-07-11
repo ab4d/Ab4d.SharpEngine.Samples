@@ -11,6 +11,7 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using System.IO;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Utilities;
@@ -25,15 +26,17 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
     /// <summary>
     /// Interaction logic for SharpEngineSceneViewInXaml.xaml
     /// </summary>
-    public partial class SharpEngineSceneViewInXaml : UserControl
+    public partial class SharpEngineSceneViewInXaml : UserControl, IDisposableSampleControl
     {
         private GroupNode? _groupNode;
-        
+
         private PointerCameraController? _pointerCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
         private int _newObjectsCounter;
+
+        private Task? _disposeTask;
 
 
         public SharpEngineSceneViewInXaml()
@@ -104,7 +107,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             CreateTestScene();
             SetupPointerCameraController();
             
-            this.Unloaded += (sender, args) => MainSceneView.Dispose();
+            this.Unloaded += (sender, args) => _ = DisposeSampleAsync();
+        }
+
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= MainSceneView.DisposeAsync().AsTask();
         }
 
         private void SetupPointerCameraController()

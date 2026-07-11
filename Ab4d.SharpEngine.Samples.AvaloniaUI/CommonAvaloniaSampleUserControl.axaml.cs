@@ -1,12 +1,14 @@
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Ab4d.SharpEngine.Samples.Common;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System;
 using Avalonia.Layout;
 using Avalonia.Media;
+using System;
+using System.Threading.Tasks;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
@@ -18,6 +20,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private InputEventsManager _inputEventsManager;
 
         private AvaloniaUIProvider _avaloniaUiProvider;
+        
+        private Task? _disposeTask;
 
         public CommonSample? CurrentCommonSample
         {
@@ -38,7 +42,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             _avaloniaUiProvider = new AvaloniaUIProvider(RootGrid, pointerEventsSource: RootBorder);
 
             this.Loaded += OnLoaded;
-            this.Unloaded += OnUnloaded;
+            //this.Unloaded += (sender, args) => _ = DisposeSampleAsync();  // Do not dispose SharpEngineSceneView when unloaded because the SharpEngineSceneView can be reused when another common sample is opened.
 
 
             // When custom MultiSampleCount or SuperSamplingCount is set, use that values.
@@ -155,11 +159,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);
             }
-        }
-
-        private void OnUnloaded(object? sender, RoutedEventArgs e)
-        {
-
         }
 
         private void ShowDeviceCreateFailedError(Exception ex)

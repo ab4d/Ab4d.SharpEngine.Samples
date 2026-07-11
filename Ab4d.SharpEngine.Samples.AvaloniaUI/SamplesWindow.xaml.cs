@@ -67,6 +67,10 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
         private bool _isSceneViewInitializedSubscribed;
         private bool _isPresentationTypeChangedSubscribed;
         private bool _isSceneViewSizeChangedSubscribed;
+        
+        // Serializes sample switches so a new switch never starts before the previous one
+        // (including the full disposal of the previous sample's VulkanDevice) has completed.
+        private Task _sampleSwitchTask = Task.CompletedTask;
 
         private ISharpEngineSceneView? _currentSharpEngineSceneView;
 
@@ -291,22 +295,47 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         private void SamplesList_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            ShowSelectedSample(e);
-        }
-
-        private void ShowSelectedSample(SelectionChangedEventArgs args)
-        {
-            if (args.AddedItems == null || args.AddedItems.Count == 0 || args.AddedItems[0] is not ListBoxItem listBoxItem)
+            // e is only valid synchronously, so read the selected item now and chain the (async) switch.
+            if (e.AddedItems == null || e.AddedItems.Count == 0 || e.AddedItems[0] is not ListBoxItem listBoxItem)
                 return;
 
             var sampleLocation = listBoxItem.Tag as string;
-            
+
+            // Chain onto the previous switch so switches are executed one after another on the UI thread.
+            var previousSwitchTask = _sampleSwitchTask;
+            _sampleSwitchTask = SwitchSampleAsync(previousSwitchTask, sampleLocation);
+        }
+
+        private async Task SwitchSampleAsync(Task previousSwitchTask, string? sampleLocation)
+        {
+            // Wait until the previous switch has completed (this includes disposing the previous sample's VulkanDevice).
+            try
+            {
+                await previousSwitchTask;
+            }
+            catch
+            {
+                // Errors of the previous switch were already handled in that switch; ignore them here.
+            }
+
+            await ShowSelectedSampleAsync(sampleLocation);
+        }
+
+        private async Task ShowSelectedSampleAsync(string? sampleLocation)
+        {
             _currentSampleLocation = sampleLocation;
 
-            if (sampleLocation == null) 
+            if (sampleLocation == null)
                 return;
 
-
+            // Dispose the previously shown sample FIRST and WAIT until it is fully disposed (including its
+            // VulkanDevice) before creating the next sample.
+            //
+            // Creating a new VulkanDevice while another one is still being disposed can fail on some drivers
+            // (for example, NVIDIA returns VK_ERROR_TOO_MANY_OBJECTS from vkGetMemoryFd) because of overlapping
+            // device lifetimes. Awaiting here (instead of blocking) keeps the UI thread free so the previous
+            // sample's asynchronous disposal (which also needs the UI thread / Avalonia compositor) can finish.
+            var previousSampleControl = _currentSampleControl;
             _currentSampleControl = null;
 
             if (_currentCommonSample != null)
@@ -314,6 +343,26 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 _currentCommonSample.Dispose();
                 _currentCommonSample = null;
             }
+            
+            if (previousSampleControl is IDisposableSampleControl disposablePreviousSample)
+            {
+                // Detach the old sample so it stops rendering, then await its full disposal.
+                if (ReferenceEquals(SelectedSampleContentControl.Content, previousSampleControl))
+                    SelectedSampleContentControl.Content = null;
+
+                try
+                {
+                    await disposablePreviousSample.DisposeSampleAsync();
+                }
+                catch (Exception ex)
+                {
+                    Utilities.Log.Warn?.Write("SamplesWindow", "Error disposing the previous sample: " + ex.Message);
+                }
+            }
+
+            // Now build the new sample control (its VulkanDevice, if any, is created only when it is attached below).
+            Control? newSampleControl = null;
+            CommonSample? newCommonSample = null;
 
             if (sampleLocation.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
             {
@@ -324,12 +373,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                     _commonTitlePage ??= new CommonTitleUserControl();
                     _commonTitlePage.MarkdownText = markdownText;
 
-                    _currentSampleControl = _commonTitlePage;
-                    _currentCommonSample = null;
+                    newSampleControl = _commonTitlePage;
                 }
             }
 
-            if (_currentSampleControl == null)
+            if (newSampleControl == null)
             {
                 var createdSample = CommonSample.CreateSampleObject(uiFramework: "Avalonia", sampleLocation, AvaloniaSamplesContext.Current, errorMessage => ShowError(errorMessage));
 
@@ -339,39 +387,32 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
                     _commonAvaloniaSampleUserControl.CurrentCommonSample = createdCommonSample;
 
-                    _currentSampleControl = _commonAvaloniaSampleUserControl;
-
-                    _currentCommonSample = createdCommonSample;
+                    newSampleControl = _commonAvaloniaSampleUserControl;
+                    newCommonSample = createdCommonSample;
                 }
                 else if (createdSample is Control createdControl)
                 {
-                    _currentSampleControl = createdControl;
-                    _currentCommonSample = null;
-                }
-                else
-                {
-                    _currentSampleControl = null;
-                    _currentCommonSample = null;
+                    newSampleControl = createdControl;
                 }
             }
 
-            if (_currentSampleControl == null)
+            if (newSampleControl == null)
             {
                 ShowError("Sample not found: " + Environment.NewLine + sampleLocation);
                 return;
             }
 
-            // Set AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
-            if (_currentSampleControl != null)
-            {
-                SharpEngineSceneView? sharpEngineSceneView;
-                if (ReferenceEquals(_currentSampleControl, _commonAvaloniaSampleUserControl))
-                    sharpEngineSceneView = _commonAvaloniaSampleUserControl.MainSceneView;
-                else
-                    sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+            _currentSampleControl = newSampleControl;
+            _currentCommonSample = newCommonSample;
 
-                AvaloniaSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
-            }
+            // Set AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView before the new sample is loaded
+            SharpEngineSceneView? sharpEngineSceneView;
+            if (ReferenceEquals(_currentSampleControl, _commonAvaloniaSampleUserControl))
+                sharpEngineSceneView = _commonAvaloniaSampleUserControl!.MainSceneView;
+            else
+                sharpEngineSceneView = FindSharpEngineSceneView(_currentSampleControl);
+
+            AvaloniaSamplesContext.Current.RegisterCurrentSharpEngineSceneView(sharpEngineSceneView);
 
             SelectedSampleContentControl.Content = _currentSampleControl;
         }

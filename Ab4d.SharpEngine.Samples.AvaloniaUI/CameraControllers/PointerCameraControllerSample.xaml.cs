@@ -1,23 +1,27 @@
 ﻿using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Utilities;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.CameraControllers
 {
     /// <summary>
     /// Interaction logic for PointerCameraControllerSample.xaml
     /// </summary>
-    public partial class PointerCameraControllerSample : UserControl
+    public partial class PointerCameraControllerSample : UserControl, IDisposableSampleControl
     {
         private PointerCameraController? _pointerCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
+        private Task? _disposeTask;
+        
         public PointerCameraControllerSample()
         {
             InitializeComponent();
@@ -68,13 +72,17 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             SetupPointerCameraController();
             CreateTestScene();
 
-            this.Unloaded += delegate (object? sender, RoutedEventArgs args)
-            {
-                MainSceneView.Dispose();
-            };
+            this.Unloaded += (sender, args) => _ = DisposeSampleAsync();
         }
 
-
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= MainSceneView.DisposeAsync().AsTask();
+        }
+        
         private void SetupPointerCameraController()
         {
             _targetPositionCamera = new TargetPositionCamera()

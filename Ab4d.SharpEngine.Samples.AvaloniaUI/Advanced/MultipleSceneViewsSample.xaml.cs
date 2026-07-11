@@ -108,8 +108,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
                 // because this will wait until Avalonia's resources are disposed (also using DisposeAsync).
                 // The engine will work correctly even if Dispose (not DisposeAsync) is called (delaying disposing the GpuDevice),
                 // but it is better to wait for Avalonia to dispose all resources before disposing the engine.
-                foreach (var sharpEngineSceneView in _sceneViews)
-                    await sharpEngineSceneView.DisposeAsync();
+                for (var i = _sceneViews.Count - 1; i >= 0; i--)
+                    await _sceneViews[i].DisposeAsync();
 
                 // Also dispose the _mainScene and _gpuDevice that were created here
                 _mainScene.Dispose();

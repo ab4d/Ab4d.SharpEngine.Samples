@@ -11,6 +11,7 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using System.IO;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.Samples.Common.Animations;
@@ -26,23 +27,25 @@ using Avalonia.Media.Imaging;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
 {
-    public partial class IntroductionPage : UserControl
+    public partial class IntroductionPage : UserControl, IDisposableSampleControl
     {
         private static readonly bool PlayAnimationOnStartup = true;       // Set to false to prevent automatically playing the animation
         private static readonly bool SkipInitializingSharpEngine = false; // When true, then no SharpEngine object will be created (only Avalonia objects will be shown)
         
         private SharpEngineLogoAnimation? _sharpEngineLogoAnimation;
 
+        private Task? _disposeTask;
+        
         public IntroductionPage()
         {
             InitializeComponent();
 
             
             // Dispose MainSceneView even when the animation is not started in if below
-            this.Unloaded += delegate (object? sender, RoutedEventArgs args)
+            this.Unloaded += (sender, args) =>
             {
                 _sharpEngineLogoAnimation?.Dispose();
-                MainSceneView.Dispose();
+                _ = DisposeSampleAsync();
             };
             
             if (SkipInitializingSharpEngine)
@@ -112,6 +115,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Titles
                 PlayAgainButton.Content = "Play animation"; // replace "Play again" because animation was not yet played
                 PlayAgainButton.IsVisible = true;
             }
+        }
+        
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= MainSceneView.DisposeAsync().AsTask();
         }
 
         private void ShowInfoTextBlock()

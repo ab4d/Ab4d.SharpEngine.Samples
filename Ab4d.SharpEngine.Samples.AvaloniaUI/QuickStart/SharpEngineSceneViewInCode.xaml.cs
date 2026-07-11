@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
@@ -21,10 +22,12 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
     /// <summary>
     /// Interaction logic for SharpEngineSceneViewInCode.xaml
     /// </summary>
-    public partial class SharpEngineSceneViewInCode : UserControl
+    public partial class SharpEngineSceneViewInCode : UserControl, IDisposableSampleControl
     {
         private readonly SharpEngineSceneView _sharpEngineSceneView;
         private PointerCameraController? _pointerCameraController;
+
+        private Task? _disposeTask;
 
         public SharpEngineSceneViewInCode()
         {
@@ -133,10 +136,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             // Add SharpEngineSceneView to the Avalonia controls tree
             SceneViewBorder.Child = _sharpEngineSceneView;
 
-            this.Unloaded += delegate (object? sender, RoutedEventArgs args)
-            {
-                _sharpEngineSceneView.Dispose();
-            };
+            this.Unloaded += (sender, args) => _ = DisposeSampleAsync();
+        }
+
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= _sharpEngineSceneView.DisposeAsync().AsTask();
         }
 
         private void SetupPointerCameraController()

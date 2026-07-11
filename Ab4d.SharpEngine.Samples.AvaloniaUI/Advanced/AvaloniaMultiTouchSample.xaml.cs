@@ -1,27 +1,30 @@
-﻿using System;
+﻿using Ab4d.SharpEngine.Cameras;
+using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.SceneNodes;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
+using System.Threading.Tasks;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
 {
     /// <summary>
     /// Interaction logic for AvaloniaMultiTouchSample.xaml
     /// </summary>
-    public partial class AvaloniaMultiTouchSample : UserControl
+    public partial class AvaloniaMultiTouchSample : UserControl, IDisposableSampleControl
     {
         private GesturesCameraController? _gesturesCameraController;
 
         private TargetPositionCamera? _targetPositionCamera;
 
+        private Task? _disposeTask;
+        
         public AvaloniaMultiTouchSample()
         {
             InitializeComponent();
@@ -29,7 +32,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             CreateTestScene();
             SetupPointerCameraController();
 
-            this.Unloaded += (sender, args) => MainSceneView.Dispose();
+            this.Unloaded += (sender, args) => _ = DisposeSampleAsync();
+        }
+        
+        /// <inheritdoc />
+        public Task DisposeSampleAsync()
+        {
+            // Cache the disposal Task so that whether this is called from Unloaded or from SamplesWindow
+            // (when switching samples), the same full-disposal Task is returned and awaited.
+            return _disposeTask ??= MainSceneView.DisposeAsync().AsTask();
         }
 
         private void SetupPointerCameraController()
