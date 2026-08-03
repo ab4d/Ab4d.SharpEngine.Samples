@@ -148,6 +148,11 @@ public class GltfImporterExporterSample : CommonSample
         // Physically Based Rendering (PBR) materials provides a much more physically accurate rendering than standard rendering
         glTfImporter.UsePbrMaterial = _usePbrMaterials;
 
+        // By default all loaded texture images are cached in GpuDevice object so next loading of the same image is instant.
+        // But this preserves the images in GPU memory after this sample is exited (cached GpuImages are disposed when the GpuDevice is disposed).
+        // Therefore we disable gpu caching so the images are disposed. 
+        glTfImporter.UseGpuDeviceCache = false; 
+
         // We could also create the glTFImporter by using a custom imageReader and by providing a VulkanDevice (this immediately creates the textures):
         //var glTfImporter = new glTFImporter(imageReader: customBitmapIO, gpuDevice: Scene.GpuDevice);
 
