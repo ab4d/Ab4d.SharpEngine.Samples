@@ -45,7 +45,7 @@
   <Sample Location="StandardModels.PositionAndScaleSample" Title="Position and scale"/>
 
   <Sample Location="Titles.AdvancedModelsTitle.md" IsTitle="True" Title="Advanced 3D models"/>
-  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing" IsUpdated="True" UpdateInfo="Added support for two-sided rendering"/>
+  <Sample Location="AdvancedModels.InstancedMeshNodeSample" Title="Mesh instancing"/>
   <Sample Location="AdvancedModels.InstancedArrowsSample" Title="Instanced arrows"/>
   <Sample Location="AdvancedModels.SimpleHeightMapSample" Title="Simple HeightMap"/>
   <Sample Location="AdvancedModels.AdvancedHeightMapSample" Title="Advanced HeightMap"/>
