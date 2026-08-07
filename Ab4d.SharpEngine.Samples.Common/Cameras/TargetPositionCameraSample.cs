@@ -17,6 +17,8 @@ public class TargetPositionCameraSample : CommonSample
 
     private TargetPositionCamera? _targetPositionCamera;
     private ICommonSampleUIElement? _distanceSlider;
+    private ICommonSampleUIElement? _fieldOfViewSlider;
+    private ICommonSampleUIElement? _isHorizontalFieldOfViewCheckBox;
     private ICommonSampleUIElement? _viewWidthSlider;
     
     private bool _isSmoothRotation = true;
@@ -70,7 +72,7 @@ public class TargetPositionCameraSample : CommonSample
         }
 
         _targetPositionCamera.TargetPosition = new Vector3(0, 0, 0);
-        _targetPositionCamera.Heading = -20;
+        _targetPositionCamera.Heading = -30;
         _targetPositionCamera.Attitude = -20;
         _targetPositionCamera.Distance = 600;
         _targetPositionCamera.ViewWidth = 600;
@@ -84,13 +86,21 @@ public class TargetPositionCameraSample : CommonSample
         if (itemIndex == 0)
         {
             _targetPositionCamera.ProjectionType = ProjectionTypes.Perspective;
+            
             _distanceSlider?.SetIsVisible(true);
+            _fieldOfViewSlider?.SetIsVisible(true);
+            _isHorizontalFieldOfViewCheckBox?.SetIsVisible(true);
+            
             _viewWidthSlider?.SetIsVisible(false);
         }
         else
         {
             _targetPositionCamera.ProjectionType = ProjectionTypes.Orthographic;
+            
             _distanceSlider?.SetIsVisible(false);
+            _fieldOfViewSlider?.SetIsVisible(false);
+            _isHorizontalFieldOfViewCheckBox?.SetIsVisible(false);  
+            
             _viewWidthSlider?.SetIsVisible(true);
         }
     }
@@ -171,28 +181,40 @@ public class TargetPositionCameraSample : CommonSample
         ui.AddSeparator();
 
 
-        ui.CreateSlider(-180, 180, () => GetCameraHeading(), newValue => _targetPositionCamera.Heading = newValue, width: 160, keyText: "Heading:", keyTextWidth: 60, formatShownValueFunc: sliderValue => sliderValue.ToString("F0") + "°");
-        ui.CreateSlider(-180, 180, () => GetCameraAttitude(), newValue => _targetPositionCamera.Attitude = newValue, width: 160, keyText: "Attitude:", keyTextWidth: 60, formatShownValueFunc: sliderValue => sliderValue.ToString("F0") + "°");
+        ui.CreateSlider(-180, 180, () => GetCameraHeading(),  newValue => _targetPositionCamera.Heading = newValue,  width: 160, keyText: "Heading:",  keyTextWidth: 60, formatShownValueFunc: sliderValue => $"{sliderValue:F0}°");
+        ui.CreateSlider(-180, 180, () => GetCameraAttitude(), newValue => _targetPositionCamera.Attitude = newValue, width: 160, keyText: "Attitude:", keyTextWidth: 60, formatShownValueFunc: sliderValue => $"{sliderValue:F0}°");
 
 
         ui.AddSeparator();
 
-        ui.CreateComboBox(new[] { "Perspective", "Orthographic" },
-                          itemChangedAction: OnProjectionTypeChanged, 
-                          selectedItemIndex: 0,
-                          width: 120,
-                          keyText: "ProjectionType:",
-                          keyTextWidth: 100);
+        ui.CreateLabel("ProjectionType:");
+        ui.CreateRadioButtons(new[] { "Perspective (?):The perspective projection is similar to the real world where the objects that are farther away from the camera appear smaller.\nPerspective projection uses Distance and FieldOfView properties to define the visible area.", 
+                                      "Orthographic (?):In orthographic projection the distance of the objects from the camera does not change the size of the objects on the screen.\nOrthographic projection is usually used for technical drawings because the objects sizes are preserved and the lines that are parallel in 3D stay parallel on the screen.\nOrthographic projection does not use Distance and FieldOfView properties but ViewWidth to define the visible area." },
+                              checkedItemChangedAction: OnProjectionTypeChanged, 
+                              selectedItemIndex: 0);
 
 
         ui.AddSeparator();
         _distanceSlider = ui.CreateSlider(10, 1000,
                                           () => _targetPositionCamera.Distance,
                                           newValue => _targetPositionCamera.Distance = newValue,
-                                          width: 120,
+                                          width: 140,
                                           keyText: "Distance:",
-                                          keyTextWidth: 100,
+                                          keyTextWidth: 80,
                                           formatShownValueFunc: sliderValue => sliderValue.ToString("F0"));
+        
+        _fieldOfViewSlider = ui.CreateSlider(10, 120,
+                                          () => _targetPositionCamera.FieldOfView,
+                                          newValue => _targetPositionCamera.FieldOfView = newValue,
+                                          width: 140,
+                                          keyText: "FieldOfView:",
+                                          keyTextWidth: 80,
+                                          formatShownValueFunc: sliderValue => $"{sliderValue:F0}°");
+
+        _isHorizontalFieldOfViewCheckBox = ui.CreateCheckBox("IsHorizontalFieldOfView", 
+                                                             isInitiallyChecked: _targetPositionCamera.IsHorizontalFieldOfView, 
+                                                             isChecked => _targetPositionCamera.IsHorizontalFieldOfView = isChecked);
+
 
         ui.AddSeparator();
         _viewWidthSlider = ui.CreateSlider(10, 1000,
@@ -212,8 +234,8 @@ public class TargetPositionCameraSample : CommonSample
         ui.CreateCheckBox("Smooth start / stop", isInitiallyChecked: true, isChecked => _isSmoothRotation = isChecked);
 
         var degreesTexts = new string[] { "-80", "-40", "0", "10", "20", "40", "60", "80", "120" };
-        ui.CreateComboBox(degreesTexts, (selectedIndex, selectedText) => _headingChangeText = selectedText, 5, width: 60, keyText: "Heading change (°/s):");
-        ui.CreateComboBox(degreesTexts, (selectedIndex, selectedText) => _attitudeChangeText = selectedText, 2, width: 60, keyText: "Attitude change (°/s):");
+        ui.CreateComboBox(degreesTexts, (selectedIndex, selectedText) => _headingChangeText = selectedText,  5, width: 60, keyText: "Heading change (°/s):",  keyTextWidth: 140);
+        ui.CreateComboBox(degreesTexts, (selectedIndex, selectedText) => _attitudeChangeText = selectedText, 2, width: 60, keyText: "Attitude change (°/s):", keyTextWidth: 140);
 
         _startStopRotationButton = ui.CreateButton("Start camera rotation", StartStopCameraRotation);
         
