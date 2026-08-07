@@ -51,6 +51,7 @@ public class WireframeRenderingSample : CommonSample
     private bool _removeDuplicateLines = true;
     
     private float _lineThickness = 1f;
+    private bool _isWorldSpaceLineThickness = false;
 
     private HashSet<ulong>? _distinctLinesHashSet;
     private GroupNode? _testSceneNode;
@@ -119,7 +120,10 @@ public class WireframeRenderingSample : CommonSample
         var sphereWireframePositions = LineUtils.GetWireframeLinePositions(_testSceneNode, _removeDuplicateLines);
 
         // After we have all the line positions, we can render the lines by using MultiLineNode
-        var wireframeLineNode = new MultiLineNode(sphereWireframePositions, isLineStrip: false, Color3.Black, _lineThickness, "WireframeLine");
+        var wireframeLineNode = new MultiLineNode(sphereWireframePositions, isLineStrip: false, Color3.Black, _lineThickness, "WireframeLine")
+        {
+            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+        };            
 
         Scene.RootNode.Add(wireframeLineNode);
     }
@@ -179,7 +183,10 @@ public class WireframeRenderingSample : CommonSample
         {
             var lineColor = coloredLinePositions.Key;
             var wireframePositions = coloredLinePositions.Value.ToArray();
-            var wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineColor, _lineThickness, "WireframeLine-" + lineColor.ToHexString());
+            var wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineColor, _lineThickness, "WireframeLine-" + lineColor.ToHexString())
+            {
+                IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+            };
 
             Scene.RootNode.Add(wireframeLineNode);
         }
@@ -211,7 +218,10 @@ public class WireframeRenderingSample : CommonSample
                         else
                             lineColor = standardMaterial.DiffuseColor;
 
-                        var lineMaterial = new LineMaterial(lineColor, _lineThickness);
+                        var lineMaterial = new LineMaterial(lineColor, _lineThickness)
+                        {
+                            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+                        };
 
                         // Create a new MeshModelNode from each ModelNode but use LineMaterial instead of StandardMaterial
                         var wireframeModelNode = new MeshModelNode(mesh, lineMaterial);
@@ -254,6 +264,8 @@ public class WireframeRenderingSample : CommonSample
             LinePattern = 0,
             LinePatternScale = 1,
             LinePatternOffset = 0,
+            
+            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
         };
 
         SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
@@ -267,7 +279,7 @@ public class WireframeRenderingSample : CommonSample
         SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = null;
     }
 #endif
-
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
@@ -316,5 +328,15 @@ public class WireframeRenderingSample : CommonSample
             _useSingleColorLines = isChecked;
             RecreateWireframe();
         });
+        
+#if VULKAN        
+        ui.CreateCheckBox("IsWorldSpaceLineThickness (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
+            isInitiallyChecked: false,
+            checkedChangedAction: isChecked =>
+            {
+                _isWorldSpaceLineThickness = isChecked;
+                RecreateWireframe();
+            });
+#endif        
     }
 }

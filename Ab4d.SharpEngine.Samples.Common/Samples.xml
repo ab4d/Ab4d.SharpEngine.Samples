@@ -83,15 +83,16 @@
   <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer" Condition="IsWpf, IsAvalonia, IsWinForms"/>
   
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
-  <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.LinesSample" Title="Line SceneNodes" IsUpdated="True" UpdateInfo="Added support for world-space line thickness"/>
   <Sample Location="Lines.LineCapsSample" Title="Lines with caps"/>
   <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
+  <Sample Location="Lines.WorldSpaceLineThicknessSample" Title="LineThickness" IsNew="True"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias"/>
-  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
-  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering" IsUpdated="True" UpdateInfo="Added support for world-space line thickness"/>
+  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid" IsUpdated="True" UpdateInfo="Added support for world-space line thickness"/>
   <Sample Location="Lines.SpecialLineRenderingSample" Title="Special line rendering"/>  
   <Sample Location="Lines.LinesPerformanceSample" Title="Lines Performance"/>
   <Sample Location="QuickStart.AntiAliasingSample" Title="Anti-aliasing (MSAA + SSAA)" Condition="IsWpf, IsAvalonia" />

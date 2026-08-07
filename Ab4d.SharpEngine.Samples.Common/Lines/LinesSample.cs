@@ -1,9 +1,10 @@
 ﻿using Ab4d.SharpEngine.Cameras;
-using System.Numerics;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lines;
 
@@ -661,10 +662,26 @@ public class LinesSample : CommonSample
             _cornerWireBoxNode.PositionType = newPositionType;
     }
 
+    private void UpateIsWorldSpaceLineThickness(bool isWorldSpaceLineThickness)
+    {
+        if (Scene == null)
+            return;
+        
+        Scene.RootNode.ForEachChild<LineBaseNode>(lineNode =>
+        {
+            if (lineNode.Material is ILineMaterial lineMaterial)
+                lineMaterial.IsWorldSpaceLineThickness = isWorldSpaceLineThickness;
+        });
+    }
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         ui.CreateComboBox(_allPositionTypesInSample.Select(p => p.ToString()).ToArray(), (selectedIndex, selectedText) => SetPositionType(selectedIndex), _currentPositionTypeIndex, 130, "PositionType:", 0);
+        
+        ui.CreateCheckBox("IsWorldSpaceLineThickness (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
+            isInitiallyChecked: false,
+            checkedChangedAction: UpateIsWorldSpaceLineThickness);
     }
 }
