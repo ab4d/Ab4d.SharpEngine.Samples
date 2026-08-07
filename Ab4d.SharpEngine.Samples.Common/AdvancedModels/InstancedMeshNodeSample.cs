@@ -473,6 +473,10 @@ public class InstancedMeshNodeSample : CommonSample
             if (_instancedMeshNode != null)
                 _instancedMeshNode.IsSolidColorMaterial = isChecked;
         });
+        ui.CreateCheckBox("IsTwoSided (?):When checked than both front and back side of the mesh will be render.\nTo test this set the mesh to 'Plane with texture' to see back side of the mesh.", false, isChecked => {
+            if (_instancedMeshNode != null)
+                _instancedMeshNode.IsTwoSided = isChecked;
+        });        
         ui.CreateCheckBox("Render only back-face materials", false, isChecked => {
             if (_instancedMeshNode != null)
                 _instancedMeshNode.IsBackFaceMaterial = isChecked;
