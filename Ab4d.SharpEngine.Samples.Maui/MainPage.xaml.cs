@@ -1,19 +1,22 @@
-﻿using System.Diagnostics;
-using Ab4d.SharpEngine.Cameras;
+﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
+using Microsoft.Maui.Graphics.Platform;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using SkiaSharp.Views.Maui;
+using static Android.Graphics.Paint;
 using Colors = Ab4d.SharpEngine.Common.Colors;
-using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
 
@@ -208,6 +211,8 @@ public partial class MainPage : ContentPage
 
         scene.RootNode.Add(wireGridNode);
 
+        
+        _sharpEngineSceneView.Scene.SetAmbientLight(0.3f);
 
         var sceneView = _sharpEngineSceneView.SceneView;
 
@@ -217,13 +222,69 @@ public partial class MainPage : ContentPage
         {
             Heading  = 30,
             Attitude = -35,
-            Distance = 300,
+            Distance = 500,
         };
 
         // Each time camera is changed, we need to render the scene again
         _targetPositionCamera.CameraChanged += (sender, args) => _sharpEngineSceneView.Refresh();
 
         sceneView.Camera = _targetPositionCamera;
+
+
+        if (_sharpEngineSceneView.Scene.GpuDevice != null)
+            LoadSampleTexture();
+        else
+            _sharpEngineSceneView.GpuDeviceCreated += (sender, args) => LoadSampleTexture();
+    }
+
+    private void LoadSampleTexture()
+    {
+        var gpuDevice = _sharpEngineSceneView.Scene.GpuDevice;
+        if (gpuDevice == null)
+            return;
+
+        // To load a bitmap you can use SkiaSharpBitmapIO or PngBitmapIO.
+        // The SkiaSharpBitmapIO can load more bitmap formats, but it requires SkiaSharp library (alreay used by MAUI).
+        // The PngBitmapIO can load only PNG files, but it does not require any additional libraries because it is part of Ab4d.SharpEngine library.
+        
+        var bitmapIO = new SkiaSharpBitmapIO();
+        //var bitmapIO = new PngBitmapIO();
+        
+        // To load a bitmap its file must be placed in the Resources/Raw folder and its Build Action must be set to MauiAsset.
+        // The the file's stream can be loaded by FileSystem.OpenAppPackageFileAsync:
+        using Stream stream = FileSystem.OpenAppPackageFileAsync("dotnet_bot.png").Result;
+
+        // After you have the stream that you can create the RawImageData class:
+        var rawImageData = bitmapIO.LoadBitmap(stream, "png");
+
+        // Then create a GpuImage from the RawImageData. 
+        var texture = new GpuImage(gpuDevice, rawImageData);
+        
+        //var textureMaterial = new StandardMaterial("dotnet_bot.png", bitmapIO) { IsTwoSided = true };
+        
+        // Now we can the StandardMaterial that will show the texture
+        var textureMaterial = new StandardMaterial(texture) { IsTwoSided = true };
+
+
+        // Alternatively, we can create the StandardMaterial with a file name and specifiy bitmapIO to load the bitmap
+        // when the GpuDevice is created (this requires that the file is deployed to the app's base folder).
+        //var textureMaterial = new StandardMaterial("dotnet_bot.png", bitmapIO) { IsTwoSided = true };
+
+        
+        var planeModel = new PlaneModelNode(centerPosition: new Vector3(0, 61.5f, -100), size: new Vector2(200, 123), normal: new Vector3(0, 0, 1), heightDirection: new Vector3(0, 1, 0), name: "DotNetBotImagePlane")
+        {
+            Material = textureMaterial,
+        };
+
+        _sharpEngineSceneView.Scene.RootNode.Add(planeModel);
+
+
+        // Add rectangle lines around the texture
+        var rectangleNode = new RectangleNode(planeModel.Position, PositionTypes.Center, planeModel.Size, 
+                                              widthDirection: new Vector3(1, 0, 0), heightDirection: new Vector3(0, 1, 0), 
+                                              lineColor: Colors.Black, lineThickness: 2);
+        
+        _sharpEngineSceneView.Scene.RootNode.Add(rectangleNode);
     }
 
     private void OnChangeCameraButtonClicked(object sender, EventArgs e)
