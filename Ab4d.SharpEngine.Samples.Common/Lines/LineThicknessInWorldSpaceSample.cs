@@ -5,18 +5,18 @@ using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Lines;
 
-public class WorldSpaceLineThicknessSample : CommonSample
+public class LineThicknessInWorldSpaceSample : CommonSample
 {
     public override string Title => "Sceen-space vs. world-space LineThickness";
     public override string Subtitle => 
-@"Sceen-space LineThickness (default) renders lines that preserve their thickness on the screen regardless where in 3D space they are.
+@"LineThickness specified in sceen-space (default) renders lines that preserve their thickness on the screen regardless where in 3D space they are.
 The actually used line thickness is LineThickness multiplied by dpi-scale.
 When you zoom in or out, the line thickness remains the same.
 
-World-space LineThickness creates line rectangles with the width set from the LineThickness. Such lines are thinner when frather away from a perspective camera.
+LineThickness specified in world-space creates line rectangles with the width set from the LineThickness. Such lines are thinner when frather away from a perspective camera.
 When you zoom in or out, the line thickness is also changed.";
     
-    public WorldSpaceLineThicknessSample(ICommonSamplesContext context)
+    public LineThicknessInWorldSpaceSample(ICommonSamplesContext context)
         : base(context)
     {
     }
@@ -33,7 +33,7 @@ When you zoom in or out, the line thickness is also changed.";
         
         var worldSpaceLineNode = new LineNode(new Vector3(0, 0, 0), new Vector3(0, 0, -1000), Ab4d.SharpEngine.Common.Colors.Red, 10, "WorldSpaceLine")
         {
-            IsWorldSpaceLineThickness = true // Set to true to use world-space line thickness
+            IsLineThicknessInWorldSpace = true // Set to true to use world-space line thickness
         };
         
         scene.RootNode.Add(worldSpaceLineNode);

@@ -51,7 +51,7 @@ public class WireframeRenderingSample : CommonSample
     private bool _removeDuplicateLines = true;
     
     private float _lineThickness = 1f;
-    private bool _isWorldSpaceLineThickness = false;
+    private bool _isLineThicknessInWorldSpace = false;
 
     private HashSet<ulong>? _distinctLinesHashSet;
     private GroupNode? _testSceneNode;
@@ -122,7 +122,7 @@ public class WireframeRenderingSample : CommonSample
         // After we have all the line positions, we can render the lines by using MultiLineNode
         var wireframeLineNode = new MultiLineNode(sphereWireframePositions, isLineStrip: false, Color3.Black, _lineThickness, "WireframeLine")
         {
-            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+            IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
         };            
 
         Scene.RootNode.Add(wireframeLineNode);
@@ -185,7 +185,7 @@ public class WireframeRenderingSample : CommonSample
             var wireframePositions = coloredLinePositions.Value.ToArray();
             var wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineColor, _lineThickness, "WireframeLine-" + lineColor.ToHexString())
             {
-                IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+                IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
             };
 
             Scene.RootNode.Add(wireframeLineNode);
@@ -220,7 +220,7 @@ public class WireframeRenderingSample : CommonSample
 
                         var lineMaterial = new LineMaterial(lineColor, _lineThickness)
                         {
-                            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+                            IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
                         };
 
                         // Create a new MeshModelNode from each ModelNode but use LineMaterial instead of StandardMaterial
@@ -265,7 +265,7 @@ public class WireframeRenderingSample : CommonSample
             LinePatternScale = 1,
             LinePatternOffset = 0,
             
-            IsWorldSpaceLineThickness = _isWorldSpaceLineThickness
+            IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
         };
 
         SceneView.DefaultRenderObjectsRenderingStep.OverrideEffectTechnique = wireframeRenderingEffectTechnique;
@@ -330,11 +330,11 @@ public class WireframeRenderingSample : CommonSample
         });
         
 #if VULKAN        
-        ui.CreateCheckBox("IsWorldSpaceLineThickness (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
+        ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: isChecked =>
             {
-                _isWorldSpaceLineThickness = isChecked;
+                _isLineThicknessInWorldSpace = isChecked;
                 RecreateWireframe();
             });
 #endif        

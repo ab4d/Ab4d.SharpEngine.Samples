@@ -212,8 +212,8 @@ public class WireGridNodeSample : CommonSample
             UpdateWireGridSetting();
         });
 
-        ui.CreateCheckBox("IsWorldSpaceLineThickness (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
+        ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
-            checkedChangedAction: (isChecked) => _wireGridNode!.IsWorldSpaceLineThickness = isChecked);
+            checkedChangedAction: (isChecked) => _wireGridNode!.IsLineThicknessInWorldSpace = isChecked);
     }
 }

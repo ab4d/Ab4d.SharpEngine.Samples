@@ -86,7 +86,7 @@
   <Sample Location="Lines.LinesSample" Title="Line SceneNodes" IsUpdated="True" UpdateInfo="Added support for world-space line thickness"/>
   <Sample Location="Lines.LineCapsSample" Title="Lines with caps"/>
   <Sample Location="Lines.MiterLimitSample" Title="MiterLimit"/>
-  <Sample Location="Lines.WorldSpaceLineThicknessSample" Title="LineThickness" IsNew="True"/>
+  <Sample Location="Lines.LineThicknessInWorldSpaceSample" Title="LineThickness" IsNew="True"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>

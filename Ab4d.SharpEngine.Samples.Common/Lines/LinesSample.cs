@@ -662,7 +662,7 @@ public class LinesSample : CommonSample
             _cornerWireBoxNode.PositionType = newPositionType;
     }
 
-    private void UpateIsWorldSpaceLineThickness(bool isWorldSpaceLineThickness)
+    private void UpateIsWorldSpaceLineThickness(bool isLineThicknessInWorldSpace)
     {
         if (Scene == null)
             return;
@@ -670,7 +670,7 @@ public class LinesSample : CommonSample
         Scene.RootNode.ForEachChild<LineBaseNode>(lineNode =>
         {
             if (lineNode.Material is ILineMaterial lineMaterial)
-                lineMaterial.IsWorldSpaceLineThickness = isWorldSpaceLineThickness;
+                lineMaterial.IsLineThicknessInWorldSpace = isLineThicknessInWorldSpace;
         });
     }
     
@@ -680,7 +680,7 @@ public class LinesSample : CommonSample
 
         ui.CreateComboBox(_allPositionTypesInSample.Select(p => p.ToString()).ToArray(), (selectedIndex, selectedText) => SetPositionType(selectedIndex), _currentPositionTypeIndex, 130, "PositionType:", 0);
         
-        ui.CreateCheckBox("IsWorldSpaceLineThickness (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
+        ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: UpateIsWorldSpaceLineThickness);
     }
