@@ -98,7 +98,11 @@ public abstract class StandardModelsSampleBase : CommonSample
             return;
 
         if (wireframeLineNode != null)
+        {
             Scene.RootNode.Remove(wireframeLineNode);
+            wireframeLineNode.Dispose();
+            wireframeLineNode = null;
+        }            
 
         if (mesh == null)
             return;
@@ -107,14 +111,10 @@ public abstract class StandardModelsSampleBase : CommonSample
         var wireframePositions = LineUtils.GetWireframeLinePositions(mesh, removedDuplicateLines: true); // remove duplicate lines at the edges of triangles
 
 
-        var lineMaterial = new LineMaterial(Color3.Black, lineThickness: 1)
-        {
-            DepthBias = 0.002f
-        };
-
-        wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineMaterial, "WireframeLines")
+        wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, Color3.Black, lineThickness: 1, "WireframeLines")
         {
             Transform = modelTransform,
+            DepthBias = 0.002f
         };
 
         Scene.RootNode.Add(wireframeLineNode);
@@ -126,7 +126,11 @@ public abstract class StandardModelsSampleBase : CommonSample
             return;
 
         if (normalsLineNode != null)
+        {
             Scene.RootNode.Remove(normalsLineNode);
+            normalsLineNode.Dispose();
+            normalsLineNode = null;
+        }
 
         if (mesh == null) 
             return;
@@ -137,14 +141,12 @@ public abstract class StandardModelsSampleBase : CommonSample
         if (normalLinePositions == null)
             return;
 
-        var lineMaterial = new LineMaterial(Colors.Orange, normalsLineThickness)
+        normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, Colors.Orange, normalsLineThickness, "NormalLines")
         {
 #if VULKAN
             EndLineCap = LineCap.ArrowAnchor
-#endif
+#endif            
         };
-
-        normalsLineNode = new MultiLineNode(normalLinePositions, isLineStrip: false, lineMaterial, "NormalLines");
 
         Scene.RootNode.Add(normalsLineNode);
     }
