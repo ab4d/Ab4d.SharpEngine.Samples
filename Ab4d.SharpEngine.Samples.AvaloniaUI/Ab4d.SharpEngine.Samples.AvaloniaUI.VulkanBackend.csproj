@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI</RootNamespace>		  
@@ -30,11 +30,11 @@
     <PackageReference Include="Ab4d.SharpEngine.AvaloniaUI" Version="4.1.9689" />
     <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.1.9689" />    
   </ItemGroup>
-  <!--<ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
+  <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.AvaloniaUI\Ab4d.SharpEngine.AvaloniaUI.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Assimp\Ab4d.SharpEngine.Assimp.csproj" />
-  </ItemGroup>-->
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Ab4d.Assimp" Version="1.3.9624" />
