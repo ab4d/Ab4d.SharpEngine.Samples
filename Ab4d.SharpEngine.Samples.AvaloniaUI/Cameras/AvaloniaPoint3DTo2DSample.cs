@@ -7,6 +7,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Ab4d.SharpEngine.Samples.AvaloniaUI.UIProvider;
 using Avalonia;
+using Avalonia.Threading;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Cameras;
 
@@ -29,7 +30,9 @@ public class AvaloniaPoint3DTo2DSample : Point3DTo2DSample
         if (_rootCanvas == null || this.IsDisposed)
             return;
 
-        PositionUIElements(screenPosition);
+        // We need to schedule the update of UI elements to prevent Avalonia's InvalidOperationException: Visual was invalidated during the render pass
+        // This may happen when the OnSphereScreenPositionChanged event handler is called after Window's size was changed.
+        Dispatcher.UIThread.InvokeAsync(() => PositionUIElements(screenPosition));
     }
 
     // This sample creates custom UI because we need a Grid with custom rows to show the InfoTextBox
