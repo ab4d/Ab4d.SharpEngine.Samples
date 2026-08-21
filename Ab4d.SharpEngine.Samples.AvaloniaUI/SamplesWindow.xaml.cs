@@ -30,6 +30,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
@@ -660,11 +661,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
                 ViewSizeInfoTextBlock.Text = "";
             }
         }
+
         private void OnSceneViewOnViewSizeChanged(object sender, ViewSizeChangedEventArgs e)
         {
             var sharpEngineSceneView = AvaloniaSamplesContext.Current.CurrentSharpEngineSceneView;
             if (sharpEngineSceneView != null)
-                UpdateViewSizeInfo(sharpEngineSceneView);
+            {
+                // We need to schedule the update of the view size to prevent Avalonia's InvalidOperationException: Visual was invalidated during the render pass
+                Dispatcher.UIThread.InvokeAsync(() => UpdateViewSizeInfo(sharpEngineSceneView));
+            }
         }
 
         private void OnPresentationTypeChanged(object? sender, string? reason)
