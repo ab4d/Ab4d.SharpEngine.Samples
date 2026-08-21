@@ -144,7 +144,11 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             _infoTexts.Add(infoTextBlock);
 
             sharpEngineSceneView.SceneView.FirstFrameRendered += (sender, args) => UpdateInfoText(sharpEngineSceneView, infoTextBlock);
-            sharpEngineSceneView.SceneView.ViewResized += (sender, args) => UpdateInfoText(sharpEngineSceneView, infoTextBlock);
+            sharpEngineSceneView.SceneView.ViewResized += (sender, args) =>
+            {
+                // We need to schedule the update of the infoTextBlock.Text to prevent Avalonia's InvalidOperationException: Visual was invalidated during the render pass
+                Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(() => UpdateInfoText(sharpEngineSceneView, infoTextBlock));
+            };
             
             var rootBorder = new Border()
             {
