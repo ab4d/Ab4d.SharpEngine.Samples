@@ -30,7 +30,6 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 {
