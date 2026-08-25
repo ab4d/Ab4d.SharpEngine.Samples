@@ -63,6 +63,27 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
     {
         if (ReferenceEquals(CurrentSharpEngineSceneView, sharpEngineSceneView))
             return;
+        
+#if VULKAN
+        // If GpuDevice is different, dispose of the current TextBlockFactory and BitmapTextCreator
+        if (CurrentSharpEngineSceneView != null && 
+            sharpEngineSceneView != null 
+            && !ReferenceEquals(CurrentSharpEngineSceneView.GpuDevice, sharpEngineSceneView.GpuDevice))
+        {
+            if (_textBlockFactory != null)
+            {
+                _textBlockFactory.Dispose();
+                _textBlockFactory = null;
+                _textBlockFactoryLoadingTask = null;
+            }
+
+            if (_bitmapTextCreator != null)
+            {
+                _bitmapTextCreator.Dispose();
+                _bitmapTextCreator = null;
+            }
+        }
+#endif
 
         CurrentSharpEngineSceneView = sharpEngineSceneView;
         OnCurrentSharpEngineSceneViewChanged();
@@ -78,12 +99,6 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
     {
         if (CurrentSharpEngineSceneView == null)
             throw new InvalidOperationException("Cannot call GetTextBlockFactory when CurrentSharpEngineSceneView is not yet set.");
-
-        if (_textBlockFactory != null && _textBlockFactory.Scene != CurrentSharpEngineSceneView.Scene)
-        {
-            _textBlockFactory.Dispose();
-            _textBlockFactory = null;
-        }
         
         if (_textBlockFactory == null)
         {
@@ -122,12 +137,6 @@ public abstract class CommonSamplesContext : ICommonSamplesContext
     {
         if (CurrentSharpEngineSceneView == null)
             throw new InvalidOperationException("Cannot call GetTextBlockFactory when CurrentSharpEngineSceneView is not yet set.");
-
-        if (_textBlockFactory != null && _textBlockFactory.Scene != CurrentSharpEngineSceneView.Scene)
-        {
-            _textBlockFactory.Dispose();
-            _textBlockFactory = null;
-        }
 
         if (_textBlockFactory == null)
         {
