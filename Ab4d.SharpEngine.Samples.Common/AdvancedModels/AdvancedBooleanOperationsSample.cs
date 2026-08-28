@@ -43,6 +43,9 @@ public class AdvancedBooleanOperationsSample : CommonSample
         _textBlockFactory.BorderThickness = 1;
         _textBlockFactory.BorderColor = Colors.DimGray;
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
         AddTextDescriptions(scene);
     }
 

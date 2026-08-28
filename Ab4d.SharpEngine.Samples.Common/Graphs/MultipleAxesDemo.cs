@@ -21,6 +21,10 @@ public class MultipleAxesDemo : CommonSample
     {
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         var defaultAxis = new AxisWithLabelsNode(bitmapTextCreator:textBlockFactory.BitmapTextCreator,
                                                  axisStartPosition: new Vector3(120, 0, 0),
                                                  axisEndPosition: new Vector3(120, 100, 0),

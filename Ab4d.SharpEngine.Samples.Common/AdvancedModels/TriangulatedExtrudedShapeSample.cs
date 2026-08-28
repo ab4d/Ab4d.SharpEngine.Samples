@@ -70,6 +70,10 @@ public class TriangulatedExtrudedShapeSample : CommonSample
 
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         scene.RootNode.Add(textBlockFactory.CreateTextBlock("2D shape",           new Vector3(-70, 110, 0),  textAttitude: 90, positionType: PositionTypes.Right));
         scene.RootNode.Add(textBlockFactory.CreateTextBlock("Triangulated shape", new Vector3(-70, 0, 0),    textAttitude: 90, positionType: PositionTypes.Right));
         scene.RootNode.Add(textBlockFactory.CreateTextBlock("Extruded shape",     new Vector3(-70, -110, 0), textAttitude: 90, positionType: PositionTypes.Right));

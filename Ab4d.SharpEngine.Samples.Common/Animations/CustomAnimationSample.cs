@@ -154,7 +154,7 @@ public class CustomAnimationSample : CommonSample
 
     private void UpdateHueTextNode(Scene? scene, float hueValue1, float hueValue2)
     {
-        if (scene == null || _textBlockFactory == null)
+        if (scene == null || _textBlockFactory == null || this.IsDisposed)
             return;
 
         if (_textNode1 != null)

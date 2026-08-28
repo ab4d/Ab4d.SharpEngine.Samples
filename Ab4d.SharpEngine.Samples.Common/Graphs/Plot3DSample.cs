@@ -65,6 +65,10 @@ public class Plot3DSample : CommonSample
 
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         StandardMaterial? gradientMaterial;
 
         if (scene.GpuDevice != null)

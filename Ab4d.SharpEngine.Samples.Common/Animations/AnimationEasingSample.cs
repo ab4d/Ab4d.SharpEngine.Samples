@@ -28,8 +28,20 @@ public class AnimationEasingSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.TargetPosition = new Vector3(0, 0, 60);
+            targetPositionCamera.Heading  = 10;
+            targetPositionCamera.Attitude = -40;
+            targetPositionCamera.Distance = 550;
+        }
+
+
         _textBlockFactory = await context.GetTextBlockFactoryAsync();
         _textBlockFactory.IsSolidColorMaterial = true;
+
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
 
         var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -5, 20), size: new Vector3(440, 10, 250), material: StandardMaterials.Silver, name: "BaseBox");
         scene.RootNode.Add(boxModelNode);
@@ -78,14 +90,6 @@ public class AnimationEasingSample : CommonSample
             animation2.Start();
             animation3.Start();
             animation4.Start();
-        }
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.TargetPosition = new Vector3(0, 0, 60);
-            targetPositionCamera.Heading  = 10;
-            targetPositionCamera.Attitude = -40;
-            targetPositionCamera.Distance = 550;
         }
     }
 

@@ -28,7 +28,18 @@ public class AxisWithLabelsSamples : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -30;
+            targetPositionCamera.Distance = 430;
+        }
+
+
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
+
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
 
         _axisNode = new AxisWithLabelsNode(bitmapTextCreator: textBlockFactory.BitmapTextCreator, 
                                            axisStartPosition: new Vector3(0, -50, 0), 
@@ -45,13 +56,6 @@ public class AxisWithLabelsSamples : CommonSample
         // Assign a Camera so the AxisWithLabelsNode is subscribed (because _axisNode.UpdateOnCameraChanges is true)
         // to camera changes and this automatically updates text directions for different camera angles.
         _axisNode.Camera = targetPositionCamera;
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 25;
-            targetPositionCamera.Attitude = -30;
-            targetPositionCamera.Distance = 430;
-        }
 
         // If _axisNode was not yet available when the OnCreateUI was first called (because GetTextBlockFactoryAsync was not yet finished),
         // then we need to create the OnCreateUI again.

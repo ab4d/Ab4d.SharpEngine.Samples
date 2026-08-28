@@ -30,6 +30,15 @@ public class TransformationsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading = 20;
+            targetPositionCamera.Attitude = -35;
+            targetPositionCamera.Distance = 840;
+            targetPositionCamera.TargetPosition = new Vector3(-5, 0, 10);
+        }
+
+
         _textBlockFactory = await context.GetTextBlockFactoryAsync();
         _textBlockFactory.BackgroundColor = Colors.LightYellow;
         _textBlockFactory.BorderThickness = 1;
@@ -41,6 +50,9 @@ public class TransformationsSample : CommonSample
                                                     positionType: PositionTypes.Bottom | PositionTypes.Center,
                                                     finalSize: new Vector3(60, 60, 60));
     
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
 
         var boxModelNode = new BoxModelNode(centerPosition: new Vector3(0, -5, 50), size: new Vector3(700, 10, 300), "BaseBoxNode")
         {
@@ -103,16 +115,6 @@ public class TransformationsSample : CommonSample
                   transform: transformGroup2,
                   text: "TransformGroup\n(translate, rotate, scale)",
                   name: "TransformGroup");
-
-
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = 20;
-            targetPositionCamera.Attitude = -35;
-            targetPositionCamera.Distance = 840;
-            targetPositionCamera.TargetPosition = new Vector3(-5, 0, 10);
-        }
     }
 
     private void AddTeapot(Scene scene, Transform? transform, string text, string name)

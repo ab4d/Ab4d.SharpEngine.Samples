@@ -89,8 +89,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
         _teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot, position: new Vector3(0, 0, 0), positionType: PositionTypes.Center, finalSize: new Vector3(80, 80, 80));
 
         _textBlockFactory = await context.GetTextBlockFactoryAsync();
-
-
+        
         if (this.IsDisposed) // If async loading takes some time and the sample is disposed before the loading is finished, then just return without setting up the scene.
             return;
 
