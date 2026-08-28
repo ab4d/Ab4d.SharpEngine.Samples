@@ -316,6 +316,8 @@ namespace Ab4d.SharpEngine.Samples.WinForms
 
                 if (sharpEngineSceneView != null)
                 {
+                    sharpEngineSceneView.RenderAsManyFramesAsPossible = renderAsManyFramesAsPossibleCheckBox.Checked;
+
                     SubscribeToUpdateFps();
 
                     if (sharpEngineSceneView.GpuDevice != null)
