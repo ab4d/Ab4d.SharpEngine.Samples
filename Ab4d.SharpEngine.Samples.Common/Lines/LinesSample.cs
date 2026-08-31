@@ -55,9 +55,9 @@ public class LinesSample : CommonSample
         else
         {
             if (context.GpuDevice != null && !context.GpuDevice.EnabledFeatures.GeometryShader)
-                _subtitle = "NOTE: The graphics card does not support geometry shader. Some line rendering featurs does not work.";
+                _subtitle = "NOTE: The graphics card does not support geometry shader. Some line rendering features do not work.";
             else
-                _subtitle = $"NOTE: Scene.LineRasterizationMode was changed from GeometryShader to {lineRasterizationMode}. Some line rendering featurs does not work.";
+                _subtitle = $"NOTE: Scene.LineRasterizationMode was changed from GeometryShader to {lineRasterizationMode}. Some line rendering features do not work.";
         }
     }
 
