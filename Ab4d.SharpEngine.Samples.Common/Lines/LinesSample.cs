@@ -14,6 +14,9 @@ public class LinesSample : CommonSample
 
 #if WEB_GL
     public override string Subtitle => "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support thick lines (LineThickness > 1) and LineCaps (line with arrows and other ending shapes) ";
+#else
+    public override string Subtitle => _subtitle;
+    private string _subtitle;
 #endif
 
     private RectangleNode? _rectanglePositionTypeNode;
@@ -44,6 +47,18 @@ public class LinesSample : CommonSample
     public LinesSample(ICommonSamplesContext context)
         : base(context)
     {
+        var lineRasterizationMode = context.CurrentSharpEngineSceneView?.Scene.LineRasterizationMode;
+        if (lineRasterizationMode == LineRasterizationModes.GeometryShader)
+        {
+            _subtitle = ""; // all line features are supported
+        }
+        else
+        {
+            if (context.GpuDevice != null && !context.GpuDevice.EnabledFeatures.GeometryShader)
+                _subtitle = "NOTE: The graphics card does not support geometry shader. Some line rendering featurs does not work.";
+            else
+                _subtitle = $"NOTE: Scene.LineRasterizationMode was changed from GeometryShader to {lineRasterizationMode}. Some line rendering featurs does not work.";
+        }
     }
 
     protected override void OnCreateScene(Scene scene)
