@@ -1343,7 +1343,7 @@ PipelineChangesCount: {8:#,##0}",
         LogMessages.Add(new Tuple<LogLevels, string>(logLevel, message));
 
         // We count number of warnings separately because _logMessages can be deleted
-        if (logLevel >= LogLevels.Warn)
+        if (logLevel >= LogLevels.Warn && logLevel <= LogLevels.Fatal) // Skip LogLevel.Special (value = 10) that may be used is come SharpEngine builds
         {
             NumberOfWarnings++;
 

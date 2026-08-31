@@ -77,6 +77,10 @@ public class BooleanOperationsSample : CommonSample
 
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         textBlockFactory.BackgroundColor = Colors.LightYellow;
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;

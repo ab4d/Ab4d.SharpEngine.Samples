@@ -22,6 +22,15 @@ public class PositionAndScaleSample: CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.TargetPosition = new Vector3(0, 30, 0);
+            targetPositionCamera.Heading = 15;
+            targetPositionCamera.Attitude = -20;
+            targetPositionCamera.Distance = 500;
+        }
+
+
         _textBlockFactory = await context.GetTextBlockFactoryAsync();
         _textBlockFactory.BackgroundColor = Colors.LightYellow;
         _textBlockFactory.BorderThickness = 1;
@@ -32,18 +41,14 @@ public class PositionAndScaleSample: CommonSample
                                                        position: new Vector3(0, 0, 0),
                                                        positionType: PositionTypes.Bottom | PositionTypes.Center,
                                                        finalSize: new Vector3(60, 60, 60));
+        
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
 
         AddSceneNode(teapotMesh, scene, new Vector3(-120, 0, 0), PositionTypes.Bottom,                   new Vector3(80, 80, 80));
         AddSceneNode(teapotMesh, scene, new Vector3(-40, 60, 0), PositionTypes.Left | PositionTypes.Top, new Vector3(80, 60, 80));
         AddSceneNode(teapotMesh, scene, new Vector3(120, 15, 0), PositionTypes.Center,                   new Vector3(80, 60, 20), preserveAspectRatio: false, wireCrossLineLength: 80);
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.TargetPosition = new Vector3(0, 30, 0);
-            targetPositionCamera.Heading = 15;
-            targetPositionCamera.Attitude = -20;
-            targetPositionCamera.Distance = 500;
-        }
 
         ShowCameraAxisPanel = true;
     }

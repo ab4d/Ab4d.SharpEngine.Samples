@@ -40,6 +40,9 @@ public class AxesBoxNodeSample : CommonSample
 
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
         _axesBoxNode = new AxesBoxNode(textBlockFactory.BitmapTextCreator)
         {
             CenterPosition = new Vector3(0, 0, 0),

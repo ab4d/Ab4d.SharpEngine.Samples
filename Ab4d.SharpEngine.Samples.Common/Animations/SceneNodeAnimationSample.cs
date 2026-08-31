@@ -193,6 +193,10 @@ public class SceneNodeAnimationSample : CommonSample
         _textBlockFactory.FontSize = 14;
         _textBlockFactory.IsSolidColorMaterial = true;
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         _planeModelNode = new PlaneModelNode("BasePlane")
         {
             Position = new Vector3(0, -5f, 0),

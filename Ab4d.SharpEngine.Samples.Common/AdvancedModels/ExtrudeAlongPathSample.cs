@@ -145,6 +145,9 @@ public class ExtrudeAlongPathSample : CommonSample
         textBlockFactory.BackgroundColor = Colors.LightYellow;
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
+        
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
 
         var textNode = textBlockFactory.CreateTextBlock("Ellipse shape\nisClosed: true\nisSmooth: true", new Vector3(-170, 10, 30), textAttitude: 30);
         scene.RootNode.Add(textNode);

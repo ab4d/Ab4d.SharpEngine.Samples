@@ -90,8 +90,8 @@
             // renderAsManyFramesAsPossibleCheckBox
             // 
             renderAsManyFramesAsPossibleCheckBox.AutoSize = true;
-            renderAsManyFramesAsPossibleCheckBox.Checked = true;
-            renderAsManyFramesAsPossibleCheckBox.CheckState = CheckState.Checked;
+            renderAsManyFramesAsPossibleCheckBox.Checked = false;
+            renderAsManyFramesAsPossibleCheckBox.CheckState = CheckState.Unchecked;
             renderAsManyFramesAsPossibleCheckBox.Dock = DockStyle.Top;
             renderAsManyFramesAsPossibleCheckBox.Location = new Point(0, 158);
             renderAsManyFramesAsPossibleCheckBox.Margin = new Padding(3, 4, 3, 4);

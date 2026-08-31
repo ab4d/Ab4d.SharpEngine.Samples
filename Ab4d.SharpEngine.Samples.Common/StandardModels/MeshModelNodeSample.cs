@@ -172,6 +172,10 @@ Click on 'Reverse triangles order' to see the effect of the changed order.";
         _textBlockFactory.BackgroundColor = Colors.Transparent; // no background
         _textBlockFactory.BorderThickness = 0;
         
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
+
         if (_standardMesh != null)
         {
             var positions = _standardMesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);

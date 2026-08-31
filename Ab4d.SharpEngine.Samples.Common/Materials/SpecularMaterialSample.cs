@@ -64,6 +64,9 @@ public class SpecularMaterialSample : CommonSample
         textBlockFactory.BorderThickness = 0;
         textBlockFactory.FontSize = 20;
 
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
+
 
         for (int i = 0; i < specularPowers.Length; i++)
         {

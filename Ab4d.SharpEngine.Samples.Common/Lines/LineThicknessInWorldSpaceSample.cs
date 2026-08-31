@@ -67,6 +67,9 @@ When you zoom in or out, the line thickness is also changed.";
         textBlockFactory.FontSize = 4;
         textBlockFactory.BackgroundHorizontalPadding = 4;
         textBlockFactory.BackgroundVerticalPadding = 2;
+
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
         
         textBlockFactory.BorderColor = Colors.Blue;
         var textNode1 = textBlockFactory.CreateTextBlock("Sceen-space\nLineThickness: 10", new Vector3(-35, 20, 0), textAttitude: 90);

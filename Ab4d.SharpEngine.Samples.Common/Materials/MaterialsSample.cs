@@ -412,6 +412,9 @@ public class MaterialsSample : CommonSample
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
         textBlockFactory.FontSize = 9;
+
+        if (this.IsDisposed) // return if the test was already changed while waiting for async tasks
+            return;
         
         var textNode1 = textBlockFactory.CreateTextBlock("DiffuseMaterial", new Vector3(-250, -20, 50), textAttitude: 30);
         scene.RootNode.Add(textNode1);
