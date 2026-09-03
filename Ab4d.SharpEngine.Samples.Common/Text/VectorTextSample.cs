@@ -140,7 +140,7 @@ public class VectorTextSample : CommonSample
             await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
 
             // You can also use the non-async version of LoadFontFile method that read the font file in the main thread:
-            TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
+            //TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
 
 #elif WEB_GL
             await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName, Scene.GpuDevice.CanvasInterop);
