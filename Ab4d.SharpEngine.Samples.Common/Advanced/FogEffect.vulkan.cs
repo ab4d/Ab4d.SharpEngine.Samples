@@ -603,7 +603,7 @@ public class FogEffect : Effect
     }
 
     /// <inheritdoc />
-    protected override unsafe void Dispose(bool disposing)
+    protected override void Dispose(bool disposing)
     {
         ResetPipelines(); // This will dispose created pipelines (after current rendering is complete)
 
@@ -624,9 +624,12 @@ public class FogEffect : Effect
             {
                 for (var i = 0; i < _pipelineShaderStages.Length; i++)
                 {
-                    var ptr = (IntPtr)_pipelineShaderStages[i].PSpecializationInfo;
-                    if (ptr != IntPtr.Zero)
-                        Scene.GpuDevice.ReleaseShaderSpecializationInfo(ptr);
+                    unsafe
+                    {
+                        var ptr = (IntPtr)_pipelineShaderStages[i].PSpecializationInfo;
+                        if (ptr != IntPtr.Zero)
+                            Scene.GpuDevice.ReleaseShaderSpecializationInfo(ptr);
+                    }
                 }
 
                 _pipelineShaderStages = null;
