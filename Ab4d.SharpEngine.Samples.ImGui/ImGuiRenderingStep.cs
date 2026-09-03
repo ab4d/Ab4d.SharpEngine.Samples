@@ -469,7 +469,7 @@ public class ImGuiRenderingStep : RenderingStep
         };
 
         Pipeline pipeline;
-        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo, null, &pipeline).CheckResult();
+        gpuDevice.Vk.CreateGraphicsPipelines(gpuDevice.Device, gpuDevice.GetPipelineCache(), 1, &pipelineCreateInfo, &pipeline).CheckResult();
         pipeline.SetName(gpuDevice, "ImGuiPipeline");
 
         _pipeline = pipeline;
@@ -565,7 +565,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         if (_matricesDescriptorPool.IsNotNull())
         {
-            gpuDevice.Vk.DestroyDescriptorPool(device, _matricesDescriptorPool, null);
+            gpuDevice.Vk.DestroyDescriptorPool(device, _matricesDescriptorPool);
             _matricesDescriptorPool = DescriptorPool.Null;
         }
 
@@ -573,7 +573,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         if (_matricesDescriptorSetLayout.IsNotNull())
         {
-            gpuDevice.Vk.DestroyDescriptorSetLayout(device, _matricesDescriptorSetLayout, null);
+            gpuDevice.Vk.DestroyDescriptorSetLayout(device, _matricesDescriptorSetLayout);
             _matricesDescriptorSetLayout = DescriptorSetLayout.Null;
         }
     }
@@ -590,7 +590,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         if (_fontTextureDescriptorPool.IsNotNull())
         {
-            gpuDevice.Vk.DestroyDescriptorPool(device, _fontTextureDescriptorPool, null);
+            gpuDevice.Vk.DestroyDescriptorPool(device, _fontTextureDescriptorPool);
             _fontTextureDescriptorPool = DescriptorPool.Null;
         }
 
@@ -598,7 +598,7 @@ public class ImGuiRenderingStep : RenderingStep
 
         if (_fontTextureDescriptorSetLayout.IsNotNull())
         {
-            gpuDevice.Vk.DestroyDescriptorSetLayout(device, _fontTextureDescriptorSetLayout, null);
+            gpuDevice.Vk.DestroyDescriptorSetLayout(device, _fontTextureDescriptorSetLayout);
             _fontTextureDescriptorSetLayout = DescriptorSetLayout.Null;
         }
     }

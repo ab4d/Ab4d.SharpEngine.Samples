@@ -351,7 +351,7 @@ public class FogEffectTechnique : EffectTechnique
 
 
         Pipeline pipeline;
-        vulkanDevice.Vk.CreateGraphicsPipelines(vulkanDevice.Device, vulkanDevice.GetPipelineCache(), 1, &pipelineCreateInfo, null, &pipeline);//.LogAndCheckResult(LogArea, "vkCreateGraphicsPipeline for " + this.Name);
+        vulkanDevice.Vk.CreateGraphicsPipelines(vulkanDevice.Device, vulkanDevice.GetPipelineCache(), 1, &pipelineCreateInfo, &pipeline);//.LogAndCheckResult(LogArea, "vkCreateGraphicsPipeline for " + this.Name);
 
         if (pipelineName != null)
         {
