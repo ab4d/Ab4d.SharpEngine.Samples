@@ -5,17 +5,8 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
-using Ab4d.Vulkan;
-using Microsoft.Maui.Graphics.Platform;
-using SkiaSharp;
-using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using static Android.Graphics.Paint;
 using Colors = Ab4d.SharpEngine.Common.Colors;
 
 namespace Ab4d.SharpEngine.Samples.Maui;
