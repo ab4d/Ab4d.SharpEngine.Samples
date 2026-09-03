@@ -623,14 +623,7 @@ public class FogEffect : Effect
             if (_pipelineShaderStages != null)
             {
                 for (var i = 0; i < _pipelineShaderStages.Length; i++)
-                {
-                    unsafe
-                    {
-                        var ptr = (IntPtr)_pipelineShaderStages[i].PSpecializationInfo;
-                        if (ptr != IntPtr.Zero)
-                            Scene.GpuDevice.ReleaseShaderSpecializationInfo(ptr);
-                    }
-                }
+                    Scene.GpuDevice.ReleaseShaderSpecializationInfo(_pipelineShaderStages[i]);
 
                 _pipelineShaderStages = null;
             }
