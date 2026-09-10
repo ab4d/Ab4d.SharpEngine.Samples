@@ -46,6 +46,7 @@
     <Compile Remove="Lines\LinesPerformanceSample.cs" />
     <Compile Remove="Lines\MiterLimitSample.cs" />
     <Compile Remove="Lines\SpecialLineRenderingSample.cs" />
+    <Compile Remove="Lines\LineThicknessInWorldSpaceSample.cs" />
     
     <Compile Remove="Lights\PCSShadowsSample.cs" />
     

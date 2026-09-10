@@ -122,7 +122,9 @@ public class WireframeRenderingSample : CommonSample
         // After we have all the line positions, we can render the lines by using MultiLineNode
         var wireframeLineNode = new MultiLineNode(sphereWireframePositions, isLineStrip: false, Color3.Black, _lineThickness, "WireframeLine")
         {
+#if VULKAN
             IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
+#endif
         };            
 
         Scene.RootNode.Add(wireframeLineNode);
@@ -185,7 +187,9 @@ public class WireframeRenderingSample : CommonSample
             var wireframePositions = coloredLinePositions.Value.ToArray();
             var wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineColor, _lineThickness, "WireframeLine-" + lineColor.ToHexString())
             {
+#if VULKAN
                 IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
+#endif
             };
 
             Scene.RootNode.Add(wireframeLineNode);
@@ -312,14 +316,14 @@ public class WireframeRenderingSample : CommonSample
         ui.AddSeparator();
         ui.AddSeparator();
 
-#if VULKAN        
+#if VULKAN
         var lineThicknessOptions = new float[] { 0.2f, 0.5f, 1, 2, 3 };
         ui.CreateComboBox(lineThicknessOptions.Select(f => f.ToString()).ToArray(), (selectedIndex, selectedText) =>
         {
             _lineThickness = lineThicknessOptions[selectedIndex];
             RecreateWireframe();
         }, selectedItemIndex: 2, keyText: "LineThickness: ");
-#endif        
+#endif
         
         ui.AddSeparator();
         
@@ -329,7 +333,7 @@ public class WireframeRenderingSample : CommonSample
             RecreateWireframe();
         });
         
-#if VULKAN        
+#if VULKAN
         ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: isChecked =>
@@ -337,6 +341,6 @@ public class WireframeRenderingSample : CommonSample
                 _isLineThicknessInWorldSpace = isChecked;
                 RecreateWireframe();
             });
-#endif        
+#endif
     }
 }
