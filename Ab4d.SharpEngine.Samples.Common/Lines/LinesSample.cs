@@ -1,6 +1,5 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF.Schema;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
@@ -12,12 +11,8 @@ public class LinesSample : CommonSample
 {
     public override string Title => "3D lines";
 
-#if WEB_GL
-    public override string Subtitle => "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support thick lines (LineThickness > 1) and LineCaps (line with arrows and other ending shapes) ";
-#else
     public override string Subtitle => _subtitle;
     private string _subtitle;
-#endif
 
     private RectangleNode? _rectanglePositionTypeNode;
     private WireBoxNode? _wireBoxNode;
@@ -47,6 +42,9 @@ public class LinesSample : CommonSample
     public LinesSample(ICommonSamplesContext context)
         : base(context)
     {
+#if WEB_GL
+        _subtitle = "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support thick lines (LineThickness > 1) and LineCaps (line with arrows and other ending shapes) ";
+#else
         var lineRasterizationMode = context.CurrentSharpEngineSceneView?.Scene.LineRasterizationMode;
         if (lineRasterizationMode == LineRasterizationModes.GeometryShader)
         {
@@ -59,6 +57,7 @@ public class LinesSample : CommonSample
             else
                 _subtitle = $"NOTE: Scene.LineRasterizationMode was changed from GeometryShader to {lineRasterizationMode}. Some line rendering features do not work.";
         }
+#endif
     }
 
     protected override void OnCreateScene(Scene scene)
@@ -124,7 +123,7 @@ public class LinesSample : CommonSample
         };
         scene.RootNode.Add(sceneNode);
 #endif
-        #endregion
+#endregion
 
         #region WireCrossNode
 
@@ -620,7 +619,7 @@ public class LinesSample : CommonSample
 
         scene.RootNode.Add(multiLineNode);
 #endif
-        #endregion
+#endregion
 
         #region Line with patterns
 #if VULKAN
@@ -649,7 +648,7 @@ public class LinesSample : CommonSample
             scene.RootNode.Add(line);
         }
 #endif
-        #endregion
+#endregion
 
 
         _currentPositionTypeIndex = 4; // Center
@@ -677,7 +676,8 @@ public class LinesSample : CommonSample
             _cornerWireBoxNode.PositionType = newPositionType;
     }
 
-    private void UpateIsWorldSpaceLineThickness(bool isLineThicknessInWorldSpace)
+#if VULKAN
+    private void UpdateIsWorldSpaceLineThickness(bool isLineThicknessInWorldSpace)
     {
         if (Scene == null)
             return;
@@ -688,15 +688,18 @@ public class LinesSample : CommonSample
                 lineMaterial.IsLineThicknessInWorldSpace = isLineThicknessInWorldSpace;
         });
     }
+#endif
     
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         ui.CreateComboBox(_allPositionTypesInSample.Select(p => p.ToString()).ToArray(), (selectedIndex, selectedText) => SetPositionType(selectedIndex), _currentPositionTypeIndex, 130, "PositionType:", 0);
-        
+
+#if VULKAN        
         ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
-            checkedChangedAction: UpateIsWorldSpaceLineThickness);
+            checkedChangedAction: UpdateIsWorldSpaceLineThickness);
+#endif
     }
 }
