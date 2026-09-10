@@ -67,6 +67,9 @@ public abstract class StandardModelsSampleBase : CommonSample
 
         _commonTexture = await base.GetCommonTextureAsync("10x10-texture.png", scene.GpuDevice);
 
+        if (this.IsDisposed) // if the sample was disposed while waiting for the texture, then do not update the material
+            return;
+
         if (isTextureMaterialChecked)
             UpdateMaterial();
     }
