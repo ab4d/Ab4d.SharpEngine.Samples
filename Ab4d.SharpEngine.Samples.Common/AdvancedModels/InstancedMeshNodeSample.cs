@@ -52,10 +52,10 @@ public class InstancedMeshNodeSample : CommonSample
         //
         //#if VULKAN // This is supported only for Vulkan
         //var instancesDataBuffer = await gpuDevice.CreateBufferAsync(_instancesData, BufferUsageFlags.VertexBuffer, name: "AsyncInstancesDataBuffer");
-        //_instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, instancesDataBuffer);
         //_instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, instancesDataBuffer, boundingBox); // If you know the boundingBox, then use it to prevent the code from calculating it
-        //
-        // If you wnt to use a callback instead of await, you can use:
+        ////_instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, instancesDataBuffer); // Bounding box is calculated by InstancedMeshNode
+
+        //// If you want to use a callback instead of await, you can use:
         //var instancesDataBuffer = gpuDevice.CreateBuffer<WorldColorInstanceData>(_instancesData.Length, BufferUsageFlags.VertexBuffer, isDeviceLocal: true, name: "AsyncInstancesDataBuffer");
         //instancesDataBuffer.WriteToBufferAsync(_instancesData, (gpuBuffer) =>
         //{
