@@ -325,7 +325,7 @@ public class GltfImporterExporterSample : CommonSample
         _exportSuccessfulLabel?.SetIsVisible(false);
 
         
-        string fullExportFileName = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_importedFileName)!, _exportFileName);
+        string fullExportFileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), _exportFileName);
 
         // First create an instance of glTFExporter
         var glTfExporter = new glTFExporter();
