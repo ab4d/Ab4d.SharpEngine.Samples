@@ -383,11 +383,14 @@ public class InstancedMeshNodeSample : CommonSample
             else
             {
                 // Alpha color is always 1 (no transparency)
+                // When changing to transparent colors we multiplied each color by alpha value (alpha-premultipled).
+                // Now we need to reverse that to get the original colors so we need to divide by alpha.
                 for (int i = 0; i < _instancesData.Length; i++)
                 {
-                    _instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red,
-                                                                _instancesData[i].DiffuseColor.Green,
-                                                                _instancesData[i].DiffuseColor.Blue,
+                    var alpha = _instancesData[i].DiffuseColor.Alpha;
+                    _instancesData[i].DiffuseColor = new Color4(_instancesData[i].DiffuseColor.Red / alpha,
+                                                                _instancesData[i].DiffuseColor.Green / alpha,
+                                                                _instancesData[i].DiffuseColor.Blue / alpha,
                                                                 alpha: 1);
                 }
             }
