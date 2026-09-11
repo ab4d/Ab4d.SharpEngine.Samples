@@ -225,6 +225,21 @@ public class InstancedMeshNodeSample : CommonSample
         UpdateStatistics();
     }
     
+    private void ChangeColor()
+    {
+        var instancesData = _instancesData;
+
+        if (instancesData == null || _instancedMeshNode == null)
+            return;
+
+        // For the first half of instances, switch Blue and Red color components
+        int count = (int)(instancesData.Length * 0.5f);
+        for (int i = 0; i < count; i++)
+            instancesData[i].DiffuseColor = new Color4(instancesData[i].DiffuseColor.Blue, instancesData[i].DiffuseColor.Green, instancesData[i].DiffuseColor.Red, instancesData[i].DiffuseColor.Alpha);
+
+        _instancedMeshNode.UpdateInstancesData(updateBoundingBox: true);
+    }
+    
     private void ChangeScale(bool isChecked)
     {
         var instancesData = _instancesData;
@@ -234,7 +249,8 @@ public class InstancedMeshNodeSample : CommonSample
 
         float scale = isChecked ? 5 : 1;
 
-        for (int i = 0; i < 100; i++)
+        int count = Math.Min(100, instancesData.Length);
+        for (int i = 0; i < count; i++)
         {
             // M11, M22 and M33 value in WorldMatrix define the ScaleX, ScaleY and ScaleZ of the transformation
             instancesData[i].World.M11 = scale;
@@ -254,7 +270,8 @@ public class InstancedMeshNodeSample : CommonSample
 
         float yOffset = isChecked ? 100 : -100;
 
-        for (int i = 0; i < 100; i++)
+        int count = Math.Min(100, instancesData.Length);
+        for (int i = 0; i < count; i++)
         {
             // M41, M42 and M43 value in WorldMatrix define the OffsetX, OffsetY and OffsetZ of the transformation
             //instancesData[i].World.M41 += xOffset;
@@ -456,6 +473,7 @@ public class InstancedMeshNodeSample : CommonSample
         ui.AddSeparator();
         ui.AddSeparator();
 
+        ui.CreateCheckBox("Change color", false, isChecked => ChangeColor());
         ui.CreateCheckBox("Hide middle third meshes", false, isChecked => ShowHideMiddleThird(isChecked));
         ui.CreateCheckBox("Scale first 100 meshes", false, isChecked => ChangeScale(isChecked));
         ui.CreateCheckBox("Translate first 100 meshes", false, isChecked => ChangeTranslation(isChecked));
