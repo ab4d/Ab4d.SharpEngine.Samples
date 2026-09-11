@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
@@ -7,6 +6,7 @@ using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.Vulkan;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 
@@ -410,7 +410,15 @@ public class AsyncUploadSample : CommonSample
         var combinedIndexBuffer  = await gpuDevice.CreateBufferAsync(combinedTriangleIndices, BufferUsageFlags.IndexBuffer,  name: "AsyncCreatedCombinedIndexBuffer");
 
         // We could also create a new GpuBuffer manually by using the GpuBuffer constructor and then call:
-        //await newVertexBuffer.WriteToBufferAsync(vertices); // NOTE: The size of GpuBuffer must be big enough for the vertices
+        //var combinedVertexBuffer = gpuDevice.CreateBuffer<PositionNormalTextureVertex>(combinedVertices.Length, BufferUsageFlags.VertexBuffer, isDeviceLocal: true, name: "AsyncCreatedCombinedVertexBuffer");
+        //await combinedVertexBuffer.WriteToBufferAsync(combinedVertices); 
+
+        // If you wnt to use a callback instead of await, you can use:
+        //combinedVertexBuffer.WriteToBufferAsync(combinedVertices, (gpuBuffer) =>
+        //{
+        //    // Create a mesh, call SetCustomVertexBuffer and set it to a MeshModelNode (see below)
+        //});
+
 
         //
         // The following code is running on UI thread (we must not create SceneNodes and Materials on background thread).
@@ -439,6 +447,9 @@ public class AsyncUploadSample : CommonSample
             var oneMeshModelNode = new MeshModelNode(oneMesh, greenMaterial, name: $"MeshModelNode_{i}");
 
             groupNode.Add(oneMeshModelNode);
+
+            // If are using instancing you can create GpuBuffer from instancesData array in the background
+            // and then call instancedMeshNode.SetCustomInstancesDataBuffer method to use the custom created GpuBuffer.
 
             indexOffset += triangleIndicesCounts[i];
         }

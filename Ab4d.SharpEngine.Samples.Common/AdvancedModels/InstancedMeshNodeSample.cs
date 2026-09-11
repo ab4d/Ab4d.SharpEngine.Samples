@@ -1,11 +1,9 @@
-﻿using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Materials;
+﻿using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Utilities;
+using Ab4d.Vulkan;
 using System.Numerics;
-using Ab4d.SharpEngine.Core;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
 
@@ -47,6 +45,23 @@ public class InstancedMeshNodeSample : CommonSample
                                              useTransparency: _useTransparency);
 
         _instancedMeshNode.SetInstancesData(_instancesData);
+
+        // Calling SetInstancesData  uploads the instancesData buffer on the UI thread.
+        // If you want to upload that in the background thread, you can use the following code
+        // (you need to wait until you have a VulkanDevice)
+        //
+        //#if VULKAN // This is supported only for Vulkan
+        //var instancesDataBuffer = await gpuDevice.CreateBufferAsync(_instancesData, BufferUsageFlags.VertexBuffer, name: "AsyncInstancesDataBuffer");
+        //_instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, instancesDataBuffer);
+        //_instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, instancesDataBuffer, boundingBox); // If you know the boundingBox, then use it to prevent the code from calculating it
+        //
+        // If you wnt to use a callback instead of await, you can use:
+        //var instancesDataBuffer = gpuDevice.CreateBuffer<WorldColorInstanceData>(_instancesData.Length, BufferUsageFlags.VertexBuffer, isDeviceLocal: true, name: "AsyncInstancesDataBuffer");
+        //instancesDataBuffer.WriteToBufferAsync(_instancesData, (gpuBuffer) =>
+        //{
+        //    _instancedMeshNode.SetCustomInstancesDataBuffer(_instancesData, gpuBuffer);
+        //});
+        //#endif
 
         scene.RootNode.Add(_instancedMeshNode);
 
@@ -232,10 +247,15 @@ public class InstancedMeshNodeSample : CommonSample
         if (instancesData == null || _instancedMeshNode == null)
             return;
 
-        // For the first half of instances, switch Blue and Red color components
+        // Invert colors for the first half of instances
         int count = (int)(instancesData.Length * 0.5f);
         for (int i = 0; i < count; i++)
-            instancesData[i].DiffuseColor = new Color4(instancesData[i].DiffuseColor.Blue, instancesData[i].DiffuseColor.Green, instancesData[i].DiffuseColor.Red, instancesData[i].DiffuseColor.Alpha);
+        {
+            instancesData[i].DiffuseColor = new Color4(1 - instancesData[i].DiffuseColor.Red, 
+                                                       1 - instancesData[i].DiffuseColor.Green, 
+                                                       1 - instancesData[i].DiffuseColor.Blue, 
+                                                       instancesData[i].DiffuseColor.Alpha);
+        }
 
         _instancedMeshNode.UpdateInstancesData(updateBoundingBox: true);
     }
