@@ -2,7 +2,6 @@
 using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.Vulkan;
 using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.AdvancedModels;
