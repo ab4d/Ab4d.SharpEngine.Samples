@@ -151,14 +151,12 @@ public class EdgeLinesSample : CommonSample
             }
         }, 100, false, "EdgeStartAngle", 100, sliderValue => sliderValue.ToString("F0"));
 
-#if VULKAN
         ui.CreateSlider(0.1f, 2f, () => _lineThickness, delegate (float newValue)
         {
             _lineThickness = newValue;
             if (_lineMaterial != null)
                 _lineMaterial.LineThickness = newValue;
         }, 100, false, "LineThickness", 100, sliderValue => sliderValue.ToString("F2"));
-#endif
 
         ui.CreateButton("Change transform", () =>
         {

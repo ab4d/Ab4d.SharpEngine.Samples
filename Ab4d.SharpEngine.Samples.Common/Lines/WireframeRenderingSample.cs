@@ -22,7 +22,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 //
 // 2) Create new MeshModelNode with the same mesh but with LineMaterial. This will render the object with ThickLineEffect and will render wireframe instead of solid objects.
 //    + no additional line positions arrays and mesh buffers are required
-//    + easy to control which objects are rendered (but cannot to control individual line positions)
+//    + easy to control which objects are rendered (but cannot control individual line positions)
 //    - worse performance because of more draw calls - each object is rendered with its own draw call even if line color is the same; no duplicate lines removal
 
 // 3) Creating a new RenderObjectsRenderingStep that will use WireframeRenderingEffectTechnique (set to OverrideEffectTechnique) to render all objects
@@ -93,7 +93,7 @@ public class WireframeRenderingSample : CommonSample
                     CreatePerObjectColoredWireframeLinePositions();
                 break;
 
-#if VULKAN
+#if VULKAN            
             case WireframeRenderingTechniques.UseLineMaterial:
                 CreateSceneNodesWithLineMaterial();
                 break;
@@ -122,9 +122,7 @@ public class WireframeRenderingSample : CommonSample
         // After we have all the line positions, we can render the lines by using MultiLineNode
         var wireframeLineNode = new MultiLineNode(sphereWireframePositions, isLineStrip: false, Color3.Black, _lineThickness, "WireframeLine")
         {
-#if VULKAN
             IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
-#endif
         };            
 
         Scene.RootNode.Add(wireframeLineNode);
@@ -187,16 +185,14 @@ public class WireframeRenderingSample : CommonSample
             var wireframePositions = coloredLinePositions.Value.ToArray();
             var wireframeLineNode = new MultiLineNode(wireframePositions, isLineStrip: false, lineColor, _lineThickness, "WireframeLine-" + lineColor.ToHexString())
             {
-#if VULKAN
                 IsLineThicknessInWorldSpace = _isLineThicknessInWorldSpace
-#endif
             };
 
             Scene.RootNode.Add(wireframeLineNode);
         }
     }
 
-#if VULKAN
+#if VULKAN    
     private void CreateSceneNodesWithLineMaterial()
     {
         if (_testSceneNode == null || Scene == null)
@@ -316,14 +312,12 @@ public class WireframeRenderingSample : CommonSample
         ui.AddSeparator();
         ui.AddSeparator();
 
-#if VULKAN
         var lineThicknessOptions = new float[] { 0.2f, 0.5f, 1, 2, 3 };
         ui.CreateComboBox(lineThicknessOptions.Select(f => f.ToString()).ToArray(), (selectedIndex, selectedText) =>
         {
             _lineThickness = lineThicknessOptions[selectedIndex];
             RecreateWireframe();
         }, selectedItemIndex: 2, keyText: "LineThickness: ");
-#endif
         
         ui.AddSeparator();
         
@@ -333,7 +327,6 @@ public class WireframeRenderingSample : CommonSample
             RecreateWireframe();
         });
         
-#if VULKAN
         ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: isChecked =>
@@ -341,6 +334,5 @@ public class WireframeRenderingSample : CommonSample
                 _isLineThicknessInWorldSpace = isChecked;
                 RecreateWireframe();
             });
-#endif
     }
 }

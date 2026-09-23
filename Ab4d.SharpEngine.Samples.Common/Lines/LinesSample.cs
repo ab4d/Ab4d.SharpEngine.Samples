@@ -43,7 +43,7 @@ public class LinesSample : CommonSample
         : base(context)
     {
 #if WEB_GL
-        _subtitle = "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support thick lines (LineThickness > 1) and LineCaps (line with arrows and other ending shapes) ";
+        _subtitle = "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support LineCaps (line with arrows and other ending shapes) and line with patterns.\nAlso, connected lines do not render line miter or beveled line joints.";
 #else
         var lineRasterizationMode = context.CurrentSharpEngineSceneView?.Scene.LineRasterizationMode;
         if (lineRasterizationMode == LineRasterizationModes.GeometryShader)
@@ -676,7 +676,6 @@ public class LinesSample : CommonSample
             _cornerWireBoxNode.PositionType = newPositionType;
     }
 
-#if VULKAN
     private void UpdateIsWorldSpaceLineThickness(bool isLineThicknessInWorldSpace)
     {
         if (Scene == null)
@@ -688,7 +687,6 @@ public class LinesSample : CommonSample
                 lineMaterial.IsLineThicknessInWorldSpace = isLineThicknessInWorldSpace;
         });
     }
-#endif
     
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
@@ -696,10 +694,8 @@ public class LinesSample : CommonSample
 
         ui.CreateComboBox(_allPositionTypesInSample.Select(p => p.ToString()).ToArray(), (selectedIndex, selectedText) => SetPositionType(selectedIndex), _currentPositionTypeIndex, 130, "PositionType:", 0);
 
-#if VULKAN        
         ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: UpdateIsWorldSpaceLineThickness);
-#endif
     }
 }

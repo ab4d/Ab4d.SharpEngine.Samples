@@ -154,7 +154,6 @@ public class WireGridNodeSample : CommonSample
             keyText: "LineColor:",
             keyTextWidth: 140);
 
-#if VULKAN
         ui.CreateSlider(0, 10, () => _selectedMinorLineThickness, sliderValue =>
             {
                 _selectedMinorLineThickness = sliderValue;
@@ -167,7 +166,6 @@ public class WireGridNodeSample : CommonSample
             sliderValue => sliderValue.ToString("F1"));
 
         ui.AddSeparator();
-#endif
 
         ui.CreateComboBox(new string[] { "Gray", "DimGray", "Black", "SkyBlue" },
             (selectedIndex, selectedText) =>
@@ -180,7 +178,6 @@ public class WireGridNodeSample : CommonSample
             keyText: "MajorLineColor:",
             keyTextWidth: 140);
 
-#if VULKAN
         ui.CreateSlider(0, 10, () => _selectedMajorLineThickness, sliderValue =>
             {
                 _selectedMajorLineThickness = sliderValue;
@@ -191,7 +188,6 @@ public class WireGridNodeSample : CommonSample
             keyText: "MajorLinesThickness:",
             keyTextWidth: 140,
             sliderValue => sliderValue.ToString("F1"));
-#endif
 
         ui.CreateSlider(0, 15, () => _selectedMajorLinesFrequency, sliderValue =>
             {
@@ -212,10 +208,8 @@ public class WireGridNodeSample : CommonSample
             UpdateWireGridSetting();
         });
 
-#if VULKAN
         ui.CreateCheckBox("IsLineThicknessInWorldSpace (?):When checked then the line thickness is specified in world space units.\nIn this case the line thickness will be smaller when the camera is farther away from the line.\nAlso, when you zoom out the scene, the lines will become thinner.\n\nWhen unchecked, then the line thickness is specified in screen space units.\nIn this case the line thickness will be the same regardless of the distance from the camera.",
             isInitiallyChecked: false,
             checkedChangedAction: (isChecked) => _wireGridNode!.IsLineThicknessInWorldSpace = isChecked);
-#endif
     }
 }

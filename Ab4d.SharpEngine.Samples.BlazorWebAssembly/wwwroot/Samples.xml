@@ -63,12 +63,13 @@
   <Sample Location="Text.BitmapTextSample" Title="Bitmap text"/>
 
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>
-  <Sample Location="Lines.LinesSample" Title="Line SceneNodes"/>
+  <Sample Location="Lines.LinesSample" Title="Line SceneNodes" IsUpdated="True" UpdateInfo="Added support for rendering thick lines (LineThickness > 1)"/>
+  <Sample Location="Lines.LineThicknessInWorldSpaceSample" Title="LineThickness" IsNew="True"/>
   <Sample Location="Lines.TubeLinesSample" Title="TubeLines"/>
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
-  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering"/>
-  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid"/>
+  <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering" IsUpdated="True" UpdateInfo="Added support for world-space thick lines (using IsLineThicknessInWorldSpace property)"/>
+  <Sample Location="Lines.WireGridNodeSample" Title="WireGrid" IsUpdated="True" UpdateInfo="Added support for world-space thick lines (using IsLineThicknessInWorldSpace property)"/>
 
   <Sample Location="Titles.GraphsTitle.md" IsTitle="True" Title="Graphs"/>
   <Sample Location="Graphs.MultipleAxesDemo" Title="Multiple axes demo"/>
