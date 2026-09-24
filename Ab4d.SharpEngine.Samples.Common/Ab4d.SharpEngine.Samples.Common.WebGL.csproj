@@ -44,7 +44,6 @@
     <Compile Remove="Lines\LineCapsSample.cs" />
     <Compile Remove="Lines\LinesPerformanceSample.cs" />
     <Compile Remove="Lines\MiterLimitSample.cs" />
-    <Compile Remove="Lines\SpecialLineRenderingSample.cs" />
     
     <Compile Remove="Lights\PCSShadowsSample.cs" />
     
@@ -55,6 +54,7 @@
     <Compile Remove="Advanced\*" />
     <Compile Include="Advanced\MeshOutlineSample.cs" />
     <Compile Include="Advanced\FrustumCullingSample.cs" />
+    <Compile Include="Advanced\BackgroundAndOverlayRenderingSample.cs" />
     <Compile Include="Advanced\FogMaterial.cs" />
     <Compile Include="Advanced\CustomFogEffectSample.cs" />
     <Compile Include="Advanced\*.webgl.cs" />

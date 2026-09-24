@@ -69,6 +69,7 @@
   <Sample Location="Lines.CurveLineSample" Title="Curve lines"/>
   <Sample Location="Lines.EdgeLinesSample" Title="Edge lines"/>
   <Sample Location="Lines.DepthBiasSample" Title="Depth-bias" IsNew="True"/>
+  <Sample Location="Lines.SpecialLineRenderingSample" Title="Special line rendering" IsNew="True"/>
   <Sample Location="Lines.WireframeRenderingSample" Title="Wireframe rendering" IsUpdated="True" UpdateInfo="Added support for world-space thick lines (using IsLineThicknessInWorldSpace property)"/>
   <Sample Location="Lines.WireGridNodeSample" Title="WireGrid" IsUpdated="True" UpdateInfo="Added support for world-space thick lines (using IsLineThicknessInWorldSpace property)"/>
 
