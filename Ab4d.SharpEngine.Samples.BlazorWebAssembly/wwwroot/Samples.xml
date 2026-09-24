@@ -113,6 +113,7 @@
   <Sample Location="Titles.AdvancedTitle.md" IsTitle="True" Title="Advanced"/>
   <Sample Location="Advanced.MeshOutlineSample" Title="Mesh outlines" />
   <Sample Location="Advanced.FrustumCullingSample" Title="Frustum culling"/>
+  <Sample Location="Advanced.BackgroundAndOverlayRenderingSample" Title="BG and Overlay rendering" IsNew="True" />
   <Sample Location="Advanced.CustomFogEffectSample" Title="Custom Fog Effect"/>
 
 </Samples>
