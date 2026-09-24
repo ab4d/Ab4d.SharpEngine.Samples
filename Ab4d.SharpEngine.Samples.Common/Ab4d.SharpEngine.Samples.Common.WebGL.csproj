@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common.WebGL</AssemblyName>
@@ -41,7 +41,6 @@
     <Compile Remove="Text\InstancedTextNodePerformanceSample.cs" />
     <Compile Remove="Text\InstancedTextNodeSample.cs" />
 
-    <Compile Remove="Lines\DepthBiasSample.cs" />
     <Compile Remove="Lines\LineCapsSample.cs" />
     <Compile Remove="Lines\LinesPerformanceSample.cs" />
     <Compile Remove="Lines\MiterLimitSample.cs" />
