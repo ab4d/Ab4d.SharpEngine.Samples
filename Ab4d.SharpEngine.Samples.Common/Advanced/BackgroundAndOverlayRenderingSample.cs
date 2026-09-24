@@ -26,18 +26,19 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         ShowCameraAxisPanel = true;
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         UpdateClearingDepthBuffer(scene);
         UpdateHitTestingPriorities(scene);
 
         AddStandardRenderedObjects(scene);
 
-        AddCustomRenderedObjects(scene);
         AddCustomRenderedLines(scene);
 
         _rotationCenterWireCross = new WireCrossNode(position: new Vector3(0, 0, 0), lineColor: Color3.Black, lineLength: 40, lineThickness: 4, "RotationCenterWireCross") { Visibility = SceneNodeVisibility.Hidden };
         scene.RootNode.Add(_rotationCenterWireCross);
+
+        await AddCustomRenderedObjects(scene);
     }
     
     /// <inheritdoc />
@@ -125,16 +126,11 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         }
     }
 
-    private void AddCustomRenderedObjects(Scene scene)
+    private async Task AddCustomRenderedObjects(Scene scene)
     {
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Resources\Models\teapot-hires.obj");
+        var teapotMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Teapot);
 
-        var objImporter = new ObjImporter();
-        var backgroundTeapotModel = objImporter.Import(fileName);
-        backgroundTeapotModel.Name = "BackgroundTeapotModel";
-
-        ModelUtils.ChangeMaterial(backgroundTeapotModel, StandardMaterials.Blue);
-
+        var backgroundTeapotModel = new MeshModelNode(teapotMesh, StandardMaterials.Blue, name: "BackgroundTeapotModel");
         ModelUtils.PositionAndScaleSceneNode(backgroundTeapotModel,
                                              position: new Vector3(-60, 0, -40),
                                              positionType: PositionTypes.Center,
@@ -154,10 +150,7 @@ public class BackgroundAndOverlayRenderingSample : CommonSample
         scene.RootNode.Add(backgroundTeapotModel);
 
         
-        var overlayTeapotModel = objImporter.Import(fileName);
-        overlayTeapotModel.Name = "OverlayTeapotModel";
-
-        ModelUtils.ChangeMaterial(overlayTeapotModel, StandardMaterials.Red);
+        var overlayTeapotModel = new MeshModelNode(teapotMesh, StandardMaterials.Red, name: "OverlayTeapotModel");
 
         ModelUtils.PositionAndScaleSceneNode(overlayTeapotModel,
                                              position: new Vector3(60, 0, -40),
