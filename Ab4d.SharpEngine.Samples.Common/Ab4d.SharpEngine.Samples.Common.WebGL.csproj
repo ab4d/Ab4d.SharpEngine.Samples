@@ -42,7 +42,6 @@
     <Compile Remove="Text\InstancedTextNodeSample.cs" />
 
     <Compile Remove="Lines\LineCapsSample.cs" />
-    <Compile Remove="Lines\LinesPerformanceSample.cs" />
     <Compile Remove="Lines\MiterLimitSample.cs" />
     
     <Compile Remove="Lights\PCSShadowsSample.cs" />

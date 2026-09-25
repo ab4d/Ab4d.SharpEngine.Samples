@@ -5,7 +5,12 @@ using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Meshes;
+
+#if VULKAN
 using Ab4d.Vulkan;
+#elif WEB_GL
+using Ab4d.SharpEngine.WebGL;
+#endif
 
 namespace Ab4d.SharpEngine.Samples.Common.Lines;
 
@@ -87,14 +92,23 @@ public class LinesPerformanceSample : CommonSample
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
         sceneView.SceneUpdating += OnSceneUpdating;
-        
+
+#if WEB_GL 
+        sceneView.SceneRendered += SceneViewOnSceneRendered;
+#endif        
+
         base.OnSceneViewInitialized(sceneView);
     }
 
     protected override void OnDisposed()
     {
         if (SceneView != null)
+        {
+#if WEB_GL 
+            SceneView.SceneRendered -= SceneViewOnSceneRendered;
+#endif
             SceneView.SceneUpdating -= OnSceneUpdating;
+        }
 
         base.OnDisposed();
     }
@@ -132,9 +146,11 @@ public class LinesPerformanceSample : CommonSample
         Scene.RootNode.DisposeAllChildren(disposeMeshes: true, disposeMaterials: true);
 
         GC.Collect();
+
+#if !WEB_GL // WaitForFullGCComplete is not supported in WebAssembly
         GC.WaitForFullGCComplete();
         GC.Collect();
-        
+#endif        
         
         _initializationTimeStopwatch.Restart();
         
@@ -312,6 +328,16 @@ public class LinesPerformanceSample : CommonSample
         return $"{_lastInitializationTimeMs:#,##0.00} ms";
     }
     
+#if WEB_GL    
+    private void SceneViewOnSceneRendered(object? sender, EventArgs e)
+    {
+        if (SceneView == null || SceneView.Statistics == null)
+            return;
+
+        Console.WriteLine($"Frame {SceneView.FrameNumber} rendered in {SceneView.Statistics.TotalRenderTimeMs:F2} ms");
+    }
+#endif
+    
     private void StartStopCameraRotation()
     {
         if (targetPositionCamera == null || _startStopCameraButton == null)
@@ -340,19 +366,19 @@ public class LinesPerformanceSample : CommonSample
             _numLinesInSpiralSliderValue = (int)newValue;
             _numLinesInSpiral = Math.Max(_numLinesInSpiralSliderValue * 500, 100);
             RecreateLinesWithDelay();
-        }, 100, false, "No. lines in one spiral:", 120, sliderValue => _numLinesInSpiral.ToString("N0") + "  ");
+        }, 100, false, "No. lines in one spiral:", 120, _ => _numLinesInSpiral.ToString("N0") + "  ");
         
         ui.CreateSlider(1, 50, () => _xSpiralCount, delegate (float newValue)
         {
             _xSpiralCount = (int)newValue;
             RecreateLinesWithDelay();
-        }, 100, false, "X spirals count:", 120, sliderValue => sliderValue.ToString("F0"));
+        }, 100, false, "X spirals count:", 120, sliderValue => $"{(int)sliderValue}");
         
         ui.CreateSlider(1, 50, () => _ySpiralCount, delegate (float newValue)
         {
             _ySpiralCount = (int)newValue;
             RecreateLinesWithDelay();
-        }, 100, false, "Y spirals count:", 120, sliderValue => sliderValue.ToString("F0"));
+        }, 100, false, "Y spirals count:", 120, sliderValue => $"{(int)sliderValue}");
         
         ui.AddSeparator();
 
@@ -367,7 +393,7 @@ public class LinesPerformanceSample : CommonSample
             RecreateLines();
         }, selectedItemIndex: 1);
 
-        ui.CreateCheckBox("Reuse mesh", _isMeshReused, isChecked =>
+        ui.CreateCheckBox("Reuse mesh (?):When checked then a single PositionsMesh is created for all spiral line positions. Then each LineNode use its Transformation to adjust the position of the lines.\n\nWhen unchecked, then each LineNode uses its own positions mesh. This significantly increases the initialization time. Render time is also slightly decreased because the mesh is not shared.", _isMeshReused, isChecked =>
         {
             _isMeshReused = isChecked;
             RecreateLines();
@@ -386,8 +412,13 @@ public class LinesPerformanceSample : CommonSample
         ui.AddSeparator();
         
         _initializeTimeLabel = ui.CreateKeyValueLabel("Initialization time:", () => GetInitializationTimeText());
-        ui.CreateLabel("Open Diagnostics to see performance");
-        
+
+#if WEB_GL
+        ui.CreateLabel("See frame time in Console log");
+#else
+        ui.CreateLabel("Open Diagnostics for performance details");
+#endif
+
         ui.AddSeparator();
         
         ui.CreateButton("Recreate lines", () => RecreateLines());
