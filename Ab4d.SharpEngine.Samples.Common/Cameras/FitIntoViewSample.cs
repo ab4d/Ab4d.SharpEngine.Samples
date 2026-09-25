@@ -30,7 +30,6 @@ public class FitIntoViewSample : CommonSample
     private GroupNode? _boxesGroup;
     private WireGridNode? _wireGridNode;
 
-    private Vector3[]? _corners;
     private WireBoxNode? _sceneWireBoundingBoxNode;
 
     public FitIntoViewSample(ICommonSamplesContext context)
