@@ -89,7 +89,6 @@ public class LinesSample : CommonSample
         #endregion
 
         #region Lines with arrows
-#if VULKAN
         sceneNode = new LineNode(name: $"Line (EndLineCap: ArrowAnchor)")
         {
             LineThickness = 2,
@@ -122,8 +121,7 @@ public class LinesSample : CommonSample
             EndLineCap = LineCap.ArrowAnchor
         };
         scene.RootNode.Add(sceneNode);
-#endif
-#endregion
+        #endregion
 
         #region WireCrossNode
 
