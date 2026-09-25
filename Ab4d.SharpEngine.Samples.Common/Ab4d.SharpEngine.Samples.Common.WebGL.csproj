@@ -30,9 +30,6 @@
     <Compile Remove="AdvancedModels\VolumeRenderingSample.cs" />
     
     <Compile Remove="HitTesting\HitTestingWithIdBitmapSample.cs" />
-    <Compile Remove="HitTesting\ModelMoverSample.cs" />
-    <Compile Remove="HitTesting\ModelRotatorSample.cs" />
-    <Compile Remove="HitTesting\ModelScalarSample.cs" />
     <Compile Remove="HitTesting\PointCloudHitTestingSample.cs" />
     <Compile Remove="HitTesting\RectangularSelectionSample.cs" />
     <Compile Remove="HitTesting\TriangleHitTestingSample.cs" />

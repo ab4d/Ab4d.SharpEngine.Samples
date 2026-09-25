@@ -100,6 +100,9 @@
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
   <Sample Location="HitTesting.MeshOctreeSample" Title="Octree sample"/>
+  <Sample Location="HitTesting.ModelMoverSample" Title="ModelMover" IsNew="True"/>
+  <Sample Location="HitTesting.ModelScalarSample" Title="ModelScalar" IsNew="True"/>
+  <Sample Location="HitTesting.ModelRotatorSample" Title="ModelRotator" IsNew="True"/>
 
   <Sample Location="Titles.AnimationsTitle.md" IsTitle="True" Title="Animation"/>
   <Sample Location="importedAnimations.razor" Title="Imported animations" IsNew="True"/>
