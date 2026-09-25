@@ -43,8 +43,8 @@ public class LinesSample : CommonSample
         : base(context)
     {
 #if WEB_GL
-        _subtitle = "IMPORTANT:\nThe current version of Ab4d.SharpEngine.Web does not support LineCaps (line with arrows and other ending shapes).\nAlso, connected lines do not render line miter or beveled line joints.";
-#else
+        _subtitle = "NOTE: Some line rendering features are not supported in WebGL. See '3D lines' section title for more info.";
+#elif VULKAN
         var lineRasterizationMode = context.CurrentSharpEngineSceneView?.Scene.LineRasterizationMode;
         if (lineRasterizationMode == LineRasterizationModes.GeometryShader)
         {
@@ -580,8 +580,7 @@ public class LinesSample : CommonSample
         scene.RootNode.Add(_cornerWireBoxNode);
         #endregion
 
-
-#region Different start and end color
+        #region Different start and end color
 #if VULKAN
         var positions2 = new Vector3[]
         {
@@ -617,7 +616,7 @@ public class LinesSample : CommonSample
 
         scene.RootNode.Add(multiLineNode);
 #endif
-#endregion
+        #endregion
 
         #region Line with patterns
         var stipplePatterns = new ushort[]
