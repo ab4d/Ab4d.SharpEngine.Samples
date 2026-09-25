@@ -28,7 +28,6 @@ public class ModelMoverSample : CommonSample
     private Vector3 _startCenterPosition;
     private GroupNode? _testSpheresGroupNode;
     private PlanarShadowNode? _planarShadowNode;
-    private MeshModelNode? _shadowModel;
     
     private ManualPointerCameraController? _pointerCameraController;
 

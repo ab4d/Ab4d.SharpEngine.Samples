@@ -24,7 +24,6 @@ public class ModelScalarSample : CommonSample
     private ModelNode? _scalingModel;
     private GroupNode? _testModelsGroupNode;
     private PlanarShadowNode? _planarShadowNode;
-    private MeshModelNode? _shadowModel;
     private Vector3 _startScaleFactors;
 
     private bool _recreatedUI;

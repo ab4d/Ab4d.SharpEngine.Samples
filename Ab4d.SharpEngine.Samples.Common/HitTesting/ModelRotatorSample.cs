@@ -31,7 +31,6 @@ public class ModelRotatorSample : CommonSample
     private ModelNode? _rotatingModel;
     private GroupNode? _testModelsGroupNode;
     private PlanarShadowNode? _planarShadowNode;
-    private MeshModelNode? _shadowModel;
 
     private bool _recreatedUI;
     private ManualInputEventsManager? _inputEventsManager;
