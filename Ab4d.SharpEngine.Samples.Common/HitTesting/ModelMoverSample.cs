@@ -27,7 +27,7 @@ public class ModelMoverSample : CommonSample
     private SphereModelNode? _movingSphere;
     private Vector3 _startCenterPosition;
     private GroupNode? _testSpheresGroupNode;
-    private PlanarShadowMeshCreator? _planarShadowMeshCreator;
+    private PlanarShadowNode? _planarShadowNode;
     private MeshModelNode? _shadowModel;
     
     private ManualPointerCameraController? _pointerCameraController;
@@ -149,7 +149,7 @@ public class ModelMoverSample : CommonSample
         // Handle events:
         _modelMover.AxesSelected += (sender, args) =>
         {
-            System.Diagnostics.Debug.WriteLine($"Selected move axes: {args.Axes}");
+            //System.Diagnostics.Debug.WriteLine($"Selected move axes: {args.Axes}");
             
             // Disable camera controller when using ModelRotator
             if (_pointerCameraController != null)
@@ -158,7 +158,7 @@ public class ModelMoverSample : CommonSample
         
         _modelMover.AxesDeselected += (sender, args) =>
         {
-            System.Diagnostics.Debug.WriteLine($"Deselected move axes: {args.Axes}");
+            //System.Diagnostics.Debug.WriteLine($"Deselected move axes: {args.Axes}");
             
             // Enable camera controller
             if (_pointerCameraController != null)
@@ -214,14 +214,7 @@ public class ModelMoverSample : CommonSample
                 _modelMoverCustomTransform.SetTranslate(newPosition);
             // else - we do not need to do anything because by default the IsAutomaticallyMoved is set to true
 
-
-            if (_planarShadowMeshCreator != null && _shadowModel != null)
-            {
-                _planarShadowMeshCreator.UpdateGroupNode();
-                _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
-
-                _shadowModel.Mesh = _planarShadowMeshCreator.ShadowMesh;
-            }
+            _planarShadowNode?.UpdateTransformations(); // Because we only change transformations, we can call UpdateTransformations to update the shadows
         };
 
         _modelMover.ModelMoveEnded += (sender, args) =>
@@ -297,20 +290,12 @@ public class ModelMoverSample : CommonSample
         if (_testSpheresGroupNode == null)
             return;
 
-        // Create PlanarShadowMeshCreator
-        _planarShadowMeshCreator = new PlanarShadowMeshCreator(_testSpheresGroupNode);
-        _planarShadowMeshCreator.SetPlane(planeCenterPosition: new Vector3(0, 0, 0), planeNormal: new Vector3(0, 1, 0), planeHeightVector: new Vector3(0, 0, 1), planeSize: new Vector2(1000, 1000));
-        _planarShadowMeshCreator.ClipToPlane = false; // No need to clip shadow to plane because plane is big enough (when having smaller plane, turn this on - this creates a lot of additional objects on GC)
+        var plane = new Plane(normal: new Vector3(0, 1, 0), d: 0.05f);
+        _planarShadowNode = new PlanarShadowNode(plane, _testSpheresGroupNode);
 
-        _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
+        _planarShadowNode.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
 
-        if (_planarShadowMeshCreator.ShadowMesh != null)
-        {
-            _shadowModel = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, StandardMaterials.DimGray, "PlanarShadowModel");
-            _shadowModel.Transform = new Ab4d.SharpEngine.Transformations.TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
-
-            scene.RootNode.Add(_shadowModel);
-        }
+        scene.RootNode.Add(_planarShadowNode);
     }
 
     /// <inheritdoc />

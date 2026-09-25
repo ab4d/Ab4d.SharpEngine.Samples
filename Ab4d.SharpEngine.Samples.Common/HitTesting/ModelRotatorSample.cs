@@ -30,7 +30,7 @@ public class ModelRotatorSample : CommonSample
 
     private ModelNode? _rotatingModel;
     private GroupNode? _testModelsGroupNode;
-    private PlanarShadowMeshCreator? _planarShadowMeshCreator;
+    private PlanarShadowNode? _planarShadowNode;
     private MeshModelNode? _shadowModel;
 
     private bool _recreatedUI;
@@ -180,7 +180,7 @@ public class ModelRotatorSample : CommonSample
         // Handle events:
         _modelRotator.AxisSelected += (sender, args) =>
         {
-            System.Diagnostics.Debug.WriteLine($"Selected rotation axis: {args.Axes}");
+            //System.Diagnostics.Debug.WriteLine($"Selected rotation axis: {args.Axes}");
             
             // Disable camera controller when using ModelRotator
             if (_pointerCameraController != null)
@@ -189,7 +189,7 @@ public class ModelRotatorSample : CommonSample
         
         _modelRotator.AxisDeselected += (sender, args) =>
         {
-            System.Diagnostics.Debug.WriteLine($"Deselected rotation axis: {args.Axes}");
+            //System.Diagnostics.Debug.WriteLine($"Deselected rotation axis: {args.Axes}");
             
             // Enable camera controller
             if (_pointerCameraController != null)
@@ -242,14 +242,7 @@ public class ModelRotatorSample : CommonSample
                 standardQuaternionTransform.SetQuaternion(newQuaternion);
             }
 
-
-            if (_planarShadowMeshCreator != null && _shadowModel != null)
-            {
-                _planarShadowMeshCreator.UpdateGroupNode();
-                _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
-
-                _shadowModel.Mesh = _planarShadowMeshCreator.ShadowMesh;
-            }
+            _planarShadowNode?.UpdateTransformations(); // Because we only change transformations, we can call UpdateTransformations to update the shadows
         };
 
         _modelRotator.ModelRotateEnded += (sender, args) =>
@@ -320,22 +313,13 @@ public class ModelRotatorSample : CommonSample
         if (_testModelsGroupNode == null)
             return;
 
-        // Create PlanarShadowMeshCreator
-        _planarShadowMeshCreator = new PlanarShadowMeshCreator(_testModelsGroupNode);
-        _planarShadowMeshCreator.SetPlane(planeCenterPosition: new Vector3(0, 0, 0), planeNormal: new Vector3(0, 1, 0), planeHeightVector: new Vector3(0, 0, 1), planeSize: new Vector2(1000, 1000));
-        _planarShadowMeshCreator.ClipToPlane = false; // No need to clip shadow to plane because plane is big enough (when having smaller plane, turn this on - this creates a lot of additional objects on GC)
-        _planarShadowMeshCreator.SimplifyNormalCalculation = false; // Because we show both front and back shadow material, we need to disable simplified normal calculation (see https://www.ab4d.com/help/SharpEngine/html/P_Ab4d_SharpEngine_Utilities_PlanarShadowMeshCreator_SimplifyNormalCalculation.htm)
-        
-        _planarShadowMeshCreator.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
+        var plane = new Plane(normal: new Vector3(0, 1, 0), d: 0.05f);
+        _planarShadowNode = new PlanarShadowNode(plane, _testModelsGroupNode);
+        _planarShadowNode.IsTwoSided = true; // Show shadow for back-face triangles in Teapot
 
-        if (_planarShadowMeshCreator.ShadowMesh != null)
-        {
-            _shadowModel = new MeshModelNode(_planarShadowMeshCreator.ShadowMesh, material: StandardMaterials.DimGray, "PlanarShadowModel");
-            _shadowModel.BackMaterial = _shadowModel.Material; // Set BackMaterial to prevent showing hole in the shadow that would show if only front-material would be used
-            _shadowModel.Transform = new TranslateTransform(0, 0.05f, 0); // Lift the shadow 3D model slightly above the ground
+        _planarShadowNode.ApplyDirectionalLight(directionalLightDirection: new Vector3(0, -1, 0)); // Top down shadow
 
-            scene.RootNode.Add(_shadowModel);
-        }
+        scene.RootNode.Add(_planarShadowNode);
     }
 
     /// <inheritdoc />
