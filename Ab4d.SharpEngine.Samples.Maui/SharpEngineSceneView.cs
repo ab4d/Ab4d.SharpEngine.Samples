@@ -554,12 +554,21 @@ public class SharpEngineSceneView : SKCanvasView, IDisposable
     {
         bool isNewBitmap = _renderedSceneBitmap == null || _renderedSceneBitmap.Width != width || _renderedSceneBitmap.Height != height;
 
+        GCHandle gcHandle;
         if (isNewBitmap)
         {
             _renderedSceneBitmap = new SKBitmap();
             _renderedSceneBitmapBytes = new byte[width * height * 4];
 
+            // prevent moving _renderedSceneBitmapBytes in memory by GC
+            gcHandle = GCHandle.Alloc(_renderedSceneBitmapBytes, GCHandleType.Pinned); 
+            _renderedSceneBitmapGCHandle = gcHandle;
+
             isNewBitmap = true;
+        }
+        else
+        {
+            gcHandle = new GCHandle();
         }
 
         // Copy from a staging GpuBuffer to _renderedSceneBitmapBytes
@@ -568,26 +577,23 @@ public class SharpEngineSceneView : SKCanvasView, IDisposable
 
         if (isNewBitmap)
         {
-            // If we created a new SKBitmap than set the address of the _renderedSceneBitmapBytes to be used a backbuffer for the SKBitmap
-            var gcHandle = GCHandle.Alloc(_renderedSceneBitmapBytes, GCHandleType.Pinned);
-            _renderedSceneBitmapGCHandle = gcHandle;
-            
             var skImageInfo = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
             
+            // If we created a new SKBitmap than set the address of the _renderedSceneBitmapBytes to be used a backbuffer for the SKBitmap
             // InstallPixels does not copy the bitmap data but use the specified pointer as the back buffer for the SKBitmap
             _renderedSceneBitmap!.InstallPixels(skImageInfo, 
-                                          gcHandle.AddrOfPinnedObject(),
+                                                gcHandle.AddrOfPinnedObject(),
                                                 rowBytes: width * 4, 
                                                 releaseProc:(address, context) =>
                                                 {
-                                                    // When the SKBitmap is disposed, we can also release the GCHandle and byte array
-                                                    if (gcHandle == _renderedSceneBitmapGCHandle)
+                                                    if (_renderedSceneBitmapGCHandle.AddrOfPinnedObject() == address)
                                                     {
                                                         _renderedSceneBitmapGCHandle = new GCHandle(); // set to null
-                                                        _renderedSceneBitmapBytes = null; // also release the byte array
+                                                        _renderedSceneBitmapBytes = null; // also release the byte array so it can be collected b GC
                                                     }
-                                                    
-                                                    gcHandle.Free();
+
+                                                    if (gcHandle.AddrOfPinnedObject() == address)
+                                                        gcHandle.Free();
                                                 });
         }
         else
