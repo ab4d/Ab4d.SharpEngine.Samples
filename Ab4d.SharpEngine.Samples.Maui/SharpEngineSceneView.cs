@@ -450,7 +450,8 @@ public class SharpEngineSceneView : SKCanvasView, IDisposable
             PaintSkCanvas();
         }
 
-        e.Surface.Canvas.DrawBitmap(_renderedSceneBitmap, info.Rect);
+        // Use Nearest filtering to map pixels 1 : 1 (if the dimension mismatch, then duplicate pixels instead of stretching the whole image)
+        e.Surface.Canvas.DrawBitmap(_renderedSceneBitmap, info.Rect, new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.Nearest));
     }
 
     private void PaintSkCanvas()
