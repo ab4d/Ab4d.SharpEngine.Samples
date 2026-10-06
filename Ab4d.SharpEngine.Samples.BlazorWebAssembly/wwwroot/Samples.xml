@@ -86,6 +86,8 @@
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials" IsUpdated="True"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
+  <Sample Location="Materials.VertexColorsMaterialSample" Title="Per-vertex colors"/>
+  <Sample IsSeparator="True" />
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
   <Sample IsSeparator="True" />
