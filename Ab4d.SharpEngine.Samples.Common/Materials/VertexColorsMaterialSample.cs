@@ -4,6 +4,7 @@ using Ab4d.SharpEngine.Lights;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Materials;
 
@@ -45,8 +46,21 @@ public class VertexColorsMaterialSample : CommonSample
             //DiffuseColor = Colors.Blue, // DiffuseColor is multiplied by the per-vertex colors (by default, set to White to preserve the per-vertex colors)
         };
 
-        var modelNode = new MeshModelNode(_boxMesh, _vertexColorMaterial, "VertexColorModel");
-        scene.RootNode.Add(modelNode);
+        // Add three nodes using the same mesh, to test the shared-mesh scenario.
+        var modelNode1 = new MeshModelNode(_boxMesh, _vertexColorMaterial, "VertexColorModel-Upper")
+        {
+            Transform = new TranslateTransform(0, 30, 0)
+        };
+        scene.RootNode.Add(modelNode1);
+
+        var modelNode2 = new MeshModelNode(_boxMesh, _vertexColorMaterial, "VertexColorModel-Center");
+        scene.RootNode.Add(modelNode2);
+
+        var modelNode3 = new MeshModelNode(_boxMesh, _vertexColorMaterial, "VertexColorModel-Lower")
+        {
+            Transform = new TranslateTransform(0, -30, 0)
+        };
+        scene.RootNode.Add(modelNode3);
 
         ShowCameraAxisPanel = true;
     }
