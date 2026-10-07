@@ -19,6 +19,7 @@ public class PixelsRenderingSample : CommonSample
 
     private float _pixelSize = 2;
     private bool _useTexture = false;
+    private bool _isWorldSize = false;
 
     private PixelsNode? _pixelsNode;
     private GpuImage? _treeGpuImage;
@@ -77,7 +78,10 @@ public class PixelsRenderingSample : CommonSample
         // Create PixelsNode that will show the positions.
         // We can also pass the positionBounds that define the BoundingBox of the positions.
         // If this is not done, the BoundingBox is calculated by the SharpEngine by checking all the positions.
-        _pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, pixelSize, "PixelsNode");
+        _pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, pixelSize, "PixelsNode")
+        {
+            IsWorldSize = _isWorldSize
+        };
 
         UpdatePixelsTexture();
 
@@ -262,7 +266,17 @@ public class PixelsRenderingSample : CommonSample
             },
             selectedItemIndex: 3);
 
+        ui.AddSeparator();
+        
+        ui.CreateCheckBox("IsWorldSize (?):When checked then the PixelSize is specified in 3D world coordinates\n(when using perspective camera, the size of the pixel is smaller when it is farther away from the camera).\n\nWhen unchecked, then the size is defined in screen coordinates\n(the size of the pixel is always the same regardless of the distance from the camera).", 
+            _isWorldSize, (isChecked) =>
+        {
+            _isWorldSize = isChecked;
 
+            if (_pixelsNode != null)
+                _pixelsNode.IsWorldSize = _isWorldSize;
+        });
+        
         ui.AddSeparator();
         ui.AddSeparator();
 

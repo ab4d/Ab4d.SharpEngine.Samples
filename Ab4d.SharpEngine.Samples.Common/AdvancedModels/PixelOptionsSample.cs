@@ -14,6 +14,7 @@ public class PixelOptionsSample : CommonSample
     
     public override string Subtitle => "The sample also shows how to render circular pixels.";
 
+    private bool _isWorldSize = false;
     private int _pixelsXCount = 16;
     private bool _hasTransparentPixelColors;
     
@@ -58,6 +59,7 @@ public class PixelOptionsSample : CommonSample
 
         var solidColorSingleSizePixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColor: Colors.Orange, pixelSize: 5)
         {
+            IsWorldSize = _isWorldSize,
             Transform = new TranslateTransform(0, 20, 300)
         };
         scene.RootNode.Add(solidColorSingleSizePixelsNode);
@@ -65,6 +67,7 @@ public class PixelOptionsSample : CommonSample
 
         var multiColorSingleSizePixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColors: pixelColors, pixelSize: 5, hasTransparentPixels: _hasTransparentPixelColors)
         {
+            IsWorldSize = _isWorldSize,
             Transform = new TranslateTransform(0, 20, 200)
         };            
         scene.RootNode.Add(multiColorSingleSizePixelsNode);
@@ -72,6 +75,7 @@ public class PixelOptionsSample : CommonSample
 
         var multiColorWithColorMaskSingleSizePixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColors: pixelColors, pixelSize: 5, hasTransparentPixels: _hasTransparentPixelColors)
         {
+            IsWorldSize = _isWorldSize,
             PixelColor = new Color4(0, 1, 0, 1), // Set the PixelColor property to use as a color mask; in our case the color mask is set to green
             Transform = new TranslateTransform(0, 20, 100)
         };            
@@ -80,6 +84,7 @@ public class PixelOptionsSample : CommonSample
         
         var solidColorMultiSizePixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColor: Colors.Orange, pixelSizes: pixelSizes)
         {
+            IsWorldSize = _isWorldSize,
             Transform = new TranslateTransform(0, 20, 0)
         };            
         scene.RootNode.Add(solidColorMultiSizePixelsNode);
@@ -87,6 +92,7 @@ public class PixelOptionsSample : CommonSample
         
         var solidColorMultiSizeWithSizeFactorPixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColor: Colors.Orange, pixelSizes: pixelSizes)
         {
+            IsWorldSize = _isWorldSize,
             PixelSize = 2, // Setting PixelSize to 2 will multiply all the pixel sizes in pixelSizes array by 2
             Transform = new TranslateTransform(0, 20, -100)
         };            
@@ -95,6 +101,7 @@ public class PixelOptionsSample : CommonSample
         
         var multiColorMultiSizePixelsNode = new PixelsNode(_pixelPositions, pixelsBoundingBox, pixelColors: pixelColors, pixelSizes: pixelSizes, hasTransparentPixels: _hasTransparentPixelColors)
         {
+            IsWorldSize = _isWorldSize,
             Transform = new TranslateTransform(0, 20, -200)
         };            
         scene.RootNode.Add(multiColorMultiSizePixelsNode);
@@ -257,6 +264,14 @@ public class PixelOptionsSample : CommonSample
             _hasTransparentPixelColors = isChecked;
             UpdatePixelColors();
         });
+        
+        ui.AddSeparator();
+        
+        ui.CreateCheckBox("IsWorldSize (?):When checked then the PixelSize is specified in 3D world coordinates\n(when using perspective camera, the size of the pixel is smaller when it is farther away from the camera).\n\nWhen unchecked, then the size is defined in screen coordinates\n(the size of the pixel is always the same regardless of the distance from the camera).", 
+            _isWorldSize, (isChecked) =>
+            {
+                Scene!.RootNode.ForEachChild<PixelsNode>(pixelsNode => pixelsNode.IsWorldSize = isChecked);
+            });
         
         ui.AddSeparator();
 
