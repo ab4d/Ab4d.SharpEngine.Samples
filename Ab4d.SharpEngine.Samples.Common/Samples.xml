@@ -111,7 +111,7 @@
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>
   <Sample Location="Materials.SpecularMaterialSample" Title="Specular material"/>
   <Sample Location="Materials.PhysicallyBasedMaterialSample" Title="PhysicallyBasedRendering" IsUpdated="True" UpdateInfo="PhysicallyBasedMaterial can now automatically combine individual metalness and roughness textures into a single MetalnessRoughness texture."/>
-  <Sample Location="Materials.VertexColorsMaterialSample" Title="Per-vertex colors" />
+  <Sample Location="Materials.VertexColorsMaterialSample" Title="Per-vertex colors" IsNew="True" />
   <Sample IsSeparator="True" />
   <Sample Location="Materials.AnimatedTexturesSample" Title="Animated textures"/>
   <Sample Location="Materials.HeatmapRenderingSample" Title="Heatmap rendering"/>
