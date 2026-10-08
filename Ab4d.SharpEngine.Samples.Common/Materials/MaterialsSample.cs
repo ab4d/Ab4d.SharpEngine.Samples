@@ -300,9 +300,6 @@ public class MaterialsSample : CommonSample
 
         _testModelsGroup.Add(modelNode5);
 
-
-#if VULKAN // VertexColor and PBR are not supported in current version of SharpEngine for the browser
-        
         //
         // 6) VertexColor material (specify different color for each vertex)
         //
@@ -353,6 +350,7 @@ public class MaterialsSample : CommonSample
         _testModelsGroup.Add(vertexColorModelNode);
 
 
+#if VULKAN // PBR is not supported in current version of SharpEngine for the browser
 
         //
         // 7) Physically Based Rendering (PBR) material
@@ -431,10 +429,10 @@ public class MaterialsSample : CommonSample
         var textNode5 = textBlockFactory.CreateTextBlock("SolidColor\r\nMaterial", new Vector3(150, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode5);
 
-#if VULKAN 
         var textNode6 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode6);
-        
+
+#if VULKAN
         var textNode7 = textBlockFactory.CreateTextBlock("PBR\r\nMaterial", new Vector3(350, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode7);
 #endif
