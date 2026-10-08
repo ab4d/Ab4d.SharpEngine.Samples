@@ -21,7 +21,7 @@ public class VertexColorsMaterialSample : CommonSample
     {
     }
 
-    protected override async Task OnCreateSceneAsync(Scene scene)
+    protected override void OnCreateScene(Scene scene)
     {
         if (targetPositionCamera != null)
         {
