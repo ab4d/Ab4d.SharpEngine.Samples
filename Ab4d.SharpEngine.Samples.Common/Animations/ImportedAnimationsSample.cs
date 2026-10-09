@@ -42,8 +42,6 @@ public class ImportedAnimationsSample : CommonSample
     private bool _isInternalTimeUpdate;
 
     private ICommonSampleUIElement? _textBoxElement;
-    private ICommonSampleUIPanel? _infoPanel;
-    private ICommonSampleUIElement? _infoLabel;
     private Vector2? _savedAxisPanelPosition;
 
     private AnimationGroup? _selectedAnimation;
@@ -661,11 +659,7 @@ public class ImportedAnimationsSample : CommonSample
             ui.CreateLabel("FileName:");
             _textBoxElement = ui.CreateTextBox(width: 400, initialText: FileUtils.FixDirectorySeparator(_initialFileName));
 
-            ui.CreateButton("Load", () =>
-            {
-                _infoPanel?.SetIsVisible(false);
-                ImportFile(_textBoxElement.GetText());
-            });
+            ui.CreateButton("Load", () => ImportFile(_textBoxElement.GetText()));
 
             // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
             if (CameraAxisPanel != null)

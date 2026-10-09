@@ -39,7 +39,6 @@ public class PCSShadowsSample : CommonSample
     private float _savedShadowBlockerSearchRadius;
     
     private int[]? _shadowSamplesCountOptions;
-    private ICommonSampleUIElement? _spotlightPositionLabel;
     private ICommonSampleUIElement? _spotlightXPositionSlider;
     private ICommonSampleUIElement? _spotlightYPositionSlider;
     private ICommonSampleUIElement? _shadowSamplesCountComboBox;
@@ -247,7 +246,6 @@ public class PCSShadowsSample : CommonSample
         // Create a new SoftShadowRenderingProvider based on the current _directionalLight / _spotLight
         SetupShadowRendering(Scene);
 
-        _spotlightPositionLabel?.SetIsVisible(_spotLight != null);
         _spotlightXPositionSlider?.SetIsVisible(_spotLight != null);
         _spotlightYPositionSlider?.SetIsVisible(_spotLight != null);
     }
