@@ -1,11 +1,6 @@
-﻿using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.Materials;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Transformations;
-using Ab4d.SharpEngine.Utilities;
-using Ab4d.Vulkan;
 using System.Numerics;
 using Ab4d.SharpEngine.Core;
 
@@ -198,9 +193,11 @@ public class PixelsRenderingSample : CommonSample
                     ShowMesh(sphereMesh, Colors.DeepSkyBlue);
                     break;
 
+#if VULKAN
                 case 2: // Dragon model
                     base.GetCommonMesh(Scene, CommonMeshes.Dragon, finalSize: new Vector3(300, 300, 300), dragonMesh => ShowMesh(dragonMesh, Colors.Orange));
                     break;
+#endif
 
                 case 3: // 10,000 pixels (100 x 1 x 100)
                     var positionsArray = CreatePositionsArray(new Vector3(0, 0, 0), new Vector3(300, 1, 300), 100, 1, 100);
@@ -236,7 +233,9 @@ public class PixelsRenderingSample : CommonSample
         var items = new string[] {
         "Box (726)",
         "Sphere (2,601)",
+#if VULKAN
         "Dragon model (143,382)",
+#endif
         "10,000 pixels (100 x 1 x 100)",
         "1 million pixels (100 x 100 x 100)",
         "9 million pixels (9 x 1M)",
