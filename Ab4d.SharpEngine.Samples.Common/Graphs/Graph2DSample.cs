@@ -13,11 +13,22 @@ public class Graph2DSample : CommonSample
     public override string Title => "2D Graph";
     public override string Subtitle => "This sample shows how to show a simple 2D graph.\nBecause of very fast rendering it would be possible to show graphs with millions of line segments.\nSee also Cameras/TwoDimensionalCamera sample for more examples on how to show 2D lines and shapes.";
 
+    private const int ValuesCount = 120;
+
     private const float GraphWidth = 360;
     private const float GraphHeight = 100;
 
     private TwoDimensionalCamera? _twoDimensionalCamera;
     private bool _isFitToViewSubscribed;
+    
+    private float[]? _graphValues1;
+    private MeshModelNode? _shapeModelNode;
+    
+    private LineNode? _horizontalSelectedLine;
+    private LineNode? _verticalSelectedLine;
+
+
+    private ICommonSampleUIElement? _selectedValueLabel;
 
     public Graph2DSample(ICommonSamplesContext context)
         : base(context)
@@ -80,22 +91,35 @@ public class Graph2DSample : CommonSample
         // Show graph with 
         //
 
-        int valueCount = 120;
-
-        float xScale = GraphWidth / (valueCount - 1);
+        float xScale = GraphWidth / (ValuesCount - 1);
         float yScale = GraphHeight;
 
 
         // Show graph line with shape under the line
-        var graphValues1 = CreateGraphValues(valueCount, offset: 2, factor: 3, scale: 1);
-        ShowGraph(graphValues1, xScale, yScale, zIndex: 0, lineColor: Colors.Green, shapeColor: Colors.LightGreen, scene: scene);
+        _graphValues1 = CreateGraphValues(ValuesCount, offset: 2, factor: 3, scale: 1);
+        ShowGraph(_graphValues1, xScale, yScale, zIndex: 0, lineColor: Colors.Green, shapeColor: Colors.LightGreen, scene: scene);
 
         // Show two additional lines without shapes
-        var graphValues2 = CreateGraphValues(valueCount, offset: 0, factor: 2, scale: 1f);
+        var graphValues2 = CreateGraphValues(ValuesCount, offset: 0, factor: 2, scale: 1f);
         ShowGraph(graphValues2, xScale, yScale, zIndex: 1, lineColor: Colors.Orange, shapeColor: Colors.Transparent, scene: scene); // Show only line
 
-        var graphValues3 = CreateGraphValues(valueCount, offset: 3, factor: 4, scale: 0.8f);
+        var graphValues3 = CreateGraphValues(ValuesCount, offset: 3, factor: 4, scale: 0.8f);
         ShowGraph(graphValues3, xScale, yScale, zIndex: 2, lineColor: Colors.Brown, shapeColor: Colors.Transparent, scene: scene); // Show only line
+
+
+        // To show dashed line, we need to create LineMaterial
+        var selectedLineMaterial = new LineMaterial("SelectedLineMaterial")
+        {
+            LineColor = Colors.Green,
+            LineThickness = 1,
+            LinePattern = 0b0011001100110011
+        };
+
+        _horizontalSelectedLine = new LineNode(selectedLineMaterial, "HorizontalSelectedLine") { Visibility = SceneNodeVisibility.Hidden};
+        _verticalSelectedLine   = new LineNode(selectedLineMaterial, "HorizontalSelectedLine") { Visibility = SceneNodeVisibility.Hidden};
+
+        scene.RootNode.Add(_horizontalSelectedLine);
+        scene.RootNode.Add(_verticalSelectedLine);
     }
 
     private void ShowGraph(float[] graphValues, float xScale, float yScale, float zIndex, Color3 lineColor, Color3 shapeColor, Scene scene)
@@ -133,9 +157,9 @@ public class Graph2DSample : CommonSample
             var geometryMesh = new GeometryMesh(shapePositions3D, shapeNormals, shapeTriangleIndices, "GraphShapeMesh");
 
             var material = new SolidColorMaterial(shapeColor);
-            var meshModelNode = new MeshModelNode(geometryMesh, material, "GraphShapeModel");
+            _shapeModelNode = new MeshModelNode(geometryMesh, material, "GraphShapeModel");
          
-            scene.RootNode.Add(meshModelNode);
+            scene.RootNode.Add(_shapeModelNode);
         }
     }
 
@@ -215,9 +239,90 @@ public class Graph2DSample : CommonSample
         }
     }
 
+    private void ProcessPointerMove(Vector2 pointerPosition)
+    {
+        if (this.SceneView == null)
+            return;
+
+        var hitResult = this.SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
+
+        if (hitResult != null && _shapeModelNode != null && _graphValues1 != null && ReferenceEquals(hitResult.HitSceneNode, _shapeModelNode))
+        {
+            var minX = _shapeModelNode.WorldBoundingBox.Minimum.X;
+            var maxX = _shapeModelNode.WorldBoundingBox.Maximum.X;
+
+            var x = (hitResult.HitPosition.X - minX) / (maxX - minX);
+
+            var graphXValue = x * ValuesCount;
+            var actualIndex = x * (_graphValues1.Length - 1);
+
+            var index1 = (int)Math.Floor(actualIndex);
+            var index2 = (int)Math.Ceiling(actualIndex);
+
+            var value1 = _graphValues1[index1];
+            var value2 = _graphValues1[index2];
+
+            var interpolatedValue = value1 + (actualIndex - index1) * (value2 - value1);
+
+            SelectValue(graphXValue, interpolatedValue);
+        }
+        else
+        {
+            HideSelectedValue();
+        }
+    }
+
+    private void SelectValue(float x, float y)
+    {
+        if (_graphValues1 == null)
+            return;
+
+        _selectedValueLabel?.SetText($"x: {x:N1}; y: {y:N2}");
+
+
+        float xScale = GraphWidth / ValuesCount;
+
+        x *= xScale;
+        y *= GraphHeight; // yScale = GraphHeight
+
+        if (_horizontalSelectedLine != null)
+        {
+            _horizontalSelectedLine.StartPosition = new Vector3(0, y, 0);
+            _horizontalSelectedLine.EndPosition   = new Vector3(x, y, 0);
+
+            _horizontalSelectedLine.Visibility = SceneNodeVisibility.Visible;
+        }
+
+        if (_verticalSelectedLine != null)
+        {
+            _verticalSelectedLine.StartPosition = new Vector3(x, 0, 0);
+            _verticalSelectedLine.EndPosition   = new Vector3(x, y, 0);
+
+            _verticalSelectedLine.Visibility = SceneNodeVisibility.Visible;
+        }
+    }
+
+    private void HideSelectedValue()
+    {
+        _selectedValueLabel?.SetText("Select value with mouse");
+
+        if (_horizontalSelectedLine != null)
+            _horizontalSelectedLine.Visibility = SceneNodeVisibility.Hidden;
+
+        if (_verticalSelectedLine != null)
+            _verticalSelectedLine.Visibility = SceneNodeVisibility.Hidden;
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(alignment: PositionTypes.Bottom | PositionTypes.Right);
+
+
+        ui.CreateLabel("Selected green value:");
+        _selectedValueLabel = ui.CreateLabel("Select value with mouse", width: 160);
+
+
+        ui.AddSeparator();
 
         ui.CreateCheckBox("Fit graph to view (?):When checked and when the size of the Window is changed, then the graph is resized to fit the view", false, isChecked =>
         {
@@ -231,5 +336,8 @@ public class Graph2DSample : CommonSample
                 UnsubscribeFitToView();
             }
         });
+
+        // Subscribe to mouse (pointer) moved
+        ui.RegisterPointerMoved(ProcessPointerMove); 
     }
 }
