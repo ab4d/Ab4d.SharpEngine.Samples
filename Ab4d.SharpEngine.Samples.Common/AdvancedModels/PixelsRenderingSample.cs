@@ -18,6 +18,7 @@ public class PixelsRenderingSample : CommonSample
 
     private PixelsNode? _pixelsNode;
     private GpuImage? _treeGpuImage;
+    private StandardMesh? _dragonMesh;
     private Color4 _savedPixelsColor;
     
     private ICommonSampleUIElement? _pixelSizeComboBox;
@@ -30,8 +31,6 @@ public class PixelsRenderingSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        ChangeShownPositions(selectedIndex: 2); // Show Dragon model
-
         if (targetPositionCamera != null)
         {
             targetPositionCamera.Heading = 30;
@@ -45,6 +44,10 @@ public class PixelsRenderingSample : CommonSample
         // In this sample we use a special TreeTexture-square.png that is the same as TreeTexture.png but
         // has added transparent pixels on the left and right so that the final image is squared.
         _treeGpuImage = await base.GetCommonTextureAsync(scene, CommonTextures.TreeSquareBitmap);
+
+        _dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, finalSize: new Vector3(300, 300, 300));
+
+        ChangeShownPositions(selectedIndex: 2); // Show Dragon model
     }
 
     private void ShowMesh(StandardMesh mesh, Color4 pixelColor)
@@ -193,11 +196,9 @@ public class PixelsRenderingSample : CommonSample
                     ShowMesh(sphereMesh, Colors.DeepSkyBlue);
                     break;
 
-#if VULKAN
                 case 2: // Dragon model
-                    base.GetCommonMesh(Scene, CommonMeshes.Dragon, finalSize: new Vector3(300, 300, 300), dragonMesh => ShowMesh(dragonMesh, Colors.Orange));
+                    ShowMesh(_dragonMesh, Colors.Orange);
                     break;
-#endif
 
                 case 3: // 10,000 pixels (100 x 1 x 100)
                     var positionsArray = CreatePositionsArray(new Vector3(0, 0, 0), new Vector3(300, 1, 300), 100, 1, 100);
@@ -233,9 +234,7 @@ public class PixelsRenderingSample : CommonSample
         var items = new string[] {
         "Box (726)",
         "Sphere (2,601)",
-#if VULKAN
         "Dragon model (143,382)",
-#endif
         "10,000 pixels (100 x 1 x 100)",
         "1 million pixels (100 x 100 x 100)",
         "9 million pixels (9 x 1M)",
