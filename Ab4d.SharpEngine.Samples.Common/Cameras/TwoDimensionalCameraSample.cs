@@ -40,7 +40,7 @@ public class TwoDimensionalCameraSample : CommonSample
 
         _twoDimensionalCamera = new TwoDimensionalCamera(
             pointerCameraController,
-            useScreenPixelUnits: true, // when false, then the size in device independent units is used (as size of DXViewportView); when true size in screen pixels is used (see SharpHorizontalAndVerticalLines sample)
+            useScreenPixelUnits: true, // when false, then the size in device independent units is used
             coordinateSystemType: TwoDimensionalCamera.TwoDimensionalCoordinateSystems.CenterOfViewOrigin) // This is also the default option and currently the only available option
         {
             MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
