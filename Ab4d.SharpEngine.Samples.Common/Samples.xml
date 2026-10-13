@@ -62,6 +62,7 @@
   <Sample Location="AdvancedModels.BooleanMeshSample" Title="BooleanMesh sample"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering" IsUpdated="True" UpdateInfo="Added IsWorldSize property"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options" IsUpdated="True" UpdateInfo="Added IsWorldSize property"/>
+  <Sample Location="AdvancedModels.BillboardsSample" Title="Billboards" IsNew="True"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
   <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox"/>
   <Sample Location="AdvancedModels.SpritesSample" Title="Sprites"/>
