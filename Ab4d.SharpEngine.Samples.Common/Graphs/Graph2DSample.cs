@@ -47,6 +47,12 @@ public class Graph2DSample : CommonSample
             AxisStartPosition = new Vector3(0, 0, 0),
             AxisEndPosition = new Vector3(GraphWidth, 0, 0),
             RightDirectionVector = new Vector3(0, 1, 0), // RightDirectionVector3 is the direction in which the text is drawn. By default, RightDirectionVector3 points to the right (1, 0, 0). We need to change that because this is also this axis direction.
+            
+            // Manually define the direction and PositionType of value labels to align the text so it is correctly shown with a TwoDimensionalCamera
+            CustomValueLabelsDirection = new Vector3(1, 0, 0), 
+            CustomValueLabelsUpDirection = new Vector3(0, 1, 0),
+            CustomValueLabelsPositionType = PositionTypes.Top,
+            
             MinimumValue = 0,
             MaximumValue = 120,
             MajorTicksStep = 10,
