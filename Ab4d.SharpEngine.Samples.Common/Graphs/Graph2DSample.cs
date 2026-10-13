@@ -216,9 +216,14 @@ public class Graph2DSample : CommonSample
         ui.CreateCheckBox("Fit graph to view (?):When checked and when the size of the Window is changed, then the graph is resized to fit the view", false, isChecked =>
         {
             if (isChecked)
+            {
+                FitGraphToView();
                 SubscribeFitToView();
+            }
             else
+            {
                 UnsubscribeFitToView();
+            }
         });
     }
 }
