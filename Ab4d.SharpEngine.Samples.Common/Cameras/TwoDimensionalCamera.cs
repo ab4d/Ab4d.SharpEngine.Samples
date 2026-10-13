@@ -22,6 +22,13 @@ public class TwoDimensionalCamera
     private float _dpiScale;
 
     private float _zoomFactor;
+    private TargetPositionCamera _usedCamera;
+    private ManualPointerCameraController _usedCameraController;
+    private SceneView _parentSceneView;
+    private bool _useScreenPixelUnits;
+    private TwoDimensionalCoordinateSystems _coordinateSystemType;
+    private float _screenPixelSize;
+    private Vector2 _viewSize;
 
     /// <summary>
     /// TwoDimensionalCoordinateSystems defines possible 2D coordinate system and axis origin types.
@@ -44,7 +51,11 @@ public class TwoDimensionalCamera
     /// Gets a TargetPositionCamera that is used to show the scene. The UsedCamera is created in the constructor of the TwoDimensionalCamera.
     /// The CameraType is set to OrthographicCamera. Initial TargetPosition is set to (0, 0, 1).
     /// </summary>
-    public TargetPositionCamera UsedCamera { get; private set; }
+    public TargetPositionCamera UsedCamera
+    {
+        get => _usedCamera;
+        private set => _usedCamera = value;
+    }
 
     /// <summary>
     /// Gets a MouseCameraController that is used to control the camera. The UsedMouseCameraController is created in the constructor of the TwoDimensionalCamera.
@@ -52,30 +63,50 @@ public class TwoDimensionalCamera
     /// Mouse wheel zoom is enabled and MouseWheelDistanceChangeFactor is set to 1.2 to slightly increase the zoom speed.
     /// ZoomMode is set to MousePosition.
     /// </summary>
-    public ManualPointerCameraController UsedCameraController { get; private set; }
+    public ManualPointerCameraController UsedCameraController
+    {
+        get => _usedCameraController;
+        private set => _usedCameraController = value;
+    }
 
     /// <summary>
     /// Gets the SceneView that is shown by this TwoDimensionalCamera.
     /// </summary>
-    public SceneView ParentSceneView { get; private set; }
+    public SceneView ParentSceneView
+    {
+        get => _parentSceneView;
+        private set => _parentSceneView = value;
+    }
 
     /// <summary>
     /// Gets a Boolean that was set when creating this TwoDimensionalCamera and specifies if screen space units are used.
     /// When false the device independent units are used - scaled by DPI scale (the same units are used by WPF).
     /// </summary>
-    public bool UseScreenPixelUnits { get; private set; }
+    public bool UseScreenPixelUnits
+    {
+        get => _useScreenPixelUnits;
+        private set => _useScreenPixelUnits = value;
+    }
 
     /// <summary>
     /// Gets the CoordinateSystemType that was used to create this TwoDimensionalCamera.
     /// </summary>
-    public TwoDimensionalCoordinateSystems CoordinateSystemType { get; private set; }
+    public TwoDimensionalCoordinateSystems CoordinateSystemType
+    {
+        get => _coordinateSystemType;
+        private set => _coordinateSystemType = value;
+    }
 
 
     /// <summary>
     /// Gets the size of screen pixel. This value can be used as LineThickness value that would create lines with 1 screen pixel thickness.
     /// This value is set in when the TwoDimensionalCamera is loaded and after the dpi scale is read (see <see cref="IsLoaded"/> property and <see cref="Loaded"/> event).
     /// </summary>
-    public float ScreenPixelSize { get; private set; }
+    public float ScreenPixelSize
+    {
+        get => _screenPixelSize;
+        private set => _screenPixelSize = value;
+    }
 
     /// <summary>
     /// Gets or sets the ShowCameraLight property from the <see cref="UsedCamera"/>.
@@ -164,7 +195,29 @@ public class TwoDimensionalCamera
     /// Gets the Size of the visible area when there is no zoom applied.
     /// To get the currently visible area based on the current zoom factor and offset call the <see cref="GetVisibleRect" /> method.
     /// </summary>
-    public Vector2 ViewSize { get; private set; }
+    public Vector2 ViewSize
+    {
+        get => _viewSize;
+        private set => _viewSize = value;
+    }
+
+    
+    private float _cameraDistance = 100;
+
+    /// <summary>
+    /// Gets or sets the distance of the camera from the camera's TargetPosition.
+    /// The objects with Z value bigger than the CameraDistance will not be visible.
+    /// Default value is 100.
+    /// </summary>
+    public float CameraDistance
+    {
+        get => _cameraDistance;
+        set
+        {
+            _cameraDistance = value;
+            _usedCamera.Distance = value;
+        }
+    }
 
     /// <summary>
     /// CameraChanged event is triggered when the camera is changed (this can happen also when the size of the view is changed).
@@ -185,8 +238,8 @@ public class TwoDimensionalCamera
         if (pointerCameraController.SceneView == null)
             throw new ArgumentException("The SceneView property of the pointerCameraController is not set");
 
-        UsedCameraController = pointerCameraController;
-        ParentSceneView = pointerCameraController.SceneView;
+        _usedCameraController = pointerCameraController;
+        _parentSceneView = pointerCameraController.SceneView;
 
         UseScreenPixelUnits = useScreenPixelUnits;
         CoordinateSystemType = coordinateSystemType;
@@ -207,11 +260,12 @@ public class TwoDimensionalCamera
             TargetPosition = new Vector3(0, 0, 1), // Set to 0,0,1 so that we will never come after the lines
             Heading = 0,
             Attitude = 0,
-            Bank = 0
+            Bank = 0,
+            Distance = _cameraDistance
         };
 
 
-        UsedCamera = targetPositionCamera;
+        _usedCamera = targetPositionCamera;
 
         ParentSceneView.Camera = targetPositionCamera;
 
@@ -229,6 +283,8 @@ public class TwoDimensionalCamera
         pointerCameraController.IsPointerWheelZoomEnabled        = true;
         pointerCameraController.PointerWheelDistanceChangeFactor = 1.2f; // Increase mouse wheel zooming speed by changing the factor from 1.05 to 1.2
         pointerCameraController.ZoomMode                         = CameraZoomMode.PointerPosition;
+        
+        pointerCameraController.PreventChangingDistanceWhenZoomingOrthographicCamera = true;
     }
 
     /// <summary>
