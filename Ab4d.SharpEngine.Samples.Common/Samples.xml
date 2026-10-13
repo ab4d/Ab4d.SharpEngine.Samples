@@ -107,6 +107,7 @@
   <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels"/>
   <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode"/>
   <Sample Location="Graphs.Plot3DSample" Title="3D Plot"/>
+  <Sample Location="Graphs.Graph2DSample" Title="2D Graph" IsNew="True"/>
   
   <Sample Location="Titles.MaterialsTitle.md" IsTitle="True" Title="Materials"/>
   <Sample Location="Materials.MaterialsSample" Title="Materials"/>

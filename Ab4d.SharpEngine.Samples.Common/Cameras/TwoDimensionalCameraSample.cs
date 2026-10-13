@@ -12,7 +12,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 public class TwoDimensionalCameraSample : CommonSample
 {
     public override string Title => "TwoDimensionalCamera";
-    public override string Subtitle => "TwoDimensionalCamera can be used to easily show 2D graphics with Ab4d.SharpEngine.";
+    public override string Subtitle => "TwoDimensionalCamera can be used to easily show 2D graphics with Ab4d.SharpEngine.\nSee also 'Graphs/2D Graph' for an example on how to show 2D graphs.";
 
     private TwoDimensionalCamera? _twoDimensionalCamera;
     private ICommonSampleUIElement? _sceneInfoLabel;
