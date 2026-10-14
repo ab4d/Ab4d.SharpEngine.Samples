@@ -29,7 +29,7 @@ public class PixelOptionsSample : CommonSample
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
         //
         // Prepare the data
@@ -115,7 +115,7 @@ public class PixelOptionsSample : CommonSample
         scene.RootNode.Add(boxModel);
         
         
-        var textBlockFactory = context.GetTextBlockFactory();
+        var textBlockFactory = await context.GetTextBlockFactoryAsync();
         textBlockFactory.BackgroundColor = Colors.LightYellow;
         textBlockFactory.BorderThickness = 1;
         textBlockFactory.BorderColor = Colors.DimGray;
@@ -169,7 +169,7 @@ public class PixelOptionsSample : CommonSample
         return pixelColors;
     }
     
-    private void ChangeTexture(int selectedIndex)
+    private async void ChangeTexture(int selectedIndex)
     {
         if (Scene == null)
             return;
@@ -189,7 +189,7 @@ public class PixelOptionsSample : CommonSample
             if (_whiteCircleGpuImage == null)
             {
                 var textureFileName = base.GetCommonTexturePath("white-circle-64x64-noaa.png");
-                _whiteCircleGpuImage ??= TextureLoader.CreateTexture(textureFileName, Scene, generateMipMaps: false);
+                _whiteCircleGpuImage ??= await TextureLoader.CreateTextureAsync(textureFileName, Scene, generateMipMaps: false);
             }
             
             // If you prefer using anti-aliased circles and do not mind the artifacts at the edges, then use the white-circle-64x64.png instead 
@@ -202,7 +202,8 @@ public class PixelOptionsSample : CommonSample
         }
         else if (selectedIndex == 2)
         {
-            _treeGpuImage ??= TextureLoader.CreateTexture(@"Resources\Textures\TreeTexture-square.png", Scene);
+            var textureFileName = base.GetCommonTexturePath("TreeTexture-square.png");
+            _treeGpuImage ??= await TextureLoader.CreateTextureAsync(textureFileName, Scene);
             texture = _treeGpuImage;
         }
         else

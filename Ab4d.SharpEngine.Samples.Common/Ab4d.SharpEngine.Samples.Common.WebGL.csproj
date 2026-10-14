@@ -23,7 +23,6 @@
 
     <Compile Remove="AdvancedModels\BooleanMeshSample.cs" />
     <Compile Remove="AdvancedModels\MultiMaterialModelNodeSample.cs" />
-    <Compile Remove="AdvancedModels\PixelOptionsSample.cs" />
     <Compile Remove="AdvancedModels\SkyboxSample.cs" />
     <Compile Remove="AdvancedModels\SpritesSample.cs" />
     <Compile Remove="AdvancedModels\VolumeRenderingSample.cs" />

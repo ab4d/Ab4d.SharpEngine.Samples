@@ -52,6 +52,7 @@
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering" IsNew="True"/>
+  <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options" IsNew="True"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers" />
