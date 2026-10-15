@@ -6,14 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced.AvaloniaMultiTouchSample" >
     <Grid Name="RootGrid">
-        <Border>
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
-                    <GradientStop Offset="0" Color="White" />
-                    <GradientStop Offset="1" Color="LightSkyBlue" />
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
+        <Border Name="SceneViewBorder" Background="{StaticResource CommonSamplePageGradient}" />
 
         <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent">
             <sharpEngine:SharpEngineSceneView.GestureRecognizers>

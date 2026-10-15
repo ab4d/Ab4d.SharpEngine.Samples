@@ -9,14 +9,7 @@
         Title="SharedSurfaceSample"
         d:DesignHeight="700" d:DesignWidth="1000">
     <Grid Name="RootGrid">
-        <Border Name="SceneViewBorder">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
-                    <GradientStop Offset="0" Color="White" />
-                    <GradientStop Offset="1" Color="LightSkyBlue" />
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
+        <Border Name="SceneViewBorder" Background="{StaticResource CommonSamplePageGradient}" />
 
         <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" Margin="10">
             <TextBlock Text="SharpEngineSceneView created in code behind" FontSize="20" FontWeight="Bold" Foreground="#444" />

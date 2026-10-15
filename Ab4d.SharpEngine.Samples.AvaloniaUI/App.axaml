@@ -18,7 +18,7 @@
             <GradientStop Color="#FFFFFFFF" Offset=".5"/>
         </LinearGradientBrush>
 
-        <LinearGradientBrush x:Key="CommonSamplePageGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+        <LinearGradientBrush x:Key="CommonSamplePageGradient" StartPoint="5%,0%" EndPoint="-5%,100%">
             <GradientStop Offset="0" Color="White" />
             <GradientStop Offset="1" Color="LightSkyBlue" />
         </LinearGradientBrush>
