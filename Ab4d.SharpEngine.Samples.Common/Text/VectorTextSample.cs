@@ -332,7 +332,7 @@ public class VectorTextSample : CommonSample
         if (_allFontFiles == null)
         {
 #if WEB_GL
-            // On the browser we have a fixed set of font files
+            // In the sample for browser we have only two font files
             _allFontFiles = new string[] { "fonts/Roboto-Regular.ttf", "fonts/Roboto-Black.ttf" };
 #else
             var localFontFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/");
