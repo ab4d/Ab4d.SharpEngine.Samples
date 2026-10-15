@@ -441,14 +441,6 @@ public class SliceModelsSample : CommonSample
                 UpdateSlicedModel();
         });
 
-        // Showing 2D slices shape is not yet implemented
-        // See sample for Ab3d.PowerToys library to see how to show 2D slice polylines.
-        // ui.CreateCheckBox("Show 2D slice", isInitiallyChecked: _show2DSlice, isChecked =>
-        // {
-        //     _show2DSlice = isChecked;
-        //     UpdateSlicedModel();
-        // });
-
         
         ui.CreateLabel("3D model:", isHeader: true);
         ui.CreateRadioButtons(new string[]
