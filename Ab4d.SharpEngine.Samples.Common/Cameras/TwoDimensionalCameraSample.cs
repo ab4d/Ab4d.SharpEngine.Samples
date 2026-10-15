@@ -1,11 +1,11 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Meshes;
+using Ab4d.SharpEngine.SceneNodes;
+using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
 using System.Numerics;
-using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.SceneNodes;
-using Ab4d.SharpEngine.Meshes;
-using Ab4d.SharpEngine.Transformations;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 
@@ -57,18 +57,8 @@ public class TwoDimensionalCameraSample : CommonSample
         UpdateSceneInfo();
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        AddText("Manually created 2D lines and shapes:", new Vector3(-400, 250, 0), Colors.Black, fontSize: 20);
-
-        var simpleShapesGroup = new GroupNode("SimpleShapes")
-        {
-            Transform = new TranslateTransform(-100, 150, 0)
-        };
-
-        scene.RootNode.Add(simpleShapesGroup);
-
-
         //
         // Mark coordinate origin (0, 0)
         //
@@ -87,7 +77,19 @@ public class TwoDimensionalCameraSample : CommonSample
             LineThickness = 1,
         };
 
-        simpleShapesGroup.Add(multiLineNode);
+        scene.RootNode.Add(multiLineNode);
+
+
+        // AddText will be called after the font is loaded async (see below)
+        //AddText("Manually created 2D lines and shapes:", new Vector3(-400, 250, 0), Colors.Black, fontSize: 20);
+
+        var simpleShapesGroup = new GroupNode("SimpleShapes")
+        {
+            Transform = new TranslateTransform(-100, 80, 0)
+        };
+
+        scene.RootNode.Add(simpleShapesGroup);
+
 
         //
         // Create a few lines
@@ -96,10 +98,10 @@ public class TwoDimensionalCameraSample : CommonSample
         {
             // 2D coordinates of the line
             float x1 = -300;
-            float y1 = -50 + i * 20;
+            float y1 = -70 + i * 20;
             
             float x2 = -250;
-            float y2 = i * 20;
+            float y2 = -20 + i * 20;
 
             var lineNode = new LineNode()
             {
@@ -165,11 +167,7 @@ public class TwoDimensionalCameraSample : CommonSample
 
 
         //
-        // Create curve with BezierCurve class from Ab3d.PowerToys library (see Lines3D/CurvesSample in Ab3d.PowerToys samples project for more)
-        //
-        // NOTE:
-        // Ab3d.DXEngine cannot show real curves but only straight lines.
-        // But you can convert a curve to many lines to simulate a curve (but this may be seen when zooming in).
+        // Create curve with BezierCurve class
         //
         var curveControlPoints = new Vector3[]
         {
@@ -259,29 +257,57 @@ public class TwoDimensionalCameraSample : CommonSample
         simpleShapesGroup.Add(shapeOutlineNode);
 
 
-        AddText("Imported 2D CAD drawing:", new Vector3(-400, -50, 0), Colors.Black, fontSize: 20);
-
-        var importedLinesGroup = LoadSampleLinesData(lineThickness: 0.8f, targetPosition: new Vector2(-550, -280), targetSize: new Vector2(800, 600));
+        // Add many lines that are read from imported file (created from a 2D CAD file)
+        var importedLinesGroup = await LoadSampleLinesDataAsync(lineThickness: 0.8f, targetPosition: new Vector2(-400, -300), targetSize: new Vector2(600, 500));
 
         scene.RootNode.Add(importedLinesGroup);
+
+
+        await LoadFont();
+
+        AddText("2D lines and shapes:", new Vector3(-400, 180, 0), Colors.Black, fontSize: 20);
+        AddText("Imported 2D CAD drawing:", new Vector3(-400, -100, 0), Colors.Black, fontSize: 20);
+    }
+
+    private async Task LoadFont()
+    {
+        if (Scene == null || Scene.GpuDevice == null)
+            return;
+
+
+        string fontName = "Roboto-Black.ttf";
+
+        try
+        {
+#if VULKAN
+            string fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontName);
+            await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
+#elif WEB_GL
+            string fontFileName = Path.Combine("fonts", fontName);
+            await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName, Scene.GpuDevice.CanvasInterop);
+#endif
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage("Error loading font:\n" + ex.Message);
+            return;
+        }
+
+        // After font is loaded, we can create an instance of VectorFontFactory by passing the fontName to constructor
+        _vectorFontFactory = new VectorFontFactory(fontName);
     }
 
     private void AddText(string text, Vector3 position, Color4 textColor, float fontSize = 20, TextPositionTypes positionType = TextPositionTypes.Baseline)
     {
-        if (Scene == null)
+        if (Scene == null || _vectorFontFactory == null)
             return;
 
-        var vectorFontFactory = GetVectorFont();
-        
-        if (vectorFontFactory == null)
-            return;
-
-        var textMesh = vectorFontFactory.CreateTextMesh(text,
-                                                        position,
-                                                        positionType,
-                                                        textDirection: new Vector3(1, 0, 0),
-                                                        upDirection: new Vector3(0, 1, 0),
-                                                        fontSize: fontSize);
+        var textMesh = _vectorFontFactory.CreateTextMesh(text,
+                                                         position,
+                                                         positionType,
+                                                         textDirection: new Vector3(1, 0, 0),
+                                                         upDirection: new Vector3(0, 1, 0),
+                                                         fontSize: fontSize);
 
         if (textMesh == null)
             return;
@@ -295,45 +321,19 @@ public class TwoDimensionalCameraSample : CommonSample
         Scene.RootNode.Add(textMeshModelNode);
     }
 
-    private VectorFontFactory? GetVectorFont()
+    private async Task<GroupNode> LoadSampleLinesDataAsync(float lineThickness, Vector2 targetPosition, Vector2 targetSize)
     {
-        if (_vectorFontFactory != null)   
-            return _vectorFontFactory;
+        var linesGroup = new GroupNode("ImportedLines");
 
-        string fontName = "Roboto-Black.ttf";
-        string fontFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/TrueTypeFonts/", fontName);
 
-        // Load the font file
-        // This method can be called multiple times when the same fontName and fontFilePath is used.
-        // You can also check if font is loaded by calling:
-        // bool isLoaded = TrueTypeFontLoader.Instance.IsFontLoaded(fontName);
-
-        try
-        {
-            TrueTypeFontLoader.Instance.LoadFontFile(fontFileName, fontName);
-
-            // You can also use the async version of LoadFontFile method that read the font file in a background thread:
-            //await TrueTypeFontLoader.Instance.LoadFontFileAsync(fontFileName, fontName);
-        }
-        catch (Exception ex)
-        {
-            ShowErrorMessage("Error loading font:\n" + ex.Message);
-            return null;
-        }
-
-        _vectorFontFactory = new VectorFontFactory(fontName);
-        
-        return _vectorFontFactory;
-    }
-
-    private GroupNode LoadSampleLinesData(float lineThickness, Vector2 targetPosition, Vector2 targetSize)
-    {
         // Read many lines from a custom bin file format.
         // The bin file was created from a metafile (wmf) file that was read by Ab2d.ReaderWmf,
         // then the lines were grouped by color and saved to a custom bin file.
 
-        Vector2 boundsPosition, boundsSize;
-        var  lines = ReadLineDataFromBin(out boundsPosition, out boundsSize);
+        (List<LineData>? lines, Vector2 boundsPosition, Vector2 boundsSize) = await ReadLineDataFromBinAsync();
+
+        if (lines == null)
+            return linesGroup;
 
 
         var targetCenter = new Vector2(targetPosition.X + targetSize.X * 0.5f, targetPosition.Y + targetSize.Y * 0.5f);
@@ -352,8 +352,6 @@ public class TwoDimensionalCameraSample : CommonSample
                                             0, -scale, // We also need to flip y axis because here y axis is pointing up
                                             xOffset, yOffset);
 
-
-        var linesGroup = new GroupNode("ImportedLines");
 
         for (var i = 0; i < lines.Count; i++)
         {
@@ -394,17 +392,39 @@ public class TwoDimensionalCameraSample : CommonSample
         return linesGroup;
     }
 
-    private static List<LineData> ReadLineDataFromBin(out Vector2 boundsPosition, out Vector2 boundsSize)
+    private async Task<(List<LineData>?, Vector2 boundsPosition, Vector2 boundsSize)> ReadLineDataFromBinAsync()
     {
         List<LineData> lines;
+        Vector2 boundsPosition, boundsSize;
 
         // Get all the names of the embedded resources in the assembly
         //var manifestResourceNames = typeof(TwoDimensionalCameraSample).Assembly.GetManifestResourceNames();
 
-        var stream = typeof(TwoDimensionalCameraSample).Assembly.GetManifestResourceStream("Ab4d.SharpEngine.Samples.Common.Resources.palazz_sport.bin");
+
+        // Read many lines from palazz_sport.bin file. This file uses a custom binary file format.
+        // The bin file was created from a metafile (wmf) file that was read by Ab2d.ReaderWmf,
+        // then the lines were grouped by color and saved to a custom bin file.
+        string sampleDataFileName = "Resources/palazz_sport.bin";
         
+        Stream? stream;
+
+#if WEB_GL
+        if (Scene == null || Scene.GpuDevice == null)
+            return (null, Vector2.Zero, Vector2.Zero);
+
+        var sampleFileBytes = await Scene.GpuDevice.CanvasInterop.LoadBinaryFileAsync(sampleDataFileName);
+        stream = new MemoryStream(sampleFileBytes);
+
+#else
+        string fullFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sampleDataFileName);
+        fullFileName = FileUtils.FixDirectorySeparator(fullFileName);
+        stream = System.IO.File.OpenRead(fullFileName);
+#endif
+
+                
         if (stream == null)
-            throw new FileNotFoundException("The embedded resource 'palazz_sport.bin' was not found in the assembly. Please make sure it is included in the project and set to 'Embedded Resource'.");
+            throw new FileNotFoundException("The resource file 'palazz_sport.bin' was not found.");
+
 
         using (stream)
         {
@@ -441,15 +461,15 @@ public class TwoDimensionalCameraSample : CommonSample
             }
         }
 
-        return lines;
+        return (lines, boundsPosition, boundsSize);
     }
 
     private class LineData
     {
-        public Color4 LineColor;
-        public float LineThickness;
-        public bool IsLineStrip;
-        public List<Vector2> Positions;
+        public readonly Color4 LineColor;
+        public readonly float LineThickness;
+        public readonly bool IsLineStrip;
+        public readonly List<Vector2> Positions;
 
         public LineData(Color4 lineColor, float lineThickness, bool isLineStrip, int initialPointsCount = 0)
         {

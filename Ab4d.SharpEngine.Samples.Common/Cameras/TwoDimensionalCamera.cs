@@ -1,14 +1,11 @@
-﻿using System;
-using System.Drawing;
-using System.Numerics;
-using System.Windows;
+﻿using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Utilities;
 
 namespace Ab4d.SharpEngine.Cameras;
 
 // NOTE:
-// Please submit improvements and fixed to TwoDimensionalCamera to https://github.com/ab4d/Ab3d.DXEngine.Wpf.Samples
+// Please submit improvements and fixes to TwoDimensionalCamera to https://github.com/ab4d/Ab4d.SharpEngine.Samples
 
 
 /// <summary>
@@ -80,7 +77,7 @@ public class TwoDimensionalCamera
 
     /// <summary>
     /// Gets a Boolean that was set when creating this TwoDimensionalCamera and specifies if screen space units are used.
-    /// When false the device independent units are used - scaled by DPI scale (the same units are used by WPF).
+    /// When false the device independent units are used - scaled by DPI scale.
     /// </summary>
     public bool UseScreenPixelUnits
     {
@@ -228,7 +225,7 @@ public class TwoDimensionalCamera
     /// Constructor
     /// </summary>
     /// <param name="pointerCameraController">ManualPointerCameraController</param>
-    /// <param name="useScreenPixelUnits">Boolean that specifies if screen space units are used. When false the device independent units are used - scaled by DPI scale (the same units are used by WPF).</param>
+    /// <param name="useScreenPixelUnits">Boolean that specifies if screen space units are used. When false the device independent units are used - scaled by DPI scale.</param>
     /// <param name="coordinateSystemType">CoordinateSystemTypes</param>
     public TwoDimensionalCamera(ManualPointerCameraController pointerCameraController, bool useScreenPixelUnits, TwoDimensionalCoordinateSystems coordinateSystemType = TwoDimensionalCoordinateSystems.CenterOfViewOrigin)
     {
@@ -250,7 +247,7 @@ public class TwoDimensionalCamera
         ParentSceneView.ViewResized += OnSceneViewSizeChanged;
 
         _zoomFactor = 1;
-        UpdateDpiScale(); // Call this method even if DXScene is not yet initialized - in this case the _dpiScale and _singlePixelLineThickness will be set to 1 (and will not be 0 anymore)
+        UpdateDpiScale(); // Call this method even if Scene is not yet initialized - in this case the _dpiScale and _singlePixelLineThickness will be set to 1 (and will not be 0 anymore)
 
 
         // Set camera initial values
@@ -371,8 +368,8 @@ public class TwoDimensionalCamera
 
         if (this.UseScreenPixelUnits)
         {
-            viewWidth = sceneView.Width;
-            viewHeight = sceneView.Height;
+            viewWidth = sceneView.Width / sceneView.DpiScaleX;
+            viewHeight = sceneView.Height / sceneView.DpiScaleY;
         }
         else
         {
@@ -380,6 +377,7 @@ public class TwoDimensionalCamera
             viewHeight = sceneView.RenderHeight;
         }
 
+        UpdateDpiScale();
 
         ViewSize = new Vector2(viewWidth, viewHeight);
 

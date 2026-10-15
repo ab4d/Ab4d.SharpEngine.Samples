@@ -45,6 +45,9 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\palazz_sport.bin" Link="Resources\palazz_sport.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
     <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
   </ItemGroup>
@@ -88,5 +91,5 @@
     <Folder Include="Resources\Textures\CloudyLightRays\" />
     <Folder Include="Resources\Textures\metal_plate_1k\" />
   </ItemGroup>
-
+  
 </Project>

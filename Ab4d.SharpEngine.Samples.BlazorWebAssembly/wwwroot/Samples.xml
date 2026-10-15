@@ -13,6 +13,7 @@
   <Sample Location="Cameras.Point3DTo2DSample" Title="Point3DTo2D"/>
   <Sample Location="Cameras.CustomCoordinateSystemSample" Title="Custom coordinate system"/>
   <Sample Location="Cameras.OffCenterCameraSample" Title="Off-center scene rendering"/>
+  <Sample Location="Cameras.TwoDimensionalCameraSample" Title="TwoDimensionalCamera" IsNew="True"/>
 
   <Sample Location="Titles.PointerCameraControllerTitle.md" IsTitle="True" Title="PointerCameraController"/>
   <Sample Location="CameraControllers.PointerCameraControllerSample" Title="PointerCameraController"/>
@@ -79,6 +80,7 @@
   <Sample Location="Graphs.AxisWithLabelsSamples" Title="AxisWithLabels"/>
   <Sample Location="Graphs.AxesBoxNodeSample" Title="AxesBoxNode"/>
   <Sample Location="Graphs.Plot3DSample" Title="3D Plot"/>
+  <Sample Location="Graphs.Graph2DSample" Title="2D Graph" IsNew="True"/>
 
   <Sample Location="Titles.LightsTitle.md" IsTitle="True" Title="Lights"/>
   <Sample Location="Lights.LightsSample" Title="Lights"/>

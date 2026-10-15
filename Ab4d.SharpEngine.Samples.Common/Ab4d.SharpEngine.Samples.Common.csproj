@@ -31,7 +31,6 @@
     <None Remove="Titles\*.md" />
     <None Remove="Importers\CadImporterInfo.md" />
     <None Remove="Resources\CadImporter-for-SharpEngine.png" />
-    <None Remove="Resources\palazz_sport.bin" />
     <None Remove="Resources\Textures\sharp-engine-logo.png" />
     <None Remove="StandardModels\OtherStandardModelsTitle.md" />
   </ItemGroup>
@@ -44,7 +43,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Importers\CadImporterInfo.md" />
-    <EmbeddedResource Include="Resources\palazz_sport.bin" />
   </ItemGroup>
 
   <ItemGroup>
