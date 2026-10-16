@@ -310,7 +310,7 @@ public class MaterialsSample : CommonSample
         // Another option is to set the PositionColors array in the VertexColorMaterial object.
         // This will also overwrite the data in the VertexColors data channel.
         //
-        // It is recommended to use VertexColors data channel instead of PositionColors in VertexColorMaterial
+        // It is recommended to use VertexColors data channel instead of PositionColors array in VertexColorMaterial
         // because in this case the color is just another property of each position in the mesh
         // and therefore that data belongs to the mesh.
         //
@@ -332,6 +332,8 @@ public class MaterialsSample : CommonSample
         //
         // By default, the colors are not pre-multiplied by alpha value,
         // but if you want to use alpha pre-multiplied colors, then set the IsPreMultiplyAlpha property on VertexColorMaterial to true.
+
+        // See also VertexColorsMaterialSample for more info.
 
         var vertexColorMaterial = new VertexColorMaterial("VertexColorMaterial")
         {
@@ -452,7 +454,7 @@ public class MaterialsSample : CommonSample
     }
 
     
-    private Color4[]? GetSphereVertexColors(StandardMesh sphereMesh, float sphereRadius)
+    public static Color4[]? GetSphereVertexColors(StandardMesh sphereMesh, float sphereRadius)
     {
         if (sphereMesh.Vertices == null)
             return null;
@@ -484,7 +486,7 @@ public class MaterialsSample : CommonSample
         return positionColors;
     }
     
-    private Color4[]? GetBoxVertexColors(StandardMesh boxMesh)
+    public static Color4[]? GetBoxVertexColors(StandardMesh boxMesh)
     {
         if (boxMesh.Vertices == null)
             return null;
