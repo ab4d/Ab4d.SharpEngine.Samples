@@ -80,7 +80,7 @@
   <Sample Location="Importers.StlImporterExporterSample" Title="Stl Importer and Exporter"/>
   <Sample Location="Importers.GltfImporterExporterSample" Title="glTF Importer and Exporter" IsUpdated="True" UpdateInfo="Added support for importing keyframe and skeletal animations.&#x0a;See 'Animation/Imported animations' sample for more info."/>
   <Sample Location="Importers.AssimpImporterSample" Title="AssimpImporter" IsUpdated="True" UpdateInfo="Added support for importing keyframe and skeletal animations.&#x0a;See 'Animation/Imported animations' sample for more info."/>
-  <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer"/>
+  <Sample Location="Importers.PointCloudImporterSample" Title="Point-cloud importer" IsUpdated="True" UpdateInfo="Added IsWorldSize property"/>
   <Sample Location="Importers.CadImporterInfo.md" Title="CAD files importer" Condition="IsWpf, IsAvalonia, IsWinForms"/>
   
   <Sample Location="Titles.LinesTitle.md" IsTitle="True" Title="3D lines"/>

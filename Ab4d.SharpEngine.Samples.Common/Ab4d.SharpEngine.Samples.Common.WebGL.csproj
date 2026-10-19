@@ -40,7 +40,10 @@
     <Compile Remove="Lights\PCSShadowsSample.cs" />
     
     <Compile Remove="Materials\PhysicallyBasedMaterialSample.cs" />
-    
+
+    <Compile Remove="Importers\**" />
+    <Compile Include="Importers\PointCloudImporterSample.cs" />
+
     <Compile Remove="Animations\ImportedAnimationsSample.cs" />
 
     <Compile Remove="Advanced\*" />
@@ -53,15 +56,14 @@
 
     <Compile Remove="Utils\*" />
     <Compile Include="Utils\CsvDataReader.cs" />
+    <Compile Include="Utils\PlyPointCloudReader.cs" />
+    <Compile Include="Utils\PlyPointCloudWriter.cs" />
 
     <None Remove="Samples.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Diagnostics\**" />
-    <!--<Compile Remove="Graphs\**" />-->
-    <Compile Remove="Importers\**" />
-    <None Remove="Importers\**" />
     <None Remove="Resources\**" />
     <EmbeddedResource Remove="Resources\**" />
     <Compile Remove="Resources\**" />

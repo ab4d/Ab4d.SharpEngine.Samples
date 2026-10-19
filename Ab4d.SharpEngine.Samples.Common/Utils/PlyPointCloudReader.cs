@@ -36,145 +36,158 @@ namespace Ab4d.SharpEngine.Samples.Common.Utils
 
         public Vector3[] ReadPointCloud(string fileName)
         {
+            fileName = FileUtils.FixDirectorySeparator(fileName);
+
+            using var fs = System.IO.File.OpenRead(fileName);
+            return ReadPointCloud(fs);
+        }
+        
+        public async Task<Vector3[]> ReadPointCloudAsync(string fileName)
+        {
+            fileName = FileUtils.FixDirectorySeparator(fileName);
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(fileName);
+            var memoryStream = new MemoryStream(fileBytes);
+
+            return ReadPointCloud(memoryStream);
+        }
+
+        public Vector3[] ReadPointCloud(Stream fileStream)
+        {
             ResetFile();
 
             Vector3[]? vertices = null;
             Color4[]? pixelColors = null;
 
-            fileName = FileUtils.FixDirectorySeparator(fileName);
-            
-            using (var fs = System.IO.File.OpenRead(fileName))
+            using (var reader = new BinaryReader(fileStream))
             {
-                using (var reader = new BinaryReader(fs))
+                ReadHeader(reader);
+
+                if (VerticesCount == 0)
+                    throw new FormatException("No vertices defined");
+
+                if (!HasStandardPosition())
+                    throw new FormatException("Cannot read ply file because vertex positions are not defined in a standard way (x, y, z)");
+                
+                vertices = new Vector3[VerticesCount];
+
+                if (FileFormat == "ascii")
                 {
-                    ReadHeader(reader);
+                    bool swapRedAndBlue;
+                    int colorIndex = GetColorIndex(requireUCharColor: false, swapRedAndBlue: out swapRedAndBlue);
+                    int redOffset = swapRedAndBlue ? 0 : 2;
+                    int blueOffset = swapRedAndBlue ? 2 : 1;
 
-                    if (VerticesCount == 0)
-                        throw new FormatException("No vertices defined");
-
-                    if (!HasStandardPosition())
-                        throw new FormatException("Cannot read ply file because vertex positions are not defined in a standard way (x, y, z)");
-                    
-                    vertices = new Vector3[VerticesCount];
-
-                    if (FileFormat == "ascii")
+                    if (colorIndex > 0)
                     {
-                        bool swapRedAndBlue;
-                        int colorIndex = GetColorIndex(requireUCharColor: false, swapRedAndBlue: out swapRedAndBlue);
-                        int redOffset = swapRedAndBlue ? 0 : 2;
-                        int blueOffset = swapRedAndBlue ? 2 : 1;
+                        pixelColors = new Color4[VerticesCount];
 
-                        if (colorIndex > 0)
+                        for (int i = 0; i < VerticesCount; i++)
                         {
-                            pixelColors = new Color4[VerticesCount];
+                            ReadLineParts(reader, maxLength: 100);
 
-                            for (int i = 0; i < VerticesCount; i++)
-                            {
-                                ReadLineParts(reader, maxLength: 100);
+                            float x = float.Parse(_lineParts[0], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                            float y = float.Parse(_lineParts[1], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                            float z = float.Parse(_lineParts[2], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
 
-                                float x = float.Parse(_lineParts[0], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-                                float y = float.Parse(_lineParts[1], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-                                float z = float.Parse(_lineParts[2], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-
-                                vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
+                            vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
 
 
-                                int red   = Int32.Parse(_lineParts[colorIndex + redOffset]);
-                                int green = Int32.Parse(_lineParts[colorIndex + 1]);
-                                int blue  = Int32.Parse(_lineParts[colorIndex + blueOffset]);
+                            int red   = Int32.Parse(_lineParts[colorIndex + redOffset]);
+                            int green = Int32.Parse(_lineParts[colorIndex + 1]);
+                            int blue  = Int32.Parse(_lineParts[colorIndex + blueOffset]);
 
-                                pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
-                            }
-                        }
-                        else
-                        {
-                            // Read only positions
-                            for (int i = 0; i < VerticesCount; i++)
-                            {
-                                ReadLineParts(reader, maxLength: 100);
-
-                                float x = float.Parse(_lineParts[0], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-                                float y = float.Parse(_lineParts[1], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-                                float z = float.Parse(_lineParts[2], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
-
-                                vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
-                            }
+                            pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
                         }
                     }
-                    else if (FileFormat == "binary_little_endian")
-                    {
-                        var oneElementSize = GetSizeOfElements(_vertexElementTypes);
-
-                        if (!HasFloatPositionFormat())
-                            throw new FormatException("Binary ply file cannot be read because positions are not defined as float values");
-
-
-                        bool swapRedAndBlue;
-                        int colorIndex = GetColorIndex(requireUCharColor: true, swapRedAndBlue: out swapRedAndBlue);
-
-                        if (colorIndex > 0)
-                        {
-                            var colorOffset = GetElementOffset(colorIndex);
-                            var skippedSizeAfterPosition = colorOffset - 3 * 4;               // how many bytes we need to skip to read the color after reading the position (position is 3 * 4 bytes)
-                            var skippedSizeAfterColor = oneElementSize - colorOffset - 3; // we read 3 float32, then skip colorOffset and read 3 uchars, other bytes need to be skipped
-
-                            pixelColors = new Color4[VerticesCount];
-
-                            for (int i = 0; i < VerticesCount; i++)
-                            {
-                                float x = reader.ReadSingle();
-                                float y = reader.ReadSingle();
-                                float z = reader.ReadSingle();
-
-                                vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
-
-                                if (skippedSizeAfterPosition > 0)
-                                    reader.BaseStream.Seek(skippedSizeAfterPosition, SeekOrigin.Current);
-
-                                byte red   = reader.ReadByte();
-                                byte green = reader.ReadByte();
-                                byte blue  = reader.ReadByte();
-
-                                if (swapRedAndBlue)
-                                {
-                                    byte temp = red;
-                                    red = blue;
-                                    blue = temp;
-                                }
-
-                                pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
-
-                                if (skippedSizeAfterColor > 0)
-                                    reader.BaseStream.Seek(skippedSizeAfterColor, SeekOrigin.Current);
-                            }
-                        }
-                        else
-                        {
-                            // Read only positions
-                            var skippedSize = oneElementSize - 3 * 4; // we read 3 float32, other bytes need to be skipped
-
-                            for (int i = 0; i < VerticesCount; i++)
-                            {
-                                float x = reader.ReadSingle();
-                                float y = reader.ReadSingle();
-                                float z = reader.ReadSingle();
-
-                                vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
-
-                                if (skippedSize > 0)
-                                    reader.BaseStream.Seek(skippedSize, SeekOrigin.Current);
-                            }
-                        }
-                    }
-                    //else if (FileFormat == "binary_big_endian")
-                    //{
-                    //    // TODO:
-                    //    // See https://stackoverflow.com/questions/8620885/c-sharp-binary-reader-in-big-endian
-                    //}
                     else
                     {
-                        throw new FormatException("Unsupported file format: " + FileFormat);
+                        // Read only positions
+                        for (int i = 0; i < VerticesCount; i++)
+                        {
+                            ReadLineParts(reader, maxLength: 100);
+
+                            float x = float.Parse(_lineParts[0], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                            float y = float.Parse(_lineParts[1], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+                            float z = float.Parse(_lineParts[2], NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture);
+
+                            vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
+                        }
                     }
+                }
+                else if (FileFormat == "binary_little_endian")
+                {
+                    var oneElementSize = GetSizeOfElements(_vertexElementTypes);
+
+                    if (!HasFloatPositionFormat())
+                        throw new FormatException("Binary ply file cannot be read because positions are not defined as float values");
+
+
+                    bool swapRedAndBlue;
+                    int colorIndex = GetColorIndex(requireUCharColor: true, swapRedAndBlue: out swapRedAndBlue);
+
+                    if (colorIndex > 0)
+                    {
+                        var colorOffset = GetElementOffset(colorIndex);
+                        var skippedSizeAfterPosition = colorOffset - 3 * 4;               // how many bytes we need to skip to read the color after reading the position (position is 3 * 4 bytes)
+                        var skippedSizeAfterColor = oneElementSize - colorOffset - 3; // we read 3 float32, then skip colorOffset and read 3 uchars, other bytes need to be skipped
+
+                        pixelColors = new Color4[VerticesCount];
+
+                        for (int i = 0; i < VerticesCount; i++)
+                        {
+                            float x = reader.ReadSingle();
+                            float y = reader.ReadSingle();
+                            float z = reader.ReadSingle();
+
+                            vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
+
+                            if (skippedSizeAfterPosition > 0)
+                                reader.BaseStream.Seek(skippedSizeAfterPosition, SeekOrigin.Current);
+
+                            byte red   = reader.ReadByte();
+                            byte green = reader.ReadByte();
+                            byte blue  = reader.ReadByte();
+
+                            if (swapRedAndBlue)
+                            {
+                                byte temp = red;
+                                red = blue;
+                                blue = temp;
+                            }
+
+                            pixelColors[i] = new Color4((float)red / 255f, (float)green / 255f, (float)blue / 255f, 1);
+
+                            if (skippedSizeAfterColor > 0)
+                                reader.BaseStream.Seek(skippedSizeAfterColor, SeekOrigin.Current);
+                        }
+                    }
+                    else
+                    {
+                        // Read only positions
+                        var skippedSize = oneElementSize - 3 * 4; // we read 3 float32, other bytes need to be skipped
+
+                        for (int i = 0; i < VerticesCount; i++)
+                        {
+                            float x = reader.ReadSingle();
+                            float y = reader.ReadSingle();
+                            float z = reader.ReadSingle();
+
+                            vertices[i] = new Vector3(x, z, y); // swap z and y; we assume that SwapYZCoordinates is true (if not, we fix that later - see code below)
+
+                            if (skippedSize > 0)
+                                reader.BaseStream.Seek(skippedSize, SeekOrigin.Current);
+                        }
+                    }
+                }
+                //else if (FileFormat == "binary_big_endian")
+                //{
+                //    // TODO:
+                //    // See https://stackoverflow.com/questions/8620885/c-sharp-binary-reader-in-big-endian
+                //}
+                else
+                {
+                    throw new FormatException("Unsupported file format: " + FileFormat);
                 }
             }
 

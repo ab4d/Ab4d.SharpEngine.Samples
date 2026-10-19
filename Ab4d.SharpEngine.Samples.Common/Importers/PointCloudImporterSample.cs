@@ -1,9 +1,10 @@
-﻿using System.Globalization;
-using System.Numerics;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Samples.Common.Utils;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
+using System.Globalization;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Importers;
 
@@ -21,44 +22,75 @@ public class PointCloudImporterSample : CommonSample
 
     private ICommonSampleUIElement? _textBoxElement;
     private ICommonSampleUIElement? _pixelsCountLabel;
+    private ICommonSampleUIElement? _loadingLabel;
 
     private string? _importedFileName;
     private int _importedPixelsCount;
 
+    private bool _isWorldSize = false;
+    private bool _showCircularPixels = false;
     private bool _isZAxisUp = true;
-    private float _pixelsSize = 1;
+    private float _pixelsSize = 2;
+    private float _pixelSizeFactor = 1;
 
     private Vector2? _savedAxisPanelPosition;
 
     private float _boundsDiagonalLength;
     private PixelsNode? _pixelsNode;
-
-
+    private GpuImage? _whiteCircleGpuImage;
+    
     public PointCloudImporterSample(ICommonSamplesContext context)
         : base(context)
     {
     }
 
-    protected override void OnCreateScene(Scene scene)
+    protected override async Task OnCreateSceneAsync(Scene scene)
     {
+#if VULKAN
         string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
-        LoadPointCloud(fileName);
+#else
+        string fileName = _initialFileName;
+#endif
 
         ShowCameraAxisPanel = true;
-    }   
 
+        await LoadPointCloud(fileName);
+
+        // We also load a texture with white circle that can be used to render circular pixels.
+        // Because the circle is white it can be multiplied by the pixel color to get the desired color.
+        // NOTE:
+        // We do not generate the mip-maps for this texture. We will also use a ClampNoInterpolation sampler.
+        // This is needed to prevent darkening the at the edges of the circle that is produces by using semi-transparent pixels 
+        // that are generated when producing mip-maps and when using the default anisotropic sampler.
+        var textureFileName = base.GetCommonTexturePath("white-circle-64x64-noaa.png");
+        _whiteCircleGpuImage ??= await TextureLoader.CreateTextureAsync(textureFileName, scene, generateMipMaps: false);
+    }
+
+#if VULKAN // CameraAxisPanel is currently not supported in WebGL
     /// <inheritdoc />
     protected override void OnDisposed()
     {
-        if (_savedAxisPanelPosition != null && CameraAxisPanel != null)
-            CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
+        if (CameraAxisPanel != null)
+        {
+            if (_savedAxisPanelPosition != null)
+                CameraAxisPanel.Position = _savedAxisPanelPosition.Value;
+
+            if (_isZAxisUp)
+            {
+                // Reset to Y up axis
+                CameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                              yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Green,
+                                              zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Blue);
+            }
+        }
 
         base.OnDisposed();
     }
+#endif
 
-    protected void LoadPointCloud(string? fileName)
+    protected async Task LoadPointCloud(string? fileName)
     {
-        if (Scene == null || fileName == null)
+        if (Scene == null || fileName == null || this.IsDisposed)
             return;
 
         Scene.RootNode.Clear();
@@ -72,7 +104,7 @@ public class PointCloudImporterSample : CommonSample
 
         try
         {
-            positions = LoadPositions(fileName, out positionColors);
+            (positions, positionColors) = await LoadPositions(fileName);
         }
         catch (Exception ex)
         {
@@ -80,6 +112,9 @@ public class PointCloudImporterSample : CommonSample
             ShowErrorMessage("Error importing file:\n" + ex.Message);
             return;
         }
+        
+        if (this.IsDisposed) // Exit when user changes the sample before async operation was completed
+            return;
 
         if (positions == null)
         {
@@ -96,7 +131,9 @@ public class PointCloudImporterSample : CommonSample
             targetPositionCamera.Distance = _boundsDiagonalLength * 1.8f;
         }
         
-       
+        _pixelSizeFactor = _boundsDiagonalLength / 1000f; // When using WorldSize pixel size, then set the Maximum size based on the size of the scene (max value is 1/200 of the _boundsDiagonalLength)
+        var usedPixelSize = _isWorldSize ? _pixelsSize * _pixelSizeFactor : _pixelsSize; // When using WorldSize, then scale pixel size based on the size of loaded point cloud
+
         // Create PixelsNode that will show the positions.
         // We can also pass the positionBounds that define the BoundingBox of the positions.
         // If this is not done, the BoundingBox is calculated by the SharpEngine by checking all the positions.
@@ -104,7 +141,10 @@ public class PointCloudImporterSample : CommonSample
         // When using PixelColors, PixelColor is used as a mask (multiplied with each color in PixelColors)
         Color4 pixelColor = positionColors != null ? Colors.White : Colors.Black;
 
-        _pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, _pixelsSize, "PixelsNode");
+        _pixelsNode = new PixelsNode(positions, positionsBounds, pixelColor, usedPixelSize, "PixelsNode")
+        {
+            IsWorldSize = _isWorldSize
+        };
 
         if (positionColors != null)
             _pixelsNode.PixelColors = positionColors;
@@ -116,16 +156,39 @@ public class PointCloudImporterSample : CommonSample
         _importedFileName = fileName;
 
         _pixelsCountLabel?.UpdateValue();
+
+        _loadingLabel?.SetIsVisible(false);
+
+#if VULKAN
+        if (CameraAxisPanel != null)
+        {
+            if (_isZAxisUp)
+            {
+                // Show Z up axis
+                CameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                              yAxisVector: new Vector3(0, 0, 1), yAxisColor: Colors.Green,
+                                              zAxisVector: new Vector3(0, 1, 0), zAxisColor: Colors.Blue);
+            }
+            else
+            {
+                // Reset to Y up axis
+                CameraAxisPanel.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                              yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Green,
+                                              zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Blue);
+            }
+        }
+#endif
     }
 
-    private Vector3[]? LoadPositions(string fileName, out Color4[]? positionColors)
+    private async Task<(Vector3[]? positions, Color4[]? positionColors)> LoadPositions(string fileName)
     {
         Vector3[]? positions;
+        Color4[]? positionColors;
         
         fileName = FileUtils.FixDirectorySeparator(fileName);
         
         var fileExtension = System.IO.Path.GetExtension(fileName);
-        bool swapYZCoordinates = _isZAxisUp;
+
 
         // Use PlyPointCloudReader to read .ply files
         // PlyPointCloudReader is available with full source code in the Ab4d.SharpEngine.Samples.Common project
@@ -134,16 +197,26 @@ public class PointCloudImporterSample : CommonSample
         {
             var plyPointCloudReader = new PlyPointCloudReader()
             {
-                SwapYZCoordinates = swapYZCoordinates
+                SwapYZCoordinates = _isZAxisUp
             };
 
-            positions = plyPointCloudReader.ReadPointCloud(fileName);
+#if WEB_GL
+            if (GpuDevice == null)
+                return (null, null);
+
+            byte[] fileBytes = await GpuDevice.CanvasInterop.LoadBinaryFileAsync(fileName);
+            var memoryStream = new MemoryStream(fileBytes);
+
+            positions = plyPointCloudReader.ReadPointCloud(memoryStream);
+#else
+            positions = await plyPointCloudReader.ReadPointCloudAsync(fileName);
+#endif
 
             positionColors = plyPointCloudReader.PixelColors;
         }
         else if (fileExtension.Equals(".xyz", StringComparison.OrdinalIgnoreCase))
         {
-            positions = LoadXyzFile(fileName, out positionColors);
+            (positions, positionColors) = await LoadXyzFileAsync(fileName);
         }
         else
         {
@@ -152,20 +225,21 @@ public class PointCloudImporterSample : CommonSample
             positionColors = null;
         }
 
-        return positions;
+        return (positions, positionColors);
     }
 
     // Load xyz files that have x,y and z value separated by tab ('\t')
     // It can also read position colors that are written after z value: color is written as red, green and blue separated by tab ('\t').
     // Note that the code below is from the performance and memory usage not optimal because it uses File.ReadAllLines.
     // This requires reading the whole file and storing it into memory. It would be better to use stream reader and read line by line.
-    private Vector3[] LoadXyzFile(string fileName, out Color4[]? positionColors)
+    private async Task<(Vector3[] positions, Color4[]? positionColors)> LoadXyzFileAsync(string fileName)
     {
-        var fileLines = System.IO.File.ReadAllLines(fileName);
+        var fileLines = await System.IO.File.ReadAllLinesAsync(fileName);
 
         int count = fileLines.Length;
 
         var positions = new Vector3[count];
+        Color4[]? positionColors;
 
         var oneLine = fileLines[0];
         var oneLineParts = oneLine.Split('\t');
@@ -202,53 +276,91 @@ public class PointCloudImporterSample : CommonSample
             }
         }
 
-        return positions;
+        return (positions, positionColors);
     }
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
+        if (_pixelsNode == null) // if point cloud is not yet loaded show "Loading point cloud ..."
+        {
+            ui.CreateStackPanel(PositionTypes.Center, addBorder: false);
+            _loadingLabel = ui.CreateLabel("Loading point cloud ...");
+        }
+
+
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
         _pixelsCountLabel = ui.CreateKeyValueLabel("Pixels count:", () => $"{_importedPixelsCount:#,##0}");
 
         ui.AddSeparator();
 
-        
 
-        // If GpuDevice is already defined, then get the minimum pixel size that is supported by the current GPU.
-        // For example, for NVIDIA this is usually 1, for Intel 0.125.
-        // Note that the PointSizeRange[1] defines the max pixel size (this is much usually much bigger than in our sample, for example for NVIDIA: 2047.9375, for Intel: 255.875)
-        float minPixelSize;
-        if (GpuDevice != null)
-            minPixelSize = GpuDevice.PhysicalDeviceDetails.PhysicalDeviceLimitsEx.PointSizeRange[0];
-        else
-            minPixelSize = 1;
-
-        ui.CreateSlider(minPixelSize, maxValue: 5f, 
+        ui.CreateSlider(minValue: 0.1f, maxValue: 5f, 
             getValueFunc: () => _pixelsSize, 
             setValueAction: newValue =>
             {
                 _pixelsSize = newValue;
+                var usedPixelSize = _isWorldSize ? _pixelsSize * _pixelSizeFactor : _pixelsSize; // When using WorldSize, then scale pixel size based on the size of loaded point cloud
                 if (_pixelsNode != null)
-                    _pixelsNode.PixelSize = newValue;
+                    _pixelsNode.PixelSize = usedPixelSize;
             },
             width: 100,
             keyText: "PixelSize:",
             formatShownValueFunc: sliderValue => sliderValue.ToString("F1"));
 
+        ui.CreateCheckBox("IsWorldSize (?):When checked then the PixelSize is specified in 3D world coordinates\n(when using perspective camera, the size of the pixel is smaller when it is farther away from the camera).\n\nWhen unchecked, then the size is defined in screen coordinates\n(the size of the pixel is always the same regardless of the distance from the camera).", 
+            _isWorldSize, (isChecked) =>
+            {
+                _isWorldSize = isChecked;
+                var usedPixelSize = _isWorldSize ? _pixelsSize * _pixelSizeFactor : _pixelsSize; // When using WorldSize, then scale pixel size based on the size of loaded point cloud
+
+                if (_pixelsNode != null)
+                {
+                    _pixelsNode.IsWorldSize = _isWorldSize;
+                    _pixelsNode.PixelSize = usedPixelSize;
+                }
+            });
+        
+        
         ui.AddSeparator();
 
+        
+        ui.CreateCheckBox("Is circular pixel", 
+            _showCircularPixels, (isChecked) =>
+            {
+                _showCircularPixels = isChecked;
+
+                if (_showCircularPixels)
+                {
+                    if (_whiteCircleGpuImage != null)
+                    {
+                        // To render texture for each pixel, we call the SetTexture method.
+                        // In this sample we also need to adjust the alphaClipThreshold from the default value of 0.5 to 0.1f,
+                        // because when using transparent colors, the alpha value of the pixels is set to 0.2f and the default alphaClipThreshold of 0.5 would not render any pixels.
+                        _pixelsNode?.SetTexture(_whiteCircleGpuImage, CommonSamplerTypes.ClampNoInterpolation, alphaClipThreshold: 0.1f);
+                    }
+                }
+                else
+                {
+                    _pixelsNode?.RemoveTexture();
+                }
+            });
+
+        ui.AddSeparator();
+
+
+#if VULKAN
         ui.CreateCheckBox("Is Z axis up", _isZAxisUp, isChecked =>
         {
             _isZAxisUp = isChecked;
 
             if (_importedFileName != null)
-                LoadPointCloud(_importedFileName); // Load again
+                _ = LoadPointCloud(_importedFileName); // Load again
         });
 
 
         // Try to register for file drag-and-drop
-        bool isDragAndDropSupported = ui.RegisterFileDropped(".*", LoadPointCloud);
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".*", (fileName) => _ = LoadPointCloud(fileName));
 
         if (isDragAndDropSupported)
         {
@@ -275,5 +387,6 @@ public class PointCloudImporterSample : CommonSample
                 CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
             }
         }
+#endif
     }
 }
