@@ -42,6 +42,7 @@
     <Compile Remove="Materials\PhysicallyBasedMaterialSample.cs" />
 
     <Compile Remove="Importers\**" />
+    <None Remove="Importers\**" />
     <Compile Include="Importers\PointCloudImporterSample.cs" />
 
     <Compile Remove="Animations\ImportedAnimationsSample.cs" />
