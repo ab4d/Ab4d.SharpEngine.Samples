@@ -116,7 +116,7 @@ public class PixelOptionsSample : CommonSample
         scene.RootNode.Add(multiColorMultiSizePixelsNode);
         
 
-        ChangeTexture(selectedIndex: 1); // show circle texture by default
+        await ChangeTextureAsync(selectedIndex: 1); // show circle texture by default
 
 
         //
@@ -170,7 +170,7 @@ public class PixelOptionsSample : CommonSample
         return pixelColors;
     }
     
-    private async void ChangeTexture(int selectedIndex)
+    private async Task ChangeTextureAsync(int selectedIndex)
     {
         if (Scene == null)
             return;
@@ -279,6 +279,6 @@ public class PixelOptionsSample : CommonSample
 
         ui.CreateRadioButtons(
             new string[] { "No texture (square pixels)", "Circle texture", "Tree texture" }, 
-            (selectedIndex, selectedText) => ChangeTexture(selectedIndex), selectedItemIndex: 1);
+            (selectedIndex, selectedText) => _ = ChangeTextureAsync(selectedIndex), selectedItemIndex: 1);
     }
 }
