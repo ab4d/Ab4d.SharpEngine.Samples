@@ -57,16 +57,6 @@ public class SphereModelNodeSample : StandardModelsSampleBase
 
         ui.AddSeparator();
 
-        //ui.CreateSlider(3, 40,
-        //    () => _sphereSegmentsCount,
-        //    newValue =>
-        //    {
-        //        _sphereSegmentsCount = (int)newValue;
-        //        UpdateModelNode();
-        //    },
-        //    100,
-        //    keyText: "Segments:",
-        //    formatShownValueFunc: newValue => newValue.ToString("F0"));
 
         _sphereSegmentsKeyValue = ui.CreateKeyValueLabel("Segments:", () => _sphereSegmentsCount.ToString(), keyTextWidth: 110);
 
