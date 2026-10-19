@@ -65,7 +65,7 @@
         if (!_canvasInterop.IsWebGLInitialized)
             return; // Skip creating Scene and SceneView objects; error message was already written to console in the InitWebGL method
 
-
+        
         var gpuDevice = WebGLDevice.Create(_canvasInterop); // We can also pass an EngineCreateOptions object to the Create method
 
         if (!gpuDevice.IsInitialized)
@@ -128,7 +128,7 @@
 
         // In this sample we also display the device info:
         //_deviceInfo = $"Device name: {gpuDevice.DeviceName}\nOpenGL version: {gpuDevice.OpenGLVersion}\nGLSL version: {gpuDevice.OpenGLShadingLanguageVersion}";
-        _deviceInfo = $"Ab4d.SharpEngine version: {sharpEnginVersion.Major}.{sharpEnginVersion.Minor}.{sharpEnginVersion.Build}\nDevice name: {gpuDevice.DeviceName}\nOpenGL version: {gpuDevice.OpenGLVersion}";
+        _deviceInfo = $"Ab4d.SharpEngine version: {sharpEnginVersion.Major}.{sharpEnginVersion.Minor}.{sharpEnginVersion.Build}\nDevice name: {gpuDevice.DeviceName}\nWebGL version: {(_canvasInterop.IsWebGL2 ? "2" : "1")}\nOpenGL version: {gpuDevice.OpenGLVersion}";
 
         StateHasChanged(); // Forces UI refresh (this is required because this event is called outside of Blazor rendering)
     }
