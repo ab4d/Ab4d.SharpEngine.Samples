@@ -608,6 +608,10 @@ public abstract class CommonSample
 
     protected void ShowErrorMessage(string errorMessage, int showTimeMs)
     {
+        // Do not show error message from a disposed sample (for example when user changes the sample before async operation was completed)
+        if (this.IsDisposed)
+            return; 
+
         if (_errorMessageLabel == null)
         {
             if (_uiProvider != null)
