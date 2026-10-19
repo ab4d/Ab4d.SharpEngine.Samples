@@ -52,9 +52,11 @@
   <Sample Location="AdvancedModels.SliceModelsSample" Title="Slice 3D model with a plane"/>
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
+  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample IsSeparator="True" />
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering" IsNew="True"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options" IsNew="True"/>
-  <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.BillboardsSample" Title="Billboards" IsNew="True"/>
 
   <Sample Location="Titles.ImportersTitle.md" IsTitle="True" Title="3D model importers" />
   <Sample Location="objFileViewer.razor" Title="OBJ file viewer" />

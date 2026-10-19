@@ -255,7 +255,7 @@ public class BillboardsSample : CommonSample
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
 
         var treesCounts = new int[] { 1000, 5000, 10000, 15000, 20000, 50000, 100000, 500000 };
-        ui.CreateComboBox(treesCounts.Select(c => c.ToString()).ToArray(), (selectedIndex, selectedText) =>
+        ui.CreateComboBox(treesCounts.Select(c => c.ToString("N0")).ToArray(), (selectedIndex, selectedText) =>
             {
                 AddRandomTrees(Scene!, treesCounts[selectedIndex]);
             },

@@ -24,7 +24,6 @@
     <Compile Remove="AdvancedModels\SkyboxSample.cs" />
     <Compile Remove="AdvancedModels\SpritesSample.cs" />
     <Compile Remove="AdvancedModels\VolumeRenderingSample.cs" />
-    <Compile Remove="AdvancedModels\BillboardsSample.cs" />
     
     <Compile Remove="HitTesting\HitTestingWithIdBitmapSample.cs" />
     <Compile Remove="HitTesting\PointCloudHitTestingSample.cs" />
