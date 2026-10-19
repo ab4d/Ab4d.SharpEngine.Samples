@@ -22,7 +22,8 @@ public class PixelsRenderingSample : CommonSample
     private Color4 _savedPixelsColor;
 
     private ICommonSampleUIElement? _pixelSizeComboBox;
-    
+    private ICommonSampleUIElement? _loadingLabel;
+
 
     public PixelsRenderingSample(ICommonSamplesContext context)
         : base(context)
@@ -51,6 +52,8 @@ public class PixelsRenderingSample : CommonSample
         ChangeShownPositions(selectedIndex: 2); // Show Dragon model
 
         targetPositionCamera?.StartRotation(40, 0, 30, EasingFunctions.CubicEaseInFunction);
+
+        _loadingLabel?.SetIsVisible(false);
     }
 
     private void ShowMesh(StandardMesh? mesh, Color4 pixelColor)
@@ -232,9 +235,15 @@ public class PixelsRenderingSample : CommonSample
 
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
+        if (_pixelsNode == null) // if point cloud is not yet loaded show "Loading point cloud ..."
+        {
+            ui.CreateStackPanel(PositionTypes.Center, addBorder: false);
+            _loadingLabel = ui.CreateLabel("Loading dragon mesh ...");
+        }
+
+
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
-
-
+        
         ui.CreateLabel("Positions:");
 
         var items = new string[] {
