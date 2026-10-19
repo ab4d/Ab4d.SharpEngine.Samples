@@ -194,10 +194,10 @@ public abstract class StandardModelsSampleBase : CommonSample
     protected virtual void UpdateMeshStatistics(StandardMesh? standardMesh)
     {
         uint positionsCount = standardMesh?.VertexCount ?? 0;
-        positionsCountText = positionsCount.ToString();
+        positionsCountText = positionsCount.ToString("N0");
 
         uint trianglesCount = (uint)(standardMesh?.IndexCount ?? 0) / 3;
-        trianglesCountText = trianglesCount.ToString();
+        trianglesCountText = trianglesCount.ToString("N0");
 
         if (positionsCountLabel != null)
             positionsCountLabel.UpdateValue();
