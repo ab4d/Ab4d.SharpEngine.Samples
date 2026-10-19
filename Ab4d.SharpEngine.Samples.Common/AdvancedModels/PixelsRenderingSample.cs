@@ -1,4 +1,5 @@
-﻿using Ab4d.SharpEngine.Common;
+﻿using System.Diagnostics;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
@@ -20,7 +21,7 @@ public class PixelsRenderingSample : CommonSample
     private GpuImage? _treeGpuImage;
     private StandardMesh? _dragonMesh;
     private Color4 _savedPixelsColor;
-    
+
     private ICommonSampleUIElement? _pixelSizeComboBox;
     
 
@@ -33,9 +34,10 @@ public class PixelsRenderingSample : CommonSample
     {
         if (targetPositionCamera != null)
         {
-            targetPositionCamera.Heading = 30;
+            targetPositionCamera.Heading = 10;
             targetPositionCamera.Distance = 600;
         }
+
 
         // IMPORTANT:
         // With PixelNode and PixelMaterial, the texture is always rendered to a square area (width == height)
@@ -48,10 +50,15 @@ public class PixelsRenderingSample : CommonSample
         _dragonMesh = await base.GetCommonMeshAsync(scene, CommonMeshes.Dragon, finalSize: new Vector3(300, 300, 300));
 
         ChangeShownPositions(selectedIndex: 2); // Show Dragon model
+
+        targetPositionCamera?.StartRotation(40, 0, 30, EasingFunctions.CubicEaseInFunction);
     }
 
-    private void ShowMesh(StandardMesh mesh, Color4 pixelColor)
+    private void ShowMesh(StandardMesh? mesh, Color4 pixelColor)
     {
+        if (mesh == null)
+            return;
+
         Vector3[]? positions = mesh.GetDataChannelArray<Vector3>(MeshDataChannelTypes.Positions);
 
         if (positions == null)
@@ -88,10 +95,10 @@ public class PixelsRenderingSample : CommonSample
     
     private void UpdatePixelsTexture()
     {
-        if (_pixelsNode == null || _treeGpuImage == null)
+        if (_pixelsNode == null)
             return;
         
-        if (_useTexture)
+        if (_useTexture && _treeGpuImage != null)
         {
             if (!_pixelsNode.HasTexture)
             {
@@ -146,13 +153,13 @@ public class PixelsRenderingSample : CommonSample
     {
         var positionsArray = new Vector3[xCount * yCount * zCount];
 
-        float xStep = xCount <= 1 ? 0 : (float)(size.X / (xCount - 1));
-        float yStep = yCount <= 1 ? 0 : (float)(size.Y / (yCount - 1));
-        float zStep = zCount <= 1 ? 0 : (float)(size.Z / (zCount - 1));
+        float xStep = xCount <= 1 ? 0 : size.X / (xCount - 1);
+        float yStep = yCount <= 1 ? 0 : size.Y / (yCount - 1);
+        float zStep = zCount <= 1 ? 0 : size.Z / (zCount - 1);
 
-        float xStart = (float)center.X - ((float)size.X / 2.0f);
-        float yStart = (float)center.Y - ((float)size.Y / 2.0f);
-        float zStart = (float)center.Z - ((float)size.Z / 2.0f);
+        float xStart = center.X - (size.X / 2.0f);
+        float yStart = center.Y - (size.Y / 2.0f);
+        float zStart = center.Z - (size.Z / 2.0f);
 
         int i = 0;
         for (int z = 0; z < zCount; z++)
@@ -193,7 +200,7 @@ public class PixelsRenderingSample : CommonSample
 
                 case 1: // Sphere
                     var sphereMesh = MeshFactory.CreateSphereMesh(centerPosition: new Vector3(0, 0, 0), radius: 100, segments: 50);
-                    ShowMesh(sphereMesh, Colors.DeepSkyBlue);
+                    ShowMesh(sphereMesh, Colors.Yellow);
                     break;
 
                 case 2: // Dragon model
