@@ -31,6 +31,15 @@ public class PixelOptionsSample : CommonSample
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
+        if (targetPositionCamera != null)
+        {
+            targetPositionCamera.Heading  = -20;
+            targetPositionCamera.Attitude = -35;
+            targetPositionCamera.Distance = 750;
+            targetPositionCamera.TargetPosition = new Vector3(30, 0, 120);
+        }
+
+
         //
         // Prepare the data
         //
@@ -107,6 +116,9 @@ public class PixelOptionsSample : CommonSample
         scene.RootNode.Add(multiColorMultiSizePixelsNode);
         
 
+        ChangeTexture(selectedIndex: 1); // show circle texture by default
+
+
         //
         // Add helper scene objects
         // 
@@ -138,17 +150,6 @@ public class PixelOptionsSample : CommonSample
         
         var textNode6 = textBlockFactory.CreateTextBlock("Per-pixel color\nPer-pixel size", new Vector3(120, 10, -200), textAttitude: 30);
         scene.RootNode.Add(textNode6);
-
-
-        if (targetPositionCamera != null)
-        {
-            targetPositionCamera.Heading = -20;
-            targetPositionCamera.Attitude = -35;
-            targetPositionCamera.Distance = 750;
-            targetPositionCamera.TargetPosition = new Vector3(30, 0, 120);
-        }
-
-        ChangeTexture(selectedIndex: 1); // show circle texture by default
     }
 
     private Color4[] GeneratePixelColors(int pixelsCount, int pixelsXCount)
