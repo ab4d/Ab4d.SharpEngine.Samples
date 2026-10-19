@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Ab4d.SharpEngine.Samples.Common;
+﻿using Ab4d.SharpEngine.Samples.Common;
 
 namespace Ab4d.SharpEngine.Samples.Blazor.UIProvider;
 
@@ -64,7 +61,10 @@ public class LabelUIElement : BlazorUIElement
             if (blazorUIProvider.FontSize > 0)
                 style += $"font-size: {blazorUIProvider.FontSize}px;";
 
-            style += "vertical-align: middle; display: inline-block; word-wrap: break-word;";
+            style += "vertical-align: middle;word-wrap: break-word;";
+
+            if (_isVisible)
+                style += "display: inline-block;";
 
             if (_styleString != null && _styleString.Contains("bold", StringComparison.OrdinalIgnoreCase))
                 style += "font-weight: bold;";
