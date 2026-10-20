@@ -32,6 +32,7 @@
   <Sample IsSeparator="True" />
   <Sample Location="StandardModels.BoxModelNodeSample" Title="BoxModelNode"/>
   <Sample Location="StandardModels.SphereModelNodeSample" Title="SphereModelNode"/>
+  <Sample Location="StandardModels.IcosphereModelNodeSample" Title="IcosphereModelNode" IsNew="True"/>
   <Sample Location="StandardModels.PlaneModelNodeSample" Title="PlaneModelNode"/>
   <Sample Location="StandardModels.CircleModelNodeSample" Title="CircleModelNode"/>
   <Sample Location="StandardModels.CylinderModelNodeSample" Title="CylinderModelNode"/>

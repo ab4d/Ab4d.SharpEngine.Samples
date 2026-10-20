@@ -7,6 +7,7 @@ namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 public class SphereModelNodeSample : StandardModelsSampleBase
 {
     public override string Title => "SphereModelNode";
+    public override string Subtitle => "SphereModelNode represents a 3D sphere that consists of equally sized triangles.";
 
     private int _sphereSegmentsCount = 15;
 
