@@ -28,7 +28,8 @@ public class InputEventsManagerSample : CommonSample
     private WireCrossNode? _wireCrossNode;
     
     private ModelNode? _selectedModelNode;
-    
+    private ICommonSampleUIElement? _keyboardModifiersLabel;
+
 
     public InputEventsManagerSample(ICommonSamplesContext context)
         : base(context)
@@ -108,18 +109,24 @@ public class InputEventsManagerSample : CommonSample
                     _wireCrossNode.Position = args.RayHitResult.HitPosition;
                     _wireCrossNode.Visibility = SceneNodeVisibility.Visible;
                 }
+
+                UpdateCurrentKeyboardModifiers(); // Show current keyboard modifier (Shift, Control, Alt, etc.) that can be read from _inputEventsManager.CurrentKeyboardModifiers
             };
 
             baseBoxEventsSource.PointerExited += (sender, args) =>
             {
                 if (_wireCrossNode != null)
                     _wireCrossNode.Visibility = SceneNodeVisibility.Hidden;
+
+                UpdateCurrentKeyboardModifiers(); // Show current keyboard modifier (Shift, Control, Alt, etc.) that can be read from _inputEventsManager.CurrentKeyboardModifiers
             };
 
             baseBoxEventsSource.PointerMoved += (sender, args) =>
             {
                 if (_wireCrossNode != null)
                     _wireCrossNode.Position = args.RayHitResult.HitPosition;
+
+                UpdateCurrentKeyboardModifiers(); // Show current keyboard modifier (Shift, Control, Alt, etc.) that can be read from _inputEventsManager.CurrentKeyboardModifiers
             };
         }
 
@@ -381,9 +388,24 @@ public class InputEventsManagerSample : CommonSample
         _isGlassBoxExcluded = isExcluded;
     }
 
+    private void UpdateCurrentKeyboardModifiers()
+    {
+        if (_inputEventsManager == null || _keyboardModifiersLabel == null)
+            return;
+
+        // During execution of PointerXYZ event handlers, it is possible to read CurrentKeyboardModifiers
+        // and check which keyboard modifiers are pressed.
+        _keyboardModifiersLabel.SetText("CurrentKeyboardModifiers: " + _inputEventsManager.CurrentKeyboardModifiers.ToString());
+    }
+
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        _keyboardModifiersLabel = ui.CreateLabel("CurrentKeyboardModifiers: None");
+
+        ui.AddSeparator();
+
 
         ui.CreateLabel("Special settings:", isHeader: true);
 
