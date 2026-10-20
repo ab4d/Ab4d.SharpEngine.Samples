@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 
@@ -49,6 +50,13 @@ public class SphereModelNodeSample : StandardModelsSampleBase
         _sphereSegmentsKeyValue?.UpdateValue();
 
         base.UpdateModelNode();
+    }
+
+    // For Sphere and Icosphere we need to set sampler type to Warp (from default Mirror)
+    // to correctly show textures when the sphere comes around itself
+    protected override CommonSamplerTypes GetDiffuseTextureSamplerType()
+    {
+        return CommonSamplerTypes.Wrap; 
     }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)

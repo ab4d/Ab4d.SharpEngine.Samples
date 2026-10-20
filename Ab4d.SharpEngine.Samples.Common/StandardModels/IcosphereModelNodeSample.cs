@@ -1,5 +1,6 @@
-﻿using System.Numerics;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.SceneNodes;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.StandardModels;
 
@@ -64,6 +65,13 @@ public class IcosphereModelNodeSample : StandardModelsSampleBase
 
         base.OnIsTextureMaterialChanged(isChecked);
     }
+    
+    // For Sphere and Icosphere we need to set sampler type to Warp (from default Mirror)
+    // to correctly show textures when the sphere comes around itself
+    protected override CommonSamplerTypes GetDiffuseTextureSamplerType()
+    {
+        return CommonSamplerTypes.Wrap; 
+    }
 
     protected override void OnCreatePropertiesUI(ICommonSampleUIProvider ui)
     {
@@ -73,7 +81,7 @@ public class IcosphereModelNodeSample : StandardModelsSampleBase
         ui.AddSeparator();
 
 
-        _subdivisionsKeyValue = ui.CreateKeyValueLabel("Subdivisions: (?):Subdivisions defines number of times a subdivision of the\ninitial (12 positions, 20 triangles) icosphere is subdivided.\nSome examples:\n-0: 12 positions, 20 triangles\n-1: 42 positions, 80 triangles\n-2: 162 positions, 320 triangles\n- 3: 642 positions, 1280 triangles (default value)\n- 4: 2562 positions, 5120 triangles", 
+        _subdivisionsKeyValue = ui.CreateKeyValueLabel("Subdivisions: (?):Subdivisions defines number of times the\ninitial (12 positions, 20 triangles) icosphere is subdivided.\nSome examples:\n-0: 12 positions, 20 triangles\n-1: 42 positions, 80 triangles\n-2: 162 positions, 320 triangles\n- 3: 642 positions, 1280 triangles (default value)\n- 4: 2562 positions, 5120 triangles", 
                                                        () => _subdivisions.ToString(), keyTextWidth: 110);
 
 

@@ -267,6 +267,7 @@ public abstract class StandardModelsSampleBase : CommonSample
         if (isTextureMaterialChecked && _commonTexture != null)
         {
             standardMaterial.DiffuseTexture = _commonTexture;
+            standardMaterial.DiffuseTextureSamplerType = GetDiffuseTextureSamplerType();
             standardMaterial.DiffuseColor = Color3.White; // When using DiffuseTexture, then DiffuseColor is used as a filter (it is multiplies by each color in the texture)
         }
         else
@@ -278,6 +279,13 @@ public abstract class StandardModelsSampleBase : CommonSample
         standardMaterial.Opacity = isSemiTransparentMaterialChecked ? 0.8f : 1.0f;
 
         return standardMaterial;
+    }
+
+    protected virtual CommonSamplerTypes GetDiffuseTextureSamplerType()
+    {
+        // Mirror is the default sampler type for StandardMaterial.
+        // But for Sphere and Icosphere we need to set this to Warp to correctly show textures when the sphere comes around itself
+        return CommonSamplerTypes.Mirror; 
     }
 
     protected virtual void UpdateMaterial()
