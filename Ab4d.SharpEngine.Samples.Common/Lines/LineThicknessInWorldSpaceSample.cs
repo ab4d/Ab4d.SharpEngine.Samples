@@ -7,13 +7,13 @@ namespace Ab4d.SharpEngine.Samples.Common.Lines;
 
 public class LineThicknessInWorldSpaceSample : CommonSample
 {
-    public override string Title => "Sceen-space vs. world-space LineThickness";
+    public override string Title => "Screen-space vs. World-space LineThickness";
     public override string Subtitle => 
-@"LineThickness specified in sceen-space (default) renders lines that preserve their thickness on the screen regardless where in 3D space they are.
+@"LineThickness specified in screen-space (default) renders lines that preserve their thickness on the screen regardless where in 3D space they are.
 The actually used line thickness is LineThickness multiplied by dpi-scale.
 When you zoom in or out, the line thickness remains the same.
 
-LineThickness specified in world-space creates line rectangles with the width set from the LineThickness. Such lines are thinner when frather away from a perspective camera.
+LineThickness specified in world-space creates line rectangles with the width set from the LineThickness. Such lines are thinner when farther away from a perspective camera.
 When you zoom in or out, the line thickness is also changed.";
     
     public LineThicknessInWorldSpaceSample(ICommonSamplesContext context)
@@ -23,9 +23,9 @@ When you zoom in or out, the line thickness is also changed.";
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
-        var screenSpaceLineNode = new LineNode(new Vector3(0, 20, 0), new Vector3(0, 20, -1000), Ab4d.SharpEngine.Common.Colors.Blue, 10, "ScrenSpaceLine");
+        var screenSpaceLineNode = new LineNode(new Vector3(0, 20, 0), new Vector3(0, 20, -1000), Ab4d.SharpEngine.Common.Colors.Blue, 10, "ScreenSpaceLine");
         
-        // By default IsWorldSpaceLineThickness is false which creates screen-space line thickness
+        // By default, IsWorldSpaceLineThickness is false which creates screen-space line thickness
         //screenSpaceLineNode.IsWorldSpaceLineThickness = false; 
         
         scene.RootNode.Add(screenSpaceLineNode);
@@ -72,7 +72,7 @@ When you zoom in or out, the line thickness is also changed.";
             return;
         
         textBlockFactory.BorderColor = Colors.Blue;
-        var textNode1 = textBlockFactory.CreateTextBlock("Sceen-space\nLineThickness: 10", new Vector3(-35, 20, 0), textAttitude: 90);
+        var textNode1 = textBlockFactory.CreateTextBlock("Screen-space\nLineThickness: 10", new Vector3(-35, 20, 0), textAttitude: 90);
         scene.RootNode.Add(textNode1);
         
         textBlockFactory.BorderColor = Colors.Red;
