@@ -125,7 +125,7 @@
   <Sample Location="Titles.HitTesting.md" IsTitle="True" Title="Hit-testing and input processing"/>
   <Sample Location="HitTesting.HitTestingSample" Title="Hit-testing"/>
   <Sample Location="HitTesting.{uiFramework}ManualInputEventsSample" Title="Manual Input events"/>
-  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager"/>
+  <Sample Location="HitTesting.InputEventsManagerSample" Title="InputEventsManager" IsUpdated="True" UpdateInfo="Added CurrentKeyboardModifiers to InputEventsManager.\nIt can be used to check the keyboard modifiers inside the Pointer events,\nfor example inside PointerPressed or PointerMoved."/>
   <Sample Location="HitTesting.InputEventsManagerWithSurfaceSample" Title="InputEventsManager with drag"/>
   <Sample Location="HitTesting.LineSelectionSample" Title="Line selection"/>
   <Sample Location="HitTesting.RayPlaneHitTestingSample" Title="Ray-plane hit testing"/>
