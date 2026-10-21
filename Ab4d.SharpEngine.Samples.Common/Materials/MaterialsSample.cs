@@ -351,15 +351,11 @@ public class MaterialsSample : CommonSample
 
         _testModelsGroup.Add(vertexColorModelNode);
 
-
-#if VULKAN // PBR is not supported in current version of SharpEngine for the browser
-
         //
         // 7) Physically Based Rendering (PBR) material
         //
 
         string metalPlateFolderName = GetCommonTexturePath("metal_plate_1k/");
-
 
         var physicallyBasedMaterial = new PhysicallyBasedMaterial(name: "PhysicallyBasedMaterial");
 
@@ -403,9 +399,6 @@ public class MaterialsSample : CommonSample
         };
 
         _testModelsGroup.Add(pbrModelNode);
-#endif
-
-
 
         var textBlockFactory = await context.GetTextBlockFactoryAsync();
         textBlockFactory.BackgroundColor = Colors.LightYellow;
@@ -434,10 +427,8 @@ public class MaterialsSample : CommonSample
         var textNode6 = textBlockFactory.CreateTextBlock("VertexColor\r\nMaterial", new Vector3(250, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode6);
 
-#if VULKAN
         var textNode7 = textBlockFactory.CreateTextBlock("PBR\r\nMaterial", new Vector3(350, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode7);
-#endif
     }
 
     protected override void OnCreateLights(Scene scene)
