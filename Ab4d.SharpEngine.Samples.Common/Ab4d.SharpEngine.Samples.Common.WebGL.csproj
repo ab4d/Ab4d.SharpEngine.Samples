@@ -40,8 +40,6 @@
     <Compile Remove="Lines\MiterLimitSample.cs" />
     
     <Compile Remove="Lights\PCSShadowsSample.cs" />
-    
-    <Compile Remove="Materials\PhysicallyBasedMaterialSample.cs" />
 
     <Compile Remove="Importers\**" />
     <None Remove="Importers\**" />
