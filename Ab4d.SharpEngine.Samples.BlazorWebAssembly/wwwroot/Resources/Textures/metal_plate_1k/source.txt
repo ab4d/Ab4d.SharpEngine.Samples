@@ -1,0 +1,4 @@
+Images downloaded from: https://polyhaven.com/a/metal_plate
+License: CC0: https://polyhaven.com/license
+
+Changes: the brightness of the diffuse texture was increased so the scene is not too dark

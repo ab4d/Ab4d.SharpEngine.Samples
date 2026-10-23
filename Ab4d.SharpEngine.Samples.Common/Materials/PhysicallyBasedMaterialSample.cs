@@ -13,6 +13,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Materials;
 public class PhysicallyBasedMaterialSample : CommonSample
 {
     public override string Title => "Physically Based Rendering (PBR)";
+
     public override string Subtitle => "PBR provides a much more physically accurate rendering than standard rendering (used for StandardMaterial).\nBesides color its main properties are Metalness and Roughness that define how light is reflected from the surface.\nPhysicallyBasedMaterial supports base color, metalness-roughness, normal and environment maps.";
 
     private readonly string _environmentMapBaseFolder;
@@ -33,7 +34,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
     private AmbientLight? _ambientLight;
 
     private PhysicallyBasedMaterial? _physicallyBasedMaterial;
-    
+
     private Color4 _baseColor = Colors.Silver;
 
 
@@ -42,10 +43,17 @@ public class PhysicallyBasedMaterialSample : CommonSample
     private GpuImage? _normalMapGpuImage;
     private GpuImage? _metalnessRoughnessMapGpuImage;
 
+#if WEB_GL
+    private RawImageData? _metalnessRawImage;
+    private RawImageData? _roughnessRawImage;
+#endif
+
     private GroupNode? _testObjectsGroupNode;
 
+#if VULKAN
     private MultiMaterialModelNode? _skyBoxNode;
     private TranslateTransform? _skyboxTransform;
+#endif
     private StandardMesh? _teapotMesh;
     private TextBlockFactory? _textBlockFactory;
 
@@ -77,8 +85,9 @@ public class PhysicallyBasedMaterialSample : CommonSample
         // (e.g. file names end with face-specific suffices: _posx, _negx, _posy, _negy, _posz, and _negz),
         // we can pass the path to directory to LoadCubeMap.
         // Otherwise, we would need to use an overload that gets 6 file names.
+#if VULKAN
         _environmentCubeMapImage = CubeMapLoader.LoadCubeMap(_environmentMapBaseFolder, scene.GpuDevice, name: "CloudyLightRays");
-
+#endif
 
         _physicallyBasedMaterial = new PhysicallyBasedMaterial(baseColor: _baseColor, metalness: _metalness, roughness: _roughness, name: "PhysicallyBasedMaterial")
             { IsTwoSided = true}; // use two sided rendering to show the inside of the teapot
@@ -100,8 +109,9 @@ public class PhysicallyBasedMaterialSample : CommonSample
         else
             SetupMultipleTeapots();
 
+#if VULKAN
         SetupSkybox(scene);
-
+#endif
 
         // After the main scene is created, load the additional textures that can be enabled by CheckBoxes:
 
@@ -114,6 +124,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
         // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
         _normalMapGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_nor_gl_1k.png", scene);
 
+#if VULKAN
         // Metalness and roughness maps are used to define how the light is reflected from the surface.
         var metalnessRawImage = scene.GpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_metal_1k.png");
         var roughnessRawImage = scene.GpuDevice.DefaultBitmapIO.LoadBitmap(metalPlateFolderName + "metal_plate_rough_1k.png");
@@ -124,7 +135,37 @@ public class PhysicallyBasedMaterialSample : CommonSample
         // But if we have separate metalness and roughness textures, then we need to combine them into one texture:
         var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
         _metalnessRoughnessMapGpuImage = new GpuImage(scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
+#elif WEB_GL
+        // Same as above, but with callbacks...
+        scene.GpuDevice.CanvasInterop.LoadImageBytes(
+            metalPlateFolderName + "metal_plate_metal_1k.png",
+            onTextureLoadedCallback: (rawImageData) =>
+            {
+                _metalnessRawImage = rawImageData;
+                CreateMetalnessRoughnessImage();
+            },
+            onLoadErrorCallback: (error) => throw new Exception($"Failed to load metalness image: {error}"));
+        scene.GpuDevice.CanvasInterop.LoadImageBytes(
+            metalPlateFolderName + "metal_plate_rough_1k.png",
+            onTextureLoadedCallback: (rawImageData) =>
+            {
+                _roughnessRawImage = rawImageData;
+                CreateMetalnessRoughnessImage();
+            },
+            onLoadErrorCallback: (error) => throw new Exception($"Failed to load roughness image: {error}"));
+#endif
     }
+
+#if WEB_GL
+    private void CreateMetalnessRoughnessImage()
+    {
+        if (_metalnessRawImage == null || _roughnessRawImage == null || Scene?.GpuDevice == null)
+            return;
+
+        var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(_metalnessRawImage, _roughnessRawImage);
+        _metalnessRoughnessMapGpuImage = new GpuImage(Scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
+    }
+#endif
 
     private void SetupSimpleScene()
     {
@@ -223,6 +264,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
         }
     }
 
+#if VULKAN
     private void SetupSkybox(Scene scene)
     {
         // To create a skybox effect, we create a MultiMaterialModelNode with a special box mesh
@@ -331,6 +373,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
             _skyboxTransform.SetTranslate(cameraPosition);
         // ReSharper restore CompareOfFloatsByEqualityOperator
     }
+#endif
 
     protected override void OnCreateLights(Scene scene)
     {
@@ -423,10 +466,12 @@ public class PhysicallyBasedMaterialSample : CommonSample
     /// <inheritdoc />
     protected override void OnDisposed()
     {
+#if VULKAN
         // Unsubscribe from CameraChanged - there we updated the position of the sky box to always be centered on the camera position.
         if (targetPositionCamera != null)
             targetPositionCamera.CameraChanged -= OnCameraChanged;
-        
+#endif
+
         base.OnDisposed();
     }
 
