@@ -134,9 +134,9 @@ public class WpfUIProvider : ICommonSampleUIProvider
         ResetSettings();
     }
 
-    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, ICommonSampleUIPanel? parent = null)
+    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = 0, ICommonSampleUIPanel? parent = null)
     {
-        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent);
+        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent, width, xMargin);
 
         if (parent != null)
         {

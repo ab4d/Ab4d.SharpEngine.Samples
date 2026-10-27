@@ -13,7 +13,7 @@ public interface ICommonSampleUIProvider
 
     void ClearAll();
 
-    ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, ICommonSampleUIPanel? parent = null);
+    ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = 0, ICommonSampleUIPanel? parent = null);
 
     void SetCurrentPanel(ICommonSampleUIPanel? panel);
 
@@ -26,7 +26,7 @@ public interface ICommonSampleUIProvider
     ICommonSampleUIElement CreateSlider(float minValue, float maxValue, Func<float> getValueFunc, Action<float> setValueAction, double width = 0, bool showTicks = false, string? keyText = null, double keyTextWidth = 0, Func<float, string>? formatShownValueFunc = null, double shownValueWidth = 0);
 
     ICommonSampleUIElement CreateComboBox(string[] items, Action<int, string?> itemChangedAction, int selectedItemIndex, double width = 0, string? keyText = null, double keyTextWidth = 0);
-    
+
     ICommonSampleUIElement CreateEnumComboBox<TEnum>(Action<TEnum> valueChangedAction, TEnum selectedValue, double width = 0, string? keyText = null, double keyTextWidth = 0) where TEnum : struct, Enum;
 
     ICommonSampleUIElement CreateRadioButtons(string[] items, Action<int, string> checkedItemChangedAction, int selectedItemIndex);

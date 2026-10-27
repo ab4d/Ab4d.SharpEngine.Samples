@@ -116,9 +116,9 @@ public class BlazorUIProvider : ICommonSampleUIProvider
         _stateChangedCallback?.Invoke();
     }
 
-    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, ICommonSampleUIPanel? parent = null)
+    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = 0, ICommonSampleUIPanel? parent = null)
     {
-        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent, isChildPanel: parent != null);
+        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent, isChildPanel: parent != null, width, xMargin);
 
         if (parent != null)
         {
