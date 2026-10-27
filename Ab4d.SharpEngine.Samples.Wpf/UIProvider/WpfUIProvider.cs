@@ -198,6 +198,25 @@ public class WpfUIProvider : ICommonSampleUIProvider
         return newElement;
     }
 
+    public ICommonSampleUIElement CreateEnumComboBox<TEnum>(Action<TEnum> valueChangedAction, TEnum selectedValue, double width = 0, string? keyText = null, double keyTextWidth = 0)
+        where TEnum : struct, Enum
+    {
+        var enumNames = Enum.GetNames<TEnum>();
+        var enumValues = Enum.GetValues<TEnum>();
+
+        var comboBox = CreateComboBox(items: enumNames,
+            itemChangedAction: (selectedIndex, _) =>
+            {
+                valueChangedAction(enumValues[selectedIndex]);
+            }, 
+            selectedItemIndex: enumValues.IndexOf(selectedValue),
+            width: width,
+            keyText: keyText,
+            keyTextWidth: keyTextWidth);
+
+        return comboBox;
+    }
+
     public ICommonSampleUIElement CreateRadioButtons(string[] items, Action<int, string> checkedItemChangedAction, int selectedItemIndex)
     {
         var newElement = new RadioButtonsUIElement(this, items, checkedItemChangedAction, selectedItemIndex);

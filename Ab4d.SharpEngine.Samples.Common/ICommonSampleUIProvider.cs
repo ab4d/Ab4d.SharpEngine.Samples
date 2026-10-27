@@ -27,6 +27,8 @@ public interface ICommonSampleUIProvider
 
     ICommonSampleUIElement CreateComboBox(string[] items, Action<int, string?> itemChangedAction, int selectedItemIndex, double width = 0, string? keyText = null, double keyTextWidth = 0);
     
+    ICommonSampleUIElement CreateEnumComboBox<TEnum>(Action<TEnum> valueChangedAction, TEnum selectedValue, double width = 0, string? keyText = null, double keyTextWidth = 0) where TEnum : struct, Enum;
+
     ICommonSampleUIElement CreateRadioButtons(string[] items, Action<int, string> checkedItemChangedAction, int selectedItemIndex);
 
     ICommonSampleUIElement CreateCheckBox(string text, bool isInitiallyChecked, Action<bool> checkedChangedAction);
