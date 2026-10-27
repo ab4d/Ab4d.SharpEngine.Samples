@@ -44,9 +44,9 @@ public class StackPanelUIElement : WpfUIPanel
 
             _stackPanel.Margin = new Thickness(10, 5, 10, 5);
 
-            border.Margin = xMargin == 0 ? new Thickness(10) 
-                                         : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 10, 10, 10) 
-                                                                                 : new Thickness(10, 10, xMargin, 10);
+            border.Margin = float.IsNaN(xMargin) ? new Thickness(10) 
+                                                 : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 10, 10, 10) 
+                                                                                         : new Thickness(10, 10, xMargin, 10);
 
             if (isSemiTransparent)
                 border.Background = new SolidColorBrush(Color.FromArgb(220, 255, 255, 255));
@@ -66,9 +66,9 @@ public class StackPanelUIElement : WpfUIPanel
             _stackPanel.HorizontalAlignment = horizontalAlignment;
             _stackPanel.VerticalAlignment = verticalAlignment;
 
-            _stackPanel.Margin = xMargin == 0 ? new Thickness(10, 5, 10, 5) 
-                                              : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 10, 5) 
-                                                                                      : new Thickness(10, 5, xMargin, 5);
+            _stackPanel.Margin = float.IsNaN(xMargin) ? new Thickness(10, 5, 10, 5) 
+                                                      : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 10, 5) 
+                                                                                              : new Thickness(10, 5, xMargin, 5);
 
             WpfElement = _stackPanel;
         }

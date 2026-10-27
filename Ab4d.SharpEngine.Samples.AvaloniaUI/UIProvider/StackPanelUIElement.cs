@@ -45,9 +45,9 @@ public class StackPanelUIElement : AvaloniaUIPanel
 
             _stackPanel.Margin = new Thickness(10, 5, 10, 5);
 
-            border.Margin = xMargin == 0 ? new Thickness(5) 
-                                         : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 5, 5) 
-                                                                                 : new Thickness(5, 5, xMargin, 5);
+            border.Margin = float.IsNaN(xMargin) ? new Thickness(5) 
+                                                 : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 5, 5) 
+                                                                                         : new Thickness(5, 5, xMargin, 5);
 
             if (isSemiTransparent)
                 border.Background = new SolidColorBrush(Color.FromArgb(220, 255, 255, 255));
@@ -67,9 +67,9 @@ public class StackPanelUIElement : AvaloniaUIPanel
             _stackPanel.HorizontalAlignment = horizontalAlignment;
             _stackPanel.VerticalAlignment = verticalAlignment;
 
-            _stackPanel.Margin = xMargin == 0 ? new Thickness(10, 5, 10, 5) 
-                                              : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 10, 5) 
-                                                                                      : new Thickness(10, 5, xMargin, 5);
+            _stackPanel.Margin = float.IsNaN(xMargin) ? new Thickness(10, 5, 10, 5) 
+                                                      : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 10, 5) 
+                                                                                              : new Thickness(10, 5, xMargin, 5);
 
             AvaloniaControl = _stackPanel;
         }

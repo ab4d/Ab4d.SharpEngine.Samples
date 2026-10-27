@@ -13,7 +13,7 @@ public interface ICommonSampleUIProvider
 
     void ClearAll();
 
-    ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = 0, ICommonSampleUIPanel? parent = null);
+    ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = float.NaN, ICommonSampleUIPanel? parent = null);
 
     void SetCurrentPanel(ICommonSampleUIPanel? panel);
 

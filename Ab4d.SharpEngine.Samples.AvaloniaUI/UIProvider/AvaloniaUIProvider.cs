@@ -134,7 +134,7 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         ResetSettings();
     }
 
-    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = 0, ICommonSampleUIPanel? parent = null)
+    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = float.NaN, ICommonSampleUIPanel? parent = null)
     {
         var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent, width, xMargin);
 

@@ -31,7 +31,7 @@ public class StackPanelUIElement : BlazorUIPanel
         float leftMargin = 5;
         float rightMargin = 5;
 
-        if (xMargin > 0)
+        if (!float.IsNaN(xMargin))
         {
             if (alignment.HasFlag(PositionTypes.Left))
                 leftMargin = xMargin;
