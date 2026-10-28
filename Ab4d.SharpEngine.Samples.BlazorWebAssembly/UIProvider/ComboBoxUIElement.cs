@@ -157,12 +157,13 @@ public class ComboBoxUIElement : BlazorUIElement
         }
         else
         {
-            throw new ArgumentException($"SetValue for ComboBox expects int or string value, but got {newValue?.GetType().Name}");
+            var newValueText = newValue.ToString();
+            _selectedIndex = Array.IndexOf(_items, newValueText);
         }
 
         BuildRenderFragment();
 
-        _itemChangedAction?.Invoke(_selectedIndex, _items[_selectedIndex]);
+        _itemChangedAction?.Invoke(_selectedIndex, _selectedIndex >= 0 ? _items[_selectedIndex] : null);
 
         blazorUIProvider.NotifyStateChanged(); // Trigger a re-render of the parent component
     }
