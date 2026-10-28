@@ -67,58 +67,7 @@ public class FreeCameraSample : CommonSample
         _freeCamera.ViewWidth = 300;
     }
 
-
-    protected override void OnCreateUI(ICommonSampleUIProvider ui)
-    {
-        _uiProvider = ui;
-
-        if (_freeCamera == null)
-            return;
-
-        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
-
-        ui.CreateLabel("TargetPositionCamera", isHeader: true);
-        ui.CreateLabel("Rotate camera: left mouse button");
-        ui.CreateLabel("Move camera: CTRL + left mouse button");
-
-        ui.AddSeparator();
-
-        ui.CreateKeyValueLabel("TargetPosition:", () => $"{_freeCamera.TargetPosition.X:F0}, {_freeCamera.TargetPosition.Y:F0}, {_freeCamera.TargetPosition.Z:F0} (red cross)", keyTextWidth: 110).SetColor(Colors.Red);
-        ui.CreateKeyValueLabel("CameraPosition:", () => $"{_freeCamera.CameraPosition.X:F0}, {_freeCamera.CameraPosition.Y:F0}, {_freeCamera.CameraPosition.Z:F0}", keyTextWidth: 110);
-        ui.CreateKeyValueLabel("UpDirection:", () => $"{_freeCamera.UpDirection.X:F2}, {_freeCamera.UpDirection.Y:F2}, {_freeCamera.UpDirection.Z:F2}", keyTextWidth: 110);
-
-        ui.AddSeparator();
-        ui.CreateComboBox(new[] { "None", "Y axis", "Z axis" },
-            itemChangedAction: OnRotationUpAxisChanged,
-            selectedItemIndex: 0,
-            width: 120,
-            keyText: "RotationUpAxis:",
-            keyTextWidth: 110);
-
-        ui.AddSeparator();
-        ui.CreateComboBox(new[] { "Perspective", "Orthographic" },
-                          itemChangedAction: OnProjectionTypeChanged,
-                          selectedItemIndex: 0,
-                          width: 120,
-                          keyText: "ProjectionType:",
-                          keyTextWidth: 110);
-
-        ui.AddSeparator();
-        _viewWidthSlider = ui.CreateSlider(10, 1000,
-                                           () => _freeCamera.ViewWidth,
-                                           newValue => _freeCamera.ViewWidth = newValue,
-                                           width: 120,
-                                           keyText: "ViewWidth:",
-                                           keyTextWidth: 110,
-                                           formatShownValueFunc: sliderValue => sliderValue.ToString("F0"))
-                                        .SetIsVisible(false);
-        
-        ui.AddSeparator();
-        ui.CreateButton("Reset camera", () => ResetCamera());
-
-        //ui.CreateButton("Fit into view", () => FitIntoView());
-    }
-
+    
     private void OnProjectionTypeChanged(int itemIndex, string? itemText)
     {
         if (_freeCamera == null)
@@ -155,5 +104,57 @@ public class FreeCameraSample : CommonSample
                 _freeCamera.RotationUpAxis = null;
                 break;
         }
+    }
+
+    protected override void OnCreateUI(ICommonSampleUIProvider ui)
+    {
+        _uiProvider = ui;
+
+        if (_freeCamera == null)
+            return;
+
+        ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right);
+
+        ui.CreateLabel("TargetPositionCamera", isHeader: true);
+        ui.CreateLabel("Rotate camera: left mouse button");
+        ui.CreateLabel("Move camera: CTRL + left mouse button");
+
+        ui.AddSeparator();
+
+        ui.CreateKeyValueLabel("TargetPosition:", () => $"{_freeCamera.TargetPosition.X:F0}, {_freeCamera.TargetPosition.Y:F0}, {_freeCamera.TargetPosition.Z:F0} (red cross)", keyTextWidth: 110).SetColor(Colors.Red);
+        ui.CreateKeyValueLabel("CameraPosition:", () => $"{_freeCamera.CameraPosition.X:F0}, {_freeCamera.CameraPosition.Y:F0}, {_freeCamera.CameraPosition.Z:F0}", keyTextWidth: 110);
+        ui.CreateKeyValueLabel("UpDirection:", () => $"{_freeCamera.UpDirection.X:F2}, {_freeCamera.UpDirection.Y:F2}, {_freeCamera.UpDirection.Z:F2}", keyTextWidth: 110);
+
+
+        ui.AddSeparator();
+        ui.CreateLabel("ProjectionType:");
+        ui.CreateRadioButtons(new[] { "Perspective (?):The perspective projection is similar to the real world where the objects that are farther away from the camera appear smaller.\nPerspective projection uses Distance and FieldOfView properties to define the visible area.", 
+                "Orthographic (?):In orthographic projection the distance of the objects from the camera does not change the size of the objects on the screen.\nOrthographic projection is usually used for technical drawings because the objects sizes are preserved and the lines that are parallel in 3D stay parallel on the screen.\nOrthographic projection does not use Distance and FieldOfView properties but ViewWidth to define the visible area." },
+            checkedItemChangedAction: OnProjectionTypeChanged, 
+            selectedItemIndex: 0);
+
+        
+        ui.AddSeparator();
+        ui.CreateComboBox(new[] { "None", "Y axis", "Z axis" },
+            itemChangedAction: OnRotationUpAxisChanged,
+            selectedItemIndex: 0,
+            width: 120,
+            keyText: "RotationUpAxis:",
+            keyTextWidth: 110);
+
+        ui.AddSeparator();
+        _viewWidthSlider = ui.CreateSlider(10, 1000,
+                                           () => _freeCamera.ViewWidth,
+                                           newValue => _freeCamera.ViewWidth = newValue,
+                                           width: 120,
+                                           keyText: "ViewWidth:",
+                                           keyTextWidth: 110,
+                                           formatShownValueFunc: sliderValue => sliderValue.ToString("F0"))
+                                        .SetIsVisible(false);
+        
+        ui.AddSeparator();
+        ui.CreateButton("Reset camera", () => ResetCamera());
+
+        //ui.CreateButton("Fit into view", () => FitIntoView());
     }
 }
