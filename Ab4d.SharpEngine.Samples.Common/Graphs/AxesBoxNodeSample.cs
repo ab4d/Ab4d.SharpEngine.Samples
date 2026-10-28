@@ -187,11 +187,10 @@ FrontFacingPlanes: AxesBoxNode will automatically show and hide axes so that the
 LeftmostAxis: AxesBoxNode will automatically show and hide vertical axes (ZAxis) so that only axis that is furthest to the left on the screen is shown.
 RightmostAxis: AxesBoxNode will automatically show and hide vertical axes so that only axis that is furthest to the right on the screen is shown.");
         
-        var strategies = new string[] { "None", "FrontFacingPlanes", "LeftmostAxis", "RightmostAxis" };
-        ui.CreateComboBox(strategies, (selectedIndex, selectedText) =>
-        {
-            _axesBoxNode!.AxisShowingStrategy = (AxesBoxNode.AxisShowingStrategies)selectedIndex;
-        }, selectedItemIndex: 1);
+        ui.CreateEnumComboBox(axisShowingStrategy => _axesBoxNode!.AxisShowingStrategy = axisShowingStrategy,
+            AxesBoxNode.AxisShowingStrategies.FrontFacingPlanes);
+
+
         
         ui.AddSeparator();
         ui.CreateLabel("Axes visibility:", isHeader: true);

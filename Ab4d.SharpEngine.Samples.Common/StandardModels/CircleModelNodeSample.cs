@@ -315,13 +315,12 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.AddSeparator();
 
 
-        _textureMappingComboBox = ui.CreateComboBox(new string[] { "Rectangular", "RadialFromCenter", "RadialFromInnerRadius" },
-            (selectedIndex, selectedText) =>
+        ui.CreateEnumComboBox(textureMappingType => 
             {
-                _textureMappingType = (CircleTextureMappingTypes)selectedIndex;
+                _textureMappingType = textureMappingType;
                 UpdateModelNode();
             },
-            selectedItemIndex: 0,
+            _textureMappingType,
             width: 140,
             keyText: "TextureMapping:",
             keyTextWidth: 110);

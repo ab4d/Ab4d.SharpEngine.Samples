@@ -1,8 +1,9 @@
 ﻿using Ab4d.SharpEngine.Cameras;
-using System.Numerics;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.SceneNodes;
+using System.Numerics;
 
 namespace Ab4d.SharpEngine.Samples.Common.Cameras;
 
@@ -313,19 +314,16 @@ This is not as precise as CheckAllPositions but can be much faster when there ar
 CheckAllPositions: Check Positions of all SceneNodes.
 This is more precise than CheckBounds but can take much longer when there are objects with a lot of positions in the scene.");
         
-        ui.CreateComboBox(new string[] { 
-                "CheckBounds", 
-                "CheckAllPositions" },
-            (selectedIndex, selectedText) =>
+        ui.CreateEnumComboBox(fitIntoViewType =>
             {
-                _fitIntoViewType = (FitIntoViewType)selectedIndex;
+                _fitIntoViewType = fitIntoViewType;
                 UpdateFitIntoView(forceUpdate: false);
 
                 // Show wire bounding box when CheckBounds is selected. This shows what is included in th FitIntoView check
                 if (_sceneWireBoundingBoxNode != null)
                     _sceneWireBoundingBoxNode.Visibility = _fitIntoViewType == FitIntoViewType.CheckBounds ? SceneNodeVisibility.Visible : SceneNodeVisibility.Hidden;
-            }, 
-            selectedItemIndex:(int)_fitIntoViewType);
+            },
+            _fitIntoViewType);
 
 
         ui.AddSeparator();
