@@ -13,6 +13,7 @@ public class CameraNavigationCirclesSample : CommonSample
 {
     private ManualInputEventsManager? _inputEventsManager;
     private CameraNavigationCircles? _cameraNavigationCircles;
+    private Color4 _savedBackgroundColor;
 
     private ICommonSampleUIElement? _fillNegativeCirclesCheckBox;
     private ICommonSampleUIElement? _fillPositiveCirclesCheckBox;
@@ -60,6 +61,16 @@ public class CameraNavigationCirclesSample : CommonSample
         scene.RootNode.Add(hashModel);
     }
 
+    protected override void OnDisposed()
+    {
+        // Disposing _cameraNavigationCircles will remove it from the SceneView
+        _cameraNavigationCircles?.Dispose();
+
+        SceneView!.BackgroundColor = _savedBackgroundColor; // Reset the BackgroundColor if it was changed to Black
+
+        base.OnDisposed();
+    }
+
     protected override void OnInputEventsManagerInitialized(ManualInputEventsManager inputEventsManager)
     {
         // NOTE:
@@ -103,7 +114,7 @@ public class CameraNavigationCirclesSample : CommonSample
     private static readonly (CameraNavigationCircles.AxisTypes, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, bool, bool, bool)[]
         PresentsArray = new [] {
         (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
-        (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, false, true, false),
+        (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, false, true, false),
         (CameraNavigationCircles.AxisTypes.LinesWithArrows, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
         (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
     };
@@ -133,7 +144,7 @@ public class CameraNavigationCirclesSample : CommonSample
         ui.CreateLabel("View settings", isHeader: true);
 
         ui.CreateLabel("Presets:");
-        ui.CreateRadioButtons(new string[] { "Default", "Colored circles", "Axis arrows", "3D object" },
+        ui.CreateRadioButtons(new string[] { "Default", "Colored positive circles", "Axis arrows", "3D object" },
             (selectedIndex, selectedText) => SelectPreset(selectedIndex),
             0);
         
@@ -190,10 +201,12 @@ public class CameraNavigationCirclesSample : CommonSample
 
         ui.CreateLabel("Other settings", isHeader: true);
 
-        ui.CreateCheckBox("SelectClosestAxis", true, isChecked => { });
-        ui.CreateCheckBox("IsCameraRotationEnabled", true, isChecked => { });
-        ui.CreateCheckBox("IsRotateToAxisEnabled", true, isChecked => { });
-        ui.CreateCheckBox("ShowOppositeAxisWhenClickedOnCur (?):When checked and when user clicks on an existing axis (the one in the center),\nthen the camera will rotate to the opposite axis.", true, isChecked => { });
+        ui.CreateCheckBox("SelectClosestAxis (?):When checked then the closest axis to the pointer or mouse is selected.\nWhen unchecked then axis is selected only when mouse or pointer is over the axis circle.", 
+            true, isChecked => _cameraNavigationCircles.SelectClosestAxis = isChecked);
+        ui.CreateCheckBox("IsCameraRotationEnabled", true, isChecked => _cameraNavigationCircles.IsCameraRotationEnabled = isChecked);
+        ui.CreateCheckBox("IsRotateToAxisEnabled", true, isChecked => _cameraNavigationCircles.IsRotateToAxisEnabled = isChecked);
+        ui.CreateCheckBox("ShowOppositeAxisWhenClickedOnCur... (?):When checked and when user clicks on an existing axis (the one in the center),\nthen the camera will rotate to the opposite axis.", 
+            true, isChecked => _cameraNavigationCircles.ShowOppositeAxisWhenClickedOnCurrentAxis = isChecked);
 
         ui.AddSeparator();
 
@@ -201,38 +214,35 @@ public class CameraNavigationCirclesSample : CommonSample
         combBoxWidth = 100;
         keyTextWidth = 195;
 
-        ui.CreateEnumComboBox((axisType) => { },
-            KeyboardModifiers.ControlKey,
-            combBoxWidth, "ModifierKeyToPreserveAttitude:", keyTextWidth);
+        ui.CreateEnumComboBox(modifierKey => _cameraNavigationCircles.PreserveAttitude = modifierKey,
+            CameraNavigationCircles.PreserveAttitudeOptions.ControlKey,
+            combBoxWidth, "PreserveAttitude: (?):PreserveAttitude specified when the camera's Attitude angle is preserved if clicked on\na horizontal axis (X and Y in the standard coordinate system).\n\nDefault value is Control. This means that if user holds down Control key and clicks on +X axis,\nthe camera will rotate to X axis while preserving the existing Attitude (will not set Attitude to zero).\n\nTo disable this functionality set this property to Never.\nTo always preserve the Attitude (without pressing any modifier key), set this property to Always.", keyTextWidth);
         
-        ui.CreateEnumComboBox((axisType) => { },
+        ui.CreateEnumComboBox(modifierKey => _cameraNavigationCircles.ModifierKeyForOppositeAxis = modifierKey,
             KeyboardModifiers.ShiftKey,
             combBoxWidth, "ModifierKeyForOppositeAxis:", keyTextWidth);
         
         var animationDurationTexts = Enumerable.Range(0, 7).Select(i => $"{i * 0.1f} {(i == 0 ? "(immediate)" : "s")}").ToArray();
         ui.CreateComboBox(animationDurationTexts,
-            (selectedIndex, selectedText) => { },
+            (selectedIndex, selectedText) => _cameraNavigationCircles.AxisClickAnimationDuration = selectedIndex * 0.1f,
             selectedItemIndex: 4,
             combBoxWidth, "AxisClickAnimationDuration:", keyTextWidth);
 
         var rotationAmounts = new int[] { 45, 90, 180, 270 };
         ui.CreateComboBox(
             rotationAmounts.Select(v => v.ToString()).ToArray(),
-            (selectedIndex, selectedText) => { },
+            (selectedIndex, selectedText) => _cameraNavigationCircles.CameraRotationAmount = rotationAmounts[selectedIndex],
             selectedItemIndex: 2,
             combBoxWidth, "CameraRotationAmount:", keyTextWidth);
-        
-        var textSizesTexts = Enumerable.Range(0, 6).Select(i => $"{10 + i}").ToArray();
-        ui.CreateComboBox(
-            textSizesTexts,
-            (selectedIndex, selectedText) => { },
-            selectedItemIndex: 3,
-            combBoxWidth, "AxisTextSize:", keyTextWidth);
-        
+ 
         var sizes = new int[] { 80, 100, 120, 140 };
         ui.CreateComboBox(
             sizes.Select(v => v.ToString()).ToArray(),
-            (selectedIndex, selectedText) => { },
+            (selectedIndex, selectedText) =>
+            {
+                _cameraNavigationCircles.Width = sizes[selectedIndex];
+                _cameraNavigationCircles.Height = sizes[selectedIndex];
+            },
             selectedItemIndex: 2,
             combBoxWidth, "Size:", keyTextWidth);
 
@@ -240,7 +250,19 @@ public class CameraNavigationCirclesSample : CommonSample
 
 
         ui.CreateButton("Customize axes (Z up)", () => { });
-        ui.CreateButton("Toggle background", () => { });
+
+        ui.CreateButton("Toggle background", () =>
+        {
+            if (SceneView!.BackgroundColor != Color4.Black)
+            {
+                _savedBackgroundColor = SceneView!.BackgroundColor;
+                SceneView!.BackgroundColor = Color4.Black;
+            }
+            else
+            {
+                SceneView!.BackgroundColor = _savedBackgroundColor;
+            }
+        });
 
         ui.CreateLabel("Additional customizations are possible by deriving your class from CameraNavigationCircles and overriding virtual methods.").SetStyle("italic");
     }
