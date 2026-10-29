@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Remove="Cameras\CameraAxisPanelSample.cs" />
+    <Compile Remove="Cameras\FitIntoViewSample.cs" />
     <Compile Remove="CameraControllers\CameraNavigationCirclesSample.cs" />
 
     <Compile Remove="AdvancedModels\BooleanMeshSample.cs" />
