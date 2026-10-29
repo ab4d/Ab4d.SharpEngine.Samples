@@ -14,6 +14,7 @@ public class CameraNavigationCirclesSample : CommonSample
     private ManualInputEventsManager? _inputEventsManager;
     private CameraNavigationCircles? _cameraNavigationCircles;
     private Color4 _savedBackgroundColor;
+    private bool _isZAxisUp;
 
     private ICommonSampleUIElement? _fillNegativeCirclesCheckBox;
     private ICommonSampleUIElement? _fillPositiveCirclesCheckBox;
@@ -116,7 +117,6 @@ public class CameraNavigationCirclesSample : CommonSample
         (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
         (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, false, true, false),
         (CameraNavigationCircles.AxisTypes.LinesWithArrows, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
-        (CameraNavigationCircles.AxisTypes.Lines, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.Always, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, CameraNavigationCircles.NavigationCircleVisibility.OnPointerOver, true, false, false),
     };
 
     private void SelectPreset(int selectedIndex)
@@ -144,7 +144,7 @@ public class CameraNavigationCirclesSample : CommonSample
         ui.CreateLabel("View settings", isHeader: true);
 
         ui.CreateLabel("Presets:");
-        ui.CreateRadioButtons(new string[] { "Default", "Colored positive circles", "Axis arrows", "3D object" },
+        ui.CreateRadioButtons(new string[] { "Default", "Colored positive circles", "Axis arrows" },
             (selectedIndex, selectedText) => SelectPreset(selectedIndex),
             0);
         
@@ -249,7 +249,29 @@ public class CameraNavigationCirclesSample : CommonSample
         ui.AddSeparator();
 
 
-        ui.CreateButton("Customize axes (Z up)", () => { });
+        ui.CreateButton("Customize axes (gray color, Z up)", () =>
+        {
+            if (_isZAxisUp)
+            {
+                // Standard colors and Y up
+                _cameraNavigationCircles.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.Red,
+                                                       yAxisVector: new Vector3(0, 1, 0), yAxisColor: Colors.Green,
+                                                       zAxisVector: new Vector3(0, 0, 1), zAxisColor: Colors.Blue);
+            }
+            else
+            {
+                // Custom Z up
+                _cameraNavigationCircles.CustomizeAxes(xAxisVector: new Vector3(1, 0, 0), xAxisColor: Colors.DimGray,
+                                                       yAxisVector: new Vector3(0, 0, -1), yAxisColor: Colors.DimGray,
+                                                       zAxisVector: new Vector3(0, 1, 0), zAxisColor: Colors.DimGray);
+
+                // CameraNavigationCircles will also correctly show the axes based on the
+                // currently used coordinate system. This can be changed by the following code:
+                //Scene.SetCoordinateSystem(CoordinateSystems.ZUpRightHanded); // CAD standard
+            }
+
+            _isZAxisUp = !_isZAxisUp;
+        });
 
         ui.CreateButton("Toggle background", () =>
         {
