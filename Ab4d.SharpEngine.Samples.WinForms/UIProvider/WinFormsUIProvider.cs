@@ -205,10 +205,10 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
         ResetSettings();
     }
 
-    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, ICommonSampleUIPanel? parent = null)
+    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = float.NaN, ICommonSampleUIPanel? parent = null)
     {
         object parentObject = parent != null ? parent : BaseWinFormsPanel;
-        var stackPanelUiElement = new StackPanelUIElement(this, parentObject, alignment, isVertical, addBorder, isSemiTransparent);
+        var stackPanelUiElement = new StackPanelUIElement(this, parentObject, alignment, isVertical, addBorder, isSemiTransparent, width, xMargin);
 
         if (parent != null)
         {
@@ -280,6 +280,25 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
         AddToCurrentPanel(newElement);
 
         return newElement;
+    }
+
+    public ICommonSampleUIElement CreateEnumComboBox<TEnum>(Action<TEnum> valueChangedAction, TEnum selectedValue, double width = 0, string? keyText = null, double keyTextWidth = 0)
+        where TEnum : struct, Enum
+    {
+        var enumNames = Enum.GetNames<TEnum>();
+        var enumValues = Enum.GetValues<TEnum>();
+
+        var comboBox = CreateComboBox(items: enumNames,
+            itemChangedAction: (selectedIndex, _) =>
+            {
+                valueChangedAction(enumValues[selectedIndex]);
+            }, 
+            selectedItemIndex: enumValues.IndexOf(selectedValue),
+            width: width,
+            keyText: keyText,
+            keyTextWidth: keyTextWidth);
+
+        return comboBox;
     }
 
     public ICommonSampleUIElement CreateCheckBox(string text, bool isInitiallyChecked, Action<bool> checkedChangedAction)

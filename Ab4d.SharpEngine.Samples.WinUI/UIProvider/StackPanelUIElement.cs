@@ -17,10 +17,13 @@ public class StackPanelUIElement : WinUIPanel
 
     public override bool IsVertical => _stackPanel.Orientation == Orientation.Vertical;
 
-    public StackPanelUIElement(WinUIProvider winUIProvider, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent)
+    public StackPanelUIElement(WinUIProvider winUIProvider, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent, float width, float xMargin)
         : base(winUIProvider)
     {
         _stackPanel = new StackPanel();
+
+        if (width != 0)
+            _stackPanel.Width = width;
 
         _stackPanel.Margin = new Thickness(10, 5, 10, 5);
         _stackPanel.Orientation = isVertical ? Orientation.Vertical : Orientation.Horizontal;
@@ -39,8 +42,13 @@ public class StackPanelUIElement : WinUIPanel
             {
                 BorderBrush = new SolidColorBrush(Colors.Black),
                 BorderThickness = new Thickness(2),
-                Margin = new Thickness(5)
             };
+
+            _stackPanel.Margin = new Thickness(10, 5, 10, 5);
+
+            border.Margin = float.IsNaN(xMargin) ? new Thickness(5) 
+                                                 : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 5, 5) 
+                                                                                         : new Thickness(5, 5, xMargin, 5);
 
             if (isSemiTransparent)
                 border.Background = new SolidColorBrush(Color.FromArgb(220, 255, 255, 255));
@@ -59,6 +67,10 @@ public class StackPanelUIElement : WinUIPanel
         {
             _stackPanel.HorizontalAlignment = horizontalAlignment;
             _stackPanel.VerticalAlignment = verticalAlignment;
+
+            _stackPanel.Margin = float.IsNaN(xMargin) ? new Thickness(10, 5, 10, 5) 
+                                                      : alignment.HasFlag(PositionTypes.Left) ? new Thickness(xMargin, 5, 10, 5) 
+                                                                                              : new Thickness(10, 5, xMargin, 5);
 
             Element = _stackPanel;
         }

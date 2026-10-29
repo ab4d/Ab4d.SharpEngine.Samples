@@ -21,7 +21,7 @@ public class StackPanelUIElement : WinFormsUIPanel
     public int BorderThickness { get; private set; }
 
 
-    public StackPanelUIElement(WinFormsUIProvider winFormsUIProvider, object parentObject, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent)
+    public StackPanelUIElement(WinFormsUIProvider winFormsUIProvider, object parentObject, PositionTypes alignment, bool isVertical, bool addBorder, bool isSemiTransparent, float width, float xMargin)
         : base(winFormsUIProvider)
     {
         _flowLayoutPanel = new FlowLayoutPanel()
@@ -50,11 +50,17 @@ public class StackPanelUIElement : WinFormsUIPanel
 
             _borderPanel = new Panel()
             {
-                Margin = new Padding(5),
                 BackColor = Color.Black,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 AutoSize = true,
             };
+
+            _borderPanel.Margin = float.IsNaN(xMargin) ? new Padding(5) 
+                                                       : alignment.HasFlag(PositionTypes.Left) ? new Padding((int)xMargin, 5, 5, 5) 
+                                                                                               : new Padding(5, 5, (int)xMargin, 5);
+
+            if (width != 0)
+                _borderPanel.MaximumSize = new Size((int)(width * winFormsUIProvider.DpiScale), int.MaxValue);
 
             _borderPanel.Controls.Add(_flowLayoutPanel);
 
@@ -62,7 +68,12 @@ public class StackPanelUIElement : WinFormsUIPanel
         }
         else
         {
-            _flowLayoutPanel.Margin = new Padding(5);
+            _flowLayoutPanel.Margin = float.IsNaN(xMargin) ? new Padding(10, 5, 10, 5) 
+                                                           : alignment.HasFlag(PositionTypes.Left) ? new Padding((int)xMargin, 5, 10, 5) 
+                                                                                                   : new Padding(10, 5, (int)xMargin, 5);
+
+            if (width != 0)
+                _flowLayoutPanel.MaximumSize = new Size((int)(width * winFormsUIProvider.DpiScale), int.MaxValue);
 
             BorderThickness = 0;
             WinFormsControl = _flowLayoutPanel;

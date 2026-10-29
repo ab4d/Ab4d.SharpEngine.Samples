@@ -123,9 +123,9 @@ public class WinUIProvider : ICommonSampleUIProvider
         ResetSettings();
     }
 
-    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, ICommonSampleUIPanel? parent = null)
+    public ICommonSampleUIPanel CreateStackPanel(PositionTypes alignment, bool isVertical = true, bool addBorder = true, bool isSemiTransparent = true, float width = 0, float xMargin = float.NaN, ICommonSampleUIPanel? parent = null)
     {
-        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent);
+        var stackPanelUiElement = new StackPanelUIElement(this, alignment, isVertical, addBorder, isSemiTransparent, width, xMargin);
 
         if (parent != null)
         {
@@ -185,6 +185,25 @@ public class WinUIProvider : ICommonSampleUIProvider
         AddToCurrentPanel(newElement);
 
         return newElement;
+    }
+
+    public ICommonSampleUIElement CreateEnumComboBox<TEnum>(Action<TEnum> valueChangedAction, TEnum selectedValue, double width = 0, string? keyText = null, double keyTextWidth = 0)
+        where TEnum : struct, Enum
+    {
+        var enumNames = Enum.GetNames<TEnum>();
+        var enumValues = Enum.GetValues<TEnum>();
+
+        var comboBox = CreateComboBox(items: enumNames,
+            itemChangedAction: (selectedIndex, _) =>
+            {
+                valueChangedAction(enumValues[selectedIndex]);
+            }, 
+            selectedItemIndex: enumValues.IndexOf(selectedValue),
+            width: width,
+            keyText: keyText,
+            keyTextWidth: keyTextWidth);
+
+        return comboBox;
     }
 
     public ICommonSampleUIElement CreateRadioButtons(string[] items, Action<int, string> checkedItemChangedAction, int selectedItemIndex)
