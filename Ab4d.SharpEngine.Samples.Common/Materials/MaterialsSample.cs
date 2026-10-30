@@ -18,6 +18,13 @@ public class MaterialsSample : CommonSample
     private GroupNode? _testModelsGroup;
     private StandardMesh[] _meshes = new StandardMesh[3];
 
+#if WEB_GL
+    // Creation of combined metalness/rougness texture map
+    private RawImageData? _metalnessRawImage;
+    private RawImageData? _roughnessRawImage;
+    private PhysicallyBasedMaterial? _physicallyBasedMaterial;
+#endif
+
     public MaterialsSample(ICommonSamplesContext context)
         : base(context)
     {
@@ -366,6 +373,7 @@ public class MaterialsSample : CommonSample
         // It is usually stored in a special RGB format where RGB values represent XYZ components of the normal vector.
         physicallyBasedMaterial.SetTextureMap(TextureMapTypes.NormalMap, metalPlateFolderName + "metal_plate_nor_gl_1k.png");
 
+#if VULKAN
         // Provide metalness and roughness textures - those two textures define how the light is reflected from the surface.
         physicallyBasedMaterial.SetTextureMap(TextureMapTypes.Metalness, metalPlateFolderName + "metal_plate_metal_1k.png");
         physicallyBasedMaterial.SetTextureMap(TextureMapTypes.Roughness, metalPlateFolderName + "metal_plate_rough_1k.png");
@@ -389,6 +397,27 @@ public class MaterialsSample : CommonSample
         // The code above used lazy-loading. We could also load the texture in async way and then use that for SetTextureMap, for example:
         //var baseColorGpuImage = await TextureLoader.CreateTextureAsync(metalPlateFolderName + "metal_plate_diff_1k.png", scene);
         //physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
+#elif WEB_GL
+        // On WebGL, only texture with combined metalness and roughness values is supported...
+        _physicallyBasedMaterial = physicallyBasedMaterial;
+
+        scene.GpuDevice.CanvasInterop.LoadImageBytes(
+            metalPlateFolderName + "metal_plate_metal_1k.png",
+            onTextureLoadedCallback: (rawImageData) =>
+            {
+                _metalnessRawImage = rawImageData;
+                CreateMetalnessRoughnessImage();
+            },
+            onLoadErrorCallback: (error) => throw new Exception($"Failed to load metalness image: {error}"));
+        scene.GpuDevice.CanvasInterop.LoadImageBytes(
+            metalPlateFolderName + "metal_plate_rough_1k.png",
+            onTextureLoadedCallback: (rawImageData) =>
+            {
+                _roughnessRawImage = rawImageData;
+                CreateMetalnessRoughnessImage();
+            },
+            onLoadErrorCallback: (error) => throw new Exception($"Failed to load roughness image: {error}"));
+#endif
         
         
         // PhysicallyBasedMaterial also supports environment map, but this is not used here - see PhysicallyBasedMaterialSample for a demo.
@@ -430,6 +459,18 @@ public class MaterialsSample : CommonSample
         var textNode7 = textBlockFactory.CreateTextBlock("PBR\r\nMaterial", new Vector3(350, -15, 50), textAttitude: 30);
         scene.RootNode.Add(textNode7);
     }
+
+#if WEB_GL
+    private void CreateMetalnessRoughnessImage()
+    {
+        if (_metalnessRawImage == null || _roughnessRawImage == null || Scene?.GpuDevice == null)
+            return;
+
+        var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(_metalnessRawImage, _roughnessRawImage);
+        var metalnessRoughnessMapGpuImage = new GpuImage(Scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
+        _physicallyBasedMaterial.SetTextureMap(TextureMapTypes.MetalnessRoughness, metalnessRoughnessMapGpuImage);
+    }
+#endif
 
     protected override void OnCreateLights(Scene scene)
     {
