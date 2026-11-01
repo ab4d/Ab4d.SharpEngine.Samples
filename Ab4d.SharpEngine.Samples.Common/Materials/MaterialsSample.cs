@@ -256,6 +256,17 @@ public class MaterialsSample : CommonSample
         //    Opacity = 0.5f
         //};
 
+
+        // NOTE:
+        // When using StandardMaterials, you can use the following methods to adjust the predefined StandardMaterial:
+        // - SetOpacity(opacity)
+        // - SetSpecular(specularColor, specularPower) or SetSpecular(specularPower)
+        // - SetTwoSided()
+        // 
+        // You can also chain those methods, for example:
+        // var material = StandardMaterials.Orange.SetOpacity(0.5f).SetSpecular(32).SetTwoSided();
+
+
         var modelNode4 = new MeshModelNode(sphereMesh, material4, "SemiTransparentModel")
         {
             // Because we can see inside the Model, we also set the BackMaterial that will render the back sides of the triangles.
