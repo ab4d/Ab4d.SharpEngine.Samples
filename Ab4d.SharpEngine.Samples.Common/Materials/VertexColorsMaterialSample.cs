@@ -16,6 +16,8 @@ public class VertexColorsMaterialSample : CommonSample
     private MeshModelNode? _sampleModelNode;
     private StandardMesh[] _meshes = new StandardMesh[2];
 
+    private Color4 _savedBackgroundColor;
+
     private ICommonSampleUIElement? _specularPowerCheckBox;
 
     public VertexColorsMaterialSample(ICommonSamplesContext context)
@@ -23,8 +25,18 @@ public class VertexColorsMaterialSample : CommonSample
     {
     }
 
+    /// <inheritdoc />
+    protected override void OnDisposed()
+    {
+        if (SceneView != null)
+            SceneView.BackgroundColor = _savedBackgroundColor; // Restore the original background color
+
+        base.OnDisposed();
+    }
+
     protected override void OnSceneViewInitialized(SceneView sceneView)
     {
+        _savedBackgroundColor = sceneView.BackgroundColor;
         sceneView.BackgroundColor = Colors.White;
 
         base.OnSceneViewInitialized(sceneView);
