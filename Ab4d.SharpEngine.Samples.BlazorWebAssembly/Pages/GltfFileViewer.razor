@@ -322,9 +322,10 @@
 
             for (var i = _gltfImporter.UnresolvedTextureMaterials.Count - 1; i >= 0; i--)
             {
-                if (_gltfImporter.UnresolvedTextureMaterials[i].fileName == fileName)
+                var entry = _gltfImporter.UnresolvedTextureMaterials[i];
+                if (entry.fileName == fileName)
                 {
-                    if (_gltfImporter.UnresolvedTextureMaterials[i].material is StandardMaterialBase standardMaterial)
+                    if (entry.material is StandardMaterialBase standardMaterial)
                     {
                         if (gpuImage == null)
                         {
@@ -333,6 +334,16 @@
                         }
 
                         standardMaterial.DiffuseTexture = gpuImage;
+                    }
+                    else if (entry.material is PhysicallyBasedMaterial pbrMaterial)
+                    {
+                        if (gpuImage == null)
+                        {
+                            gpuImage = new GpuImage(gpuDevice, rawImageData, generateMipMaps: true, fileName);
+                            gpuDevice.CacheObject(fileName, gpuImage);
+                        }
+
+                        pbrMaterial.SetTextureMap(entry.mapType, gpuImage, entry.samplerType);
                     }
 
                     _gltfImporter.UnresolvedTextureMaterials.RemoveAt(i); // Mark as resolved
