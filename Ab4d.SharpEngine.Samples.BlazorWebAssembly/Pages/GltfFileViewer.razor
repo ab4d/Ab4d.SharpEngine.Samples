@@ -25,6 +25,7 @@
     <br />
     <p>@((MarkupString)_infoText)</p>
 
+    <input type="checkbox" id="usePbrMaterial"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material.</label><br/>
     <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
         Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
     <input type="file" id="fileInput" style="display: none;" />
@@ -40,6 +41,7 @@
         let lastFileInput = null;
 
         function handleFiles(files) {
+            const usePbrMaterialCheckbox = document.getElementById('usePbrMaterial');
             const allFileNames = Array.from(files).map(file => file.name).join(',');
             dotNetInterop.invokeMethodAsync('FilesDroppedJS', allFileNames);
 
@@ -73,7 +75,7 @@
                         dotNetInterop.invokeMethodAsync('TextureImportedJS', file.name, bitmap.width, bitmap.height, imageBytes);
                     } else {
                         const bytes = new Uint8Array(arrayBuffer);
-                        dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes);
+                        dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes, usePbrMaterialCheckbox.checked);
                     }
                 };
 
@@ -344,7 +346,7 @@
 
     // The following method is called from javascript after the fileName content is read
     [JSInvokable]
-    public void FileImportedJS(string fileName, byte[] fileContent)
+    public void FileImportedJS(string fileName, byte[] fileContent, bool usePbrMaterial)
     {
         int index = GetDroppedFileIndex(fileName);
 
@@ -389,7 +391,7 @@
             }
 
             // Start importing
-            ImportDroppedGltfFile(fileName, fileContent);
+            ImportDroppedGltfFile(fileName, fileContent, usePbrMaterial);
         }
     }
 
@@ -417,14 +419,15 @@
         return index;
     }
 
-    private void ImportDroppedGltfFile(string fileName, byte[] fileContent)
+    private void ImportDroppedGltfFile(string fileName, byte[] fileContent, bool usePbrMaterial)
     {
-        ShowInfoMessage($"Start importing '{fileName}'");
+        ShowInfoMessage($"Start importing '{fileName}' (use PBR material: {usePbrMaterial})");
 
         ClearShownModel();
 
 
         _gltfImporter ??= new glTFImporter(gpuDevice: sharpEngineSceneView.Scene.GpuDevice);
+        _gltfImporter.UsePbrMaterial = usePbrMaterial;
 
         // Create a memory stream from the byte array
         using MemoryStream fileStream = new MemoryStream(fileContent);
@@ -571,4 +574,3 @@
         sharpEngineSceneView.Dispose();
     }
 }
-
