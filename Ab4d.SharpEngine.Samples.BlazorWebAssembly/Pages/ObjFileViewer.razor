@@ -111,7 +111,8 @@
         };
     })();
 
-    function attachFileImportHandler(dotNetHelper) {
+    // Name must be unique to avoid conflict with other *FileViewer samples!
+    function attachFileImportHandlerObjFileViewer(dotNetHelper) {
         window.objFileViewerModule.attachFileImportHandler(dotNetHelper);
     }
 </script>
@@ -219,7 +220,7 @@
 
         try
         {
-            await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+            await JS.InvokeVoidAsync("attachFileImportHandlerObjFileViewer", _thisJSReference);
         }
         catch (Exception ex)
         {

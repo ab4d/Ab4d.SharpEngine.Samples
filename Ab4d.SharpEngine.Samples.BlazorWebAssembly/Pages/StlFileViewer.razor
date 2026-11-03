@@ -28,7 +28,7 @@
 
 <script>
     // Initialize javascript for drag and drop only once.
-    window.objFileViewerModule = window.objFileViewerModule || (function() {
+    window.stlFileViewerModule = window.stlFileViewerModule || (function() {
         let dotNetInterop;
         let lastDropZone = null;
         let lastFileInput = null;
@@ -100,8 +100,9 @@
         };
     })();
 
-    function attachFileImportHandler(dotNetHelper) {
-        window.objFileViewerModule.attachFileImportHandler(dotNetHelper);
+    // Name must be unique to avoid conflict with other *FileViewer samples!
+    function attachFileImportHandlerStlFileViewer(dotNetHelper) {
+        window.stlFileViewerModule.attachFileImportHandler(dotNetHelper);
     }
 </script>
 
@@ -216,7 +217,7 @@
 
         try
         {
-            await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+            await JS.InvokeVoidAsync("attachFileImportHandlerStlFileViewer", _thisJSReference);
         }
         catch (Exception ex)
         {
@@ -293,4 +294,3 @@
         sharpEngineSceneView.Dispose();
     }
 }
-

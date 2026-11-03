@@ -35,7 +35,7 @@
     // Initialize javascript for drag and drop only once.
     // This javascript will call FilesDroppedJS, TextureImportedJS and FileImportedJS .Net methods.
     // The script need to be initialized by calling attachFileImportHandler function (this is done in the OnAfterRenderAsync method below).
-    window.objFileViewerModule = window.objFileViewerModule || (function() {
+    window.gltfFileViewerModule = window.gltfFileViewerModule || (function() {
         let dotNetInterop;
         let lastDropZone = null;
         let lastFileInput = null;
@@ -133,8 +133,9 @@
         };
     })();
 
-    function attachFileImportHandler(dotNetHelper) {
-        window.objFileViewerModule.attachFileImportHandler(dotNetHelper);
+    // Name must be unique to avoid conflict with other *FileViewer samples!
+    function attachFileImportHandlerGltfFileViewer(dotNetHelper) {
+        window.gltfFileViewerModule.attachFileImportHandler(dotNetHelper);
     }
 </script>
 
@@ -251,7 +252,7 @@
 
         try
         {
-            await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+            await JS.InvokeVoidAsync("attachFileImportHandlerGltfFileViewer", _thisJSReference);
         }
         catch (Exception ex)
         {
