@@ -1,7 +1,6 @@
 ﻿using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
-using Ab4d.SharpEngine.OverlayPanels;
 using Ab4d.SharpEngine.SceneNodes;
 using System.Numerics;
 
