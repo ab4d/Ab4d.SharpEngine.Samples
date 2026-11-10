@@ -153,6 +153,7 @@
     private DotNetObjectReference<GltfFileViewer>? _thisJSReference;
 
     private glTFImporter? _gltfImporter;
+    private bool _modelImportAttempted;
 
     private string[]? _droppedFileNames;
     private int _droppedImagesCount;
@@ -277,6 +278,8 @@
         _uploadedImagesCount = 0;
         _uploadedGltfFileIndex = -1;
 
+        _modelImportAttempted = false;
+
         ShowInfoMessage($"Start uploading {_droppedDataFilesCount} data file(s) and {_droppedImagesCount} image(s)");
     }
 
@@ -304,19 +307,7 @@
 
         _uploadedImagesCount++;
 
-        if (_uploadedImagesCount == _droppedImagesCount)
-        {
-            // Make it possible for GC release resources
-            _uploadedImages = null; 
-            _uploadedFileContents = null;
-
-            if (_gltfImporter != null && _gltfImporter.UnresolvedTextureMaterials != null && _gltfImporter.UnresolvedTextureMaterials.Count > 0)
-                ShowInfoMessage("All images uploaded but the following textures are not defined because the images were not uploaded: " + string.Join(", ", _gltfImporter.UnresolvedTextureMaterials.Select(f => f.fileName)));
-        }
-        else
-        {
-            UpdateUploadedFilesInfo();
-        }
+        UpdateUploadedFilesInfo();
     }
 
     private bool ResolveTexture(string fileName, RawImageData rawImageData)
@@ -386,38 +377,63 @@
             _uploadedGltfFileIndex = index; // Save the main glTf file name
         }
 
-        // Wait until all non-image files are uploaded (for example .gltf and .dat)
-        // and then call Import method.
-
-        if (_uploadedFilesCount < _droppedDataFilesCount)
-        {
-            UpdateUploadedFilesInfo();
-        }
-        else
-        {
-            if (_droppedFileNames != null && _uploadedFileContents != null)
-            {
-                if (_uploadedGltfFileIndex != -1)
-                {
-                    fileName = _droppedFileNames[_uploadedGltfFileIndex];
-                    fileContent = _uploadedFileContents[_uploadedGltfFileIndex]!;
-                }
-                else
-                {
-                    // No glTF or glb file found
-                    ShowInfoMessage($"Cannot import the dropped file(s) because they are not supported.");
-                    return;
-                }
-            }
-
-            // Start importing
-            ImportDroppedGltfFile(fileName, fileContent, usePbrMaterial);
-        }
+        UpdateUploadedFilesInfo();
     }
 
     private void UpdateUploadedFilesInfo()
     {
-        ShowInfoMessage($"Uploaded {_uploadedFilesCount} / {_droppedDataFilesCount} data files and {_uploadedImagesCount} / {_droppedImagesCount} images");
+        // Once all data files are uploaded (for example, .gltf and .dat), attempt to import the model. We could also
+        // wait for all textures to be uploaded first, but this way, we can show the (untextured) model early, and then
+        // update it as textures become available.
+        var allDataFilesUploaded = _uploadedFilesCount == _droppedDataFilesCount;
+        var allImagesUploaded = _uploadedImagesCount == _droppedImagesCount;
+
+        if (allDataFilesUploaded && !_modelImportAttempted) {
+            if (_uploadedGltfFileIndex != -1 && _droppedFileNames != null && _uploadedFileContents != null)
+            {
+                var fileName = _droppedFileNames[_uploadedGltfFileIndex];
+                var fileContent = _uploadedFileContents[_uploadedGltfFileIndex]!;
+
+                // Start importing
+                ImportDroppedGltfFile(fileName, fileContent, false/*usePbrMaterial*/);
+                if (_importedSceneNode == null)
+                    return; // We failed to load the model - exit here
+            }
+            else
+            {
+                // No glTF or glb file found
+                ShowInfoMessage($"Cannot import the dropped file(s) - main .gltf/.glb file was not found!");
+
+                _droppedFileNames = null; // Prevent loading of remaining files
+
+                _uploadedGltfFileIndex = -1;
+                _uploadedFileContents = null;
+
+                return;
+            }
+        }
+
+        if (_modelImportAttempted && allImagesUploaded)
+        {
+            // Make it possible for GC release resources
+            _uploadedImages = null;
+            _uploadedFileContents = null;
+
+            _droppedFileNames = null; // Should not be needed anymore
+
+            if (_gltfImporter != null && _gltfImporter.UnresolvedTextureMaterials != null && _gltfImporter.UnresolvedTextureMaterials.Count > 0)
+            {
+                ShowInfoMessage("Model was loaded, but the following textures/images are missing: " + string.Join(", ", _gltfImporter.UnresolvedTextureMaterials.Select(f => f.fileName)));
+            }
+            else
+            {
+                ShowInfoMessage("Model and all its resources were successfully loaded.");
+            }
+        }
+        else
+        {
+            ShowInfoMessage($"Uploaded {_uploadedFilesCount} / {_droppedDataFilesCount} data files and {_uploadedImagesCount} / {_droppedImagesCount} images");
+        }
     }
 
     private int GetDroppedFileIndex(string fileName)
@@ -454,10 +470,15 @@
 
         try
         {
+            _modelImportAttempted = true;
             var importedMeshModelNode = _gltfImporter.Import(fileStream, ResolveDroppedFileNames);
 
-            if (importedMeshModelNode == null && _gltfImporter.IsDracoMeshCompressionUsed)
-                throw new Exception("Cannot read draco compressed gltf files");
+            if (importedMeshModelNode == null)
+            {
+                if (_gltfImporter.IsDracoMeshCompressionUsed)
+                    throw new Exception("Cannot read draco compressed gltf files");
+                throw new Exception("Error while importing - perhaps the data file is missing?");
+            }
 
             if (_uploadedImages != null)
             {
@@ -474,7 +495,7 @@
         }
         catch (Exception ex)
         {
-            ShowInfoMessage("Error reading file: " + ex.Message);
+            ShowInfoMessage("Failed to load mode: " + ex.Message);
 
             // reset all arrays to null. This will stop reading the textures
             _droppedFileNames = null;
