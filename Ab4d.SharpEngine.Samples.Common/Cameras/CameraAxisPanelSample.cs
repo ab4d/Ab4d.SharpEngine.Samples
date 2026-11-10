@@ -14,6 +14,11 @@ public class CameraAxisPanelSample : CommonSample
 
     private TargetPositionCamera? _targetPositionCamera;
     private CameraAxisPanel? _cameraAxisPanel;
+    
+    private Vector2 _panelPosition = new Vector2(10, 10);
+    private int _panelSize = 100;
+    private PositionTypes _panelAlignment = PositionTypes.BottomLeft;
+    private Color4 _panelBackgroundColor = Color4.Transparent;
     private bool _adjustSizeByDpiScale = true;
 
     public CameraAxisPanelSample(ICommonSamplesContext context) 
@@ -81,14 +86,19 @@ public class CameraAxisPanelSample : CommonSample
 
         if (SceneView != null && _targetPositionCamera != null)
         {
-            _cameraAxisPanel = new CameraAxisPanel(SceneView, _targetPositionCamera, width: 100, height: 100, _adjustSizeByDpiScale)
+            _cameraAxisPanel = new CameraAxisPanel(SceneView,
+                                                   _targetPositionCamera, 
+                                                   width: _panelSize, height: _panelSize, 
+                                                   _adjustSizeByDpiScale, 
+                                                   alignment: _panelAlignment,
+                                                   positionX: _panelPosition.X,
+                                                   positionY: _panelPosition.Y)
             {
-                Position = new Vector2(10, 10),
-                Alignment = PositionTypes.BottomLeft
+                BackgroundColor = _panelBackgroundColor
             };
         }
     }
-
+    
     protected override void OnCreateUI(ICommonSampleUIProvider ui)
     {
         if (_cameraAxisPanel == null)
@@ -101,26 +111,30 @@ public class CameraAxisPanelSample : CommonSample
         var positions = new int[] { 0, 10, 20 };
         ui.CreateComboBox(positions.Select(p => $"({p}, {p})").ToArray(), (itemIndex, itemText) =>
         {
-            _cameraAxisPanel.Position = new Vector2(positions[itemIndex], positions[itemIndex]);
+            _panelPosition =  new Vector2(positions[itemIndex], positions[itemIndex]);
+            _cameraAxisPanel.Position = _panelPosition;
         }, selectedItemIndex: 1, keyText: "Position:", keyTextWidth: 80, width: 110);
 
         var alignmentOptions = new PositionTypes[] { PositionTypes.TopLeft, PositionTypes.BottomLeft, PositionTypes.TopRight, PositionTypes.BottomRight };
         ui.CreateComboBox(alignmentOptions.Select(o => o.ToString()).ToArray(), (itemIndex, itemText) =>
         {
-            _cameraAxisPanel.Alignment = alignmentOptions[itemIndex];
+            _panelAlignment = alignmentOptions[itemIndex];
+            _cameraAxisPanel.Alignment = _panelAlignment;
         }, selectedItemIndex: 1, keyText: "Alignment:", keyTextWidth: 80, width: 110);
 
         var sizes = new int[] { 80, 100, 150, 200 };
         ui.CreateComboBox(sizes.Select(s => $"{s} x {s}").ToArray(), (itemIndex, itemText) =>
         {
-            _cameraAxisPanel.Width  = sizes[itemIndex];
-            _cameraAxisPanel.Height = sizes[itemIndex];
+            _panelSize = sizes[itemIndex];
+            _cameraAxisPanel.Width  = _panelSize;
+            _cameraAxisPanel.Height = _panelSize;
         }, selectedItemIndex: 1, keyText: "Size:", keyTextWidth: 80, width: 110);
         
         var backgroundColors = new Color4[] { Colors.Transparent, Colors.White, Colors.Yellow };
         ui.CreateComboBox(backgroundColors.Select(c => c.ToKnownColorString()).ToArray(), (itemIndex, itemText) =>
         {
-            _cameraAxisPanel.BackgroundColor = backgroundColors[itemIndex];
+            _panelBackgroundColor = backgroundColors[itemIndex];
+            _cameraAxisPanel.BackgroundColor = _panelBackgroundColor;
         }, selectedItemIndex: 0, keyText: "Background:", keyTextWidth: 80, width: 110);
 
         ui.AddSeparator();

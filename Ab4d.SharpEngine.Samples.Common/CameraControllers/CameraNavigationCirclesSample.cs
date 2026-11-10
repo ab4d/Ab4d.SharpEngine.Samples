@@ -1,5 +1,4 @@
-﻿using Ab4d.SharpEngine.Cameras;
-using Ab4d.SharpEngine.Common;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.OverlayPanels;
@@ -39,9 +38,13 @@ public class CameraNavigationCirclesSample : CommonSample
         if (targetPositionCamera != null)
         {
             // Render hash model above the settings
+            targetPositionCamera.Heading = 25;
+            targetPositionCamera.Attitude = -30;
             targetPositionCamera.TargetPosition = new Vector3(0, -50, 0);
 
             targetPositionCamera.Distance = 400;
+
+            targetPositionCamera.StartRotation(40);
         }
 
         // Create hash symbol
@@ -81,10 +84,9 @@ public class CameraNavigationCirclesSample : CommonSample
 
         _inputEventsManager = inputEventsManager;
 
-        _cameraNavigationCircles = new CameraNavigationCircles(_inputEventsManager.SceneView, 
-                                                               _inputEventsManager, 
-                                                               width: 150, height: 150, 
-                                                               adjustSizeByDpiScale: true, 
+        _cameraNavigationCircles = new CameraNavigationCircles(inputEventsManager.SceneView, 
+                                                               inputEventsManager, 
+                                                               size: 150, 
                                                                alignment: PositionTypes.BottomLeft)
         {
             Position = new Vector2(10, 10),
@@ -109,7 +111,7 @@ public class CameraNavigationCirclesSample : CommonSample
 
     private void LogMessage(string message)
     {
-        //InfoTextBox.Text = message + "\n" + InfoTextBox.Text;
+        //System.Diagnostics.Debug.WriteLine(message);
     }
 
     private static readonly (CameraNavigationCircles.AxisTypes, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, CameraNavigationCircles.NavigationCircleVisibility, bool, bool, bool)[]
@@ -235,15 +237,14 @@ public class CameraNavigationCirclesSample : CommonSample
             selectedItemIndex: 2,
             combBoxWidth, "CameraRotationAmount:", keyTextWidth);
  
-        var sizes = new int[] { 80, 100, 120, 140 };
+        var sizes = new int[] { 100, 150, 200 };
         ui.CreateComboBox(
             sizes.Select(v => v.ToString()).ToArray(),
             (selectedIndex, selectedText) =>
             {
-                _cameraNavigationCircles.Width = sizes[selectedIndex];
-                _cameraNavigationCircles.Height = sizes[selectedIndex];
+                _cameraNavigationCircles.Size = sizes[selectedIndex];
             },
-            selectedItemIndex: 2,
+            selectedItemIndex: 1,
             combBoxWidth, "Size:", keyTextWidth);
 
         ui.AddSeparator();
