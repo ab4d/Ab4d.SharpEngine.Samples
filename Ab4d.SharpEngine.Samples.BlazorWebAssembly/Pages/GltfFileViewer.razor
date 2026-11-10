@@ -25,7 +25,7 @@
     <br />
     <p>@((MarkupString)_infoText)</p>
 
-    <input type="checkbox" id="usePbrMaterial"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material.</label><br/>
+    <input type="checkbox" id="usePbrMaterial"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material (<b>NOTE:</b> toggling requires model to be re-uploaded!).</label><br/>
     <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
         Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
     <input type="file" id="fileInput" style="display: none;" />
@@ -39,9 +39,9 @@
         let dotNetInterop;
         let lastDropZone = null;
         let lastFileInput = null;
+        let lastUsePbrMaterialCheckbox = null;
 
         function handleFiles(files) {
-            const usePbrMaterialCheckbox = document.getElementById('usePbrMaterial');
             const allFileNames = Array.from(files).map(file => file.name).join(',');
             dotNetInterop.invokeMethodAsync('FilesDroppedJS', allFileNames);
 
@@ -75,7 +75,7 @@
                         dotNetInterop.invokeMethodAsync('TextureImportedJS', file.name, bitmap.width, bitmap.height, imageBytes);
                     } else {
                         const bytes = new Uint8Array(arrayBuffer);
-                        dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes, usePbrMaterialCheckbox.checked);
+                        dotNetInterop.invokeMethodAsync('FileImportedJS', file.name, bytes);
                     }
                 };
 
@@ -125,10 +125,30 @@
             });
         }
 
+        function initializePbrCheckbox() {
+            const usePbrMaterialCheckbox = document.getElementById('usePbrMaterial');
+            if (!usePbrMaterialCheckbox)
+                return;
+
+            // Check if elements have changed (re-rendered), if so, re-attach listeners
+            if (lastUsePbrMaterialCheckbox === usePbrMaterialCheckbox) {
+                return; // Already initialized for these exact element
+            }
+
+            // Store references to current element
+            lastUsePbrMaterialCheckbox = usePbrMaterialCheckbox;
+
+            usePbrMaterialCheckbox.addEventListener('change', (e) => {
+                console.log(`js: Use PBR material toggled: ${e.target.checked}`);
+                dotNetInterop.invokeMethodAsync('UsePbrMaterialToggledJS', e.target.checked);
+            });
+        }
+
         return {
             attachFileImportHandler: function(dotNetHelper) {
                 dotNetInterop = dotNetHelper;
                 initializeDropZone();
+                initializePbrCheckbox();
             }
         };
     })();
@@ -154,6 +174,7 @@
 
     private glTFImporter? _gltfImporter;
     private bool _modelImportAttempted;
+    private bool _usePbrMaterial = false;
 
     private string[]? _droppedFileNames;
     private int _droppedImagesCount;
@@ -357,7 +378,7 @@
 
     // The following method is called from javascript after the fileName content is read
     [JSInvokable]
-    public void FileImportedJS(string fileName, byte[] fileContent, bool usePbrMaterial)
+    public void FileImportedJS(string fileName, byte[] fileContent)
     {
         int index = GetDroppedFileIndex(fileName);
 
@@ -380,6 +401,18 @@
         UpdateUploadedFilesInfo();
     }
 
+    // The following method is called from javascript when "Use PBR material" checkbox is toggled
+    [JSInvokable]
+    public void UsePbrMaterialToggledJS(bool enabled)
+    {
+        _usePbrMaterial = enabled;
+
+        // Clear the currently shown model
+        if (_importedSceneNode != null)
+            ShowInfoMessage("Model cleared due to change in 'Use PBR material' setting.");
+        ClearShownModel();
+    }
+
     private void UpdateUploadedFilesInfo()
     {
         // Once all data files are uploaded (for example, .gltf and .dat), attempt to import the model. We could also
@@ -395,7 +428,7 @@
                 var fileContent = _uploadedFileContents[_uploadedGltfFileIndex]!;
 
                 // Start importing
-                ImportDroppedGltfFile(fileName, fileContent, false/*usePbrMaterial*/);
+                ImportDroppedGltfFile(fileName, fileContent);
                 if (_importedSceneNode == null)
                     return; // We failed to load the model - exit here
             }
@@ -455,15 +488,15 @@
         return index;
     }
 
-    private void ImportDroppedGltfFile(string fileName, byte[] fileContent, bool usePbrMaterial)
+    private void ImportDroppedGltfFile(string fileName, byte[] fileContent)
     {
-        ShowInfoMessage($"Start importing '{fileName}' (use PBR material: {usePbrMaterial})");
+        ShowInfoMessage($"Start importing '{fileName}' (use PBR material: {_usePbrMaterial})");
 
         ClearShownModel();
 
 
         _gltfImporter ??= new glTFImporter(gpuDevice: sharpEngineSceneView.Scene.GpuDevice);
-        _gltfImporter.UsePbrMaterial = usePbrMaterial;
+        _gltfImporter.UsePbrMaterial = _usePbrMaterial;
 
         // Create a memory stream from the byte array
         using MemoryStream fileStream = new MemoryStream(fileContent);
