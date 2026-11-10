@@ -35,6 +35,7 @@ public class SkyboxSample : CommonSample
         await base.ShowCommonSceneAsync(scene, CommonScenes.Teapot, finalSize: new Vector3(100, 100, 100));
     }
 
+#if VULKAN
     private void SetupSkybox(Scene scene)
     {
         // To create a skybox effect, we create a MultiMaterialModelNode with a special box mesh
@@ -93,6 +94,58 @@ public class SkyboxSample : CommonSample
         // IMPORTANT:
         // Do not forget to unsubscribe from CameraChanged
     }
+#elif WEB_GL
+    private void SetupSkybox(Scene scene)
+    {
+        if (GpuDevice == null)
+            return;
+
+        // See Vulkan implementation above for details on setting up the sykbox.
+        var skyBoxMesh = MeshFactory.CreateSkyBoxMesh(size: 5000);
+        var skyBoxNode = new MultiMaterialModelNode(skyBoxMesh, "SkyboxMultiMaterialModelNode")
+        {
+            IsHitTestVisible = false
+        };
+
+        _skyboxTransform = new TranslateTransform(targetPositionCamera?.GetCameraPosition() ?? new Vector3(0, 0, 0));
+        skyBoxNode.Transform = _skyboxTransform;
+
+        if (scene.BackgroundRenderingLayer != null)
+        {
+            skyBoxNode.CustomRenderingLayer = scene.BackgroundRenderingLayer;
+            scene.BackgroundRenderingLayer.ClearDepthStencilBufferAfterRendering = true;
+        }
+
+        // Texture loading in WebGL is asynchronous so it needs to be handled differently than in Vulkan...
+        var sideNameSuffices = new []
+        {
+            "_posy",
+            "_posz",
+            "_negx",
+            "_posx",
+            "_negz",
+            "_negy",
+        };
+
+        for (var i = 0; i < sideNameSuffices.Length; i++)
+        {
+            var filename = GetCommonTexturePath($"Resources/Textures/CloudyLightRays/CloudyLightRays{sideNameSuffices[i]}.png");
+            var startIndex = i * 6;
+            TextureLoader.CreateTexture(
+                filename,
+                GpuDevice,
+                textureCreatedCallback: (gpuImage) => skyBoxNode.AddSubMesh(startIndex, 6, material: new SolidColorMaterial(gpuImage)),
+                textureCreationFailedCallback: (e) => Console.WriteLine($"Failed to load texture {filename}: {e}"));
+        }
+
+        scene.RootNode.Add(skyBoxNode);
+
+
+        // Subscribe to camera changes to update the _skyboxTransform
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged += OnCameraChanged;
+    }
+#endif
 
     public override void InitializePointerCameraController(ManualPointerCameraController pointerCameraController)
     {
@@ -104,6 +157,7 @@ public class SkyboxSample : CommonSample
         base.InitializePointerCameraController(pointerCameraController);
     }
 
+#if VULKAN
     private Material? GetSkyboxFaceMaterial(string sideName)
     {
         if (Scene == null || Scene.GpuDevice == null)
@@ -118,6 +172,7 @@ public class SkyboxSample : CommonSample
         // Use SolidColorMaterial so there is no shading based on lights
         return new SolidColorMaterial(texture);
     }
+#endif
 
     private void OnCameraChanged(object? sender, EventArgs e)
     {
@@ -149,4 +204,3 @@ public class SkyboxSample : CommonSample
         base.OnDisposed();
     }
 }
-

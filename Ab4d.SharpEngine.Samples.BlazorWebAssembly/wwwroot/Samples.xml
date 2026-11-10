@@ -55,6 +55,7 @@
   <Sample Location="AdvancedModels.BooleanOperationsSample" Title="Boolean Operations"/>
   <Sample Location="AdvancedModels.AdvancedBooleanOperationsSample" Title="Advanced Boolean operations"/>
   <Sample Location="AdvancedModels.PlanarShadowsSample" Title="Planar shadows"/>
+  <Sample Location="AdvancedModels.SkyboxSample" Title="Skybox" IsNew="True"/>
   <Sample IsSeparator="True" />
   <Sample Location="AdvancedModels.PixelsRenderingSample" Title="Pixels rendering" IsNew="True"/>
   <Sample Location="AdvancedModels.PixelOptionsSample" Title="Pixels rendering options" IsNew="True"/>
