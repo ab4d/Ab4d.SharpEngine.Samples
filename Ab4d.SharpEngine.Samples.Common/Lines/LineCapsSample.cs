@@ -365,7 +365,7 @@ To set a custom MinLineArrowLength for a LineNode or a derived class, call its S
         if (Scene != null && Scene.GpuDevice != null && !Scene.GpuDevice.PhysicalDeviceDetails.PossibleFeatures.GeometryShader)
         {
             ui.AddSeparator();
-            ui.CreateLabel("Hidden lines are not rendered because GeometryShader is not supported on this GPU!", maxWidth: 200).SetColor(Colors.Red);
+            ui.CreateLabel("Line caps are not rendered because GeometryShader is not supported on this GPU!", maxWidth: 200).SetColor(Colors.Red);
         }
     }
 }
