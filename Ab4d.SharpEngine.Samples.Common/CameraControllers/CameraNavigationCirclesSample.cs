@@ -43,8 +43,6 @@ public class CameraNavigationCirclesSample : CommonSample
             targetPositionCamera.TargetPosition = new Vector3(0, -50, 0);
 
             targetPositionCamera.Distance = 400;
-
-            targetPositionCamera.StartRotation(40);
         }
 
         // Create hash symbol
