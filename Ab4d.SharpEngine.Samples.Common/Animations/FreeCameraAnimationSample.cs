@@ -70,11 +70,39 @@ public class FreeCameraAnimationSample : CommonSample
     
     private void AnimateFreeCamera(Vector3? cameraPosition = null, Vector3? targetPosition = null, Vector3? upDirection = null)
     {
-        if (SceneView?.Camera is not FreeCamera freeCamera)
+        if (_freeCamera == null)
             return;
 
         if (_currentCameraAnimation != null)
             _currentCameraAnimation.Stop();
+
+        // We can use RotateTo or create an animation manually (see below)
+        if (cameraPosition.HasValue && upDirection.HasValue)
+        {
+            if (targetPosition.HasValue)
+            {
+                // animate all CameraPosition, TargetPosition and UpDirection
+                _currentCameraAnimation = _freeCamera.RotateTo(cameraPosition.Value,
+                                                               targetPosition.Value, 
+                                                               upDirection.Value, 
+                                                               animationDurationInMilliseconds: 1000, 
+                                                               easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                                               isSphericalInterpolation: _isSphericalInterpolation);
+            }
+            else
+            {
+                // animate only CameraPosition and UpDirection
+                _currentCameraAnimation = _freeCamera.RotateTo(cameraPosition.Value,
+                                                               upDirection.Value, 
+                                                               animationDurationInMilliseconds: 1000, 
+                                                               easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                                               isSphericalInterpolation: _isSphericalInterpolation);
+            }
+
+            return;
+        }
+
+        // Manually create the FreeCamera animation.
 
         // NOTE:
         // When animating FreeCamera's CameraPosition, TargetPosition and UpDirection,
@@ -82,26 +110,26 @@ public class FreeCameraAnimationSample : CommonSample
         // you cannot set CameraPosition for time 0 and 1000, and TargetPosition for time 200 and 500.
         // In this case keyframes for CameraPosition and TargetPosition must be specified for time 0, 200, 500 and 1000.
 
-        var cameraAnimation = AnimationBuilder.CreateCameraAnimation(freeCamera);
+        var cameraAnimation = AnimationBuilder.CreateCameraAnimation(_freeCamera);
 
         cameraAnimation.FreeCameraAnimationType = _isSphericalInterpolation ? CameraAnimation.FreeCameraAnimationTypes.SphericalInterpolation 
                                                                             : CameraAnimation.FreeCameraAnimationTypes.LinearInterpolation;
 
         if (cameraPosition != null)
         {
-            cameraAnimation.AddKeyframe(CameraAnimatedProperties.CameraPosition, time: 0, freeCamera.CameraPosition);
+            cameraAnimation.AddKeyframe(CameraAnimatedProperties.CameraPosition, time: 0, _freeCamera.CameraPosition);
             cameraAnimation.AddKeyframe(CameraAnimatedProperties.CameraPosition, time: 1000, cameraPosition.Value);
         }
         
         if (targetPosition != null)
         {
-            cameraAnimation.AddKeyframe(CameraAnimatedProperties.TargetPosition, time: 0, freeCamera.TargetPosition);
+            cameraAnimation.AddKeyframe(CameraAnimatedProperties.TargetPosition, time: 0, _freeCamera.TargetPosition);
             cameraAnimation.AddKeyframe(CameraAnimatedProperties.TargetPosition, time: 1000, targetPosition.Value);
         }
 
         if (upDirection != null)
         {
-            cameraAnimation.AddKeyframe(CameraAnimatedProperties.UpDirection, time: 0, freeCamera.UpDirection);
+            cameraAnimation.AddKeyframe(CameraAnimatedProperties.UpDirection, time: 0, _freeCamera.UpDirection);
             cameraAnimation.AddKeyframe(CameraAnimatedProperties.UpDirection, time: 1000, upDirection.Value);
         }
 
@@ -109,6 +137,20 @@ public class FreeCameraAnimationSample : CommonSample
 
         cameraAnimation.Start();
         _currentCameraAnimation = cameraAnimation;
+    }
+
+    private void RotateFreeCamera(float headingChange = 0, float attitudeChange = 0)
+    {
+        if (_freeCamera == null)
+            return;
+
+        if (_currentCameraAnimation != null)
+            _currentCameraAnimation.Stop();
+
+        _currentCameraAnimation = _freeCamera.RotateCamera(headingChange, attitudeChange, bankChange: 0, 
+                                                           animationDurationInMilliseconds: 1000, 
+                                                           easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                                           isSphericalInterpolation: _isSphericalInterpolation);
     }
 
     private void AnimateCameraPosition(float distanceFactor)
@@ -256,6 +298,9 @@ public class FreeCameraAnimationSample : CommonSample
                           _isSphericalInterpolation, isChecked => _isSphericalInterpolation = isChecked);
 
         ui.AddSeparator();
+        ui.CreateButton("Rotate horizontally", () => RotateFreeCamera(headingChange: 20));
+        ui.CreateButton("Rotate vertically", () => RotateFreeCamera(attitudeChange: 20));
+
         ui.AddSeparator();
         ui.CreateButton("Rotate to top down view",  () => AnimateFreeCamera(cameraPosition: new Vector3(0, 300, 0),  upDirection: new Vector3(0, 0, -1)));
         ui.CreateButton("Rotate to bottom up view", () => AnimateFreeCamera(cameraPosition: new Vector3(0, -300, 0), upDirection: new Vector3(0, 0, 1)));
@@ -265,7 +310,7 @@ public class FreeCameraAnimationSample : CommonSample
         ui.CreateButton("Rotate to left view",  () => AnimateFreeCamera(cameraPosition: new Vector3(-300, 0, 0), upDirection: new Vector3(0, 1, 0)));
         ui.CreateButton("Rotate to back view",  () => AnimateFreeCamera(cameraPosition: new Vector3(0, 0, -300), upDirection: new Vector3(0, 1, 0)));
         ui.CreateButton("Rotate to side view",  () => AnimateFreeCamera(cameraPosition: new Vector3(300, 0, 0),  upDirection: new Vector3(0, 1, 0)));
-
+        
         ui.AddSeparator();
         ui.CreateButton("Zoom out with CameraPosition", () => AnimateCameraPosition(distanceFactor: 1.5f));
         ui.CreateButton("Zoom out with Distance", () => AnimateCameraDistanceFor(distanceFactor: 1.5f));
