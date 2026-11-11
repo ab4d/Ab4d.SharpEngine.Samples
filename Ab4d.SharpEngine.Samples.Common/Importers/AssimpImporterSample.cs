@@ -91,7 +91,7 @@ public class AssimpImporterSample : CommonSample
         string? assimpLibFileName = null;
         
         if (OperatingSystem.IsWindows())
-            assimpLibFileName = Environment.Is64BitProcess ? "Assimp64.dll" : "Assimp32.dll";
+            assimpLibFileName = Environment.Is64BitProcess ? (RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "AssimpArm64*.dylib" : "Assimp64.dll") : "Assimp32.dll";
         else if (OperatingSystem.IsMacOS() && Environment.Is64BitProcess)
             assimpLibFileName = "libassimp*.dylib"; // this will be uses as a search parameter to get the latest version
         else if (OperatingSystem.IsLinux() && Environment.Is64BitProcess)
