@@ -315,7 +315,7 @@ public class CircleModelNodeSample : StandardModelsSampleBase
         ui.AddSeparator();
 
 
-        ui.CreateEnumComboBox(textureMappingType => 
+        _textureMappingComboBox = ui.CreateEnumComboBox(textureMappingType => 
             {
                 _textureMappingType = textureMappingType;
                 UpdateModelNode();

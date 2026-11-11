@@ -377,7 +377,7 @@ public class PointCloudImporterSample : CommonSample
 
             ui.CreateButton("Load", () =>
             {
-                LoadPointCloud(_textBoxElement.GetText());
+                _ = LoadPointCloud(_textBoxElement.GetText());
             });
 
             // When File name TextBox is shown in the bottom left corner, then we need to lift the CameraAxisPanel above it
