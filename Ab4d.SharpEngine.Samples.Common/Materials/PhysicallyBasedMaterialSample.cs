@@ -50,10 +50,9 @@ public class PhysicallyBasedMaterialSample : CommonSample
 
     private GroupNode? _testObjectsGroupNode;
 
-#if VULKAN
     private MultiMaterialModelNode? _skyBoxNode;
     private TranslateTransform? _skyboxTransform;
-#endif
+
     private StandardMesh? _teapotMesh;
     private TextBlockFactory? _textBlockFactory;
 
@@ -81,12 +80,24 @@ public class PhysicallyBasedMaterialSample : CommonSample
         scene.RootNode.Add(_testObjectsGroupNode);
 
 
+#if VULKAN
         // Because the images in the _environmentMapFolder follow  expected naming convention
         // (e.g. file names end with face-specific suffices: _posx, _negx, _posy, _negy, _posz, and _negz),
         // we can pass the path to directory to LoadCubeMap.
         // Otherwise, we would need to use an overload that gets 6 file names.
-#if VULKAN
         _environmentCubeMapImage = CubeMapLoader.LoadCubeMap(_environmentMapBaseFolder, scene.GpuDevice, name: "CloudyLightRays");
+#elif WEB_GL
+        // The WebGL variant of the CubeMapLoader does not support passing a directory name, as it cannot search its
+        // contents; therefore, we need to provide all six filenames.
+        _environmentCubeMapImage = await CubeMapLoader.LoadCubeMapAsync(
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_posx.png"),
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_negx.png"),
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_posy.png"),
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_negy.png"),
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_posz.png"),
+            GetCommonTexturePath($"{_environmentMapBaseFolder}/CloudyLightRays_negz.png"),
+            scene.GpuDevice,
+            name: "CloudyLightRays");
 #endif
 
         _physicallyBasedMaterial = new PhysicallyBasedMaterial(baseColor: _baseColor, metalness: _metalness, roughness: _roughness, name: "PhysicallyBasedMaterial")
@@ -109,9 +120,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
         else
             SetupMultipleTeapots();
 
-#if VULKAN
         SetupSkybox(scene);
-#endif
 
         // After the main scene is created, load the additional textures that can be enabled by CheckBoxes:
 
@@ -356,6 +365,59 @@ public class PhysicallyBasedMaterialSample : CommonSample
 
         return new SolidColorMaterial(singleFaceGpuImage); // Use SolidColorMaterial so there is no shading based on lights
     }
+#elif WEB_GL
+    private void SetupSkybox(Scene scene)
+    {
+        var skyBoxMesh = MeshFactory.CreateSkyBoxMesh(size: 5000);
+
+        _skyBoxNode = new MultiMaterialModelNode(skyBoxMesh, "SkyboxMultiMaterialModelNode")
+        {
+            IsHitTestVisible = false // IMPORTANT: Disable hit testing to prevent rotating around positions on the skybox and zooming to skybox
+        };
+
+        _skyboxTransform = new TranslateTransform(targetPositionCamera?.GetCameraPosition() ?? new Vector3(0, 0, 0));
+        _skyBoxNode.Transform = _skyboxTransform;
+
+        if (scene.BackgroundRenderingLayer != null)
+        {
+            _skyBoxNode.CustomRenderingLayer = scene.BackgroundRenderingLayer;
+            scene.BackgroundRenderingLayer.ClearDepthStencilBufferAfterRendering = true;
+        }
+
+        // In WebGL, reading faces back from cube map is not (yet?) supported. So we set up the sykbox from images
+        // again, in the same way as in Skybox sample.
+        var sideNameSuffices = new []
+        {
+            "_posy",
+            "_posz",
+            "_negx",
+            "_posx",
+            "_negz",
+            "_negy",
+        };
+
+        for (var i = 0; i < sideNameSuffices.Length; i++)
+        {
+            var filename = $"{_environmentMapBaseFolder}/CloudyLightRays{sideNameSuffices[i]}.png";
+            var startIndex = i * 6;
+            // NOTE: we disable mipmaps on skybox faces to prevent distant mips from bleeding across borders, which results in noticeable seams.
+            // For textures without mipmaps, the engine automatically forces texture wrap to clamp, so explicitly specifying sampler type when
+            // creating SolidColorMaterial makes no difference.
+            TextureLoader.CreateTexture(
+                filename,
+                GpuDevice,
+                generateMipMaps: false,
+                textureCreatedCallback: (gpuImage) => _skyBoxNode.AddSubMesh(startIndex, 6, material: new SolidColorMaterial(gpuImage)),
+                textureCreationFailedCallback: (e) => Console.WriteLine($"Failed to load texture {filename}: {e}"));
+        }
+
+        scene.RootNode.Add(_skyBoxNode);
+
+        // Subscribe to camera changes to update the _skyboxTransform
+        if (targetPositionCamera != null)
+            targetPositionCamera.CameraChanged += OnCameraChanged;
+    }
+#endif
 
     private void OnCameraChanged(object? sender, EventArgs e)
     {
@@ -373,7 +435,6 @@ public class PhysicallyBasedMaterialSample : CommonSample
             _skyboxTransform.SetTranslate(cameraPosition);
         // ReSharper restore CompareOfFloatsByEqualityOperator
     }
-#endif
 
     protected override void OnCreateLights(Scene scene)
     {
