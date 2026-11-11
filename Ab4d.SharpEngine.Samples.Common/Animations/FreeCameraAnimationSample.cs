@@ -82,22 +82,24 @@ public class FreeCameraAnimationSample : CommonSample
             if (targetPosition.HasValue)
             {
                 // animate all CameraPosition, TargetPosition and UpDirection
-                _currentCameraAnimation = _freeCamera.RotateTo(cameraPosition.Value,
-                                                               targetPosition.Value, 
-                                                               upDirection.Value, 
-                                                               animationDurationInMilliseconds: 1000, 
-                                                               easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
-                                                               isSphericalInterpolation: _isSphericalInterpolation);
+                _freeCamera.RotateTo(cameraPosition.Value,
+                                     targetPosition.Value, 
+                                     upDirection.Value, 
+                                     animationDurationInMilliseconds: 1000, 
+                                     easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                     isSphericalInterpolation: _isSphericalInterpolation);
             }
             else
             {
                 // animate only CameraPosition and UpDirection
-                _currentCameraAnimation = _freeCamera.RotateTo(cameraPosition.Value,
-                                                               upDirection.Value, 
-                                                               animationDurationInMilliseconds: 1000, 
-                                                               easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
-                                                               isSphericalInterpolation: _isSphericalInterpolation);
+                _freeCamera.RotateTo(cameraPosition.Value,
+                                     upDirection.Value, 
+                                     animationDurationInMilliseconds: 1000, 
+                                     easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                     isSphericalInterpolation: _isSphericalInterpolation);
             }
+
+            _currentCameraAnimation = _freeCamera.CameraAnimation;
 
             return;
         }
@@ -147,10 +149,12 @@ public class FreeCameraAnimationSample : CommonSample
         if (_currentCameraAnimation != null)
             _currentCameraAnimation.Stop();
 
-        _currentCameraAnimation = _freeCamera.RotateCamera(headingChange, attitudeChange, bankChange: 0, 
-                                                           animationDurationInMilliseconds: 1000, 
-                                                           easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
-                                                           isSphericalInterpolation: _isSphericalInterpolation);
+        _freeCamera.RotateCamera(headingChange, attitudeChange, bankChange: 0, 
+                                 animationDurationInMilliseconds: 5000, 
+                                 easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
+                                 isSphericalInterpolation: _isSphericalInterpolation);
+
+        _currentCameraAnimation = _freeCamera.CameraAnimation;
     }
 
     private void AnimateCameraPosition(float distanceFactor)
