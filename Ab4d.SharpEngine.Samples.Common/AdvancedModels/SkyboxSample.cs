@@ -131,9 +131,13 @@ public class SkyboxSample : CommonSample
         {
             var filename = GetCommonTexturePath($"Resources/Textures/CloudyLightRays/CloudyLightRays{sideNameSuffices[i]}.png");
             var startIndex = i * 6;
+            // NOTE: we disable mipmaps on skybox faces to prevent distant mips from bleeding across borders, which results in noticeable seams.
+            // For textures without mipmaps, the engine automatically forces texture wrap to clamp, so explicitly specifying sampler type when
+            // creating SolidColorMaterial makes no difference.
             TextureLoader.CreateTexture(
                 filename,
                 GpuDevice,
+                generateMipMaps: false,
                 textureCreatedCallback: (gpuImage) => skyBoxNode.AddSubMesh(startIndex, 6, material: new SolidColorMaterial(gpuImage)),
                 textureCreationFailedCallback: (e) => Console.WriteLine($"Failed to load texture {filename}: {e}"));
         }
