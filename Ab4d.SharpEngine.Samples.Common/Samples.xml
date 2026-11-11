@@ -149,7 +149,8 @@
   <Sample Location="Animations.GlobalAnimationPropertiesSample" Title="Global Animation properties"/>
   <Sample Location="Animations.AnimationEasingSample" Title="Animation easing"/>
   <Sample Location="Animations.MaterialAnimationSample" Title="Material animation"/>
-  <Sample Location="Animations.CameraAnimationSample" Title="Camera animation"/>
+  <Sample Location="Animations.TargetPositionCameraAnimationSample" Title="TargetPositionCamera animation"/>
+  <Sample Location="Animations.FreeCameraAnimationSample" Title="FreeCamera animation" IsNew="True"/>
   <Sample Location="Animations.SceneNodeAnimationSample" Title="SceneNode animation"/>
   <Sample Location="Animations.CustomAnimationSample" Title="Custom animation"/>
 

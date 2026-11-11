@@ -6,20 +6,21 @@ using Ab4d.SharpEngine.Samples.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Animation;
+using Ab4d.SharpEngine.Cameras;
 
 namespace Ab4d.SharpEngine.Samples.Common.Animations;
 
-public class CameraAnimationSample : CommonSample
+public class TargetPositionCameraAnimationSample : CommonSample
 {
-    public override string Title => "Camera animation sample";
-    public override string? Subtitle => null;
+    public override string Title => "TargetPositionCamera animation sample";
+    public override string? Subtitle => "This sample shows how to animate TargetPositionCamera by animating Heading, Attitude, Distance and TargetPosition properties.";
 
     private CameraAnimation? _currentCameraAnimation;
 
-    public CameraAnimationSample(ICommonSamplesContext context)
+    public TargetPositionCameraAnimationSample(ICommonSamplesContext context)
         : base(context)
     {
-    }
+    }   
 
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
@@ -32,10 +33,6 @@ public class CameraAnimationSample : CommonSample
         };
 
         scene.RootNode.Add(boxModelNode);
-
-
-        var teapotFileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources/Models/Teapot.obj");
-
 
 
         if (targetPositionCamera != null)
@@ -99,6 +96,7 @@ public class CameraAnimationSample : CommonSample
             _currentCameraAnimation.Stop();
 
         var cameraAnimation = AnimationBuilder.CreateCameraAnimation(targetPositionCamera);
+
         //cameraAnimation.SetDuration(500); // we will set duration with Set method
         cameraAnimation.EasingFunction = EasingFunctions.QuadraticEaseInOutFunction;
 
@@ -227,7 +225,7 @@ public class CameraAnimationSample : CommonSample
         ui.AddSeparator();
         ui.CreateButton("Play animation 1", () => PlayAnimation1());
         ui.CreateButton("Play animation 2", () => PlayAnimation2());
-
+        
         base.OnCreateUI(ui);
     }
 }
