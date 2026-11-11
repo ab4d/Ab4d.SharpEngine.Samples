@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
-    <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>  
-    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>
+    <TargetFramework>net11.0</TargetFramework> <!-- Ab4d.SharpEngine supports all .Net version from .Net 6 to the latest .Net version. -->
     <Version>4.1.9689</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>

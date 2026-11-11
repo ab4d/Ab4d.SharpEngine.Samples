@@ -3,7 +3,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform.iOS</RootNamespace>  
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0-ios</TargetFramework>
+    <TargetFramework>net11.0-ios</TargetFramework>
     <RuntimeIdentifiers>ios-arm64</RuntimeIdentifiers>
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
