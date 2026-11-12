@@ -20,7 +20,6 @@ public class PointCloudImporterSample : CommonSample
 
     private readonly string _initialFileName = @"Resources\PointClouds\14 Ladybrook Road 10 - cropped.ply";
 
-    private ICommonSampleUIElement? _textBoxElement;
     private ICommonSampleUIElement? _pixelsCountLabel;
     private ICommonSampleUIElement? _loadingLabel;
 
@@ -33,7 +32,10 @@ public class PointCloudImporterSample : CommonSample
     private float _pixelsSize = 2;
     private float _pixelSizeFactor = 1;
 
+#if VULKAN
+    private ICommonSampleUIElement? _textBoxElement;
     private Vector2? _savedAxisPanelPosition;
+#endif
 
     private float _boundsDiagonalLength;
     private PixelsNode? _pixelsNode;
