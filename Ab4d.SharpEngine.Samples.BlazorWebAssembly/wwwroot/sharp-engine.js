@@ -73,6 +73,7 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
 
         const dotnet = globalThis.getDotnetRuntime(0);
         dotnet.Module["canvas"] = canvas; // This is requried to be able to create WebGL context (call EGL.CreateContext)
+        dotnet.Module["context"] = context; // For image loading
 
         var dpi = window.devicePixelRatio || 1.0;
 
@@ -215,17 +216,55 @@ async function loadImageBytesFromBlob(blob, canvasId, url) {
     try {
         const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' }); // note: using premultiply does not work reliably, so we need to do that after the bitmap is loaded
 
-        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0);
-        const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+        let imageBytes = null;
 
-        const data = Array.from(imageData.data);
+        // WebGL/WebGL2 codepath: create texture from loaded bitmap, attach to framebuffer, and read pixels.
+        // Avoids the issues with alpha pre-multiplication, and preserves RGB values where alpha is 0.
+        const dotnet = globalThis.getDotnetRuntime(0);
+        const gl = dotnet.Module["context"]; // Set in initWebGLCanvas()
+
+        if (gl) {
+            log("loadImageBytes: Retrieving pixel data via WebGL2/WebGL canvas context...");
+
+            gl.activeTexture(gl.TEXTURE0);
+            let texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+
+            const framebuffer = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+            if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE) {
+                imageBytes = new Uint8Array(bitmap.width * bitmap.height * 4);
+                gl.readPixels(0, 0, bitmap.width, bitmap.height, gl.RGBA, gl.UNSIGNED_BYTE, imageBytes);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+            gl.deleteFramebuffer(framebuffer);
+            gl.deleteTexture(texture);
+        } else {
+            // Fallback via 2D canvas. Although bitmap is loaded with premultiplyAlpha='none' setting,
+            // the roundtrip of drawImage() and getImageData() involves composition with premultiplied
+            // alpha. It seems that the data is then un-multiplied post-hoc, but this is lossy; most
+            // noticeably, RGB values at A=0 are lost (i.e., become 0).
+            log("loadImageBytes: Retrieving pixel data via fallback 2D canvas context...");
+
+            const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+            const data = Array.from(imageData.data);
+            imageBytes = new Uint8Array(data);
+        }
 
         log("loadImageBytes: image byte array retrieved: " + url);
 
         if (interop)
-            interop.OnImageBytesLoaded(canvasId, url, bitmap.width, bitmap.height, data, null);
+            interop.OnImageBytesLoaded(canvasId, url, bitmap.width, bitmap.height, imageBytes, null);
     }
     catch (ex) {
         let message = `loadImageBytes: error decoding image '${url}': ${ex.message}`;
