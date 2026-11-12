@@ -8,20 +8,12 @@
     <Nullable>enable</Nullable>
     <PackageIcon>sharp-engine-logo.ico</PackageIcon>
     <ApplicationIcon>Resources/sharp-engine-logo.ico</ApplicationIcon>
-    
-    <!-- Comment the following to use Avalonia v11 -->
-    <DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(DefineConstants.Contains('AVALONIA_12'))">
-    <PackageReference Include="Avalonia" Version="12.0.5" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.5" />
-    <PackageReference Include="Avalonia.Themes.Simple" Version="12.0.5" />
-  </ItemGroup>
-  <ItemGroup Condition="!$(DefineConstants.Contains('AVALONIA_12'))">
-    <PackageReference Include="Avalonia" Version="11.3.13" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.13" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.13" />
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="12.1.6" />
   </ItemGroup>
   
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">

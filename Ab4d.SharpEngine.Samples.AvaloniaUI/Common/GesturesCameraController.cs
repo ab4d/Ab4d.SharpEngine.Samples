@@ -37,7 +37,6 @@ public class GesturesCameraController : PointerCameraController
         eventsSourceElement.GestureRecognizers.Add(new PinchGestureRecognizer());
         eventsSourceElement.GestureRecognizers.Add(new ScrollGestureRecognizer() { CanHorizontallyScroll = true, CanVerticallyScroll = true });
 
-#if AVALONIA_12        
         // Avalonia v12 code:
         // In Avalonia v12 the gesture events are moved from Gestures to InputElement and the events are directly on the control instead of attached events.
         // https://github.com/AvaloniaUI/Avalonia/commit/dc8dc3bd2e8199c8bed710ae5af8f5882be78581
@@ -51,13 +50,6 @@ public class GesturesCameraController : PointerCameraController
         //sharpEngineSceneView.AddHandler(InputElement.PinchEndedEvent, PinchEndedEventHandler);
         //eventsSourceElement.AddHandler(InputElement.ScrollGestureEvent, ScrollGestureHandler);
         //eventsSourceElement.AddHandler(InputElement.ScrollGestureEndedEvent, ScrollGestureEndedHandler);
-#else
-        // Avalonia v11 code:
-        sharpEngineSceneView.AddHandler(Gestures.PinchEvent, PinchEventHandler);
-        sharpEngineSceneView.AddHandler(Gestures.PinchEndedEvent, PinchEndedEventHandler);
-        eventsSourceElement.AddHandler(Gestures.ScrollGestureEvent, ScrollGestureHandler);
-        eventsSourceElement.AddHandler(Gestures.ScrollGestureEndedEvent, ScrollGestureEndedHandler);
-#endif        
     }
 
 
