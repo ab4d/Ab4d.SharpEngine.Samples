@@ -25,7 +25,7 @@
     <br />
     <p>@((MarkupString)_infoText)</p>
 
-    <input type="checkbox" id="usePbrMaterial"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material (<b>NOTE:</b> toggling requires model to be re-uploaded!).</label><br/>
+    <input type="checkbox" id="usePbrMaterial" checked="checked"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material (<b>NOTE:</b> toggling requires model to be re-uploaded!).</label><br/>
     <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
         Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
     <input type="file" id="fileInput" style="display: none;" />
@@ -174,7 +174,7 @@
 
     private glTFImporter? _gltfImporter;
     private bool _modelImportAttempted;
-    private bool _usePbrMaterial = false;
+    private bool _usePbrMaterial = true;
 
     private string[]? _droppedFileNames;
     private int _droppedImagesCount;
