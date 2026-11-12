@@ -62,17 +62,8 @@
     private async Task ShowMarkdown(string titleId)
     {
         // Handle markdown files
-        IJSObjectReference? markedModule;
-        try
-        {
-            // Ensure marked.js is loaded
-            markedModule = await EnsureMarkedJsLoaded();
-        }
-        catch (Exception ex)
-        {
-            markedModule = null;
-            _markdownHtmlContent = $"<p>Error loading marked.js: {ex.Message}</p>";
-        }
+        // Ensure marked.js is loaded
+        var markedModule = await EnsureMarkedJsLoaded();
 
         if (markedModule == null)
             return;
@@ -114,14 +105,23 @@
         }
     }
 
-    private async Task<IJSObjectReference> EnsureMarkedJsLoaded()
+    private async Task<IJSObjectReference?> EnsureMarkedJsLoaded()
     {
         if (_markedJSModule != null)
             return _markedJSModule; 
 
         // ImportAsync does not return IJSObjectReference in .Net 10
         //var markedModule = await System.Runtime.InteropServices.JavaScript.JSHost.ImportAsync(moduleName: "marked.js", moduleUrl: "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js");
-        _markedJSModule = await JSRuntime.InvokeAsync<IJSObjectReference>( "import", "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js");
+        try
+        {
+            _markedJSModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js");
+        }
+        catch (Exception ex)
+        {
+            _markedJSModule = null;
+            _markdownHtmlContent = $"<p>Error loading marked.js: {ex.Message}</p>";
+        }
+
         return _markedJSModule;
     }
 }

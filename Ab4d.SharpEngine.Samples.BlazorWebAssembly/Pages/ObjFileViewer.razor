@@ -216,7 +216,15 @@
 
         // Initialize javascript attachFileImportHandler so it can call back blazor (ObjFileImportedJS and MtlFileImportedJS)
         _thisJSReference = DotNetObjectReference.Create(this);
-        await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+
+        try
+        {
+            await JS.InvokeVoidAsync("attachFileImportHandler", _thisJSReference);
+        }
+        catch (Exception ex)
+        {
+            ShowInfoMessage($"Error calling attachFileImportHandler: " + ex.Message);
+        }
     }
 
     // The following method is called from javascript after the files defined in allFileNames are dropped

@@ -582,7 +582,10 @@ public partial class CanvasInterop : ICanvasInterop
         if (JS == null)
             throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that the static CanvasInterop.JS property is set after calling the InitializeInterop method.");
 
+        #pragma warning disable BL0016 // Exceptions are intentionally propagated to the caller.
         return await JS.InvokeAsync<TValue>(identifier, args);
+        #pragma warning restore BL0016
+
 #else
         throw new NotSupportedException("InvokeAsync is available only when CanvasInterop is defined in a Blazor WebAssembly assembly and not in pure .Net assembly.");
 #endif
@@ -605,7 +608,10 @@ public partial class CanvasInterop : ICanvasInterop
         if (JS == null)
             throw new SharpEngineException("Cannot invoke javascript function because IJSRuntime is not initialized. Make sure that the static CanvasInterop.JS property is set after calling the InitializeInterop method.");
 
+        #pragma warning disable BL0016 // Exceptions are intentionally propagated to the caller.
         return await JS.InvokeAsync<TValue>(identifier, cancellationToken, args);
+        #pragma warning restore BL0016
+
 #else
         throw new NotSupportedException("InvokeAsync is available only when CanvasInterop is defined in a Blazor WebAssembly assembly and not in pure .Net assembly.");
 #endif
