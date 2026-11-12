@@ -59,6 +59,7 @@
     private SharpEngineSceneView sharpEngineSceneView = null!;
 
     private TargetPositionCamera? _targetPositionCamera;
+    private PointerCameraController? _pointerCameraController;
     private DirectionalLight? _directionalLight;
 
     private StandardMaterialBase? _hashMaterial;
@@ -165,7 +166,7 @@
 
         sceneView.Camera = _targetPositionCamera;
 
-        sceneView.AddPointerCameraController(
+        _pointerCameraController = sceneView.AddPointerCameraController(
             rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
             moveCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
             quickZoomConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
