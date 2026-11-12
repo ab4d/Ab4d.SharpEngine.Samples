@@ -154,7 +154,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
             {
                 // Because we render a gradient in background RootBorder and we have set MainSceneView.IsHitTestVisible to false
                 // we need to set a custom eventsSourceElement when creating the PointerCameraController
-                _pointerCameraController ??= new PointerCameraController(MainSceneView, eventsSourceElement: RootBorder);
+                _pointerCameraController = MainSceneView.AddPointerCameraController(eventsSourceElement: RootBorder); // Use default settings
 
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);

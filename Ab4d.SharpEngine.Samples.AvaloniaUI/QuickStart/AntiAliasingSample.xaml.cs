@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using System.Windows;
-using Ab4d.SharpEngine;
+﻿using Ab4d.SharpEngine;
+using Ab4d.SharpEngine.AvaloniaUI;
 using Ab4d.SharpEngine.Cameras;
 using Ab4d.SharpEngine.Common;
+using Ab4d.SharpEngine.Core;
 using Ab4d.SharpEngine.Materials;
+using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Ab4d.SharpEngine.AvaloniaUI;
-using Ab4d.SharpEngine.Core;
-using Ab4d.SharpEngine.Samples.AvaloniaUI.Common;
+using Ab4d.SharpEngine.Utilities;
 using Ab4d.SharpEngine.Vulkan;
 using Ab4d.Vulkan;
 using Avalonia;
@@ -23,6 +15,15 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 {
@@ -242,14 +243,14 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 
             sharpEngineSceneView.SceneView.Camera = targetPositionCamera;
 
-            var pointerCameraController = new PointerCameraController(sharpEngineSceneView)
-            {
-                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.PointerPosition,
-                RotateAroundPointerPosition = true
-            };
+            sharpEngineSceneView.AddPointerCameraController(
+                rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+                moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+                quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                rotateAroundPointerPosition: true,
+                zoomMode: CameraZoomMode.PointerPosition,
+                cameraSmoothing: CameraController.CameraSmoothingPresets.Normal
+            );
         }
 
         private void CreateTestScene(Scene scene, float lineThickness)

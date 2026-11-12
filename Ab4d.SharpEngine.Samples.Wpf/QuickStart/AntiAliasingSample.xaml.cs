@@ -232,14 +232,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf.QuickStart
 
             sharpEngineSceneView.SceneView.Camera = targetPositionCamera;
 
-            var pointerCameraController = new PointerCameraController(sharpEngineSceneView)
-            {
-                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.PointerPosition,
-                RotateAroundPointerPosition = true
-            };
+            sharpEngineSceneView.AddPointerCameraController(
+                rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+                moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+                quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                rotateAroundPointerPosition: true,
+                zoomMode: CameraZoomMode.PointerPosition,
+                cameraSmoothing: CameraController.CameraSmoothingPresets.Normal
+            );
         }
 
         private void CreateTestScene(Scene scene, float lineThickness)

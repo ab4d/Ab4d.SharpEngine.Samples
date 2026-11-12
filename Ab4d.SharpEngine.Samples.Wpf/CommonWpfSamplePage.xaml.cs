@@ -162,7 +162,7 @@ namespace Ab4d.SharpEngine.Samples.Wpf
 
             if (_pointerCameraController == null) // if _pointerCameraController is not null, then InitializePointerCameraController was already called from InitializeCommonSample
             {
-                _pointerCameraController = new PointerCameraController(MainSceneView);
+                _pointerCameraController = MainSceneView.AddPointerCameraController(); // Use default settings
 
                 if (_currentCommonSample != null)
                     _currentCommonSample.InitializePointerCameraController(_pointerCameraController);

@@ -48,15 +48,14 @@ namespace Ab4d.SharpEngine.Samples.Wpf.Advanced
 
             MainSceneView.SceneView.Camera = targetPositionCamera;
 
-            var pointerCameraController = new PointerCameraController(MainSceneView)
-            {
-                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
-                ZoomMode = CameraZoomMode.PointerPosition,
-                RotateAroundPointerPosition = true,
-                CameraSmoothing = CameraController.CameraSmoothingPresets.Normal
-            };
+            MainSceneView.AddPointerCameraController(
+                rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+                moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+                quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                rotateAroundPointerPosition: true,
+                zoomMode: CameraZoomMode.PointerPosition,
+                cameraSmoothing: CameraController.CameraSmoothingPresets.Normal
+            );
             
 
             // Create WpfElementOverlay that will render the specified WpfControlsBorder to a bitmap

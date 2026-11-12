@@ -94,14 +94,25 @@ When 0 (by default), then rotation, movement or quick zoom are started immediate
             MainSceneView.SceneView.Camera = _targetPositionCamera;
 
 
-            _pointerCameraController = new PointerCameraController(MainSceneView)
-            {
-                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
-                RotateAroundPointerPosition = true,
-                ZoomMode = CameraZoomMode.PointerPosition
-            };
+            _pointerCameraController = MainSceneView.AddPointerCameraController(
+                rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+                moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+                quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                rotateAroundPointerPosition: true,
+                zoomMode: CameraZoomMode.PointerPosition
+            );
+
+            // We can also use the constructor to create PointerCameraController, but using AddPointerCameraController better communicates that 
+            // the PointerCameraController is assigned to MainSceneView and that you do not need to have a local variable or field to prevent collecting it by GC.
+            //_pointerCameraController = new PointerCameraController(MainSceneView)
+            //{
+            //    RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
+            //    MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
+            //    QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+            //    RotateAroundPointerPosition = true,
+            //    ZoomMode = CameraZoomMode.PointerPosition
+            //};
+
 
             UpdateRotateCameraConditions();
             UpdateMoveCameraConditions();

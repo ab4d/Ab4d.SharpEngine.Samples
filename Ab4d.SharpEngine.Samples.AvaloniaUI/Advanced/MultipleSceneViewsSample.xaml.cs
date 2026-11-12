@@ -340,17 +340,15 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
 
 
             // PointerCameraController use pointer or mouse to control the camera
-            _ = new PointerCameraController(sharpEngineSceneView)
-            {
-                RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,                                                       // this is already the default value but is still set up here for clarity
-                MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,               // this is already the default value but is still set up here for clarity
-                QuickZoomConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+            sharpEngineSceneView.AddPointerCameraController(
+                rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+                moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+                quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+                rotateAroundPointerPosition: false,
+                zoomMode: CameraZoomMode.ViewCenter
+            );
 
-                RotateAroundPointerPosition = false,
-                ZoomMode = CameraZoomMode.ViewCenter,
-            };
-
-            _ = new CameraAxisPanel(sharpEngineSceneView.SceneView, alignment: PositionTypes.BottomLeft);
+            sharpEngineSceneView.SceneView.AddCameraAxisPanel(alignment: PositionTypes.BottomLeft);
         }
 
         private void CreateTestScene(Scene scene)
