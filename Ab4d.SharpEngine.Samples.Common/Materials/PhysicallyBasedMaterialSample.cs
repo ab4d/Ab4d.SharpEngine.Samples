@@ -43,11 +43,6 @@ public class PhysicallyBasedMaterialSample : CommonSample
     private GpuImage? _normalMapGpuImage;
     private GpuImage? _metalnessRoughnessMapGpuImage;
 
-#if WEB_GL
-    private RawImageData? _metalnessRawImage;
-    private RawImageData? _roughnessRawImage;
-#endif
-
     private GroupNode? _testObjectsGroupNode;
 
     private MultiMaterialModelNode? _skyBoxNode;
@@ -145,36 +140,13 @@ public class PhysicallyBasedMaterialSample : CommonSample
         var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(metalnessRawImage, roughnessRawImage);
         _metalnessRoughnessMapGpuImage = new GpuImage(scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
 #elif WEB_GL
-        // Same as above, but with callbacks...
-        scene.GpuDevice.CanvasInterop.LoadImageBytes(
-            metalPlateFolderName + "metal_plate_metal_1k.png",
-            onTextureLoadedCallback: (rawImageData) =>
-            {
-                _metalnessRawImage = rawImageData;
-                CreateMetalnessRoughnessImage();
-            },
-            onLoadErrorCallback: (error) => throw new Exception($"Failed to load metalness image: {error}"));
-        scene.GpuDevice.CanvasInterop.LoadImageBytes(
-            metalPlateFolderName + "metal_plate_rough_1k.png",
-            onTextureLoadedCallback: (rawImageData) =>
-            {
-                _roughnessRawImage = rawImageData;
-                CreateMetalnessRoughnessImage();
-            },
-            onLoadErrorCallback: (error) => throw new Exception($"Failed to load roughness image: {error}"));
+        var metalnessRawImage = TextureLoader.LoadRawImageDataAsync(metalPlateFolderName + "metal_plate_metal_1k.png", scene.GpuDevice);
+        var roughnessRawImage = TextureLoader.LoadRawImageDataAsync(metalPlateFolderName + "metal_plate_rough_1k.png", scene.GpuDevice);
+
+        var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(await metalnessRawImage, await roughnessRawImage);
+        _metalnessRoughnessMapGpuImage = new GpuImage(scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
 #endif
     }
-
-#if WEB_GL
-    private void CreateMetalnessRoughnessImage()
-    {
-        if (_metalnessRawImage == null || _roughnessRawImage == null || Scene?.GpuDevice == null)
-            return;
-
-        var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(_metalnessRawImage, _roughnessRawImage);
-        _metalnessRoughnessMapGpuImage = new GpuImage(Scene.GpuDevice, metalnessRoughnessRawImage, imageSource: "MetalnessRoughness");
-    }
-#endif
 
     private void SetupSimpleScene()
     {
