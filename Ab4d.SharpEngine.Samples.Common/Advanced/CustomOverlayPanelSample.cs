@@ -13,7 +13,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 public sealed class CustomOverlayPanelSample : CommonSample
 {
     public override string Title { get; } = "Custom Overlay Panel";
-    public override string Subtitle { get; } = "This samples shows how to render a custom scene to a texture that is shown as a sprite on top of another 3D scene.";
+    public override string Subtitle { get; } = "This samples is similar to 'Simple Overlay Panel' sample but it does not\nuse OverlayPanelBase and manually creates the resources needed to show an overlay panel.";
 
     private readonly bool RenderedToSharedTexture = true; // When true, then the GpuImage stays in the GPU memory - this is much faster
 
