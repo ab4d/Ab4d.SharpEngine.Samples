@@ -7,6 +7,7 @@
 @using Ab4d.SharpEngine.Browser
 @using Ab4d.SharpEngine.glTF
 @using Ab4d.SharpEngine.Meshes
+@using Ab4d.SharpEngine.Utilities
 @implements IDisposable
 @inject IJSRuntime JS
 
@@ -30,7 +31,6 @@
     private SharpEngineSceneView sharpEngineSceneView = null!;
 
     private TargetPositionCamera? _targetPositionCamera;
-    private PointerCameraController? _pointerCameraController;
 
     private GroupNode? _importedSceneNode;
 
@@ -57,15 +57,16 @@
 
         sceneView.Camera = _targetPositionCamera;
 
-        _pointerCameraController = new PointerCameraController(sceneView)
-        {
-            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
-            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
-            ZoomMode = CameraZoomMode.PointerPosition,
-            RotateAroundPointerPosition = true,
-            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
-            IsPinchMoveEnabled = true  // move camera with two fingers
-        };
+        sceneView.AddPointerCameraController(
+            rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+            moveCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+            quickZoomConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+            rotateAroundPointerPosition: true,
+            zoomMode: CameraZoomMode.PointerPosition,
+            isPinchZoomEnabled: true, // zoom with touch pinch gesture
+            isPinchMoveEnabled: true,  // move camera with two fingers
+            cameraSmoothing: CameraController.CameraSmoothingPresets.Normal
+        );
 
         scene.SetAmbientLight(0.2f);
 

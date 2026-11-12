@@ -7,6 +7,7 @@
 @using Ab4d.SharpEngine.SceneNodes
 @using Ab4d.SharpEngine.WebGL
 @using Ab4d.SharpEngine.Browser
+@using Ab4d.SharpEngine.Utilities
 @inject IJSRuntime JS  
 @implements IDisposable
 
@@ -113,15 +114,16 @@
             Distance = 300
         };
 
-        var pointerCameraController = new PointerCameraController(sceneView)
-        {
-            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
-            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
-            ZoomMode = CameraZoomMode.PointerPosition,
-            RotateAroundPointerPosition = true,
-            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
-            IsPinchMoveEnabled = true  // move camera with two fingers
-        };
+        sceneView.AddPointerCameraController(
+            rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed, // this is already the default value but is still set up here for clarity
+            moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, // this is already the default value but is still set up here for clarity
+            quickZoomConditions:    PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.RightPointerButtonPressed, // quick zoom is disabled by default
+            rotateAroundPointerPosition: true,
+            zoomMode: CameraZoomMode.PointerPosition,
+            isPinchZoomEnabled: true, // zoom with touch pinch gesture
+            isPinchMoveEnabled: true,  // move camera with two fingers
+            cameraSmoothing: CameraController.CameraSmoothingPresets.Normal
+        );
 
 
         var sharpEnginVersion = typeof(SceneView).Assembly.GetName().Version!;

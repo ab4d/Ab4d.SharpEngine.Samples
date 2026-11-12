@@ -1,4 +1,5 @@
 ﻿@using Ab4d.SharpEngine
+@using Ab4d.SharpEngine.Browser
 @using Ab4d.SharpEngine.Common
 @using Ab4d.SharpEngine.Utilities
 @using Ab4d.SharpEngine.WebGL
@@ -407,6 +408,55 @@
 
         return deviceCreateFailedEventArgs.IsHandled;
     }
+
+    #region AddPointerCameraController, RemovePointerCameraController
+    /// <summary>
+    /// Adds a PointerCameraController to the SceneView that is shown by this SharpEngineSceneView.
+    /// </summary>
+    /// <param name="rotateCameraConditions">Conditions to rotate the camera. Default value is LeftPointerButtonPressed.</param>
+    /// <param name="moveCameraConditions">Conditions to move the camera. Default value is LeftPointerButtonPressed.</param>
+    /// <param name="quickZoomConditions">Conditions to do a camera quick zoom. Disabled by default.</param>
+    /// <param name="zoomMode">Zoom mode. Default value is ViewCenter.</param>
+    /// <param name="rotateAroundPointerPosition">Boolean that specifies if TargetPositionCamera or FreeCamera is rotated around a 3D position that is "behind" current pointer position. Default value is false.</param>
+    /// <param name="isPinchZoomEnabled">Specifies if zooming the camera is enabled by using pinch gesture by using two fingers. Default value is true.</param>
+    /// <param name="isPinchMoveEnabled">Specifies if moving the camera is enabled by using two fingers. Default value is true.</param>
+    /// <param name="cameraSmoothing">camera smoothing mode that determines how smoothly the camera reacts to rotation, movement, and zooming. Default value is Disabled.</param>
+    /// <returns>created PointerCameraController</returns>
+    public PointerCameraController AddPointerCameraController(PointerAndKeyboardConditions rotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
+                                                              PointerAndKeyboardConditions moveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
+                                                              PointerAndKeyboardConditions quickZoomConditions = PointerAndKeyboardConditions.Disabled,
+                                                              CameraZoomMode zoomMode = CameraZoomMode.ViewCenter,
+                                                              bool rotateAroundPointerPosition = false,
+                                                              bool isPinchZoomEnabled = true,
+                                                              bool isPinchMoveEnabled = true,
+                                                              CameraController.CameraSmoothingPresets cameraSmoothing = CameraController.CameraSmoothingPresets.Disabled)
+    {
+        return new PointerCameraController(this.SceneView)
+        {
+            RotateCameraConditions = rotateCameraConditions,
+            MoveCameraConditions = moveCameraConditions,
+            QuickZoomConditions = quickZoomConditions,
+            ZoomMode = zoomMode,
+            RotateAroundPointerPosition = rotateAroundPointerPosition,
+            IsPinchZoomEnabled = isPinchZoomEnabled,
+            IsPinchMoveEnabled = isPinchMoveEnabled,
+            CameraSmoothing = cameraSmoothing
+        };
+    }
+
+    /// <summary>
+    /// Removes the PointerCameraController from this SharpEngineSceneView.
+    /// </summary>
+    /// <param name="pointerCameraController">PointerCameraController</param>
+    public void RemovePointerCameraController(PointerCameraController pointerCameraController)
+    {
+        if (pointerCameraController.SceneView != this.SceneView)
+            throw new ArgumentException("Cannot remove the PointerCameraController because it belongs to some other SceneView");
+             
+        // Unsubscribe PointerCameraController from all events
+        pointerCameraController.SceneView = null;
+    }
+    #endregion
 
     /// <summary>
     /// OnDisposing
