@@ -50,7 +50,7 @@ To use the Ab4d.SharpEngine.Web library in your own project Blazor WebAssembly p
       
       <ItemGroup>
         <!--The following JavaScript file is required for CanvasInterop class to be able to communicate with the browser -->
-        <WasmExtraFilesToDeploy Include="sharp-engine.js" />
+        <WasmExtraFilesToDeploy Include="wwwroot/sharp-engine.js" />
       </ItemGroup>      
       ```
 - Open the razor page that will host the 3D scene (for example Home.razor) and add the following:
