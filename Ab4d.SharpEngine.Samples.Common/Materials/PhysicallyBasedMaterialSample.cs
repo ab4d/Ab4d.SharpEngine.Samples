@@ -420,13 +420,13 @@ public class PhysicallyBasedMaterialSample : CommonSample
 
         _frontDirectionalLight = new DirectionalLight(new Vector3(0, 0, -1));
         scene.Lights.Add(_frontDirectionalLight);
-
-        _sideSpotLight = new SpotLight(position: new Vector3(-200, 100, 50),
-            direction: new Vector3(2, -1, 0))
+        
+        _sideSpotLight = new SpotLight(position: new Vector3(-150, 200, 50), direction: new Vector3(2, -2, -0.5f))
         {
-            InnerConeAngle = 30,
-            OuterConeAngle = 40
+            InnerConeAngle = 20,
+            OuterConeAngle = 25
         };
+        
         scene.Lights.Add(_sideSpotLight);
 
         _ambientLight = new AmbientLight(0); // disabled by default
@@ -569,9 +569,9 @@ public class PhysicallyBasedMaterialSample : CommonSample
 
         ui.CreateLabel("Lights:", isHeader: true);
 
-        ui.CreateCheckBox("Top light (point light)", true, isChecked => _topPointLight!.IsEnabled = isChecked);
-        ui.CreateCheckBox("Front light (directional light)", true, isChecked => _frontDirectionalLight!.IsEnabled = isChecked);
-        ui.CreateCheckBox("Side light (spot light)", true, isChecked => _sideSpotLight!.IsEnabled = isChecked);
+        ui.CreateCheckBox("Top directional light", true, isChecked => _topPointLight!.IsEnabled = isChecked);
+        ui.CreateCheckBox("Font directional light", true, isChecked => _frontDirectionalLight!.IsEnabled = isChecked);
+        ui.CreateCheckBox("Side stop light", true, isChecked => _sideSpotLight!.IsEnabled = isChecked);
         ui.CreateCheckBox("Camera light", false, isChecked => targetPositionCamera!.ShowCameraLight = isChecked ? ShowCameraLightType.Always : ShowCameraLightType.Never);
         ui.CreateCheckBox("Ambient light (30%)", false, isChecked => _ambientLight!.SetIntensity(isChecked ? 0.3f : 0));
 
