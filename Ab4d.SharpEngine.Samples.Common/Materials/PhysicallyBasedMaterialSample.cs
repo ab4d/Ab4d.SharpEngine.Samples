@@ -570,7 +570,7 @@ public class PhysicallyBasedMaterialSample : CommonSample
         ui.CreateLabel("Lights:", isHeader: true);
 
         ui.CreateCheckBox("Top directional light", true, isChecked => _topPointLight!.IsEnabled = isChecked);
-        ui.CreateCheckBox("Font directional light", true, isChecked => _frontDirectionalLight!.IsEnabled = isChecked);
+        ui.CreateCheckBox("Front directional light", true, isChecked => _frontDirectionalLight!.IsEnabled = isChecked);
         ui.CreateCheckBox("Side stop light", true, isChecked => _sideSpotLight!.IsEnabled = isChecked);
         ui.CreateCheckBox("Camera light", false, isChecked => targetPositionCamera!.ShowCameraLight = isChecked ? ShowCameraLightType.Always : ShowCameraLightType.Never);
         ui.CreateCheckBox("Ambient light (30%)", false, isChecked => _ambientLight!.SetIntensity(isChecked ? 0.3f : 0));
