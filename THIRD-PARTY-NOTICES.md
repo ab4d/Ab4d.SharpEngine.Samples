@@ -6,7 +6,6 @@ This project includes third-party native libraries. The following notices apply 
 
 This project includes native `ifc_lite` libraries in the following directory:
 ```
-text
 lib/ifc_lite/
 ```
 The libraries are built for Windows, macOS, and Linux from a modified version of the [ifc-lite](https://github.com/LTplus-AG/ifc-lite) project.
@@ -25,7 +24,6 @@ A copy of the Mozilla Public License 2.0 is available at:
 
 This project includes native libraries from the [Open Asset Import Library (Assimp)](https://github.com/assimp/assimp) in the following directory:
 ```
-text
 lib/assimp-lib/
 ```
 The native library files are obtained from the official Assimp release assets:
@@ -34,7 +32,6 @@ The native library files are obtained from the official Assimp release assets:
 
 Assimp is licensed under the BSD 3-Clause License.
 ```
-text
 Open Asset Import Library (assimp)
 
 Copyright (c) 2006-2026, assimp team
@@ -122,7 +119,6 @@ The Assimp source code and full project information are available at:
 
 This project includes MoltenVK libraries in the following directory:
 ```
-text
 lib/MoltenVK/
 ```
 MoltenVK is included from the Vulkan SDK version **1.3.290.0**.
@@ -131,7 +127,6 @@ MoltenVK is included from the Vulkan SDK version **1.3.290.0**.
 - MoltenVK project: <https://github.com/KhronosGroup/MoltenVK>
 - License: Apache License, version 2.0
 ```
-text
 Copyright 2015-2024 The Brenwill Workshop Ltd.
 Copyright 2017-2024 The Khronos Group Inc.
 
