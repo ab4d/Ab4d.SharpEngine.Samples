@@ -435,7 +435,7 @@ public partial class CanvasInterop : ICanvasInterop
         return await tcs.Task;
     }
     
-    public void CreateImageFromBytes(byte[] imageBytes, string mimeType, string imageName, Action<RawImageData> onTextureLoadedCallback, Action<string>? onLoadErrorCallback)
+    public void CreateImageFromBytes(byte[] imageBytes, string? mimeType, string imageName, Action<RawImageData> onTextureLoadedCallback, Action<string>? onLoadErrorCallback)
     {
         ArgumentNullException.ThrowIfNull(imageName);
 
@@ -1053,7 +1053,7 @@ public partial class CanvasInterop : ICanvasInterop
     private static partial void LoadImageBytesJs(string canvasId, string imageUrl);
     
     [JSImport("createImageFromBytes", "sharp-engine.js")]
-    private static partial void CreateImageFromBytesJS(string canvasId, byte[] imageBytes, string mimeType, string imageName);
+    private static partial void CreateImageFromBytesJS(string canvasId, byte[] imageBytes, string? mimeType, string imageName);
     
     [JSImport("subscribeBrowserEvents", "sharp-engine.js")]
     private static partial void SubscribeBrowserEventsJs(string canvasId, bool subscribePointerEvents, bool subscribeRequestAnimationFrame);
