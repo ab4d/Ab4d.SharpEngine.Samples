@@ -1,25 +1,30 @@
-﻿using Ab4d.Assimp;
-using Ab4d.SharpEngine.Assimp;
-using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.glTF.Schema;
+﻿using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.IfcLight;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
 using Ab4d.SharpEngine.Transformations;
 using Ab4d.SharpEngine.Utilities;
-using Ab4d.SharpEngine.Vulkan;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace Ab4d.SharpEngine.Samples.Common.Importers;
+
+// This sample shows how to import 3D models from the ifc files.
+//
+// To do this the sample is using Ab4d.SharpEngine.IfcLight library that can use the native IFClight library from https://github.com/ab4d/ifc-lite.
+// This is a forked library from the original IFClight from https://github.com/LTplus-AG/ifc-lite.
+// The forked code adds additional functions that provide support for getting the mesh data directly from the native memory.
+// If the native library from the original code is used, then only ImportAsJson method is supported that reads the ifc file
+// and returns a json string with all the data for the 3D models.
+//
+// The compiled versions for Windows x64, macOS arm64 and Linux x64 are available in the lib/ifc_lite folder.
 
 public class IfcImporterSample : CommonSample
 {
     public override string Title => "IFC import can import BIM models from ifc files";
 
-    private string _subtitle = "IfcImporter uses a slightly updated third-party native IFClite library (https://github.com/ab4d/ifc-lite).";
+    private string _subtitle = "IfcImporter uses a native IFClite library to read the ifc file. See comments in the code for more info.";
     public override string? Subtitle => _subtitle;
 
     // Ifc4_SampleHouse.ifc file from https://github.com/youshengCode/IfcSampleFiles
