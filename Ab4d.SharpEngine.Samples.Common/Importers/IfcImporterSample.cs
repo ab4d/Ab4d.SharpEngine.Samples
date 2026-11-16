@@ -409,13 +409,14 @@ public class IfcImporterSample : CommonSample
             UpdateShownLines();
         });
 
-        ui.CreateCheckBox("Use OptimizedGroupNode", _useOptimizedGroupNode, isChecked =>
+        ui.CreateCheckBox("Use OptimizedGroupNode (?):When checked then the imported models are shown by using OptimizedGroupNode.\nThis renders all the meshes with a single draw call\n(two draw calls are used when using transparent objects).\nThis significantly improves the rendering performance.",
+            _useOptimizedGroupNode, isChecked =>
         {
             _useOptimizedGroupNode = isChecked;
             ReloadLastFile();
         });
 
-        ui.CreateCheckBox("Load as json", _loadAsJson, isChecked =>
+        ui.CreateCheckBox("Load as json (?):When checked, then ImportAsJson method is used. This loads the ifc file and returns json text of all the meshes.\nThen the json is parsed and converted into 3D models.\nThis method is the only method that is available from the original IFClite library.\nThe version that is used by this samples is updated to support reading meshes directly from native memory without using json\n(see https://github.com/ab4d/ifc-lite)", _loadAsJson, isChecked =>
         {
             _loadAsJson = isChecked;
             ReloadLastFile();
@@ -439,7 +440,7 @@ public class IfcImporterSample : CommonSample
 
         if (isDragAndDropSupported)
         {
-            _subtitle += "\n\nDrag and drop file here to open it.";
+            _subtitle += "\n\nDrag and drop ifc file here to open it.";
         }
         else
         {
