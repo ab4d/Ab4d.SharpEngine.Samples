@@ -410,24 +410,28 @@ public class MaterialsSample : CommonSample
         //physicallyBasedMaterial.SetTextureMap(TextureMapTypes.BaseColor, baseColorGpuImage);
 #elif WEB_GL
         // On WebGL, only texture with combined metalness and roughness values is supported...
-        _physicallyBasedMaterial = physicallyBasedMaterial;
+        if (scene.GpuDevice != null)
+        {
+            _physicallyBasedMaterial = physicallyBasedMaterial;
 
-        scene.GpuDevice.CanvasInterop.LoadImageBytes(
-            metalPlateFolderName + "metal_plate_metal_1k.png",
-            onTextureLoadedCallback: (rawImageData) =>
-            {
-                _metalnessRawImage = rawImageData;
-                CreateMetalnessRoughnessImage();
-            },
-            onLoadErrorCallback: (error) => throw new Exception($"Failed to load metalness image: {error}"));
-        scene.GpuDevice.CanvasInterop.LoadImageBytes(
-            metalPlateFolderName + "metal_plate_rough_1k.png",
-            onTextureLoadedCallback: (rawImageData) =>
-            {
-                _roughnessRawImage = rawImageData;
-                CreateMetalnessRoughnessImage();
-            },
-            onLoadErrorCallback: (error) => throw new Exception($"Failed to load roughness image: {error}"));
+            scene.GpuDevice.CanvasInterop.LoadImageBytes(
+                metalPlateFolderName + "metal_plate_metal_1k.png",
+                onTextureLoadedCallback: (rawImageData) =>
+                {
+                    _metalnessRawImage = rawImageData;
+                    CreateMetalnessRoughnessImage();
+                },
+                onLoadErrorCallback: (error) => throw new Exception($"Failed to load metalness image: {error}"));
+
+            scene.GpuDevice.CanvasInterop.LoadImageBytes(
+                metalPlateFolderName + "metal_plate_rough_1k.png",
+                onTextureLoadedCallback: (rawImageData) =>
+                {
+                    _roughnessRawImage = rawImageData;
+                    CreateMetalnessRoughnessImage();
+                },
+                onLoadErrorCallback: (error) => throw new Exception($"Failed to load roughness image: {error}"));
+        }
 #endif
         
         
@@ -474,7 +478,7 @@ public class MaterialsSample : CommonSample
 #if WEB_GL
     private void CreateMetalnessRoughnessImage()
     {
-        if (_metalnessRawImage == null || _roughnessRawImage == null || Scene?.GpuDevice == null)
+        if (_metalnessRawImage == null || _roughnessRawImage == null || Scene?.GpuDevice == null || _physicallyBasedMaterial == null)
             return;
 
         var metalnessRoughnessRawImage = PhysicallyBasedMaterial.CreateMetalnessRoughnessImage(_metalnessRawImage, _roughnessRawImage);

@@ -333,13 +333,16 @@ public class PhysicallyBasedMaterialSample : CommonSample
             return null;
 
         var fileName = System.IO.Path.Combine(_environmentMapBaseFolder, $"CloudyLightRays{sideName}.png");
-        var singleFaceGpuImage= TextureLoader.CreateTexture(fileName, Scene.GpuDevice);
+        var singleFaceGpuImage = TextureLoader.CreateTexture(fileName, Scene.GpuDevice);
 
         return new SolidColorMaterial(singleFaceGpuImage); // Use SolidColorMaterial so there is no shading based on lights
     }
 #elif WEB_GL
     private void SetupSkybox(Scene scene)
     {
+        if (GpuDevice == null)
+            return;
+
         var skyBoxMesh = MeshFactory.CreateSkyBoxMesh(size: 5000);
 
         _skyBoxNode = new MultiMaterialModelNode(skyBoxMesh, "SkyboxMultiMaterialModelNode")
