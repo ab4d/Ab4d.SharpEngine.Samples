@@ -69,8 +69,11 @@
     <Content Include="..\Ab4d.SharpEngine.Samples.Common\Resources\streamlines.csv" Link="Resources\streamlines.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="..\lib\assimp-lib\AssimpLicense.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
-    <None Include="..\lib\assimp-lib\win*\*" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\ifc_lite\**" CopyToOutputDirectory="PreserveNewest" LinkBase="ifc_lite\" />
   </ItemGroup>
 
   <ItemGroup>

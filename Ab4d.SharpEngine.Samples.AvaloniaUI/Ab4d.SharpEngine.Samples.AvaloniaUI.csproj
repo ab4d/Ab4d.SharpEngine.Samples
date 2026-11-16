@@ -64,6 +64,7 @@
 
   <ItemGroup>
     <None Include="..\lib\assimp-lib\**" CopyToOutputDirectory="PreserveNewest" LinkBase="assimp-lib\" />
+    <None Include="..\lib\ifc_lite\**" CopyToOutputDirectory="PreserveNewest" LinkBase="ifc_lite\" />
   </ItemGroup>
 
   <!-- MacOS and iOS require libMoltenVK.dylib to be able to use SharpEngine with Vulkan -->
