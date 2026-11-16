@@ -393,6 +393,7 @@
                         }
 
                         standardMaterial.DiffuseTexture = gpuImage;
+                        standardMaterial.DiffuseTextureSamplerType = entry.samplerType;
                     }
                     else if (entry.material is PhysicallyBasedMaterial pbrMaterial)
                     {
