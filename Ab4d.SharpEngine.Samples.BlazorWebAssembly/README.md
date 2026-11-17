@@ -46,12 +46,7 @@ To use the Ab4d.SharpEngine.Web library in your own project Blazor WebAssembly p
       <ItemGroup>
         <!--The following NativeFileReference is required for Ab4d.SharpEngine.Web to use WebGL from the browser -->
         <NativeFileReference Include="Native/libEGL.c" ScanForPInvokes="true" />
-      </ItemGroup>
-      
-      <ItemGroup>
-        <!--The following JavaScript file is required for CanvasInterop class to be able to communicate with the browser -->
-        <WasmExtraFilesToDeploy Include="wwwroot/sharp-engine.js" />
-      </ItemGroup>      
+      </ItemGroup>   
       ```
 - Open the razor page that will host the 3D scene (for example Home.razor) and add the following:
     - Add using declarations to the start of the Razor file:

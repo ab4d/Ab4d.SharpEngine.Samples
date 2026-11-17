@@ -175,7 +175,7 @@ public partial class CanvasInterop : ICanvasInterop
         catch (Exception ex)
         {
             if (ex is JSException && ex.Message.Contains("Failed to fetch dynamically imported module"))
-                throw new SharpEngineException("Cannot load sharp-engine.js. This file is required to setup the SharpEngine for Blazor WebAssembly. Make sure that the file is added to the wwwroot folder and that in csproj the following line exist: <WasmExtraFilesToDeploy Include=\"sharp-engine.js\" />.", ex);
+                throw new SharpEngineException("Cannot load sharp-engine.js. This file is required to setup the SharpEngine for Blazor WebAssembly. Make sure that the file is added to the wwwroot folder.", ex);
             
             if (ex is JSException && ex.Message.StartsWith("SyntaxError:"))
                 throw new SharpEngineException("Error parsing sharp-engine.js file. Please revert to the original file content or check your changes. Error message: " + ex.Message, ex);
