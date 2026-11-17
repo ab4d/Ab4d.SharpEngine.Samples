@@ -1120,19 +1120,24 @@ public abstract class CommonSample
             _rnd = new Random(CommonRandomSeed);
     }
 
-    public double GetRandomDouble()
+    public double GetRandomDouble(double minValue = 0, double maxValue = 1)
     {
-        return _rnd.NextDouble();
+        return _rnd.NextDouble() * maxValue + minValue;
     }
 
     public int GetRandomInt(int maxValue)
     {
-        return (int)(GetRandomDouble() * maxValue);
+        return _rnd.Next(maxValue); 
     }
-
-    public float GetRandomFloat()
+    
+    public int GetRandomInt(int minValue, int maxValue)
     {
-        return (float)GetRandomDouble();
+        return _rnd.Next(maxValue); 
+    }
+    
+    public float GetRandomFloat(float minValue = 0, float maxValue = 1)
+    {
+        return _rnd.NextSingle() * maxValue + minValue;
     }
 
     public Vector3 GetRandomPosition(Vector3 centerPosition, Vector3 areaSize)
