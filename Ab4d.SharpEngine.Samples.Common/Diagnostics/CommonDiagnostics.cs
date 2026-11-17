@@ -807,7 +807,7 @@ PipelineChangesCount: {8:#,##0}",
 
         try
         {
-            dumpText = GetRenderingLayersInfo(SharpEngineSceneView.Scene);
+            dumpText = GetRenderingLayersInfo(SharpEngineSceneView.SceneView);
         }
         catch (Exception ex)
         {
@@ -817,9 +817,10 @@ PipelineChangesCount: {8:#,##0}",
         return dumpText;
     }
 
-    private string GetRenderingLayersInfo(Scene scene)
+    private string GetRenderingLayersInfo(SceneView sceneView)
     {
-        return scene.GetRenderingLayersInfo(dumpEmptyRenderingLayers: false, showSortedValue: true, showNativeHandles: true);
+        // Call GetRenderingLayersInfo on SceneView and not on Scene object to also get RenderingLayers for OverlayPanels (CameraAxisPanel, CameraNavigationCircles).
+        return sceneView.GetRenderingLayersInfo(dumpEmptyRenderingLayers: false, showSortedValue: true, showNativeHandles: true);
     }
 
     public string GetMemoryDumpString()
@@ -1295,7 +1296,7 @@ PipelineChangesCount: {8:#,##0}",
 
             try
             {
-                dumpText = GetRenderingLayersInfo(SharpEngineSceneView.Scene);
+                dumpText = GetRenderingLayersInfo(SharpEngineSceneView.SceneView);
                 sb.AppendLine("RenderingLayers:").AppendLine(dumpText);
             }
             catch (Exception ex)
