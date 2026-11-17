@@ -1,5 +1,5 @@
 ﻿using Ab4d.SharpEngine.Common;
-using Ab4d.SharpEngine.IfcLight;
+using Ab4d.SharpEngine.IfcLite;
 using Ab4d.SharpEngine.Materials;
 using Ab4d.SharpEngine.Meshes;
 using Ab4d.SharpEngine.SceneNodes;
@@ -12,8 +12,8 @@ namespace Ab4d.SharpEngine.Samples.Common.Importers;
 
 // This sample shows how to import 3D models from the ifc files.
 //
-// To do this the sample is using Ab4d.SharpEngine.IfcLight library that can use the native IFClight library from https://github.com/ab4d/ifc-lite.
-// This is a forked library from the original IFClight from https://github.com/LTplus-AG/ifc-lite.
+// To do this the sample is using Ab4d.SharpEngine.IfcLite library that can use the native IFClite library from https://github.com/ab4d/ifc-lite.
+// This is a forked library from the original IFClite from https://github.com/LTplus-AG/ifc-lite.
 // The forked code adds additional functions that provide support for getting the mesh data directly from the native memory.
 // If the native library from the original code is used, then only ImportAsJson method is supported that reads the ifc file
 // and returns a json string with all the data for the 3D models.
@@ -54,7 +54,7 @@ public class IfcImporterSample : CommonSample
     public IfcImporterSample(ICommonSamplesContext context)
         : base(context)
     {
-        InitializeIfcLightLibrary();
+        InitializeIfcLiteLibrary();
 
         ZoomMode = CameraZoomMode.PointerPosition;
         RotateAroundPointerPosition = true;
@@ -96,20 +96,20 @@ public class IfcImporterSample : CommonSample
         base.OnDisposed();
     }
 
-    private void InitializeIfcLightLibrary()
+    private void InitializeIfcLiteLibrary()
     {
         // Calling Initialize will try to load default ifl-light library.
         // If this does not succeed, then an exception is thrown.
-        //IfcLightLibrary.Instance.Initialize();
+        //IfcLiteLibrary.Instance.Initialize();
 
         // We have more options when using TryInitialize 
-        var libraryFilePath = IfcLightLibrary.Instance.GetDefaultLibraryPath();
-        bool success = IfcLightLibrary.Instance.TryInitialize(libraryFilePath);
+        var libraryFilePath = IfcLiteLibrary.Instance.GetDefaultLibraryPath();
+        bool success = IfcLiteLibrary.Instance.TryInitialize(libraryFilePath);
 
         if (!success)
         {
-            // When we are not able to initialize IfcLight library, the reason for failure is written to InitializationFailedReason property.
-            ShowErrorMessage(IfcLightLibrary.Instance.InitializationFailedReason!);
+            // When we are not able to initialize IfcLite library, the reason for failure is written to InitializationFailedReason property.
+            ShowErrorMessage(IfcLiteLibrary.Instance.InitializationFailedReason!);
             return;
         }
 
@@ -118,21 +118,21 @@ public class IfcImporterSample : CommonSample
         //
 
         // Show used IFClite native version
-        _subtitle = _subtitle.Replace("IFClite library", $"IFClite library v{IfcLightLibrary.Instance.GetIfcLightVersionText()}");
+        _subtitle = _subtitle.Replace("IFClite library", $"IFClite library v{IfcLiteLibrary.Instance.GetIfcLiteVersionText()}");
 
 
         // Usually we want to use the native ifc-lite library that is updated so it has custom functions that 
         // can be used to read geometry mesh directly from the library's memory (see https://github.com/ab4d/ifc-lite)
         // If instead, an unchanged ifc-light library is used, then we can only use ImportAsJson method that returns json string.
-        // In this case the IfcLightLibrary.Instance.IsDirectMeshAccessSupported is false
+        // In this case the IfcLiteLibrary.Instance.IsDirectMeshAccessSupported is false
 
-        if (!IfcLightLibrary.Instance.IsDirectMeshAccessSupported)
+        if (!IfcLiteLibrary.Instance.IsDirectMeshAccessSupported)
             ShowErrorMessage("IFClite library loaded but because this build does not include the\nadded function to directly access geometry mesh.\nUsing ImportAsJson method instead.");
     }
 
     protected void ImportFile(string? fileName)
     {
-        if (!IfcLightLibrary.Instance.IsInitialized || fileName == null)
+        if (!IfcLiteLibrary.Instance.IsInitialized || fileName == null)
             return;
 
         _importedGroupNode.Clear();

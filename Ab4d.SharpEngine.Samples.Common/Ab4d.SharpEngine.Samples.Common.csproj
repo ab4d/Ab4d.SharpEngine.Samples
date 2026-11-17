@@ -19,13 +19,13 @@
     <PackageReference Include="Ab4d.SharpEngine" Version="4.1.9689" />
     <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.1.9689" />  
     <PackageReference Include="Ab4d.SharpEngine.glTF" Version="4.1.9689" />  
-    <PackageReference Include="Ab4d.SharpEngine.IfcLight" Version="5.0.1070" />  
+    <PackageReference Include="Ab4d.SharpEngine.IfcLite" Version="5.0.1070" />  
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.Assimp\Ab4d.SharpEngine.Assimp.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.glTF\Ab4d.SharpEngine.glTF.csproj" />
-    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.IfcLight\Ab4d.SharpEngine.IfcLight.csproj" />
+    <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.IfcLite\Ab4d.SharpEngine.IfcLite.csproj" />
   </ItemGroup>    
 
   <ItemGroup>
