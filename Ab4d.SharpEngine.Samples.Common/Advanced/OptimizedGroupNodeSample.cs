@@ -23,6 +23,7 @@ namespace Ab4d.SharpEngine.Samples.Common.Advanced;
 // - Change transform of child node
 //
 // SLOW child node operations (require rebuilding the group's combined vertex and index buffer and recording new combined buffers):
+// - Changed transparency of a material from opaque to transparent or vice versa.
 // - Add or remove child nodes (including GroupNode objects)
 //
 // NOT SUPPORTED child node operations:
@@ -246,11 +247,11 @@ public class OptimizedGroupNodeSample : CommonSample
         ui.CreateLabel("Fast child operations: (?):The following operations are fast because they only require change of the material or matrix buffer and\ndo not require rebuilding the group's combined buffers.");
         ui.CreateButton("Change visibility", ChangeVisibility);
         ui.CreateButton("Change color", ChangeColor);
-        ui.CreateButton("Change transparency", ChangeTransparency);
         ui.CreateButton("Change transformation", ChangeTransformation);
         ui.AddSeparator();
         
         ui.CreateLabel("Slow child operations: (?):The following operations are slow because they require rebuilding the group's combined vertex and index buffers\nand recording the command buffers again.");
+        ui.CreateButton("Change transparency", ChangeTransparency);
         ui.CreateButton("Add new models", AddRow);
         ui.CreateButton("Remove models", RemoveRow);
         UpdateInfoLabel();
