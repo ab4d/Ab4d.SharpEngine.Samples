@@ -12,7 +12,7 @@ public class CameraNavigationCirclesSample : CommonSample
 {
     private ManualInputEventsManager? _inputEventsManager;
     private CameraNavigationCircles? _cameraNavigationCircles;
-    private Color4 _savedBackgroundColor;
+    private Color4? _savedBackgroundColor;
     private bool _isZAxisUp;
 
     private ICommonSampleUIElement? _fillNegativeCirclesCheckBox;
@@ -68,7 +68,8 @@ public class CameraNavigationCirclesSample : CommonSample
         // Disposing _cameraNavigationCircles will remove it from the SceneView
         _cameraNavigationCircles?.Dispose();
 
-        SceneView!.BackgroundColor = _savedBackgroundColor; // Reset the BackgroundColor if it was changed to Black
+        if (_savedBackgroundColor.HasValue)
+            SceneView!.BackgroundColor = _savedBackgroundColor.Value; // Reset the BackgroundColor if it was changed to Black
 
         base.OnDisposed();
     }
@@ -279,9 +280,9 @@ public class CameraNavigationCirclesSample : CommonSample
                 _savedBackgroundColor = SceneView!.BackgroundColor;
                 SceneView!.BackgroundColor = Color4.Black;
             }
-            else
+            else if (_savedBackgroundColor.HasValue)
             {
-                SceneView!.BackgroundColor = _savedBackgroundColor;
+                SceneView!.BackgroundColor = _savedBackgroundColor.Value;
             }
         });
 
