@@ -83,6 +83,10 @@ public class TextBoxUIElement : WinFormsUIElement
 
     public override ICommonSampleUIElement SetText(string? text)
     {
+        // WinForms's TextBox required \r\n and will not break line when only \n is used
+        if (text != null && text.Contains('\n') && !text.Contains("\n\r"))
+            text = text.Replace("\n", "\r\n");
+
         _textBox.Text = text;
         UpdateTextSize(text);
         return this;
@@ -93,6 +97,6 @@ public class TextBoxUIElement : WinFormsUIElement
         if (newValue is not string newText)
             throw new ArgumentException($"SetValue for TextBox expects string value, but got {newValue?.GetType().Name}");
 
-        _textBox.Text = newText;
+        SetText(newText);
     }      
 }
