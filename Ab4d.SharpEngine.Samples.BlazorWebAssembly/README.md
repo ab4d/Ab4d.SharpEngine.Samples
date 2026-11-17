@@ -96,16 +96,15 @@ To use the Ab4d.SharpEngine.Web library in your own project Blazor WebAssembly p
                   Attitude = -20,
                   Distance = 300
               };
-      
-              var pointerCameraController = new PointerCameraController(sceneView)
-              {
-                  RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
-                  MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
-                  ZoomMode = CameraZoomMode.PointerPosition,
-                  RotateAroundPointerPosition = true,
-                  IsPinchZoomEnabled = true, // zoom with touch pinch gesture
-                  IsPinchMoveEnabled = true  // move camera with two fingers
-              };
+
+              sharpEngineSceneView.AddPointerCameraController(
+                  rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed,
+                  moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, 
+                  rotateAroundPointerPosition: true,
+                  zoomMode: CameraZoomMode.PointerPosition,
+                  isPinchZoomEnabled: true, // zoom with touch pinch gesture
+                  isPinchMoveEnabled: true  // move camera with two fingers
+              );
           }
       }
       ```

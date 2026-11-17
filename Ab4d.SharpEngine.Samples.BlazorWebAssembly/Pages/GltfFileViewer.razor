@@ -204,7 +204,6 @@
     private SharpEngineSceneView sharpEngineSceneView = null!;
 
     private TargetPositionCamera? _targetPositionCamera;
-    private PointerCameraController? _pointerCameraController;
 
     private GroupNode? _importedSceneNode;
 
@@ -246,15 +245,15 @@
 
         sceneView.Camera = _targetPositionCamera;
 
-        _pointerCameraController = new PointerCameraController(sceneView)
-        {
-            RotateCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed,
-            MoveCameraConditions = PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey,
-            ZoomMode = CameraZoomMode.PointerPosition,
-            RotateAroundPointerPosition = true,
-            IsPinchZoomEnabled = true, // zoom with touch pinch gesture
-            IsPinchMoveEnabled = true  // move camera with two fingers
-        };
+        // PointerCameraController use pointer or mouse to control the camera
+        sharpEngineSceneView.AddPointerCameraController(
+            rotateCameraConditions: PointerAndKeyboardConditions.LeftPointerButtonPressed,
+            moveCameraConditions:   PointerAndKeyboardConditions.LeftPointerButtonPressed | PointerAndKeyboardConditions.ControlKey, 
+            rotateAroundPointerPosition: true,
+            zoomMode: CameraZoomMode.PointerPosition,
+            isPinchZoomEnabled: true, // zoom with touch pinch gesture
+            isPinchMoveEnabled: true  // move camera with two fingers
+        );
 
         scene.SetAmbientLight(0.2f);
 
