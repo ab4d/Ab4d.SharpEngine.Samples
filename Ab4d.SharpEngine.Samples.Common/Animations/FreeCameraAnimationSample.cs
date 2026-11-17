@@ -150,7 +150,7 @@ public class FreeCameraAnimationSample : CommonSample
             _currentCameraAnimation.Stop();
 
         _freeCamera.RotateCamera(headingChange, attitudeChange, bankChange: 0, 
-                                 animationDurationInMilliseconds: 5000, 
+                                 animationDurationInMilliseconds: 500, 
                                  easingFunction: EasingFunctions.QuadraticEaseInOutFunction, 
                                  isSphericalInterpolation: _isSphericalInterpolation);
 
@@ -303,7 +303,7 @@ public class FreeCameraAnimationSample : CommonSample
 
         ui.AddSeparator();
         ui.CreateButton("Rotate horizontally", () => RotateFreeCamera(headingChange: 20));
-        ui.CreateButton("Rotate vertically", () => RotateFreeCamera(attitudeChange: 20));
+        ui.CreateButton("Rotate vertically",   () => RotateFreeCamera(attitudeChange: 20));
 
         ui.AddSeparator();
         ui.CreateButton("Rotate to top down view",  () => AnimateFreeCamera(cameraPosition: new Vector3(0, 300, 0),  upDirection: new Vector3(0, 0, -1)));
