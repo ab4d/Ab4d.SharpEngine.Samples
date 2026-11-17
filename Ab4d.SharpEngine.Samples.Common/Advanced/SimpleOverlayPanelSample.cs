@@ -41,6 +41,17 @@ public class SimpleOverlayPanelSample : CommonSample
         base.OnSceneViewInitialized(sceneView);
     }
 
+    protected override void OnDisposed()
+    {
+        if (_testOverlayPanel != null)
+        {
+            _testOverlayPanel.Dispose(); // Calling Dispose will also remove the _testOverlayPanel from the sceneView
+            _testOverlayPanel = null;
+        }
+
+        base.OnDisposed();
+    }
+
     protected override async Task OnCreateSceneAsync(Scene scene)
     {
         if (targetPositionCamera != null)
