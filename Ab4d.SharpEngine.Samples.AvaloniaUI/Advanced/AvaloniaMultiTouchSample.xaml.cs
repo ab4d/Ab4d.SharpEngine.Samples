@@ -98,6 +98,8 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.Advanced
             };
 
             MainSceneView.Scene.RootNode.Add(boxModel);
+
+            MainSceneView.Scene.SetAmbientLight(0.4f);
         }
 
         private void ScrollGestureCheckBox_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
