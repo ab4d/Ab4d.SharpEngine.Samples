@@ -603,9 +603,20 @@
         if (importedSceneNode == null)
             return;
 
-        Utilities.ModelUtils.PositionAndScaleSceneNode(importedSceneNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
+        // Instead of updating the camera's Distance to show the mode, we could also change the size of the imported model (using transformation):
+        //Utilities.ModelUtils.PositionAndScaleSceneNode(importedSceneNode, new Vector3(0, 0, 0), PositionTypes.Bottom, new Vector3(100, 100, 100));
 
         scene.RootNode.Add(importedSceneNode);
+
+
+        if (importedSceneNode.WorldBoundingBox.IsUndefined)
+            importedSceneNode.Update();
+
+        if (_targetPositionCamera != null && !importedSceneNode.WorldBoundingBox.IsUndefined)
+        {
+            _targetPositionCamera.TargetPosition = importedSceneNode.WorldBoundingBox.GetCenterPosition();
+            _targetPositionCamera.Distance = importedSceneNode.WorldBoundingBox.GetDiagonalLength() * 1.5f;
+        }
 
         _importedSceneNode = importedSceneNode;
 
