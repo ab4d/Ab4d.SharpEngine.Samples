@@ -429,7 +429,7 @@ export function disconnectWebGLCanvas(canvasId) {
         if (initialCanvas === canvas)
             initialCanvas = null;
 
-        if (!resizeObserver)
+        if (resizeObserver)
             resizeObserver.unobserve(canvas);
 
         canvasToDisplaySizeMap.delete(canvas)
