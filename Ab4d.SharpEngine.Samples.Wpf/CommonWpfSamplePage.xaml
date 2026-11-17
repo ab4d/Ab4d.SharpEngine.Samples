@@ -11,7 +11,7 @@
     <Grid Name="RootGrid">
         <Border Name="RootBorder" Background="{StaticResource CommonSamplePageGradient}" />
 
-        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="OverlayTexture" BackgroundColor="White" Margin="0 0 250 0"/>
+        <sharpEngine:SharpEngineSceneView x:Name="MainSceneView" PresentationType="SharedTexture" BackgroundColor="Transparent" />
 
         <StackPanel Name="TitleStackPanel" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical">
             <TextBlock Name="TitleTextBlock" FontSize="20" FontWeight="Bold" Foreground="#333" Margin="10 10 5 5" TextWrapping="Wrap" />
