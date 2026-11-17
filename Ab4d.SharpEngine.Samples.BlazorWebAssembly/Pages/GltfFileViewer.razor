@@ -14,7 +14,7 @@
 
 <PageTitle>Ab4d.SharpEngine - glTF file viewer</PageTitle>
 
-<div style="padding: 1.5rem">
+<div style="padding: 1.5rem; min-width: 0; width: 100%; box-sizing: border-box;">
     <h1>Ab4d.SharpEngine - glTF file viewer</h1>
 
     <p>This example shows how to load user glTF or glb (text and binary) files with Ab4d.SharpEngine.</p>
@@ -25,8 +25,8 @@
     <br />
     <p>@((MarkupString)_infoText)</p>
 
-    <input type="checkbox" id="usePbrMaterial" checked="checked"><label for="usePbrMaterial"> Use physically-based rendering (PBR) material (<b>NOTE:</b> toggling requires model to be re-uploaded!).</label><br/>
-    <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;">
+    <label><input type="checkbox" id="usePbrMaterial" checked="checked"> Use physically-based rendering (PBR) material (<b>NOTE:</b> toggling requires model to be re-uploaded!).</label><br/>
+    <div id="dropZone" style="width: 100%; min-width: 400px; height: 150px; border: 2px dashed #0078d4; border-radius: 10px; text-align: center; line-height: 150px; color: #555; font-family: sans-serif; cursor: pointer;box-sizing: border-box;max-width: 1000px;">
         Drop gltf, glb, dat, png and jpg files here or click to open file picker</div>
     <input type="file" id="fileInput" style="display: none;" />
 </div>
