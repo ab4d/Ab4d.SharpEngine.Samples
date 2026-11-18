@@ -4,7 +4,7 @@
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>
     <TargetFramework>net11.0</TargetFramework> <!-- Ab4d.SharpEngine supports all .Net version from .Net 6 to the latest .Net version. -->
-    <Version>4.1.9689</Version>
+    <Version>5.0.1075</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks> <!--This is required for FogEffect -->
@@ -16,10 +16,10 @@
     <PackageReference Include="Openize.Drako" Version="26.2.0" /> <!-- Required only to read Draco compressed glTF file -->
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)==''">
-    <PackageReference Include="Ab4d.SharpEngine" Version="4.1.9689" />
-    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="4.1.9689" />  
-    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="4.1.9689" />  
-    <PackageReference Include="Ab4d.SharpEngine.IfcLite" Version="5.0.1070" />  
+    <PackageReference Include="Ab4d.SharpEngine" Version="5.0.1075" />
+    <PackageReference Include="Ab4d.SharpEngine.Assimp" Version="5.0.1075" />  
+    <PackageReference Include="Ab4d.SharpEngine.glTF" Version="5.0.1075" />  
+    <PackageReference Include="Ab4d.SharpEngine.IfcLite" Version="5.0.1075" />  
   </ItemGroup>
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
