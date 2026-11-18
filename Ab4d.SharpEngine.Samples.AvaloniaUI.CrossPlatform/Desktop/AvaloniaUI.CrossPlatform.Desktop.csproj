@@ -6,6 +6,7 @@
     <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

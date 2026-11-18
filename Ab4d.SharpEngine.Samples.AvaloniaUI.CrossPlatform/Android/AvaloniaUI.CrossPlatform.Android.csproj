@@ -9,6 +9,7 @@
     <ApplicationId>com.ab4d.SharpEngine.Samples.AvaloniaUI.CrossPlatform</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>
     <!--<AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>-->
   </PropertyGroup>

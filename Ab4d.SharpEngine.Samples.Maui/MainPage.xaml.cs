@@ -278,7 +278,7 @@ public partial class MainPage : ContentPage
         _sharpEngineSceneView.Scene.RootNode.Add(rectangleNode);
     }
 
-    private void OnChangeCameraButtonClicked(object sender, EventArgs e)
+    private void OnChangeCameraButtonClicked(object? sender, EventArgs e)
     {
         if (_targetPositionCamera == null)
             return;
@@ -290,7 +290,7 @@ public partial class MainPage : ContentPage
         _sharpEngineSceneView.Refresh();
     }
 
-    private void OnChangeColorButtonClicked(object sender, EventArgs e)
+    private void OnChangeColorButtonClicked(object? sender, EventArgs e)
     {
         if (_hashMaterial == null)
             return;

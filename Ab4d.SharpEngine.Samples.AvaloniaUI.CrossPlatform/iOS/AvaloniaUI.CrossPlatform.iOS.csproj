@@ -8,6 +8,7 @@
     <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ApplicationId>com.ab4d.sharpengine.samples.avaloniaui</ApplicationId>
+    <DefineConstants>$(DefineConstants);AVALONIA_12</DefineConstants>
     <!-- To start the app on iOS device you will need a provisioning profile. See:
     https://github.com/ab4d/Ab4d.SharpEngine.Samples#step-by-step-instructions-to-run-the-samples-on-macos-and-ios
     https://learn.microsoft.com/en-us/xamarin/ios/get-started/installation/device-provisioning/manual-provisioning -->
