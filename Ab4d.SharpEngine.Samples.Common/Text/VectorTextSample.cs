@@ -104,8 +104,6 @@ public class VectorTextSample : CommonSample
             targetPositionCamera.Attitude = -5;
             targetPositionCamera.Distance = 1200;
         }
-
-        ShowCameraAxisPanel = true;
     }
     
     private async Task LoadFont(string fontFileName, bool recreateText = false)
