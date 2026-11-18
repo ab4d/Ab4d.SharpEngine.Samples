@@ -137,6 +137,9 @@ public abstract class CommonSample
         get => _showCameraAxisPanel;
         set
         {
+            if (_showCameraAxisPanel == value)
+                return;
+
             if (!value && CameraAxisPanel != null)
             {
                 CameraAxisPanel.Dispose(); // Remove it from SceneView
