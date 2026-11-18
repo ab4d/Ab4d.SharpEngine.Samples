@@ -466,4 +466,11 @@ public class WpfUIProvider : ICommonSampleUIProvider
         else
             FontSize = (double)fontSizeValue;
     }
+
+    public bool IsDispatchToUIThreadSupported => true;
+
+    public void DispatchToUIThread(Action action)
+    {
+        BaseWpfPanel.Dispatcher.BeginInvoke(action);
+    }
 }

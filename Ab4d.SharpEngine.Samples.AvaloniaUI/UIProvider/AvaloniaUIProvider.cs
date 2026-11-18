@@ -463,4 +463,12 @@ public class AvaloniaUIProvider : ICommonSampleUIProvider
         else
             FontSize = (double)fontSizeValue;
     }
+    
+
+    public bool IsDispatchToUIThreadSupported => true;
+
+    public void DispatchToUIThread(Action action)
+    {
+        BaseAvaloniaPanel.Dispatcher.Post(action);
+    }
 }

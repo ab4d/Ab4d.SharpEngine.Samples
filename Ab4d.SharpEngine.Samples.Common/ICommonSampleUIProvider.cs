@@ -60,4 +60,10 @@ public interface ICommonSampleUIProvider
     void SetSettingText(string settingKey, string? newValue);
     
     void SetSettingFloat(string settingKey, float newValue);
+
+    bool IsDispatchToUIThreadSupported => false;
+
+    void DispatchToUIThread(Action action)
+    {
+    }
 }
