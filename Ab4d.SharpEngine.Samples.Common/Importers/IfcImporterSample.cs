@@ -20,6 +20,10 @@ namespace Ab4d.SharpEngine.Samples.Common.Importers;
 //
 // The compiled versions for Windows x64, macOS arm64 and Linux x64 are available in the lib/ifc_lite folder.
 
+// NOTE:
+// Please provide feedback or report an issue on https://github.com/ab4d/Ab4d.SharpEngine.Samples
+// if there is some missing functionality or problems in Ab4d.SharpEngine.IfcLite library that are not present with IFClite library.
+
 public class IfcImporterSample : CommonSample
 {
     public override string Title => "IFC import can import BIM models from ifc files";
@@ -32,24 +36,35 @@ public class IfcImporterSample : CommonSample
 
     private bool _showEdgeLines = true;
     private bool _useOptimizedGroupNode = true;
+    private bool _isTwoSidedMaterial = true;
     private bool _loadAsJson = false;
     private bool _hitTesting = false;
+    private bool _useBatchImport = true;
     private string? _lastImportedFileName;
 
     private Stopwatch _loadStopwatch = new();
     private double _ifcLoadTime;
-    private double _ifcObjectCreateTime;
-
+    private bool _isLoadingIfcFile;    
+    
+    private ICommonSampleUIElement? _showEdgeLinesCheckBox;
     private ICommonSampleUIElement? _infoTextBox;
     private ICommonSampleUIElement? _textBoxElement;
     private MultiLineNode? _objectLinesNode;
 
     private GroupNode _importedGroupNode;
     private RayHitTestResult? _lastHitObject;
+    private BoundingBox _importedObjectBoundingBox;
+    private int _ifcMeshesCount;
+    private string _ifcSpaces = "";
 
     private EdgeLinesFactory? _edgeLinesFactory;
 
+    private Dictionary<SceneNode, IfcMesh> _ifcMeshesDictionary = new ();
+    
+    private ICommonSampleUIProvider? _uiProvider;
+
     private Vector2? _savedAxisPanelPosition;
+    
 
     public IfcImporterSample(ICommonSamplesContext context)
         : base(context)
@@ -78,8 +93,11 @@ public class IfcImporterSample : CommonSample
         scene.RootNode.Add(_importedGroupNode);
 
 
-        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
-        ImportFile(fileName);
+        if (_uiProvider != null)
+        {
+            string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
+            ImportFile(fileName);
+        }
 
         ShowCameraAxisPanel = true;
     }
@@ -132,14 +150,28 @@ public class IfcImporterSample : CommonSample
 
     protected void ImportFile(string? fileName)
     {
-        if (!IfcLiteLibrary.Instance.IsInitialized || fileName == null)
+        if (!IfcLiteLibrary.Instance.IsInitialized || fileName == null || Scene == null || _isLoadingIfcFile)
             return;
 
         _importedGroupNode.Clear();
+
+        if (_objectLinesNode != null)
+        {
+            Scene.RootNode.Remove(_objectLinesNode);
+            _objectLinesNode = null;
+        }
+
         _lastImportedFileName = null;
+        
+        _importedObjectBoundingBox = BoundingBox.Undefined;
 
         _ifcLoadTime = 0;
-        _ifcObjectCreateTime = 0;
+        _ifcMeshesCount = 0;
+        _ifcSpaces = "";
+
+        _ifcMeshesDictionary.Clear();
+
+        _infoTextBox?.SetText($"Start loading {System.IO.Path.GetFileName(fileName)}");
 
 
         _loadStopwatch.Restart();
@@ -148,13 +180,13 @@ public class IfcImporterSample : CommonSample
         var ifcImporter = new IfcImporter()
         {
             // Elements in the first batch (default: 20 for faster first triangles).
-            InitialBatchSize = 20,
+            InitialBatchSize = 50,
 
             // Elements in subsequent batches (default: 50).
-            ThroughputBatchSize = 50,
+            ThroughputBatchSize = 200,
 
             // When true (default) sort walls/slabs first so the most visible geometry arrives earliest.
-            FastFirstBatch = false,
+            FastFirstBatch = true,
 
             // False: skip IFC property-set parsing (faster). True (default): include properties.
             IncludeProperties = true,
@@ -185,13 +217,10 @@ public class IfcImporterSample : CommonSample
 
         if (_showEdgeLines)
         {
+            // Disabling edge lines when file size is bigger than 10MB because analysis of large models that is required to get the edge lines can take very long time
             var fileInfo = new FileInfo(fileName);
-            if (fileInfo.Length > 10000000) // > 10 MB
-            {
-                // Switch to SolidObjectsOnly because analysis of large models that is required to get the edge lines can take very long time
-                _showEdgeLines = false;
-                ShowErrorMessage("Disabling edge lines because analysis of large models that is required to get the edge lines can take very long time", showTimeMs: 3000);
-            }
+            if (fileInfo.Length > 10000000) 
+                _showEdgeLinesCheckBox?.SetValue(false); // uncheck
         }
 
         try
@@ -202,7 +231,7 @@ public class IfcImporterSample : CommonSample
             // But here we use LoadIfcGeometry (or ImportAsJson and IfcObject.Create) to get a ifcObject.
             // This way we can access additional ifc mesh properties
 
-            IfcObject ifcObject;
+            IfcObject? ifcObject;
 
             if (_loadAsJson)
             {
@@ -211,25 +240,49 @@ public class IfcImporterSample : CommonSample
             }
             else
             {
+                if (_useBatchImport)
+                {
+                    _isLoadingIfcFile = true; // This will be set to false in OnIfcModelMetadataReceived
+                    
+                    // To use batch import, we set IfcMeshBatchReceived and IfcModelMetadataReceived callbacks.
+                    // The first is called on each batch of meshes, the second is called when the whole model is loaded.
+                    // The batches are controller by ifcImporter.InitialBatchSize, ifcImporter.ThroughputBatchSize and ifcImporter.FastFirstBatch. 
+                    ifcImporter.IfcMeshBatchReceived = OnIfcMeshBatchReceived;
+                    ifcImporter.IfcModelMetadataReceived = OnIfcModelMetadataReceived;
 
-                ifcObject = ifcImporter.LoadIfcGeometry(fileName);
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            ifcImporter.LoadIfcGeometry(fileName);
+                        }
+                        catch
+                        {
+                            _isLoadingIfcFile = false;
+                        }
+                    });
+                    ifcObject = null;
+                }
+                else
+                {
+                    ifcImporter.IfcMeshBatchReceived = null;
+                    ifcObject = ifcImporter.LoadIfcGeometry(fileName);
+                }
             }
 
-            _ifcLoadTime = _loadStopwatch.Elapsed.TotalMilliseconds;
-            _loadStopwatch.Restart();
+            if (ifcObject != null)
+            {
+                // Measure load time only when LoadIfcGeometry is not called on background thread
+                _ifcLoadTime = _loadStopwatch.Elapsed.TotalMilliseconds;
+                _loadStopwatch.Restart();
 
-
-            if (_useOptimizedGroupNode)
-                ShowOptimizedIfcObject(ifcObject, _importedGroupNode);
-            else
-                ShowIfcObject(ifcObject, _importedGroupNode);
-
-            _ifcObjectCreateTime = _loadStopwatch.Elapsed.TotalMilliseconds;
-
+                if (_useOptimizedGroupNode)
+                    ShowOptimizedIfcObject(ifcObject, _importedGroupNode);
+                else
+                    ShowIfcObject(ifcObject, _importedGroupNode);
+            }
 
             _lastImportedFileName = fileName;
-
-            UpdateLastLoadTimes();
 
             // To see the hierarchy of the imported models, execute the following in the Visual Studio's Immediate Window
             //_importedGroupNode.DumpHierarchy();
@@ -240,23 +293,136 @@ public class IfcImporterSample : CommonSample
             return;
         }
 
-        if (Scene != null)
+        if (!_useBatchImport)
+            CompleteLoadingIfcFile();
+    }
+
+    private void OnIfcModelMetadataReceived(string json)
+    {
+        _isLoadingIfcFile = false; // file loaded
+        
+        _uiProvider?.DispatchToUIThread(() =>
         {
-            if (_objectLinesNode == null)
+            if (this.IsDisposed) // If this sample is already disposed then return
+                return;
+
+            CompleteLoadingIfcFile();
+        });
+    }
+
+    private void OnIfcMeshBatchReceived(List<IfcMesh> ifcMeshList)
+    {
+        _uiProvider?.DispatchToUIThread(() =>
+        {
+            if (this.IsDisposed) // If this sample is already disposed then return
+                return;
+
+            var groupNode = _useOptimizedGroupNode ? new OptimizedGroupNode() { IsTwoSided = _isTwoSidedMaterial }
+                                                   : new GroupNode();
+
+            foreach (var ifcMesh in ifcMeshList)
             {
-                var lineMaterial = new LineMaterial(Color3.Black, 1)
-                {
-                    DepthBias = 0.005f
-                };
+                var meshModelNode = ProcessIfcMesh(ifcMesh);
 
-                _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
-                Scene.RootNode.Add(_objectLinesNode);
-
+                if (meshModelNode != null)
+                    groupNode.Add(meshModelNode);
             }
 
-            UpdateShownLines();
+            if (groupNode is OptimizedGroupNode optimizedGroupNode)
+            {
+                // Use BeginInitialize to initialize the GPU buffers in the background thread
+                optimizedGroupNode.BeginInitialize(Scene!, (node, exception) =>
+                {
+                    if (exception == null)
+                    {
+                        _importedGroupNode.Add(node);
 
+                        if (!_isLoadingIfcFile)
+                            CompleteLoadingIfcFile();
+                    }
+                });
+            }
+            else
+            {
+                _importedGroupNode.Add(groupNode);
+            }
+            
+            UpdateCamera(); // Update camera as the model loads
+        });
+    }
 
+    private void ShowIfcObject(IfcObject ifcObject, GroupNode groupNode)
+    {
+        foreach (var ifcMesh in ifcObject.Meshes)
+        {
+            var meshModelNode = ProcessIfcMesh(ifcMesh);
+                
+            if (meshModelNode != null)
+                groupNode.Add(meshModelNode);
+        }
+    }
+    
+    private void ShowOptimizedIfcObject(IfcObject ifcObject, GroupNode groupNode)
+    {
+        var optimizedGroupNode = new OptimizedGroupNode()
+        {
+            IsTwoSided = _isTwoSidedMaterial
+        };
+
+        foreach (var ifcMesh in ifcObject.Meshes)
+        {
+            var meshModelNode = ProcessIfcMesh(ifcMesh);
+                
+            if (meshModelNode != null)
+                optimizedGroupNode.Add(meshModelNode);
+        }
+        
+        groupNode.Add(optimizedGroupNode);
+    }
+
+    private MeshModelNode? ProcessIfcMesh(IfcMesh ifcMesh)
+    {
+        Interlocked.Increment(ref _ifcMeshesCount);
+        
+        if (ifcMesh.IfcType == "IfcBuildingElementProxy")  // Skip showing IfcBuildingElementProxy model as it represents a generic building element that is not defined by other IFC types.
+            return null;
+        
+        // Skip showing IfcSpace model as it represents a bounded area or volume—such as a room, corridor, or functional zone—within a building or site structure.
+        // But save the names of all IfcSpaces.
+        // NOTE that ifcMesh with IfcSpace type usually deine many additional properties in the ifcMesh.PropertiesJson
+        if (ifcMesh.IfcType == "IfcSpace")  
+        {
+            _ifcSpaces += ifcMesh.Name + "\n";
+            return null;
+        }
+        
+
+        var mesh = new StandardMesh(ifcMesh.Vertices, ifcMesh.TriangleIndices, ifcMesh.Name);
+        var material = new StandardMaterial(ifcMesh.Color, name: ifcMesh.MaterialName) { IsTwoSided = _isTwoSidedMaterial };
+
+        var meshModelNode = new MeshModelNode(mesh, material, ifcMesh.Name);
+
+        if (ifcMesh.OriginVector3 != Vector3.Zero)
+            meshModelNode.Transform = new TranslateTransform(ifcMesh.OriginVector3);
+
+        _ifcMeshesDictionary.Add(meshModelNode, ifcMesh);
+        
+        _importedObjectBoundingBox.Add(meshModelNode.GetLocalBoundingBox());
+        
+        return meshModelNode;
+    }
+
+    private void CompleteLoadingIfcFile()
+    {
+        UpdateShownLines();
+        UpdateCamera();
+        UpdateIfcInfoText();
+    }
+
+    private void UpdateCamera()
+    {
+        if (Scene != null)
+        {
             Scene.RootNode.Update();
 
             if (targetPositionCamera != null && !Scene.RootNode.WorldBoundingBox.IsUndefined)
@@ -266,18 +432,20 @@ public class IfcImporterSample : CommonSample
             }
         }
     }
-    
+
     private void UpdateShownLines()
     {
-        if (_objectLinesNode == null || _importedGroupNode.Count == 0)
+        if (_importedGroupNode.Count == 0 || Scene == null)
             return; // no model imported
 
         if (!_showEdgeLines)
         {
-            _objectLinesNode.Visibility = SceneNodeVisibility.Hidden;
+            if (_objectLinesNode != null)
+                _objectLinesNode.Visibility = SceneNodeVisibility.Hidden;
+            
             return;
         }
-
+        
 
         // Reuse the instance of EdgeLinesFactory
         // This can reuse the lists and array that are internally used by the EdgeLinesFactory
@@ -322,55 +490,34 @@ public class IfcImporterSample : CommonSample
         //        }
         //    }
         //}
+        
+        if (_objectLinesNode == null)
+        {
+            var lineMaterial = new LineMaterial(Color3.Black, 1)
+            {
+                DepthBias = 0.005f
+            };
+
+            _objectLinesNode = new MultiLineNode(isLineStrip: false, lineMaterial, "ObjectLines");
+            Scene.RootNode.Add(_objectLinesNode);
+        }
 
         _objectLinesNode.Positions = edgeLinePositions.ToArray();
         _objectLinesNode.Visibility = SceneNodeVisibility.Visible;
     }
-    private void ShowIfcObject(IfcObject ifcObject, GroupNode groupNode)
-    {
-        foreach (var ifcMesh in ifcObject.Meshes)
-        {
-            var meshModelNode = CreateMeshModelNode(ifcMesh);
-                
-            if (meshModelNode != null)
-                groupNode.Add(meshModelNode);
-        }
-    }
     
-    private void ShowOptimizedIfcObject(IfcObject ifcObject, GroupNode groupNode)
+    private void UpdateIfcInfoText()
     {
-        var optimizedGroupNode = new OptimizedGroupNode();
+        string ifcInfoText;
 
-        foreach (var ifcMesh in ifcObject.Meshes)
-        {
-            var meshModelNode = CreateMeshModelNode(ifcMesh);
-                
-            if (meshModelNode != null)
-                optimizedGroupNode.Add(meshModelNode);
-        }
-        
-        groupNode.Add(optimizedGroupNode);
-    }
+        if (_ifcLoadTime > 0)
+            ifcInfoText = $"IFC Load time: {_ifcLoadTime:F2} ms\n";
+        else
+            ifcInfoText = "";
 
-    private MeshModelNode? CreateMeshModelNode(IfcMesh ifcMesh)
-    {
-        if (ifcMesh.IfcType == "IfcSpace") // Skip showing IfcSpace model as it represents a bounded area or volume—such as a room, corridor, or functional zone—within a building or site structure.
-            return null;
+        ifcInfoText += $"IFC meshes count: {_ifcMeshesCount}\n\nIFC Spaces:\n{_ifcSpaces}";
 
-        var mesh = new StandardMesh(ifcMesh.Vertices, ifcMesh.TriangleIndices, ifcMesh.Name);
-        var material = new StandardMaterial(ifcMesh.Color, name: ifcMesh.MaterialName);
-
-        var meshModelNode = new MeshModelNode(mesh, material, ifcMesh.Name);
-
-        if (ifcMesh.OriginVector3 != Vector3.Zero)
-            meshModelNode.Transform = new TranslateTransform(ifcMesh.OriginVector3);
-
-        return meshModelNode;
-    } 
-
-    private void UpdateLastLoadTimes()
-    {
-        _infoTextBox?.SetText($"IfcLoad: {_ifcLoadTime:F2} ms\nCreate IfcObject: {_ifcObjectCreateTime:F2} ms");  
+        _infoTextBox?.SetText(ifcInfoText);  
     }
 
     private void ProcessPointerMove(Vector2 pointerPosition)
@@ -378,16 +525,27 @@ public class IfcImporterSample : CommonSample
         if (!_hitTesting || SceneView == null || _infoTextBox == null)
             return;
 
-        var hitObject = SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
+        var hitResult = SceneView.GetClosestHitObject(pointerPosition.X, pointerPosition.Y);
 
-        if (hitObject != _lastHitObject)
+        if (hitResult != _lastHitObject)
         {
-            if (hitObject != null)
-                _infoTextBox.SetText("Hit object:\n" + hitObject.HitSceneNode?.Name);
+            string hitInfoText;
+            
+            if (hitResult != null && hitResult.HitSceneNode != null)
+            {
+                hitInfoText = "Hit object:\n" + hitResult.HitSceneNode.Name;
+                
+                if (_ifcMeshesDictionary.TryGetValue(hitResult.HitSceneNode, out var ifcMesh))
+                    hitInfoText += $"\n\nIFC properties:\nId: {ifcMesh.Id}\nGlobalId: {ifcMesh.GlobalId}\nType: {ifcMesh.IfcType}\nPresentationLayer: {ifcMesh.PresentationLayerName}\nMaterialName: {ifcMesh.MaterialName}\nPropertiesJson: {(ifcMesh.PropertiesJson ?? "")}";
+            }
             else
-                _infoTextBox.SetText("No object hit");
+            {
+                hitInfoText = "No object hit";
+            }
 
-            _lastHitObject = hitObject;
+            _infoTextBox.SetText(hitInfoText);
+            
+            _lastHitObject = hitResult;
         }
     }
 
@@ -403,10 +561,21 @@ public class IfcImporterSample : CommonSample
     {
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
-        ui.CreateCheckBox("Show edge lines", _showEdgeLines, isChecked =>
+        if (ui.IsDispatchToUIThreadSupported)
+            ui.CreateCheckBox("Use batch import", _useBatchImport, isChecked => _useBatchImport = isChecked);
+        else
+            _useBatchImport = false;
+        
+        _showEdgeLinesCheckBox = ui.CreateCheckBox("Show edge lines", _showEdgeLines, isChecked =>
         {
             _showEdgeLines = isChecked;
             UpdateShownLines();
+        });
+        
+        ui.CreateCheckBox("Use two sided materials", _isTwoSidedMaterial, isChecked =>
+        {
+            _isTwoSidedMaterial = isChecked;
+            ReloadLastFile();
         });
 
         ui.CreateCheckBox("Use OptimizedGroupNode (?):When checked then the imported models are shown by using OptimizedGroupNode.\nThis renders all the meshes with a single draw call\n(two draw calls are used when using transparent objects).\nThis significantly improves the rendering performance.",
@@ -416,19 +585,18 @@ public class IfcImporterSample : CommonSample
             ReloadLastFile();
         });
 
-        ui.CreateCheckBox("Load as json (?):When checked, then ImportAsJson method is used. This loads the ifc file and returns json text of all the meshes.\nThen the json is parsed and converted into 3D models.\nThis method is the only method that is available from the original IFClite library.\nThe version that is used by this samples is updated to support reading meshes directly from native memory without using json\n(see https://github.com/ab4d/ifc-lite)", _loadAsJson, isChecked =>
+        ui.CreateCheckBox("Load as json (?):When checked, then ImportAsJson method is used. This loads the IFC file and returns json text of all the meshes.\nThen the json is parsed and converted into 3D models.\nThis method is the only method that is available from the original IFClite library.\nThe version that is used by this samples is updated to support reading meshes directly from native memory without using json\n(see https://github.com/ab4d/ifc-lite)", 
+            _loadAsJson, isChecked =>
         {
             _loadAsJson = isChecked;
             ReloadLastFile();
         });
 
+        ui.AddSeparator();
         ui.CreateCheckBox("Hit testing", _hitTesting, isChecked => _hitTesting = isChecked);
 
         ui.AddSeparator();
-
-
-        _infoTextBox = ui.CreateTextBox(width: 250, height: 100);
-        UpdateLastLoadTimes(); // _infoTextBox is created after loading the initial ifc file
+        _infoTextBox = ui.CreateTextBox(width: 260, height: 220);
 
 
         // Subscribe to mouse (pointer) moved
@@ -436,11 +604,11 @@ public class IfcImporterSample : CommonSample
 
 
         // Try to register for file drag-and-drop
-        bool isDragAndDropSupported = ui.RegisterFileDropped(".*", ImportFile);
+        bool isDragAndDropSupported = ui.RegisterFileDropped(".ifc", ImportFile);
 
         if (isDragAndDropSupported)
         {
-            _subtitle += "\n\nDrag and drop ifc file here to open it.";
+            _subtitle += "\n\nDrag and drop .ifc file here to open it.";
         }
         else
         {
@@ -463,5 +631,11 @@ public class IfcImporterSample : CommonSample
                 CameraAxisPanel.Position = new Vector2(10, 80); // CameraAxisPanel is aligned to BottomLeft, so we only need to increase the y position from 10 to 80
             }
         }
+
+
+        _uiProvider = ui;
+
+        string fileName = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _initialFileName);
+        ImportFile(fileName);
     }
 }
