@@ -293,7 +293,7 @@ public class IfcImporterSample : CommonSample
             return;
         }
 
-        if (!_useBatchImport)
+        if (!_useBatchImport || _loadAsJson)
             CompleteLoadingIfcFile();
     }
 
