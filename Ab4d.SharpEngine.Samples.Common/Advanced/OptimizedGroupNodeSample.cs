@@ -100,6 +100,11 @@ public class OptimizedGroupNodeSample : CommonSample
             y = topBox.Position.Y + ((topBox.Transform as TranslateTransform)?.Y ?? 0) + Spacing;
         }
 
+        // NOTE:
+        // Here we create random BoxModelNodes that simulate different ModelNodes that can be added to OptimizedGroupNode.
+        // In reality if we would need to show the same box mesh with different colors and transformation, 
+        // then it would be much more efficient to use InstancedMeshNode.
+
         var row = new List<BoxModelNode>(RowSize * RowSize);
         for (int x = 0; x < RowSize; x++)
         {
@@ -114,7 +119,7 @@ public class OptimizedGroupNodeSample : CommonSample
                 
                 var size = new Vector3(GetRandomFloat(minValue: 5, maxValue: 18), GetRandomFloat(minValue: 5, maxValue: 18), GetRandomFloat(minValue: 5, maxValue: 18));
 
-                var box = new BoxModelNode(position, size, material: new StandardMaterial(color), name: $"Box_{x}_{_rows.Count}_{z}");
+                var box = new BoxModelNode(position, size, material: new StandardMaterial(color), name: $"Box_{x}_{_rows.Count}_{z}") { UseSharedBoxMesh = false };
                 
                 box.Update(); // Generate the mesh now so GetMesh can be used before the first rendered frame.
                 
