@@ -28,9 +28,16 @@ For the **browser and browser based apps** like Electron, the engine uses WebGL 
 - Render CT and MRI scans by using Volume rendering <sup>*</sup>
 - Included reader and writer for .obj and .stl files
 - Import 3D objects from glTF files and export the scene to glTF file by using [Ab4d.SharpEngine.glTF](https://www.nuget.org/packages/Ab4d.SharpEngine.glTF)
+- Import BIM 3D models from ifc files by using [Ab4d.SharpEngine.IfcLite](https://www.nuget.org/packages/Ab4d.SharpEngine.IfcLite) <sup>*</sup>
 - Assimp importer that uses a [third-party library](https://github.com/assimp/assimp) to import 3D models from almost any file format <sup>*</sup>
 
  <sup>*</sup> Some features are not available for the browser (WebGL) version of the engine. See [Ab4d.SharpEngine.WebGL implementation details](doc/ab4d-sharpengine-webgl-implemented-features.md).
+
+<br/>
+
+See [live Ab4d.SharpEngine.WebGL web brower samples](https://www.ab4d.com/sharp-engine-browser-demo/).
+Note that Ab4d.SharpEngine.WebGL does not support all the features. 
+Start Avalonia, WPF, WinUI or WinForms samples from this repositor to see demonstration of all the fatures.
 
 <br/>
 
@@ -82,7 +89,7 @@ For the browser and browser based apps like Electron, the engine uses WebGL (use
 
 Browser and browser based apps like Electron require [Ab4d.SharpEngine.WebGL](https://www.nuget.org/packages/Ab4d.SharpEngine.WebGL) NuGet package that uses WebGL rendering.
 
-- **Blazor WebAssembly** provided the best integration and is the only platform that supports full debugging.
+- **Blazor WebAssembly** provided the best integration and is the only platform that supports full debugging. See [live web browser samnple](https://www.ab4d.com/sharp-engine-browser-demo/).
   
 - **HTML and JavaScript** are enough to run the project with Ab4d.SharpEngine.WebGL that was compiled into wasm.
 To show the 3D scene in the browser, you can use any web server. The samples for the following web servers are provided:
@@ -90,7 +97,7 @@ To show the 3D scene in the browser, you can use any web server. The samples for
   - Node.js with Express
   - Python SocketServer
 
-- **Electron** app can use the same wasm build as the browser
+- **Electron** app can use the same wasm build as the browser.
 
 
 ### Dependencies:
@@ -101,12 +108,19 @@ To show the 3D scene in the browser, you can use any web server. The samples for
 - The Ab4d.SharpEngine.WinForms has NO EXTERNAL dependencies.
 - The Ab4d.SharpEngine.AvaloniaUI library requires Avalonia library.
 - The Ab4d.SharpEngine.glTF has NO EXTERNAL dependencies. But to load draco compressed meshes, the draco library is required (for example, Openize.Drako).
+- The Ab4d.SharpEngine.Assimp requires a third-party native [Assimp library](https://github.com/assimp/assimp).
+- The Ab4d.SharpEngine.IfcLite requires a third-party native [IfcLite library](https://github.com/ab4d/ifc-lite).
 
 
 ### System requirements to run the samples:
-- NET 6.0+
-- NET 8.0+ is required to use MAUI
-- NET 9.0+ is required to use Ab4d.SharpEngine.WebGL (for the browser)
+The samples use .Net 11 to demonstrate the usage with the latest and the fastest .Net version.
+
+But minimum requirements for Ab4d.SharpEngine are lower so you can also use the library with previous .Net versions.
+
+Here are the **mimimum .Net requirements**:
+- NET 6.0 (.Net 6 is out of support by Microsoft, but Ab4d.SharpEngine will supported .Net 6 as long as possible)
+- NET 8.0 is required to use MAUI and Ab4d.SharpEngine.IfcLite
+- NET 9.0 is required to use Ab4d.SharpEngine.WebGL (for the browser)
 
 
 ### System requirements to open the sample projects:
@@ -196,7 +210,7 @@ The following .Net solutions (.sln files) are available for desktop and mobile p
 
 ### Browser based samples
 
-The following .Net solutions (.sln files) are available for browser and browser based platforms:
+The following samples are available for browser and browser based platforms:
 
 - **Ab4d.SharpEngine.Samples.BlazorWasmFullyFeaturedDemo**\
   This solution shows how to use Ab4d.SharpEngine.WebGL in a **Blazor WebAssembly** app. It demonstrates most of the features of the engine. Using Blazor WebAssembly provides the best integration and debugging experience. 
@@ -204,17 +218,14 @@ The following .Net solutions (.sln files) are available for browser and browser 
   See [readme](Ab4d.SharpEngine.Samples.BlazorWebAssembly/README.md).
 
 - **Ab4d.SharpEngine.Samples.Electron**\
-  This solution provides files and scripts to create an Electron app that can be used on Windows, macOS and Linux.
+  This sample provides files and scripts to create an Electron app that can be used on Windows, macOS and Linux.
   It uses the compiled version of the fully featrues Blazor WebAssembly sample.
   See [readme](Ab4d.SharpEngine.Samples.Electron/README.md).
 
 - **Ab4d.SharpEngine.Samples.HtmlWebPage**\
-  This solution provides files and batch scripts that can prepare and start Node.js (with Express) or Python (SocketServer) web server.
+  This sample provides files and batch scripts that can prepare and start Node.js (with Express) or Python (SocketServer) web server.
   The sample uses a simple `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project that shows only a simple 3D scene and provides code for simple JavaScript interop (updating the 3D scene from JavaScript).
   See [readme](Ab4d.SharpEngine.Samples.HtmlWebPage/README.md).
-  
-- **Ab4d.SharpEngine.Samples.NodeJs**\
-  This solution is the same as Ab4d.SharpEngine.Samples.HtmlWebPage. The separate sln file is provided to easily see the support for Node.js web server.
 
 - **Ab4d.SharpEngine.Samples.AspNetCore**\
   This solution is same a HtmlWebPage but it uses ASP.NET Core to copy the required files into wwwroot folder and start the web server. 
@@ -306,9 +317,8 @@ In my opinion, if you already have a complex application that is built by using 
 - Ab3d.DXEngine and Ab3d.PowerToys can run on older .Net versions including .Net framework 4.8.
 
 Those two libraries provide more features and come with more samples that can be used as code templates for your needs.
-The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v4.0; this is not the full list):
+The following is a list of major features from Ab3d.DXEngine and Ab3d.PowerToys that are missing in Ab4d.SharpEngine (v5.0; this is not the full list):
 - Effects: XRay and face color effect
-- CameraNavigationCircles
 
 
 ### Advantages of Ab4d.SharpEngine
@@ -586,7 +596,6 @@ See https://www.ab4d.com/SharpEngine-history.aspx.
 
 ## Plans for later versions
 
-- Shadows
 - Multi-threaded rendering
 - Simplified creation of custom effects
 - Improve documentation and provide SKILL.md and related skill files for the AI agents to be able to use the engine.
@@ -607,3 +616,6 @@ Redistributions of source code must retain the above copyright notice, this list
 Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Ab4d.SharpEngine.IfcLIte library uses source code from IFClite (https://github.com/LTplus-AG/ifc-lite) that is publised under [MPL-2.0 license](https://github.com/LTplus-AG/ifc-lite?tab=MPL-2.0-1-ov-file).
