@@ -11,6 +11,7 @@ using Ab4d.SharpEngine.Utilities;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Colors = Ab4d.SharpEngine.Common.Colors;
@@ -161,6 +162,8 @@ public class AvaloniaMarkdownTextCreator : MarkdownTextCreator<TextBlock>
         {
             if (url != text)
                 ToolTip.SetTip(linkTextBlock, url);
+
+            linkTextBlock.Cursor = new Cursor(StandardCursorType.Hand);
 
             linkTextBlock.PointerPressed += delegate (object? sender, PointerPressedEventArgs args)
             {
