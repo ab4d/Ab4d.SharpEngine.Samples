@@ -3,9 +3,9 @@
 The Electron framework can be used to create desktop applications using web technologies that are rendered using a version of the Chromium browser engine and a back end using the Node.js runtime environment. 
 Electron apps can run on Windows, macOS and Linux.
 
-Electron is a very popular framework and is used by many applications, including Visual Studio Code, Slack, Discord, GitHub Desktop, and many others.
+Electron is a very popular framework and is used by many applications, including Visual Studio Code, Slack, GitHub Desktop, and many others.
 
-This project demonstrates how to use the files for the published Ab4d.SharpEngine sample
+This project demonstrates how to use the files from the published Ab4d.SharpEngine.WebGL sample
 to create the Electron desktop app.
 
 
@@ -28,14 +28,17 @@ This can be from:
 To prepare the files for the Electron app, you can either use the Visual Studio publish option or the `dotnet publish` command.
 
 Then copy the content of the published wwwroot folder to the wwwroot folder of this project.
-After copying you can delete all compressed .br and .gz files in the target wwwroot folder because the Electron app does not support compressed files. Compression is not needed because files are served from local disk. But when the Electron app is distributed, then the files will be compressed when creating the installer.
+After copying you can delete all compressed .br and .gz files in the target wwwroot folder because the Electron app does not support compressed files. 
+Compression is not needed because files are served from local disk (but it is benefical when downloading file from the internet).
+But when the Electron app is distributed, then the files will be compressed when creating the installer.
 
 Update the `main.js` file to point to the correct path of the `index.html` file  in out case it is set to `wwwroot/index.html`.
 
 ### Starting Electron app
 
-In this project, the Electron app can be started by executing the `start electron app.bat` script. This also checks the prerequisites and copies the files to the local wwwroot folder.
+In this project, the Electron app can be started by executing the `start-electron-app.bat` or `start-electron-app.sh` script. 
 
+The script first checks the prerequisites and copies the files to the local wwwroot folder.
 Then the scipt stats the Electron app by executing the following commmand:
 `npm run start`
 

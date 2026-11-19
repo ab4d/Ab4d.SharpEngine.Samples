@@ -1,6 +1,6 @@
 # Ab4d.SharpEngine WebAssembly demo for non-Blazor websites
 
-This sample shows how to create a .Net WebAssembly project with Ab4d.SharpEngine library that can be shown on a website that does not use Blazor WebAssembly client rendering.
+This sample shows how to create a .Net WebAssembly project with Ab4d.SharpEngine.WebGL library that can be shown on a website that does not use Blazor WebAssembly client rendering.
 
 When using Ab4d.SharpEngine for the browser the development experience is best when the library is used in a Blazor WebAssembly project.
 This is demonstrated by the [Ab4d.SharpEngine.Samples.BlazorWebAssembly project](../Ab4d.SharpEngine.Samples.BlazorWebAssembly/README.md).
@@ -34,15 +34,16 @@ To use Ab4d.SharpEngine.Web library in your own Blazor WebAssembly project, foll
 
 To use the Ab4d.SharpEngine.Web library in your own non-Blazor WebAssembly project, follow these steps:
 - Create a new "Console application" project (use .Net 9 or newer). Note: if a class library is created, then wasm files are not generated.
-- Add reference to Ab4d.SharpEngine.Web NuGet package.
+- Add reference to `Ab4d.SharpEngine.WebGL` NuGet package.
 - Copy the following files from this samples project to your project:
     - `CanvasInterop.cs` (copy to the root folder of your project)
     - `Native/libEGL.c` (create a new Native folder in your project and copy the libEGL.c file there)
 - Open the csproj file of your project and add or update the existing propertes to the following:
     - In the first `PropertyGroup`:
       ```
-      <TargetFramework>net9.0-browser</TargetFramework>
+      <TargetFramework>net11.0-browser</TargetFramework>
       <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+      <PlatformTarget>AnyCPU</PlatformTarget>
       <OutputType>Exe</OutputType>
 
       <!-- unsafe code is required to use JSExport in CanvasInterop -->
@@ -58,7 +59,7 @@ To use the Ab4d.SharpEngine.Web library in your own non-Blazor WebAssembly proje
     - Add the following two ItemGroups to the csproj file:
       ```
       <ItemGroup>
-        <!--The following NativeFileReference is required for Ab4d.SharpEngine.Web to use WebGL from the browser -->
+        <!--The following NativeFileReference is required for Ab4d.SharpEngine.WebGL to use WebGL from the browser -->
         <NativeFileReference Include="Native/libEGL.c" ScanForPInvokes="true" />
       </ItemGroup>   
       ```

@@ -1,13 +1,14 @@
 # Ab4d.SharpEngine Blazor WebAssembly sample
 
-This sample shows how to create a Blazor WebAssembly project with Ab4d.SharpEngine library.
+This sample shows how to create a Blazor WebAssembly project with Ab4d.SharpEngine.WebGL library.
 
-Using Blazor WebAssembly project is the recommended way to use Ab4d.SharpEngine library because this provides
+Using Blazor WebAssembly project is the recommended way to use Ab4d.SharpEngine.WebGL library because this provides
 the best integration of the library and is the only way to debug the .Net code that uses the library.
 
-But if you want to use Ab4d.SharpEngine in a website that does not use Blazor WebAssembly, then 
-a .Net WebAssembly project needs to be created (`TargetFramework` is set to `net10.0-browser` and `RuntimeIdentifier` is set to `browser-wasm`).
-Open the `Ab4d.SharpEngine.Samples.NoBlazorBrowserDemo.sln` solution to see a demonstration of that. Also read the following and related 
+But if you want to use Ab4d.SharpEngine.WebGL in a website that does not use Blazor WebAssembly, then 
+a .Net WebAssembly project needs to be created (`TargetFramework` is set to `net11.0-browser` and `RuntimeIdentifier` is set to `browser-wasm`).
+See Ab4d.SharpEngine.Samples.AspNetCoreApp, Ab4d.SharpEngine.Samples.Electron or Ab4d.SharpEngine.Samples.HtmlWebPage for samples on 
+how to use WebAssembly without Blazor. Also read the following and related 
 [readme file](../Ab4d.SharpEngine.Samples.WebAssemblyDemo/README.md).
 
 ### Quick start guide
@@ -20,9 +21,9 @@ Check a [live version of this sample in your browser](https://www.ab4d.com/sharp
 
 ### Usage in your own project
 
-To use the Ab4d.SharpEngine.Web library in your own project Blazor WebAssembly project, follow these steps:
+To use the Ab4d.SharpEngine.WebGL library in your own project Blazor WebAssembly project, follow these steps:
 - Create a new "Blazor WebAssembly Standalone App" project (use .Net 10 or newer).
-- Add reference to Ab4d.SharpEngine.Web NuGet package.
+- Add reference to Ab4d.SharpEngine.WebGL NuGet package.
 - Copy the following files from this samples project to your project:
     - `CanvasInterop.cs` (copy to the root folder of your project)
     - `SharpEngineSceneView.razor` (copy to the root folder of your project)

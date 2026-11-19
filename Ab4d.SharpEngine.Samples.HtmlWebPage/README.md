@@ -1,4 +1,4 @@
-# Simple HTML and JavaScript web page with Ab4d.SharpEngine
+# Simple HTML and JavaScript web page with Ab4d.SharpEngine.WebGL
 
 This project demonstrates how to create a simple web page that uses only HTML and JavaScript 
 to start the WebAssembly that is compiled from the `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project.
@@ -12,14 +12,13 @@ or a **more advanced Express node.js web server** (defined in `server.js`).
 
 Before the web server can be started, the required files must be prepared in the `wwwroot` folder.
 
-The wwwroot folder must contain the **HTML and JavaScript files** that load and start the WebAssembly.
-Those files are copied from the wwwroot folder of the Ab4d.SharpEngine.Samples.AspNetCoreApp project.
+The `wwwroot` folder must contain the **HTML and JavaScript files** that load and start the WebAssembly.
+Those files are copied from the `wwwroot` folder of the Ab4d.SharpEngine.Samples.AspNetCoreApp project.
 
-Then, the wwwroot folder must also contain the _framework folder with **WebAssembly files** that are compiled from the Ab4d.SharpEngine.Samples.WebAssemblyDemo project.
+Then, the wwwroot folder must also contain the `_framework` folder with **WebAssembly files** that are compiled from the Ab4d.SharpEngine.Samples.WebAssemblyDemo project.
 
-Compiling and copying the required files can be done by executing one of the following scripts:
-- `compile_debug_version.bat / .sh` that compiles the Ab4d.SharpEngine.Samples.WebAssemblyDemo project in debug mode and copies the required files to the wwwroot and wwwroot\_framework folders.
-- `compile_publish_version.bat / .sh` that compiles the Ab4d.SharpEngine.Samples.WebAssemblyDemo project in release mode, compresses the .js and .wasm files into Brotli compressed files (requires ThirdParty brotli tool) and copies the required files to the wwwroot and wwwroot\_framework folders.
+Compiling and copying the required files can be done by executing the `compile_publish_version.bat / .sh` script.
+That compiles the Ab4d.SharpEngine.Samples.WebAssemblyDemo project in release mode, compresses the .js and .wasm files into Brotli compressed files (requires ThirdParty brotli tool) and copies the required files to the wwwroot and wwwroot\_framework folders.
 
 
 ### Starting web server
@@ -44,7 +43,7 @@ The following sections are the same as for the Asp.Net Core project.
 
 ## Create 3D scene with Ab4d.SharpEngine library
 
-The 3D scene is created in the Ab4d.SharpEngine.Samples.WebAssemblyDemo project. This is a .Net project with `TargetFramework` set to `net9.0-browser` and `RuntimeIdentifier` set to `browser-wasm`. The project does not require any Blazor references. The project is compiled into WebAssembly (wasm) files that can be used on any web page (no need for Blazor).
+The 3D scene is created in the Ab4d.SharpEngine.Samples.WebAssemblyDemo project. This is a .Net project with `TargetFramework` set to `net11.0-browser`, `RuntimeIdentifier` set to `browser-wasm` and `PlatformTarget` to `AnyCPU`. The project does not require any Blazor references. The project is compiled into WebAssembly (wasm) files that can be used on any web page (no need for Blazor).
 
 To show 3D graphics, the Ab4d.SharpEngine.Samples.WebAssemblyDemo project references the Ab4d.SharpEngine.Web library. The WebAssemblyDemo project defines the 3D scene by adding SceneNodes objects to the Scene.RootNode. This is done in the `SharpEngineTest.cs` file.
 

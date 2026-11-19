@@ -1,7 +1,7 @@
 # Simple ASP.NET Core website with Ab4d.SharpEngine
 
 This project demonstrates how use **ASP.NET Core web server** to start a simple web page that uses 
-WebAssembly files that are compiled from the `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project.
+a `Ab4d.SharpEngine.Samples.WebAssemblyDemo` project that is compiled with `browser-wasm` RuntimeIdentifier.
 This project does not require Blazor WebAssembly because it only uses HTML and JavaScript to load and start the WebAssembly.
 
 To see how to use a Node.js web server or a simple Python web server, see the [Ab4d.SharpEngine.Samples.HtmlWebPage project](../Ab4d.SharpEngine.Samples.HtmlWebPage/README.md).
@@ -10,34 +10,25 @@ To see how to use a Node.js web server or a simple Python web server, see the [A
 
 Before the web server can be started, the required files must be prepared in the `wwwroot` folder.
 
-The wwwroot folder must contain the **HTML and JavaScript files** that load and start the WebAssembly.
-
-Then, the wwwroot folder must also contain the `_framework` folder with **WebAssembly files** that are compiled from the Ab4d.SharpEngine.Samples.WebAssemblyDemo project.
-
-By default, this project is dependent on the Ab4d.SharpEngine.Samples.WebAssemblyDemo project 
-(this is defined in .sln file and not in csproj becasue we cannot reference a project with `RuntimeIdentifier` set to `browser-wasm` from a project that does not have it).
-This means that when this project is compiled, the WebAssemblyDemo project is also compiled and the WebAssembly files are
-available in its Debug or Release folder.
-
-You can also manually compile the Ab4d.SharpEngine.Samples.WebAssemblyDemo project by starting 
-the `run_published_version.bat` script. This compiles the WebAssemblyDemo project in release mode
-and also compresses the .js and .wasm files into Brotli compressed files (requires ThirdParty brotli tool).
+If the Ab4d.SharpEngine.Samples.WebAssemblyDemo project was not published before, then 
+the `compile_WebAssemblyDemo.bat` can be used to do that.
 
 
 ### Starting web server
 
 The web server is configured and started in the `Program.cs` file.
 
-Before this is done, the code checks if the required files are available in the `wwwroot/_framework` folder. If not, then the code tries to copy the files from the 
-Ab4d.SharpEngine.Samples.HtmlWebPage or Ab4d.SharpEngine.Samples.WebAssemblyDemo projects.
+Before this is done, the code checks if the required files are available in the `wwwroot/_framework` folder
+or if files there are older than in the published Ab4d.SharpEngine.Samples.WebAssemblyDemo folder.
+In those two case the files are copied to local `wwwrooot/_framework` folder.
 
 The web server is also configured to serve Brotli compressed files (.br) when they are available.
 Brotli compressed files are much smaller and therefore the web page loads faster 
-(for example, serving only 2.2 MB when Brotli compressed instead of 9.3 MB of uncompressed data).
+(for example, the size of compiled dotnet.native is only 1.9 MB when Brotli compressed instead of 8.8 MB of uncompressed wasm file).
 
 ## Create 3D scene with Ab4d.SharpEngine library
 
-The 3D scene is created in the Ab4d.SharpEngine.Samples.WebAssemblyDemo project. This is a .Net project with `TargetFramework` set to `net9.0-browser` and `RuntimeIdentifier` set to `browser-wasm`. The project does not require any Blazor references. The project is compiled into WebAssembly (wasm) files that can be used on any web page (no need for Blazor).
+The 3D scene is created in the Ab4d.SharpEngine.Samples.WebAssemblyDemo project. This is a .Net project with `TargetFramework` set to `net11.0-browser`, `RuntimeIdentifier` set to `browser-wasm` and `PlatformTarget` to `AnyCPU`. The project does not require any Blazor references. The project is compiled into WebAssembly (wasm) files that can be used on any web page (no need for Blazor).
 
 To show 3D graphics, the Ab4d.SharpEngine.Samples.WebAssemblyDemo project references the Ab4d.SharpEngine.Web library. The WebAssemblyDemo project defines the 3D scene by adding SceneNodes objects to the Scene.RootNode. This is done in the `SharpEngineTest.cs` file.
 
