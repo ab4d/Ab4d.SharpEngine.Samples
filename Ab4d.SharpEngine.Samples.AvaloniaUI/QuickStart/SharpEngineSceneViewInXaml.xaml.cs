@@ -20,6 +20,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
 {
@@ -271,7 +272,7 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI.QuickStart
             if (renderedSceneBitmap != null)
             {
                 string fileName = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AvaloniaSharpEngineScene.png");
-                renderedSceneBitmap.Save(fileName);
+                renderedSceneBitmap.Save(fileName, new JpegBitmapEncoderOptions());
 
                 System.Diagnostics.Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
             }
