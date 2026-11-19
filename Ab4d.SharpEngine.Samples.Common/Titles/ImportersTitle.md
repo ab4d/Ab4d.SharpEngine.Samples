@@ -1,15 +1,36 @@
-﻿# 3D model importers
+﻿# 3D model importers and exporters
 
-Ab4d.SharpEngine includes a **ObjImporter** and **ObjExporter** that can be used to import 3D models from obj files and export 3D scene to obj files. Obj file is a very common and simple text based file format that usually comes with a separate mtl file that defines materials. Note that the obj file cannot store object hierarchies and transformation.
+### Included in Ab4d.SharpEngine library
 
-The Ab4d.SharpEngine also includes a **StlImporter** and **StlExporter** that can be used to import a 3D model from stl files and export a 3D object to stl files. Stl file is file format that is commonly used for 3D printing. It can store only triangle meshes and does not support materials or object hierarchies.
+**ObjImporter** and **ObjExporter** can be used to import 3D models from obj files and export 3D scene to obj files. Obj file is a very common and simple text based file format that usually comes with a separate mtl file that defines materials. Note that the obj file cannot store object hierarchies and transformations.
 
-The **Ab4d.SharpEngine.glTF library** (available as a separate NuGet package) can read 3D objects from glTF files. glTF is a standard file format for three-dimensional scenes and models and is defined by the KhronosGroup. The file format uses one of two possible file extensions: .gltf or .glb. Both .gltf and .glb files may reference external binary and texture resources. Alternatively, both formats may be self-contained by directly embedding binary data buffers. The Ab4d.SharpEngine.glTF library provides a **glTFImporter** and **glTFExporter** classes that can import or export existing 3D scene. It is also possible to export any 3D scene from the Diagnostics window by clicking on **"Export Scene to glTF"**.
+**StlImporter** and **StlExporter** can be used to import a 3D model from stl files and export a 3D object to stl files. Stl file is a file format that is commonly used for 3D printing. It can store only triangle meshes and does not support materials or object hierarchies.
+
+It is also possible to import **point-cloud data** with **PlyPointCloudReader** (reading from .ply files) and by using **LoadXyzFile** method to read from .xyz files. The source for PlyPointCloudReader is available in the Ab4d.SharpEngine.Samples.Common project in Utils/PlyPointCloudReader.cs file. The source for LoadXyzFile is available in Importers/PointCloudImporterSample.cs file.
+
+### Ab4d.SharpEngine.glTF library
+
+Ab4d.SharpEngine.glTF library (available as a separate NuGet package) can read 3D objects from glTF files. glTF is a standard file format for three-dimensional scenes and models and is defined by the Khronos Group. The file format uses one of two possible file extensions: .gltf or .glb. Both .gltf and .glb files may reference external binary and texture resources. Alternatively, both formats may be self-contained by directly embedding binary data buffers. 
+
+Ab4d.SharpEngine.glTF library provides a **glTFImporter** for imported 3D objects from gtTF files. The library also provides **glTFExporter** classe that can export an existing 3D scene.
+
+In this samples app it is also possible to export any 3D scene from the Diagnostics window by clicking on **"Export Scene to glTF"**.
+
+### Ab4d.SharpEngine.IfcLite library
+
+Ab4d.SharpEngine.IfcLite library can be used to import 3D models and object metadata from **IFC files**.
+
+An IFC (Industry Foundation Classes) file is the open, vendor-neutral standard data model and file format used in **Building Information Modeling (BIM)** to share 3D geometry and rich construction data across different software platforms.
+
+The library uses a slightly modified version of the **native IFClite library** that supports reading mesh geometry data directly from native memory. See [IFClite fork on GitHub](https://github.com/ab4d/ifc-lite) for more info.
+
+### Ab4d.SharpEngine.Assimp library
 
 To read 3D models from many other file formats, use the **Assimp importer**. Assimp (Open Asset Import Library) is an open source library that can **read 3D models from almost all file formats**, including **fbx, dea and ply** (click on "Show supported formats" button in the AssimpSample to see all supported file formats). It is compiled into a native library. Therefore the Ab4d.SharpEngine.Assimp library is required to use Assimp importer.
 
 These samples come with precompiled Assimp libraries that are available in the lib/assimp-lib folder. When using the Assimp library you need to make sure that the correct native dll is present in the same folder as the app or that you set the path to the dll by providing it in the call to the AssimpLibrary.Instance.Initialize method.
 
-The previous importers support reading 3D objects from 3D meshes that are defined by triangles (positions + triangle indices). But CAD applications do not work with triangles but with solid objects that are defined by mathematical equations. Those objects can be usually exporter into **STEP** (.step, .stp) or **IGES** (.iges, .igs) files. Those two file types can be read by using the **Ab4d.OpenCascade library** that can read the parts hierarchy with all faces and edge data. This is demonstrated in the **CadImporter** application - [see project on GitHub](https://github.com/ab4d/CadImporter).
+### Ab4d.OpenCascade library
 
-It is also possible to import **point-cloud data** with **PlyPointCloudReader** (reading from .ply files) and by using **LoadXyzFile** method to read from .xyz files. The source for PlyPointCloudReader is available in the Ab4d.SharpEngine.Samples.Common project in Utils/PlyPointCloudReader.cs file. The source for LoadXyzFile is available in Importers/PointCloudImporterSample.cs file.
+The previous importers support reading 3D objects from 3D meshes that are defined by triangles (positions + triangle indices). But CAD applications do not work with triangles but with solid objects that are defined by mathematical equations. Those objects can usually be exporter into **STEP** (.step, .stp) or **IGES** (.iges, .igs) files. Those two file types can be read using the **Ab4d.OpenCascade library** that can read the parts hierarchy with all faces and edge data. This is demonstrated in the **CadImporter** application - [see project on GitHub](https://github.com/ab4d/CadImporter).
+
