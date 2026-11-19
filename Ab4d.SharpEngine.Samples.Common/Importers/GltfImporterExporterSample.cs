@@ -171,8 +171,10 @@ public class GltfImporterExporterSample : CommonSample
             //using (var fs = System.IO.File.OpenRead(fileName))
             //    _importedModelNodes = _assimpImporter.Import(fs, formatHint: System.IO.Path.GetExtension(fileName));
 
-            _importedModelNodes = await glTfImporter.ImportAsync(fileName);
-            //_importedModelNodes = glTfImporter.Import(fileName);
+            if (this.IsTestEnvironment)
+                _importedModelNodes = glTfImporter.Import(fileName); // When this sample is started from automatic test, load the file synchronously
+            else
+                _importedModelNodes = await glTfImporter.ImportAsync(fileName);
             
             // To see the hierarchy of the imported models, execute the following in the Visual Studio's Immediate Window (first check that _importedModelNodes is GroupNode and not ModelMeshNode):
             //_importedModelNodes.DumpHierarchy();
