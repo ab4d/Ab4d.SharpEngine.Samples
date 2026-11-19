@@ -1,12 +1,8 @@
 using Ab4d.SharpEngine.Common;
 using Ab4d.SharpEngine.Utilities;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
-using Windows.Foundation;
-using System;
 using System.Numerics;
 using Ab4d.SharpEngine.Samples.UnoPlatform;
-using Newtonsoft.Json.Linq;
 
 namespace Ab4d.SharpEngine.UnoPlatform
 {
