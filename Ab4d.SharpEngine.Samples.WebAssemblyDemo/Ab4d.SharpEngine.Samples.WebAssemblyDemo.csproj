@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net11.0-browser</TargetFramework>
@@ -51,7 +51,7 @@
     <!--If Microsoft.AspNetCore.Components.WebAssembly reference is required for Microsoft.JSInterop.IJSRuntime that is used in 
         CanvasInterop class to provide javascript interop from anywhere in the project.
         If this is not needed, then remove this reference and define the NO_JSInterop constant in this csproj by using DefineConstants. -->
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0" />
   </ItemGroup>
 
 </Project>
