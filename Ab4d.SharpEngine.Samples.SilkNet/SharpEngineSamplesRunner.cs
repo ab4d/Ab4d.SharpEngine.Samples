@@ -371,7 +371,7 @@ namespace Ab4d.SharpEngine.Samples.CrossPlatform
             };
 
             SurfaceKHR vulkanSurface;
-            var result = VulkanInstance.Win32SurfaceExt.CreateWin32Surface(vulkanInstance, &surfaceCreateInfo, null, &vulkanSurface);
+            var result = VulkanInstance.Win32SurfaceExt.CreateWin32Surface(vulkanInstance, &surfaceCreateInfo, &vulkanSurface);
 
             if (result != Result.Success || vulkanSurface.Handle == 0)
                 throw new SharpEngineException("Failed to create a Vulkan surface - reason: " + result.ToString());
