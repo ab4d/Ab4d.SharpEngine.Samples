@@ -28,7 +28,7 @@ echo "Checking WebAssembly files in wwwroot folder"
 
 if [ ! -f "wwwroot/index.html" ]; then
 
-  if [ ! -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot" ]; then
+  if [ ! -d "../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net11.0/publish/wwwroot" ]; then
     echo "Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly"
 	dotnet publish ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release /p:PublishProfile=../Ab4d.SharpEngine.Samples.BlazorWebAssembly/Properties/PublishProfiles/FolderProfile.pubxml
   
@@ -44,7 +44,7 @@ if [ ! -f "wwwroot/index.html" ]; then
   fi
     
   echo "Copying published files to local wwwroot"
-  cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net10.0/publish/wwwroot/* wwwroot/
+  cp -r ../Ab4d.SharpEngine.Samples.BlazorWebAssembly/bin/Release/net11.0/publish/wwwroot/* wwwroot/
   
   if [ $? -ne 0 ]; then
     echo "Error copying from Ab4d.SharpEngine.Samples.BlazorWebAssembly to local wwwroot folder."

@@ -21,7 +21,7 @@ echo Checking WebAssembly files in wwwroot folder
 
 if exist "wwwroot\index.html" goto start_electron
 
-if not exist "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\publish\wwwroot" (
+if not exist "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net11.0\publish\wwwroot" (
     echo Generating publish build for Ab4d.SharpEngine.Samples.BlazorWebAssembly 
 	dotnet publish ..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\Ab4d.SharpEngine.Samples.BlazorWebAssembly.csproj -c Release /p:PublishProfile=..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\Properties\PublishProfiles\FolderProfile.pubxml
     if errorlevel 1 goto publish_error
@@ -30,7 +30,7 @@ if not exist "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\
 
 echo Copying published files to local wwwroot
 
-xcopy /E /Y /C "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net10.0\publish\wwwroot\*" "wwwroot\"
+xcopy /E /Y /C "..\Ab4d.SharpEngine.Samples.BlazorWebAssembly\bin\Release\net11.0\publish\wwwroot\*" "wwwroot\"
 if errorlevel 1 goto copy_error
 
 rem Delete compressed files because they are not used by Electron - serving files from the local hard disk is very fast.

@@ -7,8 +7,8 @@ fi
 
 if [ -d "wwwroot/_framework" ]; then
   rm -f wwwroot/_framework/*
-  rm -f wwwroot/_framework/supportFiles/*
 else
+  mkdir -p wwwroot
   mkdir -p wwwroot/_framework
 fi
 
@@ -21,7 +21,7 @@ if [ $? -ne 0 ]; then
   rm -rf obj/*
   dotnet publish -c Release
   if [ $? -ne 0 ]; then
-    echo "Error compiling project"
+    echo "Error compiling Ab4d.SharpEngine.Samples.WebAssemblyDemo project"
     read -p "Press enter to continue"
     cd ../Ab4d.SharpEngine.Samples.HtmlWebPage
     exit 1
@@ -29,7 +29,7 @@ if [ $? -ne 0 ]; then
 fi
 
 cp -r ../Ab4d.SharpEngine.Samples.AspNetCoreApp/wwwroot/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/
-cp -r bin/Release/net10.0-browser/browser-wasm/AppBundle/_framework/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/
+cp -r bin\Release\net11.0-browser\publish\wwwroot\_framework/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/
 
 cd ../Ab4d.SharpEngine.Samples.HtmlWebPage
 
@@ -48,5 +48,7 @@ cd ../Ab4d.SharpEngine.Samples.HtmlWebPage
 #    ../ThirdParty/brotli/brotli -f "$file"
 #  done
 #fi
+
+echo "Everything compiled and copied to local wwwroot folder. Start web server by starting start-node-express-web-server.sh"
 
 read -p "Press enter to continue"
