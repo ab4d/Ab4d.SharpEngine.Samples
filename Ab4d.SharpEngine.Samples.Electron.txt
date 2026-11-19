@@ -1,0 +1,2 @@
+To create an Electron app, open the Ab4d.SharpEngine.Samples.Electron folder
+and start the start-electron-app.bat (Windows) or start-electron-app.sh (macOS or Linux).

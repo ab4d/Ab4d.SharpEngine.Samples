@@ -1,0 +1,3 @@
+To show how to use WebAssemblyDemo a browser-wasm .Net application in a simple HTML web page with JavaScript
+open the Ab4d.SharpEngine.Samples.HtmlWebPage folder and use the scripts there to compile 
+Ab4d.SharpEngine.Samples.WebAssemblyDemo project and start Node.Js or Python web server.
