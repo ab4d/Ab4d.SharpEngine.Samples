@@ -188,6 +188,8 @@ public class GltfImporterExporterSample : CommonSample
             return;
         }
 
+        if (this.IsDisposed) // If this sample was already closed
+            return;
 
         // If you know that only a single model is stored in the glTF file,
         // or if you need only the first model, then you can also use:
