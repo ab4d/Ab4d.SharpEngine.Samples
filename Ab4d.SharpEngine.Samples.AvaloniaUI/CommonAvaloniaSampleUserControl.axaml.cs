@@ -21,8 +21,6 @@ namespace Ab4d.SharpEngine.Samples.AvaloniaUI
 
         private AvaloniaUIProvider _avaloniaUiProvider;
         
-        private Task? _disposeTask;
-
         public CommonSample? CurrentCommonSample
         {
             get => _currentCommonSample;
