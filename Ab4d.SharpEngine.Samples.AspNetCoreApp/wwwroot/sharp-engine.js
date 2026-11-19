@@ -36,12 +36,11 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
 
     const canvas = globalThis.document.getElementById(canvasId);
 
-    if (canvas)
-    {
+    if (canvas) {
         let webglVersion;
 
         var context = canvas.getContext('webgl2', { antialias: useMSAA, preserveDrawingBuffer: preserveDrawingBuffer });
-        
+
         if (context) {
             webglVersion = "2";
         }
@@ -69,15 +68,16 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
                     interop.OnContextLostJsCallback(canvasId);
             }, false
         );
-        
+
 
         const dotnet = globalThis.getDotnetRuntime(0);
         dotnet.Module["canvas"] = canvas; // This is requried to be able to create WebGL context (call EGL.CreateContext)
+        dotnet.Module["context"] = context; // For image loading
 
         var dpi = window.devicePixelRatio || 1.0;
 
         var rect = canvas.getBoundingClientRect(); // This will get the size in float values without rounding (as with clientWidth/clientHeight)
-        var displayWidth  = Math.round(rect.width * dpi);
+        var displayWidth = Math.round(rect.width * dpi);
         var displayHeight = Math.round(rect.height * dpi);
 
         // Make the size of canvas back buffers the corect size
@@ -105,8 +105,7 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
         // so we need to pass it as a string
         return `OK:v${webglVersion};${displayWidth};${displayHeight};${dpi}`;
     }
-    else
-    {
+    else {
         var errorMessage = "Canvas not found: " + canvasId;
         console.error(errorMessage);
         return errorMessage;
@@ -170,7 +169,7 @@ export function loadBinaryFile(canvasId, url) {
 export async function loadImageBytes(canvasId, url) {
     var loggedUrl = url.startsWith("data:") ? "base64 encoded data" : url; // prevent logging the whole base64 string in case of data url
     log("loadImageBytes: start loading " + loggedUrl);
-    
+
     if (!createImageBitmap || typeof OffscreenCanvas === "undefined") {
         // Before Safari 16.4 (2024-03-27)
         await loadImageBytesOldWay(canvasId, url);
@@ -206,26 +205,64 @@ export async function createImageFromBytes(canvasId, imageBytes, mimeType, image
     log("createImageFromBytes: start creating " + imageName);
 
     // 1. Create a Blob from the array
-    const blob = new Blob([imageBytes], { type: mimeType }); 
+    const blob = new Blob([imageBytes], { type: mimeType });
 
     await loadImageBytesFromBlob(blob, canvasId, imageName);
 }
 
 async function loadImageBytesFromBlob(blob, canvasId, url) {
     try {
-        const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' });
+        const bitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none' }); // note: using premultiply does not work reliably, so we need to do that after the bitmap is loaded
 
-        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(bitmap, 0, 0);
-        const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+        let imageBytes = null;
 
-        const data = Array.from(imageData.data);
+        // WebGL/WebGL2 codepath: create texture from loaded bitmap, attach to framebuffer, and read pixels.
+        // Avoids the issues with alpha pre-multiplication, and preserves RGB values where alpha is 0.
+        const dotnet = globalThis.getDotnetRuntime(0);
+        const gl = dotnet.Module["context"]; // Set in initWebGLCanvas()
+
+        if (gl) {
+            log("loadImageBytes: Retrieving pixel data via WebGL2/WebGL canvas context...");
+
+            gl.activeTexture(gl.TEXTURE0);
+            let texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bitmap);
+
+            const framebuffer = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+            if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE) {
+                imageBytes = new Uint8Array(bitmap.width * bitmap.height * 4);
+                gl.readPixels(0, 0, bitmap.width, bitmap.height, gl.RGBA, gl.UNSIGNED_BYTE, imageBytes);
+            }
+
+            gl.bindTexture(gl.TEXTURE_2D, null);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+            gl.deleteFramebuffer(framebuffer);
+            gl.deleteTexture(texture);
+        } else {
+            // Fallback via 2D canvas. Although bitmap is loaded with premultiplyAlpha='none' setting,
+            // the roundtrip of drawImage() and getImageData() involves composition with premultiplied
+            // alpha. It seems that the data is then un-multiplied post-hoc, but this is lossy; most
+            // noticeably, RGB values at A=0 are lost (i.e., become 0).
+            log("loadImageBytes: Retrieving pixel data via fallback 2D canvas context...");
+
+            const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bitmap, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+            const data = Array.from(imageData.data);
+            imageBytes = new Uint8Array(data);
+        }
 
         log("loadImageBytes: image byte array retrieved: " + url);
 
         if (interop)
-            interop.OnImageBytesLoaded(canvasId, url, bitmap.width, bitmap.height, data, null);
+            interop.OnImageBytesLoaded(canvasId, url, bitmap.width, bitmap.height, imageBytes, null);
     }
     catch (ex) {
         let message = `loadImageBytes: error decoding image '${url}': ${ex.message}`;
@@ -267,8 +304,7 @@ async function loadImageBytesOldWay(canvasId, url) {
         if (interop)
             interop.OnImageBytesLoaded(canvasId, url, width, height, data, null);
     }
-    catch (ex)
-    {
+    catch (ex) {
         let message = "Error loading " + url + ": " + ex.message;
         log(message);
 
@@ -295,8 +331,7 @@ export function unsubscribeBrowserEvents(canvasId, unsubscribeMouseEvents, unsub
     if (!interop)
         return;
 
-    if (unsubscribeMouseEvents)
-    {
+    if (unsubscribeMouseEvents) {
         const canvas = getCanvas(canvasId);
 
         if (canvas) {
@@ -360,7 +395,7 @@ export function setPointerCapture(canvasId, pointerId) {
         }
         catch (ex) {
             // prevent an error when pointerId event was already finished and does not exist anymore when this is called
-        } 
+        }
     }
 }
 
@@ -375,7 +410,7 @@ export function releasePointerCapture(canvasId, pointerId) {
         }
         catch (ex) {
             // prevent an error when pointerId event was already finished and does not exist anymore when this is called
-        } 
+        }
     }
 }
 
@@ -390,7 +425,7 @@ export function disconnectWebGLCanvas(canvasId) {
         if (initialCanvas === canvas)
             initialCanvas = null;
 
-        if (!resizeObserver)
+        if (resizeObserver)
             resizeObserver.unobserve(canvas);
 
         canvasToDisplaySizeMap.delete(canvas)
@@ -432,8 +467,7 @@ export function showRawBitmap(canvasId, width, height, pixelData, displayStyle) 
 }
 
 
-function onFrameUpdate()
-{
+function onFrameUpdate() {
     if (!interop || !isUpdating)
         return;
 
@@ -474,7 +508,7 @@ function onResize(entries) {
             height = entry.contentRect.height;
         }
 
-        
+
         const displayWidth = Math.round(width * dpr);
         const displayHeight = Math.round(height * dpr);
 
@@ -680,7 +714,7 @@ const touchMove = (e) => {
 
     checkPinch(e, true);
 
-     if (e.touches.length === 1) {
+    if (e.touches.length === 1) {
         var touch = e.changedTouches[0];
         var bcr = e.target.getBoundingClientRect();
         var x = touch.clientX - bcr.x;
@@ -707,6 +741,6 @@ const touchEnd = (e) => {
         interop.OnPointerMovedJsCallback(e.currentTarget.id, x, y, e.buttons, keyboardModifiers);
         interop.OnPointerUpJsCallback(e.currentTarget.id, button, keyboardModifiers);
     }
-    
+
     checkPinch(e, false);
 }
