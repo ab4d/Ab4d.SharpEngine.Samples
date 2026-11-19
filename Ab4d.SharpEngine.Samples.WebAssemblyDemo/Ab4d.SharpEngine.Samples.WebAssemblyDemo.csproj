@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net11.0-browser</TargetFramework>
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <RootNamespace>Ab4d.SharpEngine.Samples.WebAssemblyDemo</RootNamespace>
 
     <OutputType>Exe</OutputType>
