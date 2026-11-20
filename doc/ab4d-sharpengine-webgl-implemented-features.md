@@ -7,27 +7,26 @@ Namespace implementation status:
 - **Cameras**: 100% implemented :heavy_check_mark:
 - **Materials**:
     - StandardEffect - 100% implemented :heavy_check_mark:
-    - ThickLineEffect - LineThickness, line patterns and line caps and hidden lines are not supported.   
-      WebGL does not support thick lines or geometry shader so this requires a different approach (probably CPU based mesh generation). This will be supported after v1.0. Use TubeLineModelNode and TubePathModelNode with SolidColorMaterial for thick lines (here the line thickness in not in screen space values).
+    - ThickLineEffect - LineThickness, line patterns and world-space line thickness are implemented. Rendering connected lines (PolyLines) with mitered and beveled joints and rendering line caps (arrows and other shapes) is still not supported.
     - PixelEffect - 100% implemented :heavy_check_mark:
     - SpriteEffect - planned for next version :hourglass_flowing_sand:
-    - VertexColorEffect - planned for next version :hourglass_flowing_sand:
+    - VertexColorEffect - 100% implemented :heavy_check_mark:
     - VolumeRenderingEffect - supported later :two:
 - **Lights**: 100% implemented :heavy_check_mark:
 - **Materials**: 
     - StandardMaterial - 100% implemented :heavy_check_mark:
     - SolidColorMaterial - (using StandardEffect) - 100% implemented :heavy_check_mark:
-    - LineMaterial - Rendering colored lines with 1px line thickness. See comment with ThickLineEffect for more info.
-    - PolyLineMaterial - Polylines are rendered as multiple individual lines. Because line thickness is limited to 1px, no mitered and beveled joints are required.
+    - LineMaterial - See comment with ThickLineEffect for more info.
+    - PolyLineMaterial - See comment with ThickLineEffect for more info.
     - PositionColoredLineMaterial - supported later :two:
-    - VertexColorMaterial - planned for next version :hourglass_flowing_sand:
-    - PrimitiveIdMaterial - planned after v1.1 :hourglass_flowing_sand:
+    - VertexColorMaterial - 100% implemented :heavy_check_mark:
+    - PrimitiveIdMaterial -  planned for the next version :hourglass_flowing_sand:
     - DepthOnlyMaterial - supported later :two:
     - VolumeMaterial - supported later :two:
-- **Meshes**: all supported except SubMesh (planned for next version) :hourglass_flowing_sand:
+- **Meshes**: 100% implemented :heavy_check_mark:
 - **OverlayPanels**: CameraAxisPanel planned for next version :hourglass_flowing_sand:
-- **PostProcessing**: planned after v1.1 :hourglass_flowing_sand:
-- **SceneNodes**: all supported except: MultiMaterialModelNode and PixelsNode. All planned for next version :hourglass_flowing_sand:
+- **PostProcessing**:  planned for the next version :hourglass_flowing_sand:
+- **SceneNodes**:  100% implemented :heavy_check_mark:
 - **Transformations**: 100% implemented :heavy_check_mark:
 - **Utilities**: implemented all except:
     - BezierCurve, BSpline - 100% implemented :heavy_check_mark:
@@ -39,16 +38,16 @@ Namespace implementation status:
     - MeshBooleanOperations - 100% implemented :heavy_check_mark:
     - MeshOctree - 100% implemented :heavy_check_mark:
     - MeshTrianglesSorter - 100% implemented :heavy_check_mark:
-    - ModelMover, ModelRotator and ModelScalar - planned for next version :hourglass_flowing_sand:
+    - ModelMover, ModelRotator and ModelScalar -  100% implemented :heavy_check_mark:
     - ObjImporter - 100% implemented :heavy_check_mark:
-    - ObjExporter - planned for next version :hourglass_flowing_sand:
+    - ObjExporter - planned for the next version :hourglass_flowing_sand:
     - StlImporter - 100% implemented :heavy_check_mark:
-    - StlExporter - planned for next version :hourglass_flowing_sand:
+    - StlExporter - planned for the next version :hourglass_flowing_sand:
     - glTFImporter - 100% implemented :heavy_check_mark:
     - TextureLoader, TextureFactory - 100% implemented :heavy_check_mark:
     - Triangulator - 100% implemented :heavy_check_mark:
     - TrueTypeFontLoader, VectorFontFactory - 100% implemented :heavy_check_mark:
-    - SpriteBatch - planned for next version :hourglass_flowing_sand:
+    - SpriteBatch - planned for the next version :hourglass_flowing_sand:
    
 Other not implemented features:
 - Super-sampling (planned for later)
