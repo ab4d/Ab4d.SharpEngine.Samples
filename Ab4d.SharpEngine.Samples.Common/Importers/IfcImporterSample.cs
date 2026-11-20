@@ -389,16 +389,23 @@ public class IfcImporterSample : CommonSample
         
         // Skip showing IfcSpace model as it represents a bounded area or volume—such as a room, corridor, or functional zone—within a building or site structure.
         // But save the names of all IfcSpaces.
-        // NOTE that ifcMesh with IfcSpace type usually deine many additional properties in the ifcMesh.PropertiesJson
+        // NOTE that ifcMesh with IfcSpace type usually defines many additional properties in the ifcMesh.PropertiesJson
         if (ifcMesh.IfcType == "IfcSpace")  
         {
             _ifcSpaces += ifcMesh.Name + "\n";
             return null;
         }
-        
+
+
+        // Temporary workaround:
+        // Currently IFClite for all semi-transparent colors set the red color channel to 1 so all windows look red.
+        // To solve that, the following code adjusts the red color to the average of green + blue.
+        var color = ifcMesh.Color;
+        if (color.Alpha < 1 && MathUtils.IsOne(color.Red))
+            color = new Color4((color.Green + color.Blue) * 0.5f, color.Green, color.Blue, color.Alpha);
 
         var mesh = new StandardMesh(ifcMesh.Vertices, ifcMesh.TriangleIndices, ifcMesh.Name);
-        var material = new StandardMaterial(ifcMesh.Color, name: ifcMesh.MaterialName) { IsTwoSided = _isTwoSidedMaterial };
+        var material = new StandardMaterial(color, name: ifcMesh.MaterialName) { IsTwoSided = _isTwoSidedMaterial };
 
         var meshModelNode = new MeshModelNode(mesh, material, ifcMesh.Name);
 
@@ -562,7 +569,7 @@ public class IfcImporterSample : CommonSample
         ui.CreateStackPanel(PositionTypes.Bottom | PositionTypes.Right, isVertical: true);
 
         if (ui.IsDispatchToUIThreadSupported)
-            ui.CreateCheckBox("Use batch import", _useBatchImport, isChecked => _useBatchImport = isChecked);
+            ui.CreateCheckBox("Use batch import (?):When checked then the model is received in batches in the background thread.", _useBatchImport, isChecked => _useBatchImport = isChecked);
         else
             _useBatchImport = false;
         
