@@ -9,7 +9,7 @@ Namespace implementation status:
     - StandardEffect - 100% implemented :heavy_check_mark:
     - ThickLineEffect - LineThickness, line patterns and line caps and hidden lines are not supported.   
       WebGL does not support thick lines or geometry shader so this requires a different approach (probably CPU based mesh generation). This will be supported after v1.0. Use TubeLineModelNode and TubePathModelNode with SolidColorMaterial for thick lines (here the line thickness in not in screen space values).
-    - PixelEffect - planned for next version :hourglass_flowing_sand:
+    - PixelEffect - 100% implemented :heavy_check_mark:
     - SpriteEffect - planned for next version :hourglass_flowing_sand:
     - VertexColorEffect - planned for next version :hourglass_flowing_sand:
     - VolumeRenderingEffect - supported later :two:
