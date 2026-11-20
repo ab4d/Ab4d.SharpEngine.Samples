@@ -29,7 +29,7 @@ if [ $? -ne 0 ]; then
 fi
 
 cp -r ../Ab4d.SharpEngine.Samples.AspNetCoreApp/wwwroot/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/
-cp -r bin\Release\net11.0-browser\publish\wwwroot\_framework/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/
+cp -r bin/Release/net11.0-browser/publish/wwwroot/_framework/* ../Ab4d.SharpEngine.Samples.HtmlWebPage/wwwroot/_framework/
 
 cd ../Ab4d.SharpEngine.Samples.HtmlWebPage
 
