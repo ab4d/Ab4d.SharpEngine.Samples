@@ -117,7 +117,7 @@ The samples use .Net 11 to demonstrate usage with the latest and fastest .Net ve
 
 But the minimum requirements for Ab4d.SharpEngine are lower, so you can also use the library with previous .Net versions.
 
-Here are the **mimimum .Net requirements**:
+Here are the **minimum .Net requirements**:
 - .NET 6.0 (.Net 6 is out of support by Microsoft, but Ab4d.SharpEngine will support .Net 6 as long as possible)
 - .NET 8.0 is required to use MAUI and Ab4d.SharpEngine.IfcLite
 - .NET 9.0 is required to use Ab4d.SharpEngine.WebGL (for the browser)
