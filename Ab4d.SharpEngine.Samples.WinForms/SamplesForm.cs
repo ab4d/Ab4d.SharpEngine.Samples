@@ -81,8 +81,12 @@ namespace Ab4d.SharpEngine.Samples.WinForms
             UpdateGraphicsCardInfo();
 
             LoadSamples();
+        }
 
-            this.Closing += (sender, args) => UnsubscribeToUpdateFps();
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            UnsubscribeToUpdateFps();
+            base.OnFormClosing(e);
         }
 
 
