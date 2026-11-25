@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.Common</AssemblyName>
     <RootNamespace>Ab4d.SharpEngine.Samples.Common</RootNamespace>
-    <TargetFramework>net11.0</TargetFramework> <!-- Ab4d.SharpEngine supports all .Net version from .Net 6 to the latest .Net version. -->
+    <TargetFramework>net11.0</TargetFramework> <!-- Ab4d.SharpEngine supports all .Net version from .Net 6 to the latest .Net version. Note that .Net 8 is required by Ab4d.SharpEngine.IfcLite. -->
     <Version>5.0.1075</Version>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
