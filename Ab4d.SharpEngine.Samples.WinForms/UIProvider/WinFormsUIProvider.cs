@@ -293,7 +293,7 @@ public class WinFormsUIProvider : ICommonSampleUIProvider
             {
                 valueChangedAction(enumValues[selectedIndex]);
             }, 
-            selectedItemIndex: enumValues.IndexOf(selectedValue),
+            selectedItemIndex: Array.IndexOf(enumValues, selectedValue),
             width: width,
             keyText: keyText,
             keyTextWidth: keyTextWidth);
