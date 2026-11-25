@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Ab4d.SharpEngine.Samples.WinForms</AssemblyName>
@@ -27,7 +27,17 @@
   <ItemGroup Condition="$(SHARPENGINE_PRIVATE_DIR)!=''">
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine\Ab4d.SharpEngine.csproj" />
     <ProjectReference Include="$(SHARPENGINE_PRIVATE_DIR)\Ab4d.SharpEngine.WinForms\Ab4d.SharpEngine.WinForms.csproj" />
-  </ItemGroup> 
+  </ItemGroup>
+
+  <!-- Workaround for compiler warning that WIndowsBase version cannot be resolved. This prevents WebView2 from loading Microsoft.Web.WebView2.Wpf -->
+  <Target Name="RemoveWebView2WpfReference" BeforeTargets="ResolveAssemblyReferences"
+          Condition="'$(UseWindowsForms)' == 'true' and '$(UseWPF)' != 'true'">
+    <ItemGroup>
+      <_WebView2WpfReference Include="@(Reference)"
+                             Condition="'%(FileName)' == 'Microsoft.Web.WebView2.Wpf'" />
+      <Reference Remove="@(_WebView2WpfReference)" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <EmbeddedResource Include="Titles\RenderFormSample.md" />
