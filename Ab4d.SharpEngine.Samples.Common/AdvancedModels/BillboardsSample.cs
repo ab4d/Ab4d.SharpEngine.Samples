@@ -94,8 +94,6 @@ public class BillboardsSample : CommonSample
         if (_heightMapNode == null || _heightData == null)
             return;
 
-        var rnd = new Random();
-
         var positions = new Vector3[tresCount];
         var pixelSizes = new float[tresCount];
 
@@ -115,8 +113,8 @@ public class BillboardsSample : CommonSample
 
         for (int i = 0; i < tresCount; i++)
         {
-            var x = rnd.NextSingle();
-            var z = rnd.NextSingle();
+            var x = GetRandomFloat();
+            var z = GetRandomFloat();
             var y = GetHeight(x, z);
 
             if (y > maxTreeHeight)
@@ -135,7 +133,7 @@ public class BillboardsSample : CommonSample
                 // Higher the tree, less probable it is to show it.
                 // Also the size is smaller as the height increases.
                 float percent = (y - forestHeight) / (maxTreeHeight - forestHeight);
-                if (rnd.NextSingle() < percent)
+                if (GetRandomFloat() < percent)
                 {
                     // skip this tree
                     i--;
@@ -146,7 +144,7 @@ public class BillboardsSample : CommonSample
             }
             else
             {
-                treeSize = rnd.NextSingle() * 1.0f + 0.5f; // random between 0.5 to 1.5
+                treeSize = GetRandomFloat() * 1.0f + 0.5f; // random between 0.5 to 1.5
             }
 
             positions[i] = new Vector3(x * xFactor + xOffset,
