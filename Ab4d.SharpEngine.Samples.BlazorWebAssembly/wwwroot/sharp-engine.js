@@ -72,7 +72,7 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
         
 
         const dotnet = globalThis.getDotnetRuntime(0);
-        dotnet.Module["canvas"] = canvas; // This is requried to be able to create WebGL context (call EGL.CreateContext)
+        dotnet.Module["canvas"] = canvas; // This is required to be able to create WebGL context (call EGL.CreateContext)
         dotnet.Module["context"] = context; // For image loading
 
         var dpi = window.devicePixelRatio || 1.0;
@@ -81,7 +81,7 @@ export function initWebGLCanvas(canvasId, useMSAA, preserveDrawingBuffer, subscr
         var displayWidth  = Math.round(rect.width * dpi);
         var displayHeight = Math.round(rect.height * dpi);
 
-        // Make the size of canvas back buffers the corect size
+        // Make the size of canvas back buffers the correct size
         canvas.width = displayWidth;
         canvas.height = displayHeight;
 
@@ -318,9 +318,9 @@ async function loadImageBytesOldWay(canvasId, url) {
 
 // NOTE:
 // We cannot subscribe to mouse events in SetWebGLCanvas because this requires async method
-// because we need to call "await getAssemblyExports" (without awit the exports are empyt).
-// But if SetWebGLCanvas is async then it returns no result to .Net and we get an error that "resut is not a string".
-// Therefore we require two methods: SetWebGLCanvas and SubscribeBrowserEvents
+// because we need to call "await getAssemblyExports" (without await the exports are empty).
+// But if SetWebGLCanvas is async then it returns no result to .Net and we get an error that "result is not a string".
+// Therefore, we require two methods: SetWebGLCanvas and SubscribeBrowserEvents
 export function subscribeBrowserEvents(canvasId, subscribeMouseEvents, subscribeRequestAnimationFrame) {
     log("subscribeBrowserEvents canvasId:" + canvasId);
 
@@ -522,7 +522,7 @@ function onResize(entries) {
         if (displayWidth !== oldWidth || displayHeight !== oldHeight) {
             canvasToDisplaySizeMap.set(canvas, [displayWidth, displayHeight]);
 
-            // Make the size of canvas back buffers the corect size
+            // Make the size of canvas back buffers the correct size
             canvas.width = displayWidth;
             canvas.height = displayHeight;
 
