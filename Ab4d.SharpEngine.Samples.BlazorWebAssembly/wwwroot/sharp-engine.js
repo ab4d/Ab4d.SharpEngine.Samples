@@ -20,7 +20,7 @@ export async function initInteropAsync() {
     var config = dotnet.getConfig();
     var exports = await dotnet.getAssemblyExports(config.mainAssemblyName);
 
-    //IMORTANT:
+    //IMPORTANT:
     //If we change the namespace or class name of the Ab4d.SharpEngine.WebGL.CanvasInterop,
     //then we also need to change the following line:
     interop = exports.Ab4d.SharpEngine.WebGL.CanvasInterop;
